@@ -24,6 +24,14 @@ grade: stable
 confinement: strict
 compression: lzo
 
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+
 apps:
   desktop-scriptures:
     command: src/scriptures/ui/app.py

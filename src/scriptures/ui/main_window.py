@@ -608,6 +608,16 @@ class MainWindow(QMainWindow):
         book: Book,
         chapter_id: int,
     ) -> None:
+        # Flush before reading anything below, not just before _set_content
+        # tears the old view down (too late): the new ReadingView's own
+        # constructor reads notes/tags/highlights from the database, and
+        # would otherwise see stale data if this chapter (or a note
+        # attached to it) still has an unflushed debounced edit pending -
+        # most noticeably when re-navigating to the very chapter you're
+        # already on.
+        if self._current_reading_view is not None:
+            self._current_reading_view.flush_pending_save()
+
         chapter = get_chapter(self.conn, chapter_id)
         unit = "Section" if volume.slug == "doctrine-and-covenants" else "Chapter"
 

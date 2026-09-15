@@ -11,6 +11,12 @@ with The Church of Jesus Christ of Latter-day Saints. Scripture text
 courtesy of the [beandog/lds-scriptures](https://github.com/beandog/lds-scriptures)
 project.
 
+## Screenshots
+
+![Landing page with the Scripture of the Day banner](docs/screenshots/landing.png)
+
+![A chapter open with a highlight, chapter tags/note, and a verse note](docs/screenshots/chapter.png)
+
 ## Install
 
 Desktop Scriptures is published on the Snap Store:
