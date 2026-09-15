@@ -1,0 +1,30 @@
+name: 🧪 Snap Builds
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Build Snap
+        uses: snapcore/action-build@v1
+        id: build
+        with:
+          args: pack
+
+      - name: Snapcraft Review
+        uses: diddlesnaps/snapcraft-review-action@v1
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          isClassic: 'false'
