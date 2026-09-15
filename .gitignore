@@ -8,3 +8,6 @@ __pycache__/
 # network, and it's fully redundant with the already-committed
 # data/scriptures.db it gets imported into.
 data/raw/lds-scriptures.txt
+
+# Local snapcraft build output
+*.snap

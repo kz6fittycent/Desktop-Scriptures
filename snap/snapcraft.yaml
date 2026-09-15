@@ -16,7 +16,7 @@ issues: https://github.com/kz6fittycent/Desktop-Scriptures/issues
 source-code: https://github.com/kz6fittycent/Desktop-Scriptures
 icon: snap/gui/desktop-scriptures.png
 
-base: core26
+base: core24
 grade: stable
 confinement: strict
 compression: lzo
@@ -24,6 +24,8 @@ compression: lzo
 apps:
   desktop-scriptures:
     command: usr/bin/python3 $SNAP/src/scriptures/ui/app.py
+    extensions:
+      - gnome
     plugs:
       - desktop
       - desktop-legacy
@@ -32,27 +34,27 @@ apps:
       - home
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
-      PYTHONPATH: $SNAP/src
-      QT_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt6/plugins
-      QT_QPA_PLATFORM_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt6/plugins/platforms
-      XDG_DATA_DIRS: $SNAP/usr/share:$XDG_DATA_DIRS
+      PYTHONPATH: $SNAP/lib/python3.12/site-packages:$SNAP/src
 
 parts:
   desktop-scriptures:
     plugin: nil
     source: .
+    build-packages:
+      - python3-pip
     stage-packages:
       - python3
-      - python3-pyside6.qtcore
-      - python3-pyside6.qtgui
-      - python3-pyside6.qtwidgets
-      - qt6-qpa-plugins
-      - qt6-wayland
       - libsqlite3-0
       - fonts-noto-color-emoji
       - fonts-dejavu-core
     override-build: |
       craftctl default
+
+      mkdir -p "$CRAFT_PART_INSTALL/lib/python3.12/site-packages"
+      pip3 install \
+        --target="$CRAFT_PART_INSTALL/lib/python3.12/site-packages" \
+        --no-cache-dir \
+        -r "$CRAFT_PART_SRC/requirements.txt"
 
       mkdir -p "$CRAFT_PART_INSTALL/src"
       cp -r "$CRAFT_PART_SRC/src/scriptures" "$CRAFT_PART_INSTALL/src/scriptures"
