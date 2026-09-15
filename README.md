@@ -182,7 +182,7 @@ only the UI is missing.
 Desktop-Scriptures/
   data/
     volumes.json       # canonical volume/testament/book hierarchy (hand-maintained)
-    scriptures.db       # <- your imported database (see below), not committed
+    scriptures.db       # the imported database - committed, so the repo is buildable as-is
     raw/
       sample.txt        # small hand-built test fixture (20 verses, all volumes)
       lds-scriptures.txt  # <- YOU ADD THIS (see below), not committed
@@ -206,6 +206,11 @@ Desktop-Scriptures/
         export.py              # notes/search-results export to ~/Documents as .txt
   scripts/
     import_scriptures.py # parses the raw text file into the SQLite database
+  snap/
+    snapcraft.yaml        # core24, strict confinement, gnome extension
+    gui/
+      desktop-scriptures.desktop
+      desktop-scriptures.png
   tests/                 # (empty - next step)
   README.md
 ```

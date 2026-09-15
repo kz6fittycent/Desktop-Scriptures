@@ -3,3 +3,8 @@ __pycache__/
 *.pyo
 *.egg-info/
 .pytest_cache/
+
+# Local-only download per README - the app never fetches this over the
+# network, and it's fully redundant with the already-committed
+# data/scriptures.db it gets imported into.
+data/raw/lds-scriptures.txt
