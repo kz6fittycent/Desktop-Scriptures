@@ -23,7 +23,7 @@ compression: lzo
 
 apps:
   desktop-scriptures:
-    command: usr/bin/python3 $SNAP/src/scriptures/ui/app.py
+    command: usr/bin/python3.12 $SNAP/src/scriptures/ui/app.py
     extensions:
       - gnome
     plugs:
