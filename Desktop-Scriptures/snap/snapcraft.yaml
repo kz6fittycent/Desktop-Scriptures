@@ -1,0 +1,62 @@
+name: desktop-scriptures
+title: Desktop Scriptures
+summary: Read the LDS standard works offline, with notes, tags, and search
+description: |
+  A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
+  and Pearl of Great Price - fully offline, with personal notes, tags,
+  verse highlighting, keyword search, and a reading streak.
+
+  This is an unofficial application, not produced by or affiliated with
+  The Church of Jesus Christ of Latter-day Saints. Scripture text courtesy
+  of the beandog/lds-scriptures project.
+adopt-info: desktop-scriptures
+license: MIT
+contact: https://github.com/kz6fittycent/Desktop-Scriptures
+issues: https://github.com/kz6fittycent/Desktop-Scriptures/issues
+source-code: https://github.com/kz6fittycent/Desktop-Scriptures
+icon: snap/gui/desktop-scriptures.png
+
+base: core24
+grade: stable
+confinement: strict
+compression: lzo
+
+apps:
+  desktop-scriptures:
+    command: usr/bin/python3 $SNAP/src/scriptures/ui/app.py
+    extensions:
+      - gnome
+    plugs:
+      - home
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONPATH: $SNAP/src
+      QT_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt6/plugins
+      QT_QPA_PLATFORM_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt6/plugins/platforms
+
+parts:
+  desktop-scriptures:
+    plugin: nil
+    source: .
+    stage-packages:
+      - python3
+      - python3-pyside6.qtcore
+      - python3-pyside6.qtgui
+      - python3-pyside6.qtwidgets
+      - qt6-qpa-plugins
+      - qt6-wayland
+      - libsqlite3-0
+      - fonts-noto-color-emoji
+      - fonts-dejavu-core
+    override-build: |
+      craftctl default
+
+      mkdir -p "$CRAFT_PART_INSTALL/src"
+      cp -r "$CRAFT_PART_SRC/src/scriptures" "$CRAFT_PART_INSTALL/src/scriptures"
+      find "$CRAFT_PART_INSTALL/src" -name "__pycache__" -type d -exec rm -rf {} +
+
+      mkdir -p "$CRAFT_PART_INSTALL/data"
+      cp "$CRAFT_PART_SRC/data/scriptures.db" "$CRAFT_PART_INSTALL/data/scriptures.db"
+      cp "$CRAFT_PART_SRC/data/volumes.json" "$CRAFT_PART_INSTALL/data/volumes.json"
+
+      craftctl set version="$(grep -oP 'APP_VERSION = "\K[^"]+' "$CRAFT_PART_SRC/src/scriptures/ui/about_dialog.py")"

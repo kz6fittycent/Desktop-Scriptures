@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Desktop Scriptures
+Comment=Read the LDS standard works offline, with notes, tags, and search
+Exec=desktop-scriptures
+Icon=${SNAP}/meta/gui/desktop-scriptures.png
+Terminal=false
+Categories=Education;Literature;
+StartupNotify=true
