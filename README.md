@@ -1,5 +1,7 @@
 # Desktop-Scriptures
 
+[![desktop-scriptures](https://snapcraft.io/desktop-scriptures/badge.svg)](https://snapcraft.io/desktop-scriptures)
+
 A desktop reader for the LDS standard works (Bible, Book of Mormon,
 Doctrine and Covenants, Pearl of Great Price) with personal notes, tags,
 highlights, keyword search, and a reading streak. Fully offline. Built
