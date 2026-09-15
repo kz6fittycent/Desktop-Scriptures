@@ -16,7 +16,7 @@ issues: https://github.com/kz6fittycent/Desktop-Scriptures/issues
 source-code: https://github.com/kz6fittycent/Desktop-Scriptures
 icon: snap/gui/desktop-scriptures.png
 
-base: core24
+base: core26
 grade: stable
 confinement: strict
 compression: lzo
@@ -24,15 +24,18 @@ compression: lzo
 apps:
   desktop-scriptures:
     command: usr/bin/python3 $SNAP/src/scriptures/ui/app.py
-    extensions:
-      - gnome
     plugs:
+      - desktop
+      - desktop-legacy
+      - wayland
+      - x11
       - home
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONPATH: $SNAP/src
       QT_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt6/plugins
       QT_QPA_PLATFORM_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt6/plugins/platforms
+      XDG_DATA_DIRS: $SNAP/usr/share:$XDG_DATA_DIRS
 
 parts:
   desktop-scriptures:
