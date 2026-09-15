@@ -79,12 +79,32 @@ READING_PALETTES: dict[str, ReadingPalette] = {
     "day": ReadingPalette(
         background="#FFFFFF", text="#1A1A1A", verse_number="#3A5C8A", title_border="#CCCCCC"
     ),
+    # Matches the dark App Theme's surface/text/primary/border exactly
+    # (APP_PALETTES["dark"]) rather than its own separate near-black, so
+    # the reading card doesn't look darker than the chrome around it.
     "night": ReadingPalette(
-        background="#1B1B1B", text="#DCDCDC", verse_number="#7FA8D9", title_border="#3A3A3A"
+        background="#343436", text="#E8E8E8", verse_number="#8C9EFF", title_border="#48484A"
     ),
     "sepia": ReadingPalette(
         background="#F4ECD8", text="#3B2F1E", verse_number="#8B5E34", title_border="#D8C9A3"
     ),
+}
+
+
+@dataclass(frozen=True)
+class HighlightColor:
+    background: str
+    text: str
+
+
+# Highlighter marks always use a dark, fixed text color rather than the
+# active reading palette's - the backgrounds are light pastels by design
+# (like a real highlighter pen), so they'd be unreadable against night
+# scheme's light-on-dark verse text.
+HIGHLIGHT_COLORS: dict[str, HighlightColor] = {
+    "yellow": HighlightColor(background="#FFF176", text="#1A1A1A"),
+    "pink": HighlightColor(background="#F8BBD0", text="#1A1A1A"),
+    "orange": HighlightColor(background="#FFCC80", text="#1A1A1A"),
 }
 
 
@@ -122,17 +142,19 @@ APP_PALETTES: dict[str, AppPalette] = {
         card_text="#283593",
     ),
     "dark": AppPalette(
-        window_bg="#121212",
+        # A neutral dark gray rather than near-black - easier on the eyes
+        # for extended reading than the higher-contrast Material default.
+        window_bg="#2A2A2C",
         text="#E8E8E8",
-        surface="#1E1E1E",
-        border="#2C2C2E",
-        hover_bg="#2A2A2E",
-        muted="#9AA0A6",
+        surface="#343436",
+        border="#48484A",
+        hover_bg="#3C3C3E",
+        muted="#A3A3A8",
         primary="#8C9EFF",
         primary_hover="#536DFE",
-        card_bg="#262A45",
-        card_hover_bg="#323761",
-        card_text="#C5CAE9",
+        card_bg="#33375A",
+        card_hover_bg="#3F4570",
+        card_text="#C7CCEE",
     ),
 }
 
@@ -234,11 +256,32 @@ def app_stylesheet(theme: str) -> str:
             border: 1px solid {p.border};
             border-radius: {PANEL_RADIUS}px;
         }}
+        QLabel#sotdBanner {{
+            font-size: 14px;
+            padding: 12px 16px;
+            margin: 0px 8px 8px 8px;
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {PANEL_RADIUS}px;
+            color: {p.text};
+        }}
         QLabel#breadcrumbSep {{ color: {p.muted}; }}
         QLabel#breadcrumbCurrent {{ font-weight: bold; }}
         QLabel#breadcrumbLink {{
             color: {p.primary};
             text-decoration: underline;
+        }}
+        QFrame#sidePanelBox {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {PANEL_RADIUS}px;
+            padding: 10px;
+        }}
+        QLabel#panelSectionTitle {{
+            font-weight: bold;
+            font-size: 13px;
+            color: {p.muted};
+            background: transparent;
         }}
         QLabel#searchSectionHeader {{
             color: {p.muted};
@@ -278,6 +321,23 @@ def app_stylesheet(theme: str) -> str:
         QPushButton#zoomButton[annotated="true"] {{
             border: 1px solid {p.primary};
             color: {p.primary};
+        }}
+        QPushButton#navButton {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+            padding: 8px 18px;
+            margin: 8px;
+            font-weight: bold;
+        }}
+        QPushButton#navButton:hover {{
+            background-color: {p.card_bg};
+            color: {p.card_text};
+        }}
+        QPushButton#navButton:disabled {{
+            color: {p.muted};
+            border: 1px solid {p.border};
+            background-color: {p.window_bg};
         }}
         QPushButton#annotateButton {{
             background-color: transparent;

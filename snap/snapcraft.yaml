@@ -60,5 +60,6 @@ parts:
       mkdir -p "$CRAFT_PART_INSTALL/data"
       cp "$CRAFT_PART_SRC/data/scriptures.db" "$CRAFT_PART_INSTALL/data/scriptures.db"
       cp "$CRAFT_PART_SRC/data/volumes.json" "$CRAFT_PART_INSTALL/data/volumes.json"
+      cp "$CRAFT_PART_SRC/data/scripture_of_the_day_pool.json" "$CRAFT_PART_INSTALL/data/scripture_of_the_day_pool.json"
 
       craftctl set version="$(grep -oP 'APP_VERSION = "\K[^"]+' "$CRAFT_PART_SRC/src/scriptures/ui/about_dialog.py")"

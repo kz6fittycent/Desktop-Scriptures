@@ -132,14 +132,21 @@ CREATE TABLE IF NOT EXISTS tag_assignments (
 
 CREATE INDEX IF NOT EXISTS idx_tag_assignments_tag ON tag_assignments(tag_id);
 
--- Highlights: whole-verse for v1, one of three colors, persists indefinitely.
+-- Highlights: an arbitrary substring of a verse's text (start_offset,
+-- end_offset - a Python-slice-style [start, end) range into verses.text),
+-- one of three colors. A verse can have several non-overlapping highlighted
+-- ranges; db.py migrates forward any pre-range-based (whole-verse-only)
+-- highlights rows from before this range model existed.
 CREATE TABLE IF NOT EXISTS highlights (
-    id          INTEGER PRIMARY KEY,
-    verse_id    INTEGER NOT NULL REFERENCES verses(id),
-    color       TEXT NOT NULL CHECK (color IN ('yellow', 'pink', 'orange')),
-    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE (verse_id)   -- one highlight color per verse in v1
+    id            INTEGER PRIMARY KEY,
+    verse_id      INTEGER NOT NULL REFERENCES verses(id),
+    color         TEXT NOT NULL CHECK (color IN ('yellow', 'pink', 'orange')),
+    start_offset  INTEGER NOT NULL,
+    end_offset    INTEGER NOT NULL,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_highlights_verse ON highlights(verse_id);
 
 -- Reading streak: one row per calendar day the user opened any chapter.
 -- Opening counts regardless of how much was read (per product decision).

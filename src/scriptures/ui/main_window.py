@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import sqlite3
 from datetime import date
+from html import escape
 
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QAction, QActionGroup, QKeySequence
+from PySide6.QtCore import QSize, QTimer, Qt
+from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -28,6 +29,7 @@ from PySide6.QtWidgets import (
 
 from scriptures.data_access import (
     Book,
+    Chapter,
     Testament,
     Volume,
     get_book,
@@ -46,6 +48,7 @@ from scriptures.data_access import (
     record_reading,
     set_setting,
 )
+from scriptures.sotd import get_scripture_of_the_day
 from scriptures.ui.about_dialog import AboutDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
@@ -56,6 +59,11 @@ from scriptures.ui import theme as theming
 
 BOOK_OF_MORMON_SHARE_URL = "https://go.churchofjesuschrist.org/x/n1Ic"
 
+# How long a chapter has to stay open, uninterrupted, before it counts
+# toward the reading streak - long enough that clicking through chapters
+# (e.g. browsing to find a passage) doesn't rack up "reads" you didn't do.
+READING_STREAK_DWELL_MS = 5000
+
 
 class MainWindow(QMainWindow):
     def __init__(self, conn: sqlite3.Connection):
@@ -63,6 +71,21 @@ class MainWindow(QMainWindow):
         self.conn = conn
         self._path: list[dict] = []  # breadcrumb segments below the root
         self._current_reading_view: ReadingView | None = None
+        # Highlighter tool state - which color (or "clear") is armed, if
+        # any. Deliberately not persisted like the theme/font settings
+        # below: it's a transient tool selection, not a standing
+        # preference, so it always starts back at "Off" on launch.
+        self._armed_highlight: str | None = None
+
+        # Reading streak dwell gate: a chapter only counts as "read" once
+        # it's been open, uninterrupted, for READING_STREAK_DWELL_MS -
+        # _set_content() cancels this whenever the user navigates away
+        # first, chapter-to-chapter included.
+        self._streak_timer = QTimer(self)
+        self._streak_timer.setSingleShot(True)
+        self._streak_timer.setInterval(READING_STREAK_DWELL_MS)
+        self._streak_timer.timeout.connect(self._on_streak_dwell_elapsed)
+        self._pending_streak_chapter_id: int | None = None
 
         self._app_theme = get_setting(conn, "app_theme", "light")
         if self._app_theme not in theming.APP_THEMES:
@@ -133,7 +156,7 @@ class MainWindow(QMainWindow):
         focus_search.triggered.connect(self._focus_search_bar)
         self.addAction(focus_search)
 
-        # Menu order left-to-right: Menu, View, Help.
+        # Menu order left-to-right: Menu, View, Highlighter, Help.
         file_menu = self.menuBar().addMenu("&Menu")
 
         export_notes_action = QAction("Export Notes", self)
@@ -191,6 +214,35 @@ class MainWindow(QMainWindow):
         zoom_reset.triggered.connect(self._zoom_reset)
         menu.addAction(zoom_reset)
 
+        # Its own top-level menu, not a View submenu: it's a tool the user
+        # reaches for mid-read to quickly switch colors, not a one-time
+        # preference like the View menu's theme/font settings - burying it
+        # a level deep would cost an extra click every time.
+        highlight_menu = self.menuBar().addMenu("Hi&ghlighter")
+        highlight_group = QActionGroup(self)
+        highlight_group.setExclusive(True)
+
+        off_action = QAction("Off", self, checkable=True)
+        off_action.setChecked(True)
+        off_action.triggered.connect(lambda checked=False: self._set_highlight_mode(None))
+        highlight_group.addAction(off_action)
+        highlight_menu.addAction(off_action)
+
+        for color in ("yellow", "pink", "orange"):
+            action = QAction(color.capitalize(), self, checkable=True)
+            action.setIcon(self._swatch_icon(theming.HIGHLIGHT_COLORS[color].background))
+            action.triggered.connect(lambda checked=False, c=color: self._set_highlight_mode(c))
+            highlight_group.addAction(action)
+            highlight_menu.addAction(action)
+
+        highlight_menu.addSeparator()
+        clear_highlight_action = QAction("Clear Highlight", self, checkable=True)
+        clear_highlight_action.triggered.connect(
+            lambda checked=False: self._set_highlight_mode("clear")
+        )
+        highlight_group.addAction(clear_highlight_action)
+        highlight_menu.addAction(clear_highlight_action)
+
         help_menu = self.menuBar().addMenu("&Help")
         about_action = QAction("&About Desktop Scriptures", self)
         about_action.triggered.connect(self._show_about)
@@ -237,6 +289,14 @@ class MainWindow(QMainWindow):
 
     def _update_resume_button(self) -> None:
         self.resume_button.setVisible(get_last_read_chapter_id(self.conn) is not None)
+
+    def _on_streak_dwell_elapsed(self) -> None:
+        if self._pending_streak_chapter_id is None:
+            return
+        record_reading(self.conn, self._pending_streak_chapter_id, date.today().isoformat())
+        self._pending_streak_chapter_id = None
+        self._update_streak_display()
+        self._update_resume_button()
 
     def _show_about(self) -> None:
         AboutDialog(self).exec()
@@ -287,24 +347,53 @@ class MainWindow(QMainWindow):
                 palette, self._font_family, self._font_size
             )
 
+    @staticmethod
+    def _swatch_icon(hex_color: str) -> QIcon:
+        pixmap = QPixmap(QSize(14, 14))
+        pixmap.fill(QColor(hex_color))
+        return QIcon(pixmap)
+
+    def _set_highlight_mode(self, mode: str | None) -> None:
+        self._armed_highlight = mode
+        if self._current_reading_view is not None:
+            self._current_reading_view.set_armed_highlight(mode)
+
+    def closeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if self._current_reading_view is not None:
+            self._current_reading_view.flush_pending_save()
+        super().closeEvent(event)
+
     # ------------------------------------------------------------------
     # Content swapping / breadcrumb
     # ------------------------------------------------------------------
 
     def _set_content(self, widget: QWidget) -> None:
+        # Whatever was showing before is being navigated away from - if it
+        # was a chapter still mid-dwell (see READING_STREAK_DWELL_MS), that
+        # visit didn't last long enough to count.
+        self._streak_timer.stop()
+        self._pending_streak_chapter_id = None
+
         if widget is not self._current_reading_view:
             self._current_reading_view = None
         while self._content_layout.count():
             item = self._content_layout.takeAt(0)
             if item.widget():
+                old = item.widget()
+                # A ReadingView being replaced may have an unsaved,
+                # debounced chapter note - flush it now rather than losing
+                # whatever was typed in the last ~second before navigating.
+                flush = getattr(old, "flush_pending_save", None)
+                if flush is not None:
+                    flush()
                 # hide() first: see the matching comment in
                 # BreadcrumbBar.set_path() - deleteLater() alone defers the
                 # repaint that clears the old widget's region, which can
                 # leave stale pixels behind (very visible now that section
                 # titles are opaque rounded surfaces rather than a plain
                 # background with a thin border).
-                item.widget().hide()
-                item.widget().deleteLater()
+                old.hide()
+                old.deleteLater()
         self._content_layout.addWidget(widget)
 
     def _update_breadcrumb(self) -> None:
@@ -329,10 +418,24 @@ class MainWindow(QMainWindow):
         self._path = []
         self._update_breadcrumb()
         volumes = get_volumes(self.conn)
+
+        banner = None
+        sotd = get_scripture_of_the_day(self.conn)
+        if sotd is not None:
+            banner = QLabel(
+                "<b>Scripture of the Day:</b><br>"
+                f"{escape(sotd.text)} - {escape(sotd.reference)}"
+            )
+            banner.setTextFormat(Qt.TextFormat.RichText)
+            banner.setObjectName("sotdBanner")
+            banner.setWordWrap(True)
+            banner.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         grid = CardGridWidget(
             "Desktop Scriptures",
             [(v.id, v.name) for v in volumes],
             card_size=LANDING_CARD_SIZE,
+            banner=banner,
         )
         grid.card_clicked.connect(self._on_volume_clicked)
         self._set_content(grid)
@@ -451,6 +554,53 @@ class MainWindow(QMainWindow):
     # Level: chapter -> reading view
     # ------------------------------------------------------------------
 
+    def _adjacent_chapter(
+        self,
+        volume: Volume,
+        testament: Testament | None,
+        book: Book,
+        chapter: Chapter,
+        direction: int,
+    ) -> tuple[Testament | None, Book, Chapter] | None:
+        """The chapter one step before/after this one (direction -1/+1),
+        rolling into the next/previous book - and, within the Bible, across
+        the Old/New Testament boundary too - but never out of the current
+        volume. None at the very start/end of the volume.
+
+        Book sort_order is only meaningful within a single testament (e.g.
+        Matthew and Genesis are both sort_order 1, in different
+        testaments), so book lists are always re-fetched scoped to a
+        specific testament rather than compared by sort_order alone.
+        """
+        chapters = get_chapters(self.conn, book.id)
+        idx = next(i for i, c in enumerate(chapters) if c.id == chapter.id)
+        new_idx = idx + direction
+        if 0 <= new_idx < len(chapters):
+            return testament, book, chapters[new_idx]
+
+        book_list = get_books(self.conn, volume.id, testament.id if testament else None)
+        book_idx = next(i for i, b in enumerate(book_list) if b.id == book.id)
+        new_book_idx = book_idx + direction
+        if 0 <= new_book_idx < len(book_list):
+            new_book = book_list[new_book_idx]
+            new_chapters = get_chapters(self.conn, new_book.id)
+            new_chapter = new_chapters[0] if direction > 0 else new_chapters[-1]
+            return testament, new_book, new_chapter
+
+        if testament is not None:
+            testaments = get_testaments(self.conn, volume.id)
+            t_idx = next(i for i, t in enumerate(testaments) if t.id == testament.id)
+            new_t_idx = t_idx + direction
+            if 0 <= new_t_idx < len(testaments):
+                new_testament = testaments[new_t_idx]
+                new_books = get_books(self.conn, volume.id, new_testament.id)
+                new_book = new_books[0] if direction > 0 else new_books[-1]
+                new_chapters = get_chapters(self.conn, new_book.id)
+                new_chapter = new_chapters[0] if direction > 0 else new_chapters[-1]
+                return new_testament, new_book, new_chapter
+
+        return None
+
     def _on_chapter_clicked(
         self,
         volume: Volume,
@@ -489,16 +639,33 @@ class MainWindow(QMainWindow):
         verses = get_verses(self.conn, chapter_id)
         title = verses[0].reference.rsplit(":", 1)[0] if verses else book.name
         palette = theming.READING_PALETTES[self._reading_scheme]
+        prev_target = self._adjacent_chapter(volume, testament, book, chapter, -1)
+        next_target = self._adjacent_chapter(volume, testament, book, chapter, 1)
         view = ReadingView(
-            self.conn, chapter_id, title, verses, palette, self._font_family, self._font_size
+            self.conn,
+            chapter_id,
+            title,
+            verses,
+            palette,
+            self._font_family,
+            self._font_size,
+            has_previous=prev_target is not None,
+            has_next=next_target is not None,
+            armed_highlight=self._armed_highlight,
         )
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)
+        if prev_target is not None:
+            pt, pb, pc = prev_target
+            view.prev_requested.connect(lambda: self._on_chapter_clicked(volume, pt, pb, pc.id))
+        if next_target is not None:
+            nt, nb, nc = next_target
+            view.next_requested.connect(lambda: self._on_chapter_clicked(volume, nt, nb, nc.id))
         self._current_reading_view = view
         self._set_content(view)
 
-        # Reading streak: opening a chapter counts as "read" for today,
-        # regardless of how much is actually read (per product decision).
-        record_reading(self.conn, chapter_id, date.today().isoformat())
-        self._update_streak_display()
-        self._update_resume_button()
+        # Reading streak: only counts once this chapter has stayed open,
+        # uninterrupted, for READING_STREAK_DWELL_MS - see _set_content()
+        # (cancels this on navigating away) and _on_streak_dwell_elapsed().
+        self._pending_streak_chapter_id = chapter_id
+        self._streak_timer.start()

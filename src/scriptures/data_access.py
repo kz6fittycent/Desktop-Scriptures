@@ -63,6 +63,18 @@ class Tag:
 
 
 @dataclass(frozen=True)
+class Highlight:
+    """A highlighted substring of a verse: verse.text[start_offset:end_offset]
+    (a Python-slice-style [start, end) range), in one of three colors."""
+
+    id: int
+    verse_id: int
+    color: str
+    start_offset: int
+    end_offset: int
+
+
+@dataclass(frozen=True)
 class NoteResult:
     """A note-search hit: `reference` is the verse's reference, or a
     "Book chapter_number" label for a chapter-level note."""
@@ -170,6 +182,25 @@ def get_verses(conn: sqlite3.Connection, chapter_id: int) -> list[Verse]:
     ]
 
 
+def get_verse_by_reference(
+    conn: sqlite3.Connection, book_name: str, chapter_number: int, verse_number: int
+) -> Verse | None:
+    """Look up a verse by book name + chapter + verse number (e.g. for the
+    Scripture of the Day pool, which references verses this way rather
+    than by id). None if it doesn't resolve to an actual verse."""
+    r = conn.execute(
+        "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
+        "FROM verses v "
+        "JOIN chapters c ON c.id = v.chapter_id "
+        "JOIN books b ON b.id = c.book_id "
+        "WHERE b.name = ? AND c.chapter_number = ? AND v.verse_number = ?",
+        (book_name, chapter_number, verse_number),
+    ).fetchone()
+    if not r:
+        return None
+    return Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
+
+
 def get_chapter_location(
     conn: sqlite3.Connection, chapter_id: int
 ) -> tuple[Volume, Testament | None, Book, Chapter] | None:
@@ -211,6 +242,58 @@ def set_setting(conn: sqlite3.Connection, key: str, value: str) -> None:
         (key, value),
     )
     conn.commit()
+
+
+def get_highlights(conn: sqlite3.Connection, chapter_id: int) -> dict[int, list[Highlight]]:
+    """verse_id -> that verse's highlighted ranges (there can be more than
+    one per verse), for drawing highlight backgrounds without an N+1
+    query. Ordered by start_offset so callers can render them in text
+    order without re-sorting."""
+    rows = conn.execute(
+        "SELECT h.id, h.verse_id, h.color, h.start_offset, h.end_offset "
+        "FROM highlights h JOIN verses v ON v.id = h.verse_id "
+        "WHERE v.chapter_id = ? ORDER BY h.start_offset",
+        (chapter_id,),
+    ).fetchall()
+    by_verse: dict[int, list[Highlight]] = {}
+    for r in rows:
+        by_verse.setdefault(r["verse_id"], []).append(
+            Highlight(r["id"], r["verse_id"], r["color"], r["start_offset"], r["end_offset"])
+        )
+    return by_verse
+
+
+def add_highlight(
+    conn: sqlite3.Connection, verse_id: int, color: str, start_offset: int, end_offset: int
+) -> None:
+    """Highlight verse.text[start_offset:end_offset] in this color. Ranges
+    never overlap, so any existing range(s) intersecting this one are
+    removed first - the newest selection always wins over what it covers."""
+    _delete_overlapping(conn, verse_id, start_offset, end_offset)
+    conn.execute(
+        "INSERT INTO highlights (verse_id, color, start_offset, end_offset) VALUES (?, ?, ?, ?)",
+        (verse_id, color, start_offset, end_offset),
+    )
+    conn.commit()
+
+
+def clear_highlight_range(
+    conn: sqlite3.Connection, verse_id: int, start_offset: int, end_offset: int
+) -> None:
+    """Remove whatever highlight range(s) intersect
+    verse.text[start_offset:end_offset]."""
+    _delete_overlapping(conn, verse_id, start_offset, end_offset)
+    conn.commit()
+
+
+def _delete_overlapping(
+    conn: sqlite3.Connection, verse_id: int, start_offset: int, end_offset: int
+) -> None:
+    # Two [start, end) ranges overlap iff each starts before the other ends.
+    conn.execute(
+        "DELETE FROM highlights WHERE verse_id = ? AND start_offset < ? AND end_offset > ?",
+        (verse_id, end_offset, start_offset),
+    )
 
 
 def get_annotated_verse_ids(conn: sqlite3.Connection, chapter_id: int) -> set[int]:

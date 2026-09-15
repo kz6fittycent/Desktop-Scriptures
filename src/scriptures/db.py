@@ -26,9 +26,45 @@ def connect(db_path: Path) -> sqlite3.Connection:
 
 
 def _ensure_schema(conn: sqlite3.Connection) -> None:
+    _migrate_whole_verse_highlights(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
+    _backfill_migrated_highlights(conn)
     conn.commit()
+
+
+def _migrate_whole_verse_highlights(conn: sqlite3.Connection) -> None:
+    """An earlier highlights table (one row per verse, no start/end
+    offsets - the whole verse was "the" highlight) predates letting the
+    user drag-select just a word or phrase. `CREATE TABLE IF NOT EXISTS`
+    below won't add the new columns to an existing table, so a database
+    still on that shape needs its highlights table moved aside before the
+    real schema is (re)applied; `_backfill_migrated_highlights` then
+    copies its rows forward as full-verse ranges.
+    """
+    table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'highlights'"
+    ).fetchone()
+    if not table_exists:
+        return
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(highlights)")}
+    if "start_offset" in columns:
+        return
+    conn.execute("ALTER TABLE highlights RENAME TO highlights_pre_ranges")
+
+
+def _backfill_migrated_highlights(conn: sqlite3.Connection) -> None:
+    old_table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'highlights_pre_ranges'"
+    ).fetchone()
+    if not old_table_exists:
+        return
+    conn.execute(
+        "INSERT INTO highlights (verse_id, color, start_offset, end_offset, created_at) "
+        "SELECT old.verse_id, old.color, 0, LENGTH(v.text), old.created_at "
+        "FROM highlights_pre_ranges old JOIN verses v ON v.id = old.verse_id"
+    )
+    conn.execute("DROP TABLE highlights_pre_ranges")
 
 
 def fts5_available(conn: sqlite3.Connection) -> bool:

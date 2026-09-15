@@ -8,7 +8,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QLabel, QVBoxLayout, QWidget
 
-APP_VERSION = "1.0"
+APP_VERSION = "1.1"
 BEANDOG_REPO_URL = "https://github.com/beandog/lds-scriptures"
 CHURCH_SCRIPTURES_URL = "https://www.churchofjesuschrist.org/study/scriptures"
 

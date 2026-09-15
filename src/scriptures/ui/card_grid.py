@@ -198,6 +198,7 @@ class CardGridWidget(QWidget):
         items: list[tuple[object, str]],
         parent: QWidget | None = None,
         card_size: int = CARD_SIZE,
+        banner: QWidget | None = None,
     ):
         super().__init__(parent)
 
@@ -207,6 +208,13 @@ class CardGridWidget(QWidget):
         title_label.setObjectName("sectionTitle")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         outer.addWidget(title_label)
+
+        # Optional extra widget between the title and the card grid - e.g.
+        # the landing page's Scripture of the Day banner. Not used by most
+        # callers, hence just a plain optional slot rather than a title
+        # feature of its own.
+        if banner is not None:
+            outer.addWidget(banner)
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
