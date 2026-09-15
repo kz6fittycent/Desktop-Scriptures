@@ -23,7 +23,7 @@ compression: lzo
 
 apps:
   desktop-scriptures:
-    command: usr/bin/python3.12 $SNAP/src/scriptures/ui/app.py
+    command: src/scriptures/ui/app.py
     extensions:
       - gnome
     plugs:
@@ -38,27 +38,21 @@ apps:
 
 parts:
   desktop-scriptures:
-    plugin: nil
+    plugin: python
     source: .
-    build-packages:
-      - python3-pip
+    python-requirements:
+      - requirements.txt
     stage-packages:
-      - python3
       - libsqlite3-0
       - fonts-noto-color-emoji
       - fonts-dejavu-core
     override-build: |
       craftctl default
 
-      mkdir -p "$CRAFT_PART_INSTALL/lib/python3.12/site-packages"
-      pip3 install \
-        --target="$CRAFT_PART_INSTALL/lib/python3.12/site-packages" \
-        --no-cache-dir \
-        -r "$CRAFT_PART_SRC/requirements.txt"
-
       mkdir -p "$CRAFT_PART_INSTALL/src"
       cp -r "$CRAFT_PART_SRC/src/scriptures" "$CRAFT_PART_INSTALL/src/scriptures"
       find "$CRAFT_PART_INSTALL/src" -name "__pycache__" -type d -exec rm -rf {} +
+      chmod +x "$CRAFT_PART_INSTALL/src/scriptures/ui/app.py"
 
       mkdir -p "$CRAFT_PART_INSTALL/data"
       cp "$CRAFT_PART_SRC/data/scriptures.db" "$CRAFT_PART_INSTALL/data/scriptures.db"
