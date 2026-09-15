@@ -9,12 +9,15 @@ description: |
   This is an unofficial application, not produced by or affiliated with
   The Church of Jesus Christ of Latter-day Saints. Scripture text courtesy
   of the beandog/lds-scriptures project.
+  
 adopt-info: desktop-scriptures
 license: MIT
 contact: https://github.com/kz6fittycent/Desktop-Scriptures
 issues: https://github.com/kz6fittycent/Desktop-Scriptures/issues
 source-code: https://github.com/kz6fittycent/Desktop-Scriptures
 icon: snap/gui/desktop-scriptures.png
+website: https://github.com/kz6fittycent/Desktop-Scriptures
+donation: https://www.patreon.com/kz6fittycent
 
 base: core24
 grade: stable
