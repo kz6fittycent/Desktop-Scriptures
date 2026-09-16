@@ -76,6 +76,12 @@ class MainWindow(QMainWindow):
         # below: it's a transient tool selection, not a standing
         # preference, so it always starts back at "Off" on launch.
         self._armed_highlight: str | None = None
+        # Which tab (Study/Citations) of the reading view's side panel is
+        # selected. Each chapter navigation rebuilds ReadingView (and its
+        # QTabWidget) from scratch, so without this the tab would silently
+        # reset to "Study" every time - tracked here and threaded back in
+        # via selected_side_tab so it survives Previous/Next navigation.
+        self._side_tab_index = 0
 
         # Reading streak dwell gate: a chapter only counts as "read" once
         # it's been open, uninterrupted, for READING_STREAK_DWELL_MS -
@@ -346,6 +352,9 @@ class MainWindow(QMainWindow):
             self._current_reading_view.apply_theme(
                 palette, self._font_family, self._font_size
             )
+
+    def _on_side_tab_changed(self, index: int) -> None:
+        self._side_tab_index = index
 
     @staticmethod
     def _swatch_icon(hex_color: str) -> QIcon:
@@ -662,9 +671,11 @@ class MainWindow(QMainWindow):
             has_previous=prev_target is not None,
             has_next=next_target is not None,
             armed_highlight=self._armed_highlight,
+            selected_side_tab=self._side_tab_index,
         )
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)
+        view.side_tab_changed.connect(self._on_side_tab_changed)
         if prev_target is not None:
             pt, pb, pc = prev_target
             view.prev_requested.connect(lambda: self._on_chapter_clicked(volume, pt, pb, pc.id))

@@ -6,10 +6,15 @@ app-theme (light/dark chrome) lives in theme.py's app-wide stylesheet
 instead, since it applies to every screen, not just this one.
 
 Each verse has a small pencil button; clicking it reveals (creating if
-needed) that verse's note/tags entry in the persistent ChapterPanel docked
-to the right, and focuses it there - the panel is the single editing
-surface for every note and tag in this chapter, verse-level and
-chapter-level alike.
+needed) that verse's note/tags entry in the "Study" tab of the tabbed
+panel docked to the right, and focuses it there - that tab (ChapterPanel)
+is the single editing surface for every note and tag in this chapter,
+verse-level and chapter-level alike. The other tab, "Citations", shows
+which of this chapter's verses are cited in General Conference talks
+(pilot-scoped - see scriptures/citations.py) - selecting which tab is
+current is tracked by MainWindow and threaded back in via
+selected_side_tab, so it survives Previous/Next chapter navigation even
+though each navigation rebuilds this whole view from scratch.
 
 Highlighting is armed from the Highlighter menu (see main_window.py) rather
 than anything on this screen. Each verse's body is a read-only QTextEdit
@@ -33,12 +38,12 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
+    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
-from scriptures.citations import Citation, get_citations
 from scriptures.data_access import (
     Highlight,
     Verse,
@@ -49,12 +54,11 @@ from scriptures.data_access import (
     get_note,
     get_tags,
 )
-from scriptures.ui.chapter_panel import ChapterPanel
-from scriptures.ui.citations_dialog import CitationsDialog
+from scriptures.ui.chapter_panel import PANEL_WIDTH, ChapterPanel
+from scriptures.ui.citations_panel import CitationsPanel
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
 
 VERSE_NUMBER_WIDTH = 32
-CITATION_BADGE_WIDTH = 32
 
 
 class _VerseTextEdit(QTextEdit):
@@ -148,6 +152,7 @@ class ReadingView(QWidget):
     zoom_out_requested = Signal()
     prev_requested = Signal()
     next_requested = Signal()
+    side_tab_changed = Signal(int)
 
     def __init__(
         self,
@@ -162,6 +167,7 @@ class ReadingView(QWidget):
         has_previous: bool = False,
         has_next: bool = False,
         armed_highlight: str | None = None,
+        selected_side_tab: int = 0,
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
@@ -209,8 +215,6 @@ class ReadingView(QWidget):
         self._number_labels: dict[int, QLabel] = {}
         self._body_widgets: dict[int, _VerseTextEdit] = {}
         self._annotate_buttons: dict[int, QPushButton] = {}
-        self._citation_buttons: dict[int, QPushButton] = {}
-        self._citations: dict[int, list[Citation]] = {}
         for verse in verses:
             row = QHBoxLayout()
             row.setSpacing(10)
@@ -230,33 +234,6 @@ class ReadingView(QWidget):
             number_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
             row.addWidget(number_label, 0)
             self._number_labels[verse.id] = number_label
-
-            # Always in the layout, at a fixed width, even for the (vast
-            # majority of) verses outside the pilot's 100-verse pool that
-            # have no citation data - so the body column's start x-position
-            # stays identical across every verse in the chapter regardless
-            # of which ones happen to show a badge, the same reasoning as
-            # VERSE_NUMBER_WIDTH above. Left with no text/border/click, a
-            # badge with no citations is invisible.
-            citations = get_citations(verse.reference)
-            self._citations[verse.id] = citations
-            citation_btn = QPushButton(str(len(citations)) if citations else "")
-            citation_btn.setObjectName("citationBadge")
-            citation_btn.setFixedSize(CITATION_BADGE_WIDTH, 28)
-            citation_btn.setProperty("hasCitations", bool(citations))
-            if citations:
-                citation_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-                citation_btn.setToolTip(
-                    f"Cited in {len(citations)} General Conference "
-                    f"talk{'s' if len(citations) != 1 else ''} - click to view"
-                )
-                citation_btn.clicked.connect(
-                    lambda checked=False, v=verse: self._open_citations(v)
-                )
-            else:
-                citation_btn.setEnabled(False)
-            row.addWidget(citation_btn, 0, Qt.AlignmentFlag.AlignTop)
-            self._citation_buttons[verse.id] = citation_btn
 
             body = _VerseTextEdit()
             body.range_selected.connect(
@@ -292,7 +269,17 @@ class ReadingView(QWidget):
 
         self._panel = ChapterPanel(conn, chapter_id, verses, annotated_ids)
         self._panel.verse_annotation_changed.connect(self._refresh_verse_indicator)
-        outer.addWidget(self._panel)
+
+        self._side_tabs = QTabWidget()
+        self._side_tabs.setFixedWidth(PANEL_WIDTH)
+        self._side_tabs.addTab(self._panel, "Study")
+
+        citations_panel = CitationsPanel(verses)
+        self._side_tabs.addTab(citations_panel, self._citations_tab_label(citations_panel))
+
+        self._side_tabs.setCurrentIndex(selected_side_tab)
+        self._side_tabs.currentChanged.connect(self.side_tab_changed)
+        outer.addWidget(self._side_tabs)
 
         self.apply_theme(palette, font_family, font_size)
 
@@ -352,12 +339,10 @@ class ReadingView(QWidget):
     def _open_verse_note(self, verse: Verse) -> None:
         self._panel.focus_verse(verse)
 
-    def _open_citations(self, verse: Verse) -> None:
-        citations = self._citations.get(verse.id, [])
-        if not citations:
-            return
-        dialog = CitationsDialog(verse.reference, citations, parent=self)
-        dialog.exec()
+    @staticmethod
+    def _citations_tab_label(citations_panel: CitationsPanel) -> str:
+        count = citations_panel.cited_verse_count
+        return f"Citations ({count})" if count else "Citations"
 
     def _on_range_selected(self, verse: Verse, start: int, end: int) -> None:
         # Selection is otherwise left alone here - with no highlighter
