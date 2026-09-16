@@ -68,6 +68,7 @@ class _VerseTextEdit(QTextEdit):
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
+        self.setObjectName("verseBody")
         self.setReadOnly(True)
         self.setFrameStyle(QFrame.Shape.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -312,7 +313,6 @@ class ReadingView(QWidget):
         )
 
         body = self._body_widgets[verse.id]
-        body.setStyleSheet("background: transparent; border: none;")
         body.render_text(
             verse.text, self._font, self._palette.text, self._verse_highlights.get(verse.id, [])
         )

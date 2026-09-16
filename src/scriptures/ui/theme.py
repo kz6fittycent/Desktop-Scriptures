@@ -389,6 +389,17 @@ def app_stylesheet(theme: str) -> str:
         QLineEdit#headerSearchBar:focus {{
             border: 1px solid {p.primary};
         }}
+        /* Overrides the generic QTextEdit padding/border above - without
+        this, the 6px padding pushes each verse's body text down inside
+        its row while the verse-number QLabel (not a QLineEdit/QTextEdit,
+        so untouched by that rule) stays flush at the top, misaligning
+        the two vertically. Colors are still applied per-character in
+        reading_view.py via QTextCharFormat, not here. */
+        QTextEdit#verseBody {{
+            background: transparent;
+            border: none;
+            padding: 0px;
+        }}
         QDialog QPushButton {{
             background-color: {p.surface};
             border: 1px solid {p.border};
