@@ -69,5 +69,6 @@ parts:
       cp "$CRAFT_PART_SRC/data/scriptures.db" "$CRAFT_PART_INSTALL/data/scriptures.db"
       cp "$CRAFT_PART_SRC/data/volumes.json" "$CRAFT_PART_INSTALL/data/volumes.json"
       cp "$CRAFT_PART_SRC/data/scripture_of_the_day_pool.json" "$CRAFT_PART_INSTALL/data/scripture_of_the_day_pool.json"
+      cp "$CRAFT_PART_SRC/data/verse_citations.json" "$CRAFT_PART_INSTALL/data/verse_citations.json"
 
-      craftctl set version="$(grep -oP 'APP_VERSION = "\K[^"]+' "$CRAFT_PART_SRC/src/scriptures/ui/about_dialog.py")"
+      craftctl set version="$(grep -oP '__version__ = "\K[^"]+' "$CRAFT_PART_SRC/src/scriptures/__init__.py")"

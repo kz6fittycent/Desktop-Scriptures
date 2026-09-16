@@ -13,8 +13,16 @@ import sqlite3
 from datetime import date
 from html import escape
 
-from PySide6.QtCore import QSize, QTimer, Qt
-from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
+from PySide6.QtCore import QSize, QTimer, QUrl, Qt
+from PySide6.QtGui import (
+    QAction,
+    QActionGroup,
+    QColor,
+    QDesktopServices,
+    QIcon,
+    QKeySequence,
+    QPixmap,
+)
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -27,6 +35,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from scriptures import __version__
 from scriptures.data_access import (
     Book,
     Chapter,
@@ -49,7 +58,6 @@ from scriptures.data_access import (
     set_setting,
 )
 from scriptures.sotd import get_scripture_of_the_day
-from scriptures.ui.about_dialog import AboutDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.export import export_notes
@@ -58,6 +66,9 @@ from scriptures.ui.search_view import SearchView
 from scriptures.ui import theme as theming
 
 BOOK_OF_MORMON_SHARE_URL = "https://go.churchofjesuschrist.org/x/n1Ic"
+BEANDOG_REPO_URL = "https://github.com/beandog/lds-scriptures"
+BYU_CITATION_INDEX_URL = "https://scriptures.byu.edu"
+CHURCH_SCRIPTURES_URL = "https://www.churchofjesuschrist.org/study/scriptures"
 
 # How long a chapter has to stay open, uninterrupted, before it counts
 # toward the reading streak - long enough that clicking through chapters
@@ -249,10 +260,54 @@ class MainWindow(QMainWindow):
         highlight_group.addAction(clear_highlight_action)
         highlight_menu.addAction(clear_highlight_action)
 
+        # No "About" dialog - the dropdown itself carries the same
+        # verbiage a popup would have (version, the unofficial-app
+        # disclaimer required by the project's own stated policy, and
+        # credits). Each line is a disabled (unclickable) label except the
+        # three credit/link lines, which open the relevant page in the
+        # browser via QDesktopServices, same mechanism as any other
+        # external link in the app.
         help_menu = self.menuBar().addMenu("&Help")
-        about_action = QAction("&About Desktop Scriptures", self)
-        about_action.triggered.connect(self._show_about)
-        help_menu.addAction(about_action)
+
+        version_action = QAction(f"Desktop Scriptures — version {__version__}", self)
+        version_action.setEnabled(False)
+        help_menu.addAction(version_action)
+
+        help_menu.addSeparator()
+
+        disclaimer_action = QAction(
+            "This is an unofficial application, not produced by or "
+            "affiliated with The Church of Jesus Christ of Latter-day Saints.",
+            self,
+        )
+        disclaimer_action.setEnabled(False)
+        help_menu.addAction(disclaimer_action)
+
+        help_menu.addSeparator()
+
+        beandog_action = QAction(
+            "Special thanks to Beandog for the scripture text this app is built on.", self
+        )
+        beandog_action.triggered.connect(
+            lambda: QDesktopServices.openUrl(QUrl(BEANDOG_REPO_URL))
+        )
+        help_menu.addAction(beandog_action)
+
+        byu_action = QAction(
+            "Special thanks to BYU's Scripture Citation Index for General "
+            "Conference citation data.",
+            self,
+        )
+        byu_action.triggered.connect(
+            lambda: QDesktopServices.openUrl(QUrl(BYU_CITATION_INDEX_URL))
+        )
+        help_menu.addAction(byu_action)
+
+        church_action = QAction("Read the scriptures officially at churchofjesuschrist.org", self)
+        church_action.triggered.connect(
+            lambda: QDesktopServices.openUrl(QUrl(CHURCH_SCRIPTURES_URL))
+        )
+        help_menu.addAction(church_action)
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
@@ -303,9 +358,6 @@ class MainWindow(QMainWindow):
         self._pending_streak_chapter_id = None
         self._update_streak_display()
         self._update_resume_button()
-
-    def _show_about(self) -> None:
-        AboutDialog(self).exec()
 
     def _share_book_of_mormon(self) -> None:
         box = QMessageBox(self)
