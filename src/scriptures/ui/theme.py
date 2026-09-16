@@ -356,6 +356,29 @@ def app_stylesheet(theme: str) -> str:
             color: {p.primary};
             border: 1px solid {p.primary};
         }}
+        /* Base rule (and :disabled) is fully invisible - reading_view.py
+        always creates one per verse, at a fixed width, so the verse text
+        column stays aligned whether or not a given verse has citation
+        data; [hasCitations="true"] is the only variant that actually
+        looks like anything. */
+        QPushButton#citationBadge, QPushButton#citationBadge:disabled {{
+            background-color: transparent;
+            border: none;
+            color: transparent;
+            font-size: 11px;
+            font-weight: bold;
+        }}
+        QPushButton#citationBadge[hasCitations="true"] {{
+            background-color: {p.card_bg};
+            border: 1px solid {p.primary};
+            border-radius: 14px;
+            color: {p.primary};
+        }}
+        QPushButton#citationBadge[hasCitations="true"]:hover {{
+            background-color: {p.primary};
+            color: #FFFFFF;
+            border: 1px solid {p.primary};
+        }}
         QWidget#tagChip {{
             background-color: {p.card_bg};
             border-radius: 12px;

@@ -38,6 +38,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from scriptures.citations import Citation, get_citations
 from scriptures.data_access import (
     Highlight,
     Verse,
@@ -49,9 +50,11 @@ from scriptures.data_access import (
     get_tags,
 )
 from scriptures.ui.chapter_panel import ChapterPanel
+from scriptures.ui.citations_dialog import CitationsDialog
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
 
 VERSE_NUMBER_WIDTH = 32
+CITATION_BADGE_WIDTH = 32
 
 
 class _VerseTextEdit(QTextEdit):
@@ -206,6 +209,8 @@ class ReadingView(QWidget):
         self._number_labels: dict[int, QLabel] = {}
         self._body_widgets: dict[int, _VerseTextEdit] = {}
         self._annotate_buttons: dict[int, QPushButton] = {}
+        self._citation_buttons: dict[int, QPushButton] = {}
+        self._citations: dict[int, list[Citation]] = {}
         for verse in verses:
             row = QHBoxLayout()
             row.setSpacing(10)
@@ -225,6 +230,33 @@ class ReadingView(QWidget):
             number_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
             row.addWidget(number_label, 0)
             self._number_labels[verse.id] = number_label
+
+            # Always in the layout, at a fixed width, even for the (vast
+            # majority of) verses outside the pilot's 100-verse pool that
+            # have no citation data - so the body column's start x-position
+            # stays identical across every verse in the chapter regardless
+            # of which ones happen to show a badge, the same reasoning as
+            # VERSE_NUMBER_WIDTH above. Left with no text/border/click, a
+            # badge with no citations is invisible.
+            citations = get_citations(verse.reference)
+            self._citations[verse.id] = citations
+            citation_btn = QPushButton(str(len(citations)) if citations else "")
+            citation_btn.setObjectName("citationBadge")
+            citation_btn.setFixedSize(CITATION_BADGE_WIDTH, 28)
+            citation_btn.setProperty("hasCitations", bool(citations))
+            if citations:
+                citation_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+                citation_btn.setToolTip(
+                    f"Cited in {len(citations)} General Conference "
+                    f"talk{'s' if len(citations) != 1 else ''} - click to view"
+                )
+                citation_btn.clicked.connect(
+                    lambda checked=False, v=verse: self._open_citations(v)
+                )
+            else:
+                citation_btn.setEnabled(False)
+            row.addWidget(citation_btn, 0, Qt.AlignmentFlag.AlignTop)
+            self._citation_buttons[verse.id] = citation_btn
 
             body = _VerseTextEdit()
             body.range_selected.connect(
@@ -319,6 +351,13 @@ class ReadingView(QWidget):
 
     def _open_verse_note(self, verse: Verse) -> None:
         self._panel.focus_verse(verse)
+
+    def _open_citations(self, verse: Verse) -> None:
+        citations = self._citations.get(verse.id, [])
+        if not citations:
+            return
+        dialog = CitationsDialog(verse.reference, citations, parent=self)
+        dialog.exec()
 
     def _on_range_selected(self, verse: Verse, start: int, end: int) -> None:
         # Selection is otherwise left alone here - with no highlighter
