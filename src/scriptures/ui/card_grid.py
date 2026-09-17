@@ -13,7 +13,7 @@ leave the squares stretched into rectangles.
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QFontMetrics
 from PySide6.QtWidgets import (
     QFrame,
     QGraphicsDropShadowEffect,
@@ -132,6 +132,37 @@ class FlowLayout(QLayout):
         return total_height + top + bottom
 
 
+def _wrap_lines(text: str, metrics: QFontMetrics, width: int) -> list[str]:
+    """Greedy word-wrap simulation - same technique QLabel's own wrapping
+    uses - so the resulting line count matches what word-wrap would
+    actually produce at this width."""
+    words = text.split()
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        candidate = f"{current} {word}".strip()
+        if current and metrics.horizontalAdvance(candidate) > width:
+            lines.append(current)
+            current = word
+        else:
+            current = candidate
+    if current:
+        lines.append(current)
+    return lines
+
+
+def _elide_label_text(text: str, metrics: QFontMetrics, width: int, max_lines: int) -> str:
+    """`text`, word-wrapped to at most `max_lines` lines at `width` - if it
+    would need more than that, the last visible line ends in an ellipsis
+    instead of the overflow being clipped off by the card's fixed height."""
+    lines = _wrap_lines(text, metrics, width)
+    if len(lines) <= max_lines:
+        return text
+    visible = lines[:max_lines]
+    visible[-1] = metrics.elidedText(visible[-1], Qt.TextElideMode.ElideRight, width)
+    return "\n".join(visible)
+
+
 class Card(QFrame):
     """A single clickable, fixed-size square card. Emits `clicked` with the
     item_id it represents. Colors/radius come from the app-wide stylesheet
@@ -155,11 +186,41 @@ class Card(QFrame):
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
+        margin = 12
         layout = QVBoxLayout(self)
-        text = QLabel(label)
+        layout.setContentsMargins(margin, margin, margin, margin)
+        text = QLabel()
         text.setWordWrap(True)
         text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(text)
+
+        # The QSS cascade (QFrame#card QLabel { font-size: 14px;
+        # font-weight: bold; }) hasn't necessarily been applied yet at
+        # construction time, so measuring against the label's plain
+        # default font here would under-measure how much text actually
+        # fits. Matching that font explicitly keeps the two in sync
+        # regardless of when the stylesheet actually gets polished onto
+        # the widget.
+        card_font = text.font()
+        card_font.setPixelSize(14)
+        card_font.setBold(True)
+        text.setFont(card_font)
+
+        # Cards are a fixed size regardless of label length (uniform grid,
+        # matching every other level's card - a Journal of Discourses
+        # "Speaker - Title" label can be far longer than "Chapter 12").
+        # A label too long to fit is elided to however many lines actually
+        # fit, ellipsis on the last one, with the full text as a tooltip -
+        # the standard fixed-size-tile-with-long-name pattern (file
+        # manager icons, browser tabs), rather than shrinking the font
+        # (illegible at the size some of these titles would need) or a
+        # popup (a tooltip already *is* that, for free).
+        content_width = size - 2 * margin
+        metrics = QFontMetrics(card_font)
+        max_lines = max(1, (size - 2 * margin) // metrics.lineSpacing())
+        text.setText(_elide_label_text(label, metrics, content_width, max_lines))
+        if metrics.horizontalAdvance(label) > content_width or "\n" in label:
+            self.setToolTip(label)
 
         self._shadow = QGraphicsDropShadowEffect(self)
         self._shadow.setBlurRadius(14)

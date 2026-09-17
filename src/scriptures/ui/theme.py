@@ -256,6 +256,12 @@ def app_stylesheet(theme: str) -> str:
             border: 1px solid {p.border};
             border-radius: {PANEL_RADIUS}px;
         }}
+        QLabel#readingSubtitle {{
+            font-size: 13px;
+            font-style: italic;
+            color: {p.muted};
+            margin: -4px 8px 8px 8px;
+        }}
         QLabel#sotdBanner {{
             font-size: 14px;
             padding: 12px 16px;

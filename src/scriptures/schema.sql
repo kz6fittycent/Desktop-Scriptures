@@ -37,12 +37,19 @@ CREATE TABLE IF NOT EXISTS books (
 );
 
 -- For D&C, a "chapter" row represents a Section (or an Official Declaration).
--- The UI layer decides whether to label this "Chapter" or "Section" based on
--- the parent book/volume - the schema doesn't need to know.
+-- For Journal of Discourses, it represents one discourse (sermon) - title/
+-- speaker/discourse_date identify it instead of chapter_number alone, which
+-- is just its sequential position within the volume there. The UI layer
+-- decides how to label a chapter based on the parent book/volume; the
+-- schema doesn't need to know. All three columns stay NULL for ordinary
+-- scripture chapters.
 CREATE TABLE IF NOT EXISTS chapters (
     id              INTEGER PRIMARY KEY,
     book_id         INTEGER NOT NULL REFERENCES books(id),
     chapter_number  INTEGER NOT NULL,
+    title           TEXT,             -- JoD discourse title, e.g. "Salvation"
+    speaker         TEXT,             -- JoD discourse speaker, e.g. "Brigham Young"
+    discourse_date  TEXT,             -- JoD discourse date, ISO (full or "YYYY-MM")
     UNIQUE (book_id, chapter_number)
 );
 

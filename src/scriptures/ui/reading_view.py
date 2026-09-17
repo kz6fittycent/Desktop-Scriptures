@@ -168,6 +168,7 @@ class ReadingView(QWidget):
         has_next: bool = False,
         armed_highlight: str | None = None,
         selected_side_tab: int = 0,
+        subtitle: str | None = None,
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
@@ -202,6 +203,16 @@ class ReadingView(QWidget):
 
         reading_column.addLayout(header)
 
+        # Only Journal of Discourses chapters pass a subtitle - who gave
+        # it and when matters for a sermon in a way it doesn't for
+        # scripture, where the title (e.g. "Genesis 1") is self-contained.
+        if subtitle:
+            subtitle_label = QLabel(subtitle)
+            subtitle_label.setObjectName("readingSubtitle")
+            subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            subtitle_label.setWordWrap(True)
+            reading_column.addWidget(subtitle_label)
+
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
         self._scroll.viewport().setObjectName("readingViewport")
@@ -212,6 +223,12 @@ class ReadingView(QWidget):
         self._content_layout.setSpacing(10)
 
         annotated_ids = get_annotated_verse_ids(conn, chapter_id)
+        # A chapter with exactly one verse - every Journal of Discourses
+        # discourse, imported as one continuous page of prose rather than
+        # numbered statements - has nothing for a verse number to
+        # disambiguate, so it's left off entirely instead of showing a
+        # lone, meaningless "1" next to a whole page of text.
+        show_numbers = len(verses) > 1
         self._number_labels: dict[int, QLabel] = {}
         self._body_widgets: dict[int, _VerseTextEdit] = {}
         self._annotate_buttons: dict[int, QPushButton] = {}
@@ -229,11 +246,12 @@ class ReadingView(QWidget):
             row.addWidget(annotate_btn, 0, Qt.AlignmentFlag.AlignTop)
             self._annotate_buttons[verse.id] = annotate_btn
 
-            number_label = QLabel(str(verse.verse_number))
-            number_label.setFixedWidth(VERSE_NUMBER_WIDTH)
-            number_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
-            row.addWidget(number_label, 0)
-            self._number_labels[verse.id] = number_label
+            if show_numbers:
+                number_label = QLabel(str(verse.verse_number))
+                number_label.setFixedWidth(VERSE_NUMBER_WIDTH)
+                number_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+                row.addWidget(number_label, 0)
+                self._number_labels[verse.id] = number_label
 
             body = _VerseTextEdit()
             body.range_selected.connect(
@@ -325,11 +343,12 @@ class ReadingView(QWidget):
         )
 
     def _render_verse(self, verse: Verse) -> None:
-        number_label = self._number_labels[verse.id]
-        number_label.setFont(self._font)
-        number_label.setStyleSheet(
-            f"color: {self._palette.verse_number}; font-weight: bold; background: transparent;"
-        )
+        number_label = self._number_labels.get(verse.id)
+        if number_label is not None:
+            number_label.setFont(self._font)
+            number_label.setStyleSheet(
+                f"color: {self._palette.verse_number}; font-weight: bold; background: transparent;"
+            )
 
         body = self._body_widgets[verse.id]
         body.render_text(

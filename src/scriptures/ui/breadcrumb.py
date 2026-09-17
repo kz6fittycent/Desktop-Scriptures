@@ -8,7 +8,16 @@ earlier level in one click instead of repeatedly going back.
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QWidget
+
+# A scripture chapter's breadcrumb label ("Genesis 1") never comes close to
+# this; a Journal of Discourses discourse's ("Speaker - Title", the title
+# sometimes 100+ characters of real 1850s sermon title) routinely would -
+# without a cap, an un-wrapped, un-elided QLabel's minimumSizeHint is its
+# full unwrapped text width, which becomes the whole window's minimum
+# width, making it wider than the screen and unable to shrink back down.
+MAX_SEGMENT_WIDTH = 280
 
 
 class _LinkLabel(QLabel):
@@ -69,10 +78,22 @@ class BreadcrumbBar(QWidget):
 
             is_last = i == len(labels) - 1
             if is_last:
-                current = QLabel(label)
+                current = QLabel()
                 current.setObjectName("breadcrumbCurrent")
+                self._set_elided_text(current, label, bold=True)
                 self._layout.addWidget(current)
             else:
-                link = _LinkLabel(label)
+                link = _LinkLabel("")
+                self._set_elided_text(link, label, bold=False)
                 link.clicked.connect(lambda idx=i: self.segment_clicked.emit(idx))
                 self._layout.addWidget(link)
+
+    @staticmethod
+    def _set_elided_text(label: QLabel, text: str, *, bold: bool) -> None:
+        font = label.font()
+        font.setBold(bold)
+        label.setFont(font)
+        elided = QFontMetrics(font).elidedText(text, Qt.TextElideMode.ElideRight, MAX_SEGMENT_WIDTH)
+        label.setText(elided)
+        if elided != text:
+            label.setToolTip(text)

@@ -36,6 +36,9 @@ class Book:
 class Chapter:
     id: int
     chapter_number: int
+    title: str | None = None
+    speaker: str | None = None
+    discourse_date: str | None = None
 
 
 @dataclass(frozen=True)
@@ -156,18 +159,22 @@ def get_book(conn: sqlite3.Connection, book_id: int) -> Book:
 
 def get_chapters(conn: sqlite3.Connection, book_id: int) -> list[Chapter]:
     rows = conn.execute(
-        "SELECT id, chapter_number FROM chapters "
+        "SELECT id, chapter_number, title, speaker, discourse_date FROM chapters "
         "WHERE book_id = ? ORDER BY chapter_number",
         (book_id,),
     ).fetchall()
-    return [Chapter(r["id"], r["chapter_number"]) for r in rows]
+    return [
+        Chapter(r["id"], r["chapter_number"], r["title"], r["speaker"], r["discourse_date"])
+        for r in rows
+    ]
 
 
 def get_chapter(conn: sqlite3.Connection, chapter_id: int) -> Chapter:
     r = conn.execute(
-        "SELECT id, chapter_number FROM chapters WHERE id = ?", (chapter_id,)
+        "SELECT id, chapter_number, title, speaker, discourse_date FROM chapters WHERE id = ?",
+        (chapter_id,),
     ).fetchone()
-    return Chapter(r["id"], r["chapter_number"])
+    return Chapter(r["id"], r["chapter_number"], r["title"], r["speaker"], r["discourse_date"])
 
 
 def get_verses(conn: sqlite3.Connection, chapter_id: int) -> list[Verse]:

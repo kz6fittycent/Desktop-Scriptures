@@ -27,6 +27,7 @@ def connect(db_path: Path) -> sqlite3.Connection:
 
 def _ensure_schema(conn: sqlite3.Connection) -> None:
     _migrate_whole_verse_highlights(conn)
+    _migrate_add_chapter_metadata_columns(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
@@ -65,6 +66,28 @@ def _backfill_migrated_highlights(conn: sqlite3.Connection) -> None:
         "FROM highlights_pre_ranges old JOIN verses v ON v.id = old.verse_id"
     )
     conn.execute("DROP TABLE highlights_pre_ranges")
+
+
+def _migrate_add_chapter_metadata_columns(conn: sqlite3.Connection) -> None:
+    """`CREATE TABLE IF NOT EXISTS` below won't add columns to a chapters
+    table that already exists from before the Journal of Discourses
+    import needed title/speaker/discourse_date - add them here if
+    missing. Safe on a fresh database too: PRAGMA table_info on a
+    not-yet-created table just returns no rows, so the "already there"
+    check below is skipped rather than erroring, and schema.sql then
+    creates the table with these columns already included.
+    """
+    table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'chapters'"
+    ).fetchone()
+    if not table_exists:
+        return
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(chapters)")}
+    if "title" in columns:
+        return
+    conn.execute("ALTER TABLE chapters ADD COLUMN title TEXT")
+    conn.execute("ALTER TABLE chapters ADD COLUMN speaker TEXT")
+    conn.execute("ALTER TABLE chapters ADD COLUMN discourse_date TEXT")
 
 
 def fts5_available(conn: sqlite3.Connection) -> bool:

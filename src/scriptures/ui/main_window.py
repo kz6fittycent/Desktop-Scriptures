@@ -13,16 +13,8 @@ import sqlite3
 from datetime import date
 from html import escape
 
-from PySide6.QtCore import QSize, QTimer, QUrl, Qt
-from PySide6.QtGui import (
-    QAction,
-    QActionGroup,
-    QColor,
-    QDesktopServices,
-    QIcon,
-    QKeySequence,
-    QPixmap,
-)
+from PySide6.QtCore import QSize, QTimer, Qt
+from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -33,6 +25,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QWidgetAction,
 )
 
 from scriptures import __version__
@@ -69,6 +62,11 @@ BOOK_OF_MORMON_SHARE_URL = "https://go.churchofjesuschrist.org/x/n1Ic"
 BEANDOG_REPO_URL = "https://github.com/beandog/lds-scriptures"
 BYU_CITATION_INDEX_URL = "https://scriptures.byu.edu"
 CHURCH_SCRIPTURES_URL = "https://www.churchofjesuschrist.org/study/scriptures"
+
+# Caps how wide the Help menu's word-wrapped labels (see _help_menu_label)
+# can get, so the dropdown stays comfortably narrower than the window
+# instead of growing to fit its longest line.
+HELP_MENU_TEXT_WIDTH = 280
 
 # How long a chapter has to stay open, uninterrupted, before it counts
 # toward the reading streak - long enough that clicking through chapters
@@ -263,51 +261,43 @@ class MainWindow(QMainWindow):
         # No "About" dialog - the dropdown itself carries the same
         # verbiage a popup would have (version, the unofficial-app
         # disclaimer required by the project's own stated policy, and
-        # credits). Each line is a disabled (unclickable) label except the
-        # three credit/link lines, which open the relevant page in the
-        # browser via QDesktopServices, same mechanism as any other
-        # external link in the app.
+        # credits). Plain QAction text doesn't word-wrap (menu width just
+        # grows to fit the longest line, which overflowed past the
+        # window edge here), so each line is a QWidgetAction hosting a
+        # word-wrapped, width-capped QLabel instead - QMenu supports that
+        # fine, unlike QMenuBar itself (see the comment below on the
+        # corner-widget workaround for that).
         help_menu = self.menuBar().addMenu("&Help")
 
-        version_action = QAction(f"Desktop Scriptures — version {__version__}", self)
-        version_action.setEnabled(False)
-        help_menu.addAction(version_action)
-
+        help_menu.addAction(
+            self._help_menu_label(f"Desktop Scriptures — version {__version__}")
+        )
         help_menu.addSeparator()
-
-        disclaimer_action = QAction(
-            "This is an unofficial application, not produced by or "
-            "affiliated with The Church of Jesus Christ of Latter-day Saints.",
-            self,
+        help_menu.addAction(
+            self._help_menu_label(
+                "This is an unofficial application, not produced by or "
+                "affiliated with The Church of Jesus Christ of Latter-day Saints."
+            )
         )
-        disclaimer_action.setEnabled(False)
-        help_menu.addAction(disclaimer_action)
-
         help_menu.addSeparator()
-
-        beandog_action = QAction(
-            "Special thanks to Beandog for the scripture text this app is built on.", self
+        help_menu.addAction(
+            self._help_menu_label(
+                f'Special thanks to <a href="{BEANDOG_REPO_URL}">Beandog</a> for '
+                "the scripture text this app is built on."
+            )
         )
-        beandog_action.triggered.connect(
-            lambda: QDesktopServices.openUrl(QUrl(BEANDOG_REPO_URL))
+        help_menu.addAction(
+            self._help_menu_label(
+                f'Special thanks to <a href="{BYU_CITATION_INDEX_URL}">BYU\'s '
+                "Scripture Citation Index</a> for General Conference citation data."
+            )
         )
-        help_menu.addAction(beandog_action)
-
-        byu_action = QAction(
-            "Special thanks to BYU's Scripture Citation Index for General "
-            "Conference citation data.",
-            self,
+        help_menu.addAction(
+            self._help_menu_label(
+                "Read the scriptures officially at "
+                f'<a href="{CHURCH_SCRIPTURES_URL}">churchofjesuschrist.org</a>.'
+            )
         )
-        byu_action.triggered.connect(
-            lambda: QDesktopServices.openUrl(QUrl(BYU_CITATION_INDEX_URL))
-        )
-        help_menu.addAction(byu_action)
-
-        church_action = QAction("Read the scriptures officially at churchofjesuschrist.org", self)
-        church_action.triggered.connect(
-            lambda: QDesktopServices.openUrl(QUrl(CHURCH_SCRIPTURES_URL))
-        )
-        help_menu.addAction(church_action)
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
@@ -409,10 +399,63 @@ class MainWindow(QMainWindow):
         self._side_tab_index = index
 
     @staticmethod
+    def _chapter_label(volume: Volume, chapter: Chapter) -> str:
+        """Card/breadcrumb label for one chapter - "Section N" for D&C,
+        "Speaker - Title" for a Journal of Discourses discourse (its
+        chapter_number is just a sequential position, not something a
+        reader would recognize the way a section number is), "Preface"/
+        "Lecture N" for Lectures on Faith (chapter_number 0 is the
+        preface, which precedes "Lecture First" in the original and
+        isn't itself a lecture), "Chapter N" otherwise."""
+        if volume.slug == "journal-of-discourses" and chapter.speaker:
+            return f"{chapter.speaker} - {chapter.title}"
+        if volume.slug == "lectures-on-faith":
+            return "Preface" if chapter.chapter_number == 0 else f"Lecture {chapter.chapter_number}"
+        unit = "Section" if volume.slug == "doctrine-and-covenants" else "Chapter"
+        return f"{unit} {chapter.chapter_number}"
+
+    @staticmethod
+    def _chapter_subtitle(chapter: Chapter) -> str | None:
+        """Speaker/title/date line for the reading view header - only
+        Journal of Discourses chapters have this context to show."""
+        if not chapter.speaker:
+            return None
+        date_label = MainWindow._format_discourse_date(chapter.discourse_date)
+        by_line = f"{chapter.speaker}, {date_label}" if date_label else chapter.speaker
+        return f"{chapter.title} — {by_line}"
+
+    @staticmethod
+    def _format_discourse_date(iso_date: str | None) -> str | None:
+        if not iso_date:
+            return None
+        try:
+            if len(iso_date) == 7:  # "YYYY-MM" - day unknown
+                return date.fromisoformat(iso_date + "-01").strftime("%B %Y")
+            return date.fromisoformat(iso_date).strftime("%B %-d, %Y")
+        except ValueError:
+            return iso_date
+
+    @staticmethod
     def _swatch_icon(hex_color: str) -> QIcon:
         pixmap = QPixmap(QSize(14, 14))
         pixmap.fill(QColor(hex_color))
         return QIcon(pixmap)
+
+    def _help_menu_label(self, html: str) -> QWidgetAction:
+        """One line of the Help menu, as a word-wrapped QLabel hosted in a
+        QWidgetAction rather than a plain QAction - see the comment where
+        the Help menu is built for why. Any <a href> in `html` is left
+        clickable (opens in the browser) via setOpenExternalLinks; a line
+        with no link is just inert text, same as a disabled QAction."""
+        label = QLabel(html)
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setOpenExternalLinks(True)
+        label.setWordWrap(True)
+        label.setMaximumWidth(HELP_MENU_TEXT_WIDTH)
+        label.setContentsMargins(12, 4, 12, 4)
+        action = QWidgetAction(self)
+        action.setDefaultWidget(label)
+        return action
 
     def _set_highlight_mode(self, mode: str | None) -> None:
         self._armed_highlight = mode
@@ -603,8 +646,7 @@ class MainWindow(QMainWindow):
         self._update_breadcrumb()
 
         chapters = get_chapters(self.conn, book_id)
-        unit = "Section" if volume.slug == "doctrine-and-covenants" else "Chapter"
-        items = [(c.id, f"{unit} {c.chapter_number}") for c in chapters]
+        items = [(c.id, self._chapter_label(volume, c)) for c in chapters]
         grid = CardGridWidget(book.name, items)
         grid.card_clicked.connect(
             lambda cid: self._on_chapter_clicked(volume, testament, book, cid)
@@ -680,7 +722,6 @@ class MainWindow(QMainWindow):
             self._current_reading_view.flush_pending_save()
 
         chapter = get_chapter(self.conn, chapter_id)
-        unit = "Section" if volume.slug == "doctrine-and-covenants" else "Chapter"
 
         path = [{"label": volume.name, "action": lambda: self._on_volume_clicked(volume.id)}]
         if testament:
@@ -698,7 +739,7 @@ class MainWindow(QMainWindow):
         )
         path.append(
             {
-                "label": f"{unit} {chapter.chapter_number}",
+                "label": self._chapter_label(volume, chapter),
                 "action": lambda: self._on_chapter_clicked(
                     volume, testament, book, chapter_id
                 ),
@@ -724,6 +765,7 @@ class MainWindow(QMainWindow):
             has_next=next_target is not None,
             armed_highlight=self._armed_highlight,
             selected_side_tab=self._side_tab_index,
+            subtitle=self._chapter_subtitle(chapter),
         )
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)
