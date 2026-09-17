@@ -3,8 +3,8 @@ name: 🚀 Promote to Stable
 # Fires on any issue comment; the `if:` below narrows it down to a
 # "/promote ..." comment, from someone with write access, on an actual
 # issue (not a PR) - the "Parse revisions" step does the real, exact
-# match against "/promote <revision>[,<revision>...] stable" and fails
-# loudly if the comment doesn't match that. The real gate is the
+# match against "/promote <revision>[,<revision>...] stable [done]" and
+# fails loudly if the comment doesn't match that. The real gate is the
 # `environment:` on the job itself though - matching those conditions
 # only lets the run start and sit waiting for manual approval, it
 # doesn't release anything by itself.
@@ -41,16 +41,21 @@ jobs:
         run: |
           # call-for-testing.yml writes the exact command (with the real
           # revision already filled in) into the issue - this only
-          # accepts an exact "/promote <revision>[,<revision>...] stable"
-          # match, one or more comma-separated revision numbers, so a
-          # copy-pasted command from that issue always works and
-          # anything else fails loudly instead of silently doing nothing.
-          revisions="$(grep -oP '^/promote \K[0-9]+(,[0-9]+)*(?= stable$)' <<< "$COMMENT_BODY")"
-          if [[ -z "$revisions" ]]; then
-            echo "Comment didn't match '/promote <revision>[,<revision>...] stable' exactly: '$COMMENT_BODY'"
+          # accepts an exact "/promote <revision>[,<revision>...] stable
+          # [done]" match, so a copy-pasted command from that issue
+          # always works and anything else fails loudly instead of
+          # silently doing nothing. Bash's own regex match (not grep) so
+          # the optional trailing "done" can be captured as a separate
+          # group alongside the revision list in one pass.
+          if [[ "$COMMENT_BODY" =~ ^/promote\ ([0-9]+(,[0-9]+)*)\ stable(\ done)?$ ]]; then
+            revisions="${BASH_REMATCH[1]}"
+            close_issue="${BASH_REMATCH[3]:+true}"
+          else
+            echo "Comment didn't match '/promote <revision>[,<revision>...] stable [done]' exactly: '$COMMENT_BODY'"
             exit 1
           fi
           echo "revisions=${revisions}" >> "$GITHUB_OUTPUT"
+          echo "close-issue=${close_issue:-false}" >> "$GITHUB_OUTPUT"
 
       - name: Install snapcraft
         run: sudo snap install snapcraft --classic
@@ -65,7 +70,7 @@ jobs:
             snapcraft release "${SNAP_NAME}" "$rev" stable
           done
 
-      - name: Comment and close the issue
+      - name: Comment on the issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -74,4 +79,10 @@ jobs:
           gh issue comment "${ISSUE_NUMBER}" \
             --repo "${{ github.repository }}" \
             --body "Revision(s) \`${REVISIONS}\` have been released to \`latest/stable\`. 🎉"
-          gh issue close "${ISSUE_NUMBER}" --repo "${{ github.repository }}"
+
+      - name: Close the issue
+        if: steps.parse.outputs.close-issue == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue close "${ISSUE_NUMBER}" --repo "${{ github.repository }}"

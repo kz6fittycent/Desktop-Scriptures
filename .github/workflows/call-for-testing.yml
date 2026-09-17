@@ -91,25 +91,24 @@ jobs:
           VERSION: ${{ needs.publish-candidate.outputs.version }}
           REVISION: ${{ needs.publish-candidate.outputs.revision }}
         run: |
-          # The exact "/promote <revision> stable" command is what
-          # promote-to-stable.yml parses back out of the triggering
-          # comment (not this issue body) - keep the command shown here
-          # in sync with the pattern it matches if this changes.
+          # The "/promote <revision>[,<revision>...] stable [done]" syntax
+          # here is what promote-to-stable.yml parses back out of the
+          # triggering comment (not this issue body) - keep it in sync
+          # with the pattern that workflow matches if this changes.
+          #
+          # Deliberately "stable", not "latest/stable" like snapcrafters'
+          # own call-for-testing issues use: a `snapcraft export-login`
+          # macaroon's channel grant is the bare risk levels, and the
+          # track-qualified form gets rejected with
+          # invalid-channel-permission (hit this for real with this exact
+          # store credential - see the "Upload to the candidate channel"
+          # step above).
           body=$(cat <<EOF
           A new candidate build of Desktop Scriptures is ready for testing.
 
           **Version:** ${VERSION}
           **Revision:** ${REVISION}
           **Channel:** \`latest/candidate\`
-
-          > [!TIP]
-          > **Ready to ship it?** Comment exactly this on this issue - the exact revision to promote is already filled in:
-          >
-          > \`\`\`
-          > /promote ${REVISION} stable
-          > \`\`\`
-          >
-          > That queues \`promote-to-stable.yml\`, which then waits for your manual approval in GitHub's UI (the \`promote-stable\` environment) before it actually runs \`snapcraft release\`.
 
           ## How to test
 
@@ -123,7 +122,26 @@ jobs:
 
           2. Launch it and try it out.
           3. Automated screenshots from a clean VM will be added to this issue shortly, as a sanity check that the build actually launches.
-          4. Once you're satisfied this revision is good, comment \`/promote ${REVISION} stable\` (see above) to release it.
+
+          ## How to release it
+
+          Once you're satisfied this revision is good, promote it to stable by commenting:
+
+          \`\`\`
+          /promote <revision>[,<revision>...] stable [done]
+          \`\`\`
+
+          - \`<revision>\` - the revision number(s) to release (comma-separated for more than one)
+          - \`stable\` - required as shown; this command only ever promotes to \`stable\`
+          - \`done\` (optional) - also closes this issue once released; leave it off to release and keep the issue open for further testing
+
+          For this revision, that's:
+
+          \`\`\`
+          /promote ${REVISION} stable done
+          \`\`\`
+
+          That queues \`promote-to-stable.yml\`, which then waits for your manual approval in GitHub's UI (the \`promote-stable\` environment) before it actually runs \`snapcraft release\`.
 
           ---
           _Opened automatically after a successful build on \`main\`._
@@ -231,6 +249,6 @@ jobs:
 
           ---
 
-          Looks good? Comment \`/promote ${REVISION} stable\` on this issue to release it to \`latest/stable\` (requires your manual approval in GitHub's UI).
+          Looks good? Comment \`/promote ${REVISION} stable done\` on this issue to release it to \`latest/stable\` and close this issue (drop \`done\` to release without closing). Requires your manual approval in GitHub's UI.
           EOF
           )"
