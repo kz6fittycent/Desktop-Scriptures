@@ -29,3 +29,14 @@ Desktop Scriptures is published on the Snap Store:
 ```
 sudo snap install desktop-scriptures
 ```
+
+## TODO
+
+Features under consideration for future versions:
+
+- [ ] Complete reading history
+- [ ] AI integration to help provide full context of chapter/verse/doctrine based on Conference talks, Discourses, etc.
+- [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
+- [ ] Amount of time spent in scriptures (hours/minutes)
+- [ ] Apocrypha?
+- [ ] Wiki
