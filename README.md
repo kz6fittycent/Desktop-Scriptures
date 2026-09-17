@@ -40,3 +40,4 @@ Features under consideration for future versions:
 - [ ] Amount of time spent in scriptures (hours/minutes)
 - [ ] Apocrypha?
 - [ ] Wiki
+- [ ] JST
