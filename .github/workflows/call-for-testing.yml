@@ -1,0 +1,216 @@
+name: 📣 Call for Testing
+
+# Chained off "🧪 Snap Builds" via workflow_run (rather than its own
+# push: trigger) so this only fires once that workflow has actually
+# passed on main - a PR build/review succeeding doesn't publish
+# anything, and a push to main that FAILS review shouldn't get a
+# candidate release or a testing issue either.
+on:
+  workflow_run:
+    workflows: ["🧪 Snap Builds"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  SNAP_NAME: desktop-scriptures
+
+jobs:
+  # Rebuilds from scratch rather than reusing an artifact from the
+  # triggering run, since snap-builds.yml (deliberately left untouched)
+  # doesn't publish one - same commit though, checked out via head_sha.
+  publish-candidate:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      revision: ${{ steps.upload.outputs.revision }}
+    steps:
+      - name: Checkout the built commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Determine the app version
+        id: version
+        run: |
+          version="$(grep -oP '__version__ = "\K[^"]+' src/scriptures/__init__.py)"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Snap
+        uses: snapcore/action-build@v1
+        id: build
+        with:
+          args: pack
+
+      - name: Upload to the candidate channel
+        id: upload
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          output="$(snapcraft upload "${{ steps.build.outputs.snap }}" --release=latest/candidate)"
+          echo "$output"
+
+          revision="$(grep -Po 'Revision \K[0-9]+' <<< "$output")"
+          if [[ -z "$revision" ]]; then
+            echo "Could not parse a revision number out of 'snapcraft upload' output."
+            exit 1
+          fi
+          echo "revision=${revision}" >> "$GITHUB_OUTPUT"
+
+  open-issue:
+    needs: publish-candidate
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    outputs:
+      issue-number: ${{ steps.create.outputs.issue-number }}
+    steps:
+      - name: Ensure the call-for-testing label exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create "call-for-testing" \
+            --repo "${{ github.repository }}" \
+            --color "FBCA04" \
+            --description "Automated candidate build ready for testing" \
+            2>/dev/null || true
+
+      - name: Create the call for testing issue
+        id: create
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.publish-candidate.outputs.version }}
+          REVISION: ${{ needs.publish-candidate.outputs.revision }}
+        run: |
+          # The "**Revision:** N" line is machine-parsed back out of the
+          # issue body by promote-to-stable.yml - keep its exact format
+          # in sync with the grep pattern there if this changes.
+          body=$(cat <<EOF
+          A new candidate build of Desktop Scriptures is ready for testing.
+
+          **Version:** ${VERSION}
+          **Revision:** ${REVISION}
+          **Channel:** \`latest/candidate\`
+
+          ## How to test
+
+          1. Install or refresh to this build:
+
+             \`\`\`
+             sudo snap install ${SNAP_NAME} --channel latest/candidate
+             # or, if already installed:
+             sudo snap refresh ${SNAP_NAME} --channel latest/candidate
+             \`\`\`
+
+          2. Launch it and try it out.
+          3. Automated screenshots from a clean VM will be added to this issue shortly, as a sanity check that the build actually launches.
+          4. Once you're satisfied this revision is good, comment \`/promote stable\` on this issue to release it - that step requires manual approval in GitHub's UI before it actually runs.
+
+          ---
+          _Opened automatically after a successful build on \`main\`._
+          EOF
+          )
+
+          url=$(gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "Call for testing: v${VERSION} (revision ${REVISION})" \
+            --label "call-for-testing" \
+            --body "$body")
+          echo "issue-number=$(basename "$url")" >> "$GITHUB_OUTPUT"
+
+  screenshots:
+    needs: [publish-candidate, open-issue]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM access for the runner
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup LXD
+        uses: canonical/setup-lxd@v0.1.1
+
+      - name: Install ghvmctl
+        run: |
+          sudo snap install ghvmctl
+          sudo snap connect ghvmctl:lxd lxd:lxd
+
+      - name: Launch a desktop VM and install the candidate snap
+        env:
+          REVISION: ${{ needs.publish-candidate.outputs.revision }}
+        run: |
+          ghvmctl prepare
+
+          # NOT `ghvmctl snap-install`: that subcommand unconditionally
+          # appends `--classic`, which the Snap Store rejects for our
+          # strict-confinement snap. `exec` + a plain `snap install`
+          # sidesteps that.
+          ghvmctl exec "sudo snap install ${SNAP_NAME} --revision ${REVISION}"
+
+          ghvmctl snap-run "${SNAP_NAME}"
+
+          # gnome-screenshot can succeed against the bare desktop before
+          # the app has actually mapped a window, so it can't be used as
+          # a readiness signal - a fixed grace period stands in instead.
+          sleep 60
+
+      - name: Capture screenshots
+        run: |
+          ghvmctl screenshot-full
+          ghvmctl screenshot-window
+
+      - name: Publish screenshots to the screenshots branch
+        id: publish
+        env:
+          REVISION: ${{ needs.publish-candidate.outputs.revision }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin screenshots >/dev/null 2>&1; then
+            git fetch origin screenshots
+            git checkout -B screenshots origin/screenshots
+          else
+            git checkout --orphan screenshots
+            git rm -rf --quiet .
+          fi
+
+          dest="revision-${REVISION}"
+          mkdir -p "$dest"
+          cp -L ~/ghvmctl-screenshots/screenshot-screen.png "$dest/screen.png"
+          cp -L ~/ghvmctl-screenshots/screenshot-window.png "$dest/window.png"
+
+          git add "$dest"
+          git commit -m "Add screenshots for revision ${REVISION}"
+          git push origin screenshots
+
+          echo "dest=${dest}" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on the call for testing issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ needs.open-issue.outputs.issue-number }}
+          REVISION: ${{ needs.publish-candidate.outputs.revision }}
+          DEST: ${{ steps.publish.outputs.dest }}
+        run: |
+          base="https://raw.githubusercontent.com/${{ github.repository }}/screenshots/${DEST}"
+          gh issue comment "${ISSUE_NUMBER}" \
+            --repo "${{ github.repository }}" \
+            --body "$(cat <<EOF
+          Automated screenshots from revision ${REVISION}, installed fresh in a clean Ubuntu desktop VM:
+
+          ![Full screen](${base}/screen.png)
+
+          ![App window](${base}/window.png)
+          EOF
+          )"

@@ -1,0 +1,65 @@
+name: 🚀 Promote to Stable
+
+# Fires on any issue comment; the `if:` below narrows it down to an
+# exact "/promote stable" comment, from someone with write access, on
+# an actual issue (not a PR). The real gate is the `environment:` on
+# the job itself - matching those conditions only lets the run start
+# and sit waiting for manual approval, it doesn't release anything by
+# itself.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+env:
+  SNAP_NAME: desktop-scriptures
+
+jobs:
+  promote:
+    if: >
+      github.event.issue.pull_request == null &&
+      github.event.comment.body == '/promote stable' &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    environment: promote-stable
+    steps:
+      - name: Acknowledge the command
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content='+1' --silent
+
+      - name: Parse the candidate revision out of the issue body
+        id: revision
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          # Matches the "**Revision:** N" line written by call-for-testing.yml
+          revision="$(grep -oP '\*\*Revision:\*\* \K[0-9]+' <<< "$ISSUE_BODY" | head -n1)"
+          if [[ -z "$revision" ]]; then
+            echo "Could not find a '**Revision:** N' line in this issue's body."
+            exit 1
+          fi
+          echo "revision=${revision}" >> "$GITHUB_OUTPUT"
+
+      - name: Install snapcraft
+        run: sudo snap install snapcraft --classic
+
+      - name: Release to stable
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: snapcraft release "${SNAP_NAME}" "${{ steps.revision.outputs.revision }}" stable
+
+      - name: Comment and close the issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REVISION: ${{ steps.revision.outputs.revision }}
+        run: |
+          gh issue comment "${ISSUE_NUMBER}" \
+            --repo "${{ github.repository }}" \
+            --body "Revision ${REVISION} has been released to \`latest/stable\`. 🎉"
+          gh issue close "${ISSUE_NUMBER}" --repo "${{ github.repository }}"
