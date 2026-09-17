@@ -1,11 +1,13 @@
 name: 🚀 Promote to Stable
 
-# Fires on any issue comment; the `if:` below narrows it down to an
-# exact "/promote stable" comment, from someone with write access, on
-# an actual issue (not a PR). The real gate is the `environment:` on
-# the job itself - matching those conditions only lets the run start
-# and sit waiting for manual approval, it doesn't release anything by
-# itself.
+# Fires on any issue comment; the `if:` below narrows it down to a
+# "/promote ..." comment, from someone with write access, on an actual
+# issue (not a PR) - the "Parse revisions" step does the real, exact
+# match against "/promote <revision>[,<revision>...] stable" and fails
+# loudly if the comment doesn't match that. The real gate is the
+# `environment:` on the job itself though - matching those conditions
+# only lets the run start and sit waiting for manual approval, it
+# doesn't release anything by itself.
 on:
   issue_comment:
     types: [created]
@@ -20,7 +22,7 @@ jobs:
   promote:
     if: >
       github.event.issue.pull_request == null &&
-      github.event.comment.body == '/promote stable' &&
+      startsWith(github.event.comment.body, '/promote ') &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
     environment: promote-stable
@@ -32,18 +34,23 @@ jobs:
           gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
             -f content='+1' --silent
 
-      - name: Parse the candidate revision out of the issue body
-        id: revision
+      - name: Parse revisions out of the comment
+        id: parse
         env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
-          # Matches the "**Revision:** N" line written by call-for-testing.yml
-          revision="$(grep -oP '\*\*Revision:\*\* \K[0-9]+' <<< "$ISSUE_BODY" | head -n1)"
-          if [[ -z "$revision" ]]; then
-            echo "Could not find a '**Revision:** N' line in this issue's body."
+          # call-for-testing.yml writes the exact command (with the real
+          # revision already filled in) into the issue - this only
+          # accepts an exact "/promote <revision>[,<revision>...] stable"
+          # match, one or more comma-separated revision numbers, so a
+          # copy-pasted command from that issue always works and
+          # anything else fails loudly instead of silently doing nothing.
+          revisions="$(grep -oP '^/promote \K[0-9]+(,[0-9]+)*(?= stable$)' <<< "$COMMENT_BODY")"
+          if [[ -z "$revisions" ]]; then
+            echo "Comment didn't match '/promote <revision>[,<revision>...] stable' exactly: '$COMMENT_BODY'"
             exit 1
           fi
-          echo "revision=${revision}" >> "$GITHUB_OUTPUT"
+          echo "revisions=${revisions}" >> "$GITHUB_OUTPUT"
 
       - name: Install snapcraft
         run: sudo snap install snapcraft --classic
@@ -51,15 +58,20 @@ jobs:
       - name: Release to stable
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-        run: snapcraft release "${SNAP_NAME}" "${{ steps.revision.outputs.revision }}" stable
+          REVISIONS: ${{ steps.parse.outputs.revisions }}
+        run: |
+          IFS=',' read -ra revs <<< "$REVISIONS"
+          for rev in "${revs[@]}"; do
+            snapcraft release "${SNAP_NAME}" "$rev" stable
+          done
 
       - name: Comment and close the issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REVISION: ${{ steps.revision.outputs.revision }}
+          REVISIONS: ${{ steps.parse.outputs.revisions }}
         run: |
           gh issue comment "${ISSUE_NUMBER}" \
             --repo "${{ github.repository }}" \
-            --body "Revision ${REVISION} has been released to \`latest/stable\`. 🎉"
+            --body "Revision(s) \`${REVISIONS}\` have been released to \`latest/stable\`. 🎉"
           gh issue close "${ISSUE_NUMBER}" --repo "${{ github.repository }}"

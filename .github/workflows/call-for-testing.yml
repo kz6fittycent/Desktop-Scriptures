@@ -91,9 +91,10 @@ jobs:
           VERSION: ${{ needs.publish-candidate.outputs.version }}
           REVISION: ${{ needs.publish-candidate.outputs.revision }}
         run: |
-          # The "**Revision:** N" line is machine-parsed back out of the
-          # issue body by promote-to-stable.yml - keep its exact format
-          # in sync with the grep pattern there if this changes.
+          # The exact "/promote <revision> stable" command is what
+          # promote-to-stable.yml parses back out of the triggering
+          # comment (not this issue body) - keep the command shown here
+          # in sync with the pattern it matches if this changes.
           body=$(cat <<EOF
           A new candidate build of Desktop Scriptures is ready for testing.
 
@@ -102,10 +103,10 @@ jobs:
           **Channel:** \`latest/candidate\`
 
           > [!TIP]
-          > **Ready to ship it?** Comment exactly this on this issue:
+          > **Ready to ship it?** Comment exactly this on this issue - the exact revision to promote is already filled in:
           >
           > \`\`\`
-          > /promote stable
+          > /promote ${REVISION} stable
           > \`\`\`
           >
           > That queues \`promote-to-stable.yml\`, which then waits for your manual approval in GitHub's UI (the \`promote-stable\` environment) before it actually runs \`snapcraft release\`.
@@ -122,7 +123,7 @@ jobs:
 
           2. Launch it and try it out.
           3. Automated screenshots from a clean VM will be added to this issue shortly, as a sanity check that the build actually launches.
-          4. Once you're satisfied this revision is good, comment \`/promote stable\` (see above) to release it.
+          4. Once you're satisfied this revision is good, comment \`/promote ${REVISION} stable\` (see above) to release it.
 
           ---
           _Opened automatically after a successful build on \`main\`._
@@ -230,6 +231,6 @@ jobs:
 
           ---
 
-          Looks good? Comment \`/promote stable\` on this issue to release it to \`latest/stable\` (requires your manual approval in GitHub's UI).
+          Looks good? Comment \`/promote ${REVISION} stable\` on this issue to release it to \`latest/stable\` (requires your manual approval in GitHub's UI).
           EOF
           )"
