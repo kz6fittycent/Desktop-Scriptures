@@ -21,7 +21,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from scriptures.db import connect  # noqa: E402
+from scriptures.db import connect, sync_bundled_content  # noqa: E402
 from scriptures.ui.main_window import MainWindow  # noqa: E402
 
 # The bundled, pre-imported database - read-only once packaged (it ships
@@ -59,6 +59,12 @@ def main() -> None:
         sys.exit(1)
 
     conn = connect(db_path)
+
+    # Only relevant for the writable $SNAP_USER_COMMON copy - see
+    # sync_bundled_content's docstring for why this can't just be part
+    # of the one-time seed copy above.
+    if os.environ.get("SNAP_USER_COMMON") and db_path != BUNDLED_DB_PATH:
+        sync_bundled_content(conn, BUNDLED_DB_PATH)
 
     app = QApplication(sys.argv)
     window = MainWindow(conn)

@@ -90,6 +90,133 @@ def _migrate_add_chapter_metadata_columns(conn: sqlite3.Connection) -> None:
     conn.execute("ALTER TABLE chapters ADD COLUMN discourse_date TEXT")
 
 
+def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> None:
+    """Copy any volumes/testaments/books/chapters/verses that exist in the
+    bundled (packaged) database but not yet in `conn`, leaving whatever is
+    already present - and all user data (notes/tags/highlights/reading
+    streak/settings) - untouched.
+
+    Without this, a snap refresh only replaces the read-only bundled copy
+    inside the new revision's squashfs. The writable copy under
+    $SNAP_USER_COMMON is seeded from that bundled copy exactly once, on
+    an install's first-ever launch (see app.py's _default_db_path) - so
+    an existing user would otherwise be stuck on whatever set of volumes
+    happened to exist the day they first launched the app, no matter how
+    many more get added upstream later. Matching is by natural key at
+    each level (volume slug, book name, chapter number, verse number)
+    rather than by id, since bundled and writable are separate SQLite
+    files with independent, unrelated autoincrement ids.
+    """
+    if not bundled_db_path.exists():
+        return
+
+    conn.execute("ATTACH DATABASE ? AS bundled", (str(bundled_db_path),))
+    try:
+        for b_vol in conn.execute("SELECT * FROM bundled.volumes ORDER BY sort_order"):
+            row = conn.execute(
+                "SELECT id FROM volumes WHERE slug = ?", (b_vol["slug"],)
+            ).fetchone()
+            if row is None:
+                cur = conn.execute(
+                    "INSERT INTO volumes (name, slug, sort_order) VALUES (?, ?, ?)",
+                    (b_vol["name"], b_vol["slug"], b_vol["sort_order"]),
+                )
+                volume_id = cur.lastrowid
+            else:
+                volume_id = row["id"]
+
+            testament_map: dict[int, int] = {}
+            for b_test in conn.execute(
+                "SELECT * FROM bundled.testaments WHERE volume_id = ? ORDER BY sort_order",
+                (b_vol["id"],),
+            ):
+                trow = conn.execute(
+                    "SELECT id FROM testaments WHERE volume_id = ? AND name = ?",
+                    (volume_id, b_test["name"]),
+                ).fetchone()
+                if trow is None:
+                    cur = conn.execute(
+                        "INSERT INTO testaments (volume_id, name, slug, sort_order) "
+                        "VALUES (?, ?, ?, ?)",
+                        (volume_id, b_test["name"], b_test["slug"], b_test["sort_order"]),
+                    )
+                    testament_map[b_test["id"]] = cur.lastrowid
+                else:
+                    testament_map[b_test["id"]] = trow["id"]
+
+            for b_book in conn.execute(
+                "SELECT * FROM bundled.books WHERE volume_id = ? ORDER BY sort_order",
+                (b_vol["id"],),
+            ):
+                testament_id = (
+                    testament_map.get(b_book["testament_id"])
+                    if b_book["testament_id"] is not None
+                    else None
+                )
+                brow = conn.execute(
+                    "SELECT id FROM books WHERE volume_id = ? AND name = ?",
+                    (volume_id, b_book["name"]),
+                ).fetchone()
+                if brow is None:
+                    cur = conn.execute(
+                        "INSERT INTO books (volume_id, testament_id, name, sort_order) "
+                        "VALUES (?, ?, ?, ?)",
+                        (volume_id, testament_id, b_book["name"], b_book["sort_order"]),
+                    )
+                    book_id = cur.lastrowid
+                else:
+                    book_id = brow["id"]
+
+                for b_chap in conn.execute(
+                    "SELECT * FROM bundled.chapters WHERE book_id = ? ORDER BY chapter_number",
+                    (b_book["id"],),
+                ):
+                    crow = conn.execute(
+                        "SELECT id FROM chapters WHERE book_id = ? AND chapter_number = ?",
+                        (book_id, b_chap["chapter_number"]),
+                    ).fetchone()
+                    if crow is None:
+                        cur = conn.execute(
+                            "INSERT INTO chapters "
+                            "(book_id, chapter_number, title, speaker, discourse_date) "
+                            "VALUES (?, ?, ?, ?, ?)",
+                            (
+                                book_id,
+                                b_chap["chapter_number"],
+                                b_chap["title"],
+                                b_chap["speaker"],
+                                b_chap["discourse_date"],
+                            ),
+                        )
+                        chapter_id = cur.lastrowid
+                    else:
+                        chapter_id = crow["id"]
+
+                    for b_verse in conn.execute(
+                        "SELECT * FROM bundled.verses WHERE chapter_id = ? ORDER BY verse_number",
+                        (b_chap["id"],),
+                    ):
+                        vrow = conn.execute(
+                            "SELECT id FROM verses WHERE chapter_id = ? AND verse_number = ?",
+                            (chapter_id, b_verse["verse_number"]),
+                        ).fetchone()
+                        if vrow is None:
+                            conn.execute(
+                                "INSERT INTO verses "
+                                "(chapter_id, verse_number, text, reference) "
+                                "VALUES (?, ?, ?, ?)",
+                                (
+                                    chapter_id,
+                                    b_verse["verse_number"],
+                                    b_verse["text"],
+                                    b_verse["reference"],
+                                ),
+                            )
+        conn.commit()
+    finally:
+        conn.execute("DETACH DATABASE bundled")
+
+
 def fts5_available(conn: sqlite3.Connection) -> bool:
     """Confirm the SQLite build this Python was linked against supports FTS5.
     Ubuntu's system SQLite has FTS5 enabled, but this is worth checking
