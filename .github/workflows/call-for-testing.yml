@@ -101,6 +101,15 @@ jobs:
           **Revision:** ${REVISION}
           **Channel:** \`latest/candidate\`
 
+          > [!TIP]
+          > **Ready to ship it?** Comment exactly this on this issue:
+          >
+          > \`\`\`
+          > /promote stable
+          > \`\`\`
+          >
+          > That queues \`promote-to-stable.yml\`, which then waits for your manual approval in GitHub's UI (the \`promote-stable\` environment) before it actually runs \`snapcraft release\`.
+
           ## How to test
 
           1. Install or refresh to this build:
@@ -113,7 +122,7 @@ jobs:
 
           2. Launch it and try it out.
           3. Automated screenshots from a clean VM will be added to this issue shortly, as a sanity check that the build actually launches.
-          4. Once you're satisfied this revision is good, comment \`/promote stable\` on this issue to release it - that step requires manual approval in GitHub's UI before it actually runs.
+          4. Once you're satisfied this revision is good, comment \`/promote stable\` (see above) to release it.
 
           ---
           _Opened automatically after a successful build on \`main\`._
@@ -218,5 +227,9 @@ jobs:
           ![Full screen](${base}/screen.png)
 
           ![App window](${base}/window.png)
+
+          ---
+
+          Looks good? Comment \`/promote stable\` on this issue to release it to \`latest/stable\` (requires your manual approval in GitHub's UI).
           EOF
           )"
