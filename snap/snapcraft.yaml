@@ -3,13 +3,17 @@ title: Desktop Scriptures
 summary: Read the LDS standard works offline, with notes, tags, and search
 description: |
   A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
-  and Pearl of Great Price - fully offline, with personal notes, tags,
-  verse highlighting, keyword search, and a reading streak.
+  Pearl of Great Price, Journal of Discourses, and Lectures on Faith -
+  fully offline, with personal notes, tags, verse highlighting, keyword
+  search, General Conference citations, a Scripture of the Day banner,
+  and a reading streak.
 
   This is an unofficial application, not produced by or affiliated with
   The Church of Jesus Christ of Latter-day Saints. Scripture text courtesy
-  of the beandog/lds-scriptures project.
-  
+  of the beandog/lds-scriptures project; Journal of Discourses text
+  courtesy of its public-domain scans on archive.org; General Conference
+  citation data courtesy of BYU's Scripture Citation Index.
+
 adopt-info: desktop-scriptures
 license: MIT
 contact: https://github.com/kz6fittycent/Desktop-Scriptures
