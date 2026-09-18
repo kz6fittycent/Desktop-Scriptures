@@ -559,23 +559,57 @@ def get_tag_targets(conn: sqlite3.Connection, tag_id: int, limit: int = 100) -> 
 
 
 def record_reading(conn: sqlite3.Connection, chapter_id: int, read_date: str) -> None:
-    """Log today's date as read, for the reading streak. Safe to call
-    multiple times per day - read_date is UNIQUE, so we upsert."""
+    """Log today's date as read, for the reading streak (safe to call
+    multiple times per day - read_date is UNIQUE, so we upsert), and log
+    this visit for the "Resume Reading" history (see reading_history's
+    schema comment on why that one's a plain insert, not an upsert)."""
     conn.execute(
         "INSERT INTO reading_log (read_date, chapter_id) VALUES (?, ?) "
         "ON CONFLICT(read_date) DO UPDATE SET chapter_id = excluded.chapter_id",
         (read_date, chapter_id),
     )
+    conn.execute("INSERT INTO reading_history (chapter_id) VALUES (?)", (chapter_id,))
     conn.commit()
 
 
-def get_last_read_chapter_id(conn: sqlite3.Connection) -> int | None:
-    """The chapter from the most recent day anything was read, for a
-    "Resume Reading" shortcut. None if nothing has been read yet."""
-    r = conn.execute(
-        "SELECT chapter_id FROM reading_log ORDER BY read_date DESC LIMIT 1"
-    ).fetchone()
-    return r["chapter_id"] if r else None
+@dataclass(frozen=True)
+class ReadingHistoryEntry:
+    """One distinct chapter from the "Resume Reading" history - enough
+    fields for the UI layer to build the same kind of label
+    MainWindow._chapter_label already builds for cards/breadcrumbs
+    (Section N for D&C, Speaker - Title for Journal of Discourses, etc.),
+    plus the book name, since this list can span more than one book."""
+
+    chapter_id: int
+    volume_slug: str
+    book_name: str
+    chapter_number: int
+    title: str | None
+    speaker: str | None
+
+
+def get_reading_history(conn: sqlite3.Connection, limit: int = 5) -> list[ReadingHistoryEntry]:
+    """The `limit` most recently-read distinct chapters, most recent
+    first - re-reading a chapter bumps it back to the top rather than
+    adding a second entry for it."""
+    rows = conn.execute(
+        "SELECT c.id AS chapter_id, vol.slug AS volume_slug, b.name AS book_name, "
+        "c.chapter_number, c.title, c.speaker, MAX(rh.read_at) AS last_read "
+        "FROM reading_history rh "
+        "JOIN chapters c ON c.id = rh.chapter_id "
+        "JOIN books b ON b.id = c.book_id "
+        "JOIN volumes vol ON vol.id = b.volume_id "
+        "GROUP BY rh.chapter_id "
+        "ORDER BY last_read DESC "
+        "LIMIT ?",
+        (limit,),
+    ).fetchall()
+    return [
+        ReadingHistoryEntry(
+            r["chapter_id"], r["volume_slug"], r["book_name"], r["chapter_number"], r["title"], r["speaker"]
+        )
+        for r in rows
+    ]
 
 
 def get_reading_streak(conn: sqlite3.Connection) -> int:

@@ -222,6 +222,20 @@ CREATE TABLE IF NOT EXISTS reading_log (
     chapter_id  INTEGER REFERENCES chapters(id)  -- last chapter opened that day (informational)
 );
 
+-- Recent-reads history for the "Resume Reading" dropdown: one row per
+-- qualifying chapter open (same dwell-time trigger as reading_log above),
+-- not deduplicated here - re-reading a chapter should bump it back to the
+-- top of the dropdown, which falls out naturally from
+-- "MAX(read_at) per chapter_id, newest first" rather than needing an
+-- upsert. Unlike reading_log, this is a per-visit log, not per-day.
+CREATE TABLE IF NOT EXISTS reading_history (
+    id          INTEGER PRIMARY KEY,
+    chapter_id  INTEGER NOT NULL REFERENCES chapters(id),
+    read_at     TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_reading_history_chapter ON reading_history(chapter_id);
+
 -- Simple key/value settings store: theme, font, color scheme, zoom level, etc.
 CREATE TABLE IF NOT EXISTS settings (
     key    TEXT PRIMARY KEY,

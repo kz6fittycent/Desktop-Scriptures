@@ -6,7 +6,8 @@ A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
 Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
 Joseph Smith Translation - fully offline, with personal notes, tags,
 verse highlighting, keyword search, a Topical Guide, General Conference
-citations, a Scripture of the Day banner, and a reading streak.
+citations, a Scripture of the Day banner, a reading streak, and a
+Resume Reading history of your last 5 chapters.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -39,12 +40,12 @@ sudo snap install desktop-scriptures
 
 Features under consideration for future versions:
 
-- [ ] Complete reading history
+- [x] Reading history (v1.3 - Resume Reading now shows your last 5 chapters, most recent first)
 - [ ] AI integration to help provide full context of chapter/verse/doctrine based on Conference talks, Discourses, etc.
 - [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
 - [ ] Amount of time spent in scriptures (hours/minutes)
 - [ ] Apocrypha?
 - [ ] Wiki
 - [x] JST (v1.3)
-- [x] Topical Guide (v1.3 - 25 major topics, correlated from the app's own scripture text and General Conference citation index; see scripts/build_topical_guide.py)
+- [x] Topical Guide
 - [ ] P2P syncing capability

@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
     QVBoxLayout,
@@ -32,6 +33,7 @@ from scriptures import __version__
 from scriptures.data_access import (
     Book,
     Chapter,
+    ReadingHistoryEntry,
     Testament,
     Volume,
     get_book,
@@ -39,7 +41,7 @@ from scriptures.data_access import (
     get_chapter,
     get_chapter_location,
     get_chapters,
-    get_last_read_chapter_id,
+    get_reading_history,
     get_reading_streak,
     get_setting,
     get_testament,
@@ -327,10 +329,15 @@ class MainWindow(QMainWindow):
         corner_layout.setContentsMargins(0, 0, 8, 0)
         corner_layout.setSpacing(8)
 
-        self.resume_button = QPushButton("Resume Reading")
+        # A plain QPushButton with clicked -> exec()'d QMenu, not
+        # setMenu() - setMenu()'s built-in drop-down arrow is drawn by
+        # the active Qt style, which wouldn't necessarily match this
+        # app's own QSS theming the way the "▾" text suffix and the
+        # already-themed QMenu rule (see theme.py) both do.
+        self.resume_button = QPushButton("Resume Reading ▾")
         self.resume_button.setObjectName("resumeButton")
         self.resume_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.resume_button.clicked.connect(self._resume_reading)
+        self.resume_button.clicked.connect(self._show_resume_menu)
         corner_layout.addWidget(self.resume_button)
 
         self.streak_label = QLabel()
@@ -351,7 +358,33 @@ class MainWindow(QMainWindow):
         self.streak_label.setVisible(True)
 
     def _update_resume_button(self) -> None:
-        self.resume_button.setVisible(get_last_read_chapter_id(self.conn) is not None)
+        self.resume_button.setVisible(bool(get_reading_history(self.conn, limit=1)))
+
+    def _show_resume_menu(self) -> None:
+        entries = get_reading_history(self.conn, limit=5)
+        if not entries:
+            return
+        menu = QMenu(self)
+        for entry in entries:
+            action = menu.addAction(self._history_entry_label(entry))
+            action.triggered.connect(
+                lambda checked=False, chapter_id=entry.chapter_id: self._resume_reading(chapter_id)
+            )
+        menu.exec(self.resume_button.mapToGlobal(self.resume_button.rect().bottomLeft()))
+
+    @staticmethod
+    def _history_entry_label(entry: ReadingHistoryEntry) -> str:
+        """Same special-casing as _chapter_label, but book-qualified
+        (e.g. "Genesis 1", not just "Chapter 1") since this list can span
+        more than one book - Journal of Discourses is left as-is, since
+        "Speaker - Title" is already self-describing without its book
+        name ("Volume N")."""
+        if entry.volume_slug == "journal-of-discourses" and entry.speaker:
+            return f"{entry.speaker} - {entry.title}"
+        if entry.volume_slug == "lectures-on-faith":
+            suffix = "Preface" if entry.chapter_number == 0 else f"Lecture {entry.chapter_number}"
+            return f"{entry.book_name} - {suffix}"
+        return f"{entry.book_name} {entry.chapter_number}"
 
     def _on_streak_dwell_elapsed(self) -> None:
         if self._pending_streak_chapter_id is None:
@@ -556,10 +589,7 @@ class MainWindow(QMainWindow):
         grid.card_clicked.connect(self._on_volume_clicked)
         self._set_content(grid)
 
-    def _resume_reading(self) -> None:
-        chapter_id = get_last_read_chapter_id(self.conn)
-        if chapter_id is None:
-            return
+    def _resume_reading(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)
         if location is None:
             return
