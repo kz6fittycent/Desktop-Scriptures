@@ -13,7 +13,7 @@ import sqlite3
 from datetime import date
 from html import escape
 
-from PySide6.QtCore import QSize, QTimer, Qt
+from PySide6.QtCore import QPoint, QSize, QTimer, Qt
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -370,21 +370,34 @@ class MainWindow(QMainWindow):
             action.triggered.connect(
                 lambda checked=False, chapter_id=entry.chapter_id: self._resume_reading(chapter_id)
             )
-        menu.exec(self.resume_button.mapToGlobal(self.resume_button.rect().bottomLeft()))
+        # Anchored by its right edge, not QMenu's default top-left corner -
+        # this button sits in the window's own top-right corner, so a menu
+        # growing rightward from its bottom-left routinely overflowed past
+        # the window's own right edge instead of staying inside it.
+        bottom_right = self.resume_button.mapToGlobal(self.resume_button.rect().bottomRight())
+        menu.exec(bottom_right - QPoint(menu.sizeHint().width(), 0))
 
-    @staticmethod
-    def _history_entry_label(entry: ReadingHistoryEntry) -> str:
+    _HISTORY_LABEL_MAX_LEN = 50
+
+    @classmethod
+    def _history_entry_label(cls, entry: ReadingHistoryEntry) -> str:
         """Same special-casing as _chapter_label, but book-qualified
         (e.g. "Genesis 1", not just "Chapter 1") since this list can span
         more than one book - Journal of Discourses is left as-is, since
         "Speaker - Title" is already self-describing without its book
-        name ("Volume N")."""
+        name ("Volume N"). Capped at _HISTORY_LABEL_MAX_LEN and elided -
+        a long Journal of Discourses title otherwise blows out the menu's
+        width far past any reasonable dropdown size."""
         if entry.volume_slug == "journal-of-discourses" and entry.speaker:
-            return f"{entry.speaker} - {entry.title}"
-        if entry.volume_slug == "lectures-on-faith":
+            label = f"{entry.speaker} - {entry.title}"
+        elif entry.volume_slug == "lectures-on-faith":
             suffix = "Preface" if entry.chapter_number == 0 else f"Lecture {entry.chapter_number}"
-            return f"{entry.book_name} - {suffix}"
-        return f"{entry.book_name} {entry.chapter_number}"
+            label = f"{entry.book_name} - {suffix}"
+        else:
+            label = f"{entry.book_name} {entry.chapter_number}"
+        if len(label) <= cls._HISTORY_LABEL_MAX_LEN:
+            return label
+        return label[: cls._HISTORY_LABEL_MAX_LEN - 1].rstrip() + "…"
 
     def _on_streak_dwell_elapsed(self) -> None:
         if self._pending_streak_chapter_id is None:
