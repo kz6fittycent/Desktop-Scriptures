@@ -47,7 +47,15 @@ jobs:
           # silently doing nothing. Bash's own regex match (not grep) so
           # the optional trailing "done" can be captured as a separate
           # group alongside the revision list in one pass.
-          if [[ "$COMMENT_BODY" =~ ^/promote\ ([0-9]+(,[0-9]+)*)\ stable(\ done)?$ ]]; then
+          #
+          # Trailing whitespace/newline is tolerated (`[[:space:]]*$`
+          # rather than a bare `$`): copying the command out of the
+          # fenced code block call-for-testing.yml renders it in commonly
+          # brings along a trailing newline, and GitHub's own comment box
+          # does too if you hit enter after pasting - neither is a typo
+          # worth failing loudly over the way a wrong revision number or
+          # missing "stable" still should be.
+          if [[ "$COMMENT_BODY" =~ ^/promote\ ([0-9]+(,[0-9]+)*)\ stable(\ done)?[[:space:]]*$ ]]; then
             revisions="${BASH_REMATCH[1]}"
             close_issue="${BASH_REMATCH[3]:+true}"
           else
