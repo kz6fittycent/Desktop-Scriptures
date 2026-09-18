@@ -141,7 +141,7 @@ jobs:
           /promote ${REVISION} stable done
           \`\`\`
 
-          That queues \`promote-to-stable.yml\`, which then waits for your manual approval in GitHub's UI (the \`promote-stable\` environment) before it actually runs \`snapcraft release\`.
+          That triggers \`promote-to-stable.yml\`, which runs \`snapcraft release\` immediately - no separate approval step.
 
           ---
           _Opened automatically after a successful build on \`main\`._
@@ -249,6 +249,6 @@ jobs:
 
           ---
 
-          Looks good? Comment \`/promote ${REVISION} stable done\` on this issue to release it to \`latest/stable\` and close this issue (drop \`done\` to release without closing). Requires your manual approval in GitHub's UI.
+          Looks good? Comment \`/promote ${REVISION} stable done\` on this issue to release it to \`latest/stable\` and close this issue (drop \`done\` to release without closing) - that alone triggers the release, no other step needed.
           EOF
           )"

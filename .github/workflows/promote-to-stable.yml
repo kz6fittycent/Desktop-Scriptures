@@ -4,10 +4,16 @@ name: 🚀 Promote to Stable
 # "/promote ..." comment, from someone with write access, on an actual
 # issue (not a PR) - the "Parse revisions" step does the real, exact
 # match against "/promote <revision>[,<revision>...] stable [done]" and
-# fails loudly if the comment doesn't match that. The real gate is the
-# `environment:` on the job itself though - matching those conditions
-# only lets the run start and sit waiting for manual approval, it
-# doesn't release anything by itself.
+# fails loudly if the comment doesn't match that. That `if:`
+# (author-association check included) is the only gate - matching it
+# runs the whole job straight through to `snapcraft release`, no
+# separate approval click, matching snapcrafters' own repos. The
+# `environment: promote-stable` below is for secret scoping only
+# (SNAPCRAFT_STORE_CREDENTIALS is stored on that environment, not the
+# repo) - it must NOT have a "Required reviewers" protection rule
+# configured (Settings -> Environments -> promote-stable) or that adds
+# back exactly the manual-approval pause this workflow is written to not
+# have.
 on:
   issue_comment:
     types: [created]
