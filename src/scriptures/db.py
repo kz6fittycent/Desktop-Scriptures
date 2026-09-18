@@ -212,9 +212,73 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                                     b_verse["reference"],
                                 ),
                             )
+        _sync_bundled_topics(conn)
         conn.commit()
     finally:
         conn.execute("DETACH DATABASE bundled")
+
+
+def _sync_bundled_topics(conn: sqlite3.Connection) -> None:
+    """Topics (and their scripture/talk references) are developer-authored
+    like the scripture text above, not user data - synced the same way,
+    by natural key (topic slug; a topic_verse by its verse reference
+    string; a topic_talk by its URL) so a re-run of
+    scripts/build_topical_guide.py just adds what's new."""
+    for b_topic in conn.execute("SELECT * FROM bundled.topics ORDER BY sort_order"):
+        row = conn.execute(
+            "SELECT id FROM topics WHERE slug = ?", (b_topic["slug"],)
+        ).fetchone()
+        if row is None:
+            cur = conn.execute(
+                "INSERT INTO topics (name, slug, description, sort_order) VALUES (?, ?, ?, ?)",
+                (b_topic["name"], b_topic["slug"], b_topic["description"], b_topic["sort_order"]),
+            )
+            topic_id = cur.lastrowid
+        else:
+            topic_id = row["id"]
+            # Description/sort_order can change on a re-run without a slug
+            # change - keep the writable copy in sync with the bundled one.
+            conn.execute(
+                "UPDATE topics SET name = ?, description = ?, sort_order = ? WHERE id = ?",
+                (b_topic["name"], b_topic["description"], b_topic["sort_order"], topic_id),
+            )
+
+        for b_tv in conn.execute(
+            "SELECT * FROM bundled.topic_verses WHERE topic_id = ? ORDER BY sort_order",
+            (b_topic["id"],),
+        ):
+            exists = conn.execute(
+                "SELECT 1 FROM topic_verses WHERE topic_id = ? AND volume_slug = ? AND reference = ?",
+                (topic_id, b_tv["volume_slug"], b_tv["reference"]),
+            ).fetchone()
+            if exists is None:
+                conn.execute(
+                    "INSERT INTO topic_verses (topic_id, volume_slug, reference, sort_order) "
+                    "VALUES (?, ?, ?, ?)",
+                    (topic_id, b_tv["volume_slug"], b_tv["reference"], b_tv["sort_order"]),
+                )
+
+        for b_talk in conn.execute(
+            "SELECT * FROM bundled.topic_talks WHERE topic_id = ? ORDER BY sort_order",
+            (b_topic["id"],),
+        ):
+            exists = conn.execute(
+                "SELECT 1 FROM topic_talks WHERE topic_id = ? AND url = ?",
+                (topic_id, b_talk["url"]),
+            ).fetchone()
+            if exists is None:
+                conn.execute(
+                    "INSERT INTO topic_talks (topic_id, talk_title, speaker, date, url, sort_order) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        topic_id,
+                        b_talk["talk_title"],
+                        b_talk["speaker"],
+                        b_talk["date"],
+                        b_talk["url"],
+                        b_talk["sort_order"],
+                    ),
+                )
 
 
 def fts5_available(conn: sqlite3.Connection) -> bool:

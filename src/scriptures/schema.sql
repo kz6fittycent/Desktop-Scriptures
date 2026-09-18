@@ -65,6 +65,65 @@ CREATE TABLE IF NOT EXISTS verses (
 CREATE INDEX IF NOT EXISTS idx_verses_chapter ON verses(chapter_id);
 CREATE INDEX IF NOT EXISTS idx_chapters_book ON chapters(book_id);
 CREATE INDEX IF NOT EXISTS idx_books_volume ON books(volume_id);
+CREATE INDEX IF NOT EXISTS idx_verses_reference ON verses(reference);
+
+-- ---------------------------------------------------------------------
+-- Topical guide: developer-authored, like the scripture text itself, and
+-- synced forward the same way (see db.py's sync_bundled_content) - never
+-- user data. Built/refreshed by scripts/build_topical_guide.py, never
+-- edited by hand or by the app itself.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS topics (
+    id           INTEGER PRIMARY KEY,
+    name         TEXT NOT NULL UNIQUE,      -- e.g. "Faith"
+    slug         TEXT NOT NULL UNIQUE,
+    description  TEXT NOT NULL,             -- a brief framing, not a definition
+    sort_order   INTEGER NOT NULL
+);
+
+-- References a verse by its (volume slug, reference) pair, not verses.id
+-- - a topic's supporting scriptures are chosen by matching text across
+-- the whole bundled database, which can include a verse from a book a
+-- given writable database hasn't synced in yet, and this keeps syncing
+-- this table a plain natural-key operation (no cross-database id
+-- remapping) the same way volumes/books/chapters already are. The
+-- volume slug is needed alongside `reference` because reference strings
+-- aren't unique on their own across volumes - the Joseph Smith
+-- Translation reuses the King James Bible's own book/chapter/verse
+-- numbering, so e.g. "Romans 3:3" exists once in Holy Bible and again,
+-- with different wording, in Joseph Smith Translation. Resolved against
+-- verses.reference (indexed above) joined through to volumes at query
+-- time; a topic_verses row that doesn't (yet) match any verse is simply
+-- skipped by that join rather than erroring.
+CREATE TABLE IF NOT EXISTS topic_verses (
+    id           INTEGER PRIMARY KEY,
+    topic_id     INTEGER NOT NULL REFERENCES topics(id),
+    volume_slug  TEXT NOT NULL,
+    reference    TEXT NOT NULL,
+    sort_order   INTEGER NOT NULL,
+    UNIQUE (topic_id, volume_slug, reference)
+);
+
+CREATE INDEX IF NOT EXISTS idx_topic_verses_topic ON topic_verses(topic_id);
+
+-- Same metadata-only shape as verse_citations.json (see citations.py) -
+-- talk title/speaker/date/URL, never talk text - just persisted in the
+-- database instead of a side JSON file, since these need to join and
+-- sort alongside topic_verses rather than being looked up one verse at a
+-- time.
+CREATE TABLE IF NOT EXISTS topic_talks (
+    id          INTEGER PRIMARY KEY,
+    topic_id    INTEGER NOT NULL REFERENCES topics(id),
+    talk_title  TEXT NOT NULL,
+    speaker     TEXT NOT NULL,
+    date        TEXT NOT NULL,
+    url         TEXT NOT NULL,
+    sort_order  INTEGER NOT NULL,
+    UNIQUE (topic_id, url)
+);
+
+CREATE INDEX IF NOT EXISTS idx_topic_talks_topic ON topic_talks(topic_id);
 
 -- Full-text search over verse text. External-content table keeps the index
 -- in sync with `verses` via triggers below, without duplicating storage.

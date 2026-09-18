@@ -44,6 +44,10 @@ from scriptures.data_access import (
     get_setting,
     get_testament,
     get_testaments,
+    get_topic,
+    get_topics,
+    get_topic_talks,
+    get_topic_verses,
     get_verses,
     get_volume,
     get_volumes,
@@ -56,7 +60,15 @@ from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.export import export_notes
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
+from scriptures.ui.topical_guide_view import TopicDetailView
 from scriptures.ui import theme as theming
+
+# Sentinel item_id for the landing page's synthetic "Topical Guide" card,
+# mixed in alongside the real (integer) volume ids from get_volumes() -
+# it isn't a scripture volume (no testaments/books/chapters), so
+# _on_volume_clicked branches to _show_topical_guide() instead of the
+# normal get_volume() lookup whenever it sees this.
+TOPICAL_GUIDE_ID = "topical-guide"
 
 BOOK_OF_MORMON_SHARE_URL = "https://go.churchofjesuschrist.org/x/n1Ic"
 BEANDOG_REPO_URL = "https://github.com/beandog/lds-scriptures"
@@ -537,7 +549,7 @@ class MainWindow(QMainWindow):
 
         grid = CardGridWidget(
             "Desktop Scriptures",
-            [(v.id, v.name) for v in volumes],
+            [(v.id, v.name) for v in volumes] + [(TOPICAL_GUIDE_ID, "Topical Guide")],
             card_size=LANDING_CARD_SIZE,
             banner=banner,
         )
@@ -553,6 +565,34 @@ class MainWindow(QMainWindow):
             return
         volume, testament, book, _chapter = location
         self._on_chapter_clicked(volume, testament, book, chapter_id)
+
+    # ------------------------------------------------------------------
+    # Topical Guide
+    # ------------------------------------------------------------------
+
+    def _show_topical_guide(self) -> None:
+        self._path = [{"label": "Topical Guide", "action": self._show_topical_guide}]
+        self._update_breadcrumb()
+        topics = get_topics(self.conn)
+        grid = CardGridWidget("Topical Guide", [(t.id, t.name) for t in topics])
+        grid.card_clicked.connect(self._show_topic_detail)
+        self._set_content(grid)
+
+    def _show_topic_detail(self, topic_id: int) -> None:
+        topic = get_topic(self.conn, topic_id)
+        self._path = [
+            {"label": "Topical Guide", "action": self._show_topical_guide},
+            {"label": topic.name, "action": lambda: self._show_topic_detail(topic_id)},
+        ]
+        self._update_breadcrumb()
+
+        verses = get_topic_verses(self.conn, topic_id)
+        talks = get_topic_talks(self.conn, topic_id)
+        view = TopicDetailView(topic, verses, talks)
+        # Same handler Search uses: resolve a chapter id into its full
+        # volume/testament/book path and navigate there.
+        view.scripture_selected.connect(self._on_search_result_selected)
+        self._set_content(view)
 
     # ------------------------------------------------------------------
     # Search
@@ -584,7 +624,10 @@ class MainWindow(QMainWindow):
     # Level: testament (Bible only) or straight to books
     # ------------------------------------------------------------------
 
-    def _on_volume_clicked(self, volume_id: int) -> None:
+    def _on_volume_clicked(self, volume_id: int | str) -> None:
+        if volume_id == TOPICAL_GUIDE_ID:
+            self._show_topical_guide()
+            return
         volume = get_volume(self.conn, volume_id)
         self._path = [
             {"label": volume.name, "action": lambda: self._on_volume_clicked(volume_id)}

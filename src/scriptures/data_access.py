@@ -78,6 +78,25 @@ class Highlight:
 
 
 @dataclass(frozen=True)
+class Topic:
+    id: int
+    name: str
+    slug: str
+    description: str
+
+
+@dataclass(frozen=True)
+class TopicTalk:
+    """Same metadata-only shape as citations.py's Citation - talk title,
+    speaker, date, and its churchofjesuschrist.org URL, never talk text."""
+
+    talk_title: str
+    speaker: str
+    date: str
+    url: str
+
+
+@dataclass(frozen=True)
 class NoteResult:
     """A note-search hit: `reference` is the verse's reference, or a
     "Book chapter_number" label for a chapter-level note."""
@@ -579,3 +598,55 @@ def get_reading_streak(conn: sqlite3.Connection) -> int:
         streak += 1
         cursor -= timedelta(days=1)
     return streak
+
+
+# ---------------------------------------------------------------------
+# Topical guide (see schema.sql's comment above the topics tables, and
+# scripts/build_topical_guide.py, which is the only thing that writes to
+# them)
+# ---------------------------------------------------------------------
+
+
+def get_topics(conn: sqlite3.Connection) -> list[Topic]:
+    rows = conn.execute(
+        "SELECT id, name, slug, description FROM topics ORDER BY sort_order"
+    ).fetchall()
+    return [Topic(r["id"], r["name"], r["slug"], r["description"]) for r in rows]
+
+
+def get_topic(conn: sqlite3.Connection, topic_id: int) -> Topic:
+    r = conn.execute(
+        "SELECT id, name, slug, description FROM topics WHERE id = ?", (topic_id,)
+    ).fetchone()
+    return Topic(r["id"], r["name"], r["slug"], r["description"])
+
+
+def get_topic_verses(conn: sqlite3.Connection, topic_id: int) -> list[Verse]:
+    """Joined by (volume slug, reference), not id (see topic_verses'
+    schema comment - reference alone is ambiguous between Holy Bible and
+    Joseph Smith Translation) - a stale pair that no longer matches any
+    verse (e.g. an older writable database that hasn't synced in a book
+    yet) is simply left out by this join rather than erroring."""
+    rows = conn.execute(
+        "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
+        "FROM topic_verses tv "
+        "JOIN verses v ON v.reference = tv.reference "
+        "JOIN chapters c ON c.id = v.chapter_id "
+        "JOIN books b ON b.id = c.book_id "
+        "JOIN volumes vol ON vol.id = b.volume_id AND vol.slug = tv.volume_slug "
+        "WHERE tv.topic_id = ? ORDER BY tv.sort_order",
+        (topic_id,),
+    ).fetchall()
+    return [
+        Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
+        for r in rows
+    ]
+
+
+def get_topic_talks(conn: sqlite3.Connection, topic_id: int) -> list[TopicTalk]:
+    rows = conn.execute(
+        "SELECT talk_title, speaker, date, url FROM topic_talks "
+        "WHERE topic_id = ? ORDER BY sort_order",
+        (topic_id,),
+    ).fetchall()
+    return [TopicTalk(r["talk_title"], r["speaker"], r["date"], r["url"]) for r in rows]
