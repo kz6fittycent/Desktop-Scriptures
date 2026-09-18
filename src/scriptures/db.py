@@ -31,6 +31,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
+    _backfill_reading_history(conn)
     conn.commit()
 
 
@@ -66,6 +67,25 @@ def _backfill_migrated_highlights(conn: sqlite3.Connection) -> None:
         "FROM highlights_pre_ranges old JOIN verses v ON v.id = old.verse_id"
     )
     conn.execute("DROP TABLE highlights_pre_ranges")
+
+
+def _backfill_reading_history(conn: sqlite3.Connection) -> None:
+    """reading_history is new - on a database that already has reading_log
+    entries (i.e. an existing install being upgraded, not a fresh one) but
+    no reading_history yet, seed it from reading_log once, so the Resume
+    Reading button doesn't disappear right after upgrading and only come
+    back once something new gets read. reading_log only ever kept one,
+    most-recent chapter per calendar day, so this is a coarser history
+    than reading_history normally builds going forward, but it's the
+    closest thing to prior history this database has.
+    """
+    if conn.execute("SELECT 1 FROM reading_history LIMIT 1").fetchone():
+        return
+    conn.execute(
+        "INSERT INTO reading_history (chapter_id, read_at) "
+        "SELECT chapter_id, read_date || 'T00:00:00' FROM reading_log "
+        "WHERE chapter_id IS NOT NULL"
+    )
 
 
 def _migrate_add_chapter_metadata_columns(conn: sqlite3.Connection) -> None:
