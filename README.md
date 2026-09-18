@@ -45,7 +45,6 @@ Features under consideration for future versions:
 - [ ] Amount of time spent in scriptures (hours/minutes)
 - [ ] Apocrypha?
 - [ ] Wiki
-- [x] JST (v1.3 - 61 of 66 books imported; Song of Solomon was never translated in this edition)
-- [ ] JST: 2 John, 3 John, Jude, and Revelation - skipped in v1.3 because this specific scan has pages interleaved out of order across that section; needs either a second source for just those books or manual reconstruction (see scripts/import_inspired_version.py)
+- [x] JST (v1.3)
 - [x] Topical Guide (v1.3 - 25 major topics, correlated from the app's own scripture text and General Conference citation index; see scripts/build_topical_guide.py)
 - [ ] P2P syncing capability
