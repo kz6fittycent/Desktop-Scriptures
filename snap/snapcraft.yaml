@@ -49,6 +49,10 @@ apps:
       - wayland
       - x11
       - home
+      # For the optional, opt-in AI-assisted search (see ai_client.py) -
+      # talks only to whatever endpoint the user configures themselves
+      # under Ask -> AI Settings..., never anywhere on its own.
+      - network
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONPATH: $SNAP/lib/python3.12/site-packages:$SNAP/src

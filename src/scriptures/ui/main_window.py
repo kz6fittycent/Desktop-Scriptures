@@ -60,6 +60,7 @@ from scriptures.data_access import (
 )
 from scriptures.sotd import get_scripture_of_the_day
 from scriptures.sync import sync_now
+from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.export import export_notes
@@ -97,6 +98,14 @@ READING_STREAK_DWELL_MS = 5000
 # above, never inside anything sync.py itself reads or writes.
 SYNC_FOLDER_SETTING = "sync_folder_path"
 LAST_SYNC_SETTING = "last_sync_at"
+
+# Settings keys backing the Ask menu's AI Settings - local-only like the
+# Sync settings above (never touched by sync.py, never leaves this
+# device), holding the user's own bring-your-own AI endpoint config.
+AI_ENABLED_SETTING = "ai_enabled"
+AI_BASE_URL_SETTING = "ai_api_base_url"
+AI_API_KEY_SETTING = "ai_api_key"
+AI_MODEL_SETTING = "ai_model"
 
 
 class MainWindow(QMainWindow):
@@ -354,6 +363,16 @@ class MainWindow(QMainWindow):
         # client) at any time while this menu sits closed.
         sync_menu.aboutToShow.connect(self._update_sync_status)
         self._update_sync_status()
+
+        # Opt-in, bring-your-own-endpoint AI-assisted search - see
+        # ai_client.py's module docstring for the full design. "Ask a
+        # Question..." (Stage 2/3) will join this menu alongside AI
+        # Settings.
+        ask_menu = self.menuBar().addMenu("As&k")
+
+        ai_settings_action = QAction("AI Settings...", self)
+        ai_settings_action.triggered.connect(self._show_ai_settings)
+        ask_menu.addAction(ai_settings_action)
 
         # No "About" dialog - the dropdown itself carries the same
         # verbiage a popup would have (version, the unofficial-app
@@ -618,6 +637,26 @@ class MainWindow(QMainWindow):
             return
         volume, testament, book, _chapter = location
         self._on_chapter_clicked(volume, testament, book, chapter_id)
+
+    # ------------------------------------------------------------------
+    # Ask (opt-in, bring-your-own-endpoint AI-assisted search - see
+    # ai_client.py's module docstring for the full design)
+    # ------------------------------------------------------------------
+
+    def _show_ai_settings(self) -> None:
+        dialog = AiSettingsDialog(
+            enabled=get_setting(self.conn, AI_ENABLED_SETTING) == "true",
+            base_url=get_setting(self.conn, AI_BASE_URL_SETTING, ""),
+            api_key=get_setting(self.conn, AI_API_KEY_SETTING, ""),
+            model=get_setting(self.conn, AI_MODEL_SETTING, ""),
+            parent=self,
+        )
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        set_setting(self.conn, AI_ENABLED_SETTING, "true" if dialog.enabled else "false")
+        set_setting(self.conn, AI_BASE_URL_SETTING, dialog.base_url)
+        set_setting(self.conn, AI_API_KEY_SETTING, dialog.api_key)
+        set_setting(self.conn, AI_MODEL_SETTING, dialog.model)
 
     def _on_side_tab_changed(self, index: int) -> None:
         self._side_tab_index = index
