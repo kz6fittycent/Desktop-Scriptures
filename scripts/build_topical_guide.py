@@ -248,6 +248,153 @@ TOPICS = [
         "and guide His children back to Him.",
         "scripture OR scriptures OR \"word of God\"",
     ),
+    (
+        "Second Coming",
+        "second-coming",
+        "The Second Coming is the promised return of Jesus Christ in glory, to reign "
+        "personally upon the earth and gather His people.",
+        "\"second coming\" OR \"coming of the Son of man\" OR \"day of the Lord\"",
+    ),
+    (
+        "Temple",
+        "temple",
+        "Temples are houses of the Lord, where sacred ordinances are performed and "
+        "covenants are made binding for eternity.",
+        "temple OR temples OR \"house of the Lord\"",
+    ),
+    (
+        "Missionary Work",
+        "missionary-work",
+        "Missionary work is sharing the gospel of Jesus Christ with others, inviting all "
+        "to come unto Him.",
+        "\"preach the gospel\" OR preaching OR \"carry my gospel\"",
+    ),
+    (
+        "Tithing",
+        "tithing",
+        "Tithing is returning one-tenth of one's increase to the Lord, a law that brings "
+        "both temporal and spiritual blessings.",
+        "tithing OR tithes OR tithe",
+    ),
+    (
+        "Chastity",
+        "chastity",
+        "Chastity is the proper use of the sacred power to create life, reserved for "
+        "marriage between husband and wife.",
+        "chastity OR adultery OR fornication OR whoredoms",
+    ),
+    (
+        "Marriage",
+        "marriage",
+        "Marriage between husband and wife is ordained of God, central to His plan for "
+        "His children.",
+        "marriage OR married OR husband OR wife",
+    ),
+    (
+        "Fasting",
+        "fasting",
+        "Fasting is abstaining from food and drink, paired with prayer, to draw closer to "
+        "God and receive His blessings.",
+        "fasting OR fast OR fasted",
+    ),
+    (
+        "Discipleship",
+        "discipleship",
+        "Discipleship is following Jesus Christ - taking His name upon us and striving to "
+        "become like Him.",
+        "disciple OR disciples OR \"follow me\"",
+    ),
+    (
+        "Grace",
+        "grace",
+        "Grace is the enabling power and mercy of Jesus Christ, freely given, by which we "
+        "are saved beyond our own efforts.",
+        "grace",
+    ),
+    (
+        "Trials and Adversity",
+        "trials-and-adversity",
+        "Trials and adversity are challenges God allows for our growth, to be met with "
+        "faith rather than despair.",
+        "affliction OR afflictions OR tribulation OR tribulations OR adversity",
+    ),
+    (
+        "Peace",
+        "peace",
+        "Peace is the calm assurance Christ offers His followers, distinct from the mere "
+        "absence of trouble in the world.",
+        "peace OR peaceable OR peacemakers",
+    ),
+    (
+        "Love",
+        "love",
+        "Love is the great commandment - for God and for one another - at the root of "
+        "every other commandment.",
+        "\"love one another\" OR loveth OR beloved",
+    ),
+    (
+        "Sabbath Day",
+        "sabbath-day",
+        "The Sabbath is a day set apart for rest and worship, a weekly opportunity to "
+        "renew covenants and draw near to God.",
+        "sabbath OR \"seventh day\"",
+    ),
+    (
+        "Prophets",
+        "prophets",
+        "Prophets are called of God to teach, warn, and testify of Jesus Christ to His "
+        "children on the earth.",
+        "prophet OR prophets OR prophesy OR prophesied",
+    ),
+    (
+        "Ordinances",
+        "ordinances",
+        "Ordinances are sacred acts performed with priesthood authority, through which "
+        "covenants with God are made and sealed.",
+        "ordinance OR ordinances",
+    ),
+    (
+        "Plan of Salvation",
+        "plan-of-salvation",
+        "The plan of salvation is God's plan for the eternal happiness and progression of "
+        "His children through the Atonement of Jesus Christ.",
+        "\"plan of salvation\" OR \"plan of redemption\" OR \"plan of happiness\" OR \"great plan\"",
+    ),
+    (
+        "Premortal Life",
+        "premortal-life",
+        "The premortal life is our existence as spirit children of God before we were "
+        "born on the earth.",
+        "\"before the world was\" OR foreordained OR foreordination",
+    ),
+    (
+        "Judgment",
+        "judgment",
+        "The judgment is the day when all will be held accountable before God for their "
+        "thoughts, words, and deeds.",
+        "judgment OR judged OR \"judgment seat\"",
+    ),
+    (
+        "Creation",
+        "creation",
+        "The Creation is the ordered work by which God formed the earth and all things "
+        "upon it, as a place for His children.",
+        "creation OR created OR \"in the beginning\"",
+    ),
+    (
+        "Consecration",
+        "consecration",
+        "Consecration is dedicating one's time, talents, and resources to building the "
+        "kingdom of God.",
+        "consecrate OR consecrated OR consecration",
+    ),
+    (
+        "Honesty",
+        "honesty",
+        "Honesty is being truthful and trustworthy in word and deed, a foundation of "
+        "personal integrity.",
+        "honest OR honesty OR \"false witness\"",
+    ),
 ]
 
 

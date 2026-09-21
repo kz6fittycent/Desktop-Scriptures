@@ -1,6 +1,6 @@
 {
   "_source": "scriptures.byu.edu Citation Index (General Conference talks)",
-  "_harvested": "2026-09-18",
+  "_harvested": "2026-09-21",
   "_note": "Metadata only (talk title, speaker, date, churchofjesuschrist.org URL) - never talk text, per copyright. See scripts/harvest_citations.py. Keyed by the exact verse reference string used in the imported database (e.g. 'Genesis 1:1').",
   "citations": {
     "Moses 1:39": [
@@ -39781,6 +39781,4247 @@
     "Romans 6:16": [],
     "Titus 2:2": [],
     "Zephaniah 2:3": [],
-    "Zephaniah 3:3": []
+    "Zephaniah 3:3": [],
+    "1 Chronicles 28:13": [],
+    "1 Chronicles 4:38": [],
+    "1 Chronicles 4:40": [],
+    "1 Corinthians 15:10": [],
+    "1 Corinthians 16:23": [],
+    "1 Corinthians 3:17": [
+      {
+        "talk_title": "The Joy of Womanhood",
+        "speaker": "Margaret D. Nadauld",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/the-joy-of-womanhood?lang=eng"
+      },
+      {
+        "talk_title": "We Are Children of God",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/10/we-are-children-of-god?lang=eng"
+      },
+      {
+        "talk_title": "Staying Unspotted from the World",
+        "speaker": "George P. Lee",
+        "date": "April 1978",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1978/04/staying-unspotted-from-the-world?lang=eng"
+      },
+      {
+        "talk_title": "The Continuing Power of the Holy Ghost",
+        "speaker": "Franklin Dewey Richards",
+        "date": "April 1973",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1973/04/the-continuing-power-of-the-holy-ghost?lang=eng"
+      }
+    ],
+    "1 Corinthians 5:1": [],
+    "1 Corinthians 6:18": [
+      {
+        "talk_title": "Repentance and Change",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/repentance-and-change?lang=eng"
+      },
+      {
+        "talk_title": "Personal Purity",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/10/personal-purity?lang=eng"
+      }
+    ],
+    "1 Corinthians 7:10": [],
+    "1 Corinthians 7:14": [],
+    "1 Corinthians 7:3": [],
+    "1 Corinthians 7:33": [],
+    "1 Corinthians 7:34": [],
+    "1 Corinthians 7:39": [],
+    "1 Corinthians 7:4": [],
+    "1 Corinthians 9:14": [
+      {
+        "talk_title": "“Behold the Man”",
+        "speaker": "Keith B. McMullin",
+        "date": "October 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/10/behold-the-man?lang=eng"
+      },
+      {
+        "talk_title": "Miracles of the Restoration",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/10/miracles-of-the-restoration?lang=eng"
+      },
+      {
+        "talk_title": "Some Scriptural Lessons on Leadership",
+        "speaker": "Spencer J. Condie",
+        "date": "April 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/04/some-scriptural-lessons-on-leadership?lang=eng"
+      },
+      {
+        "talk_title": "The Path to Eternal Glory",
+        "speaker": "Delbert L. Stapley",
+        "date": "April 1973",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1973/04/the-path-to-eternal-glory?lang=eng"
+      }
+    ],
+    "1 John 3:11": [
+      {
+        "talk_title": "Eternal Truth",
+        "speaker": "John C. Pingree, Jr.",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/52pingree?lang=eng"
+      }
+    ],
+    "1 John 4:11": [
+      {
+        "talk_title": "The Love of God",
+        "speaker": "Benjamin M. Z. Tai",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/56tai?lang=eng"
+      },
+      {
+        "talk_title": "The Love of God",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/15christofferson?lang=eng"
+      }
+    ],
+    "1 John 4:7": [],
+    "1 John 5:1": [],
+    "1 Nephi 16:35": [],
+    "1 Nephi 4:25": [],
+    "1 Peter 1:10": [],
+    "1 Peter 1:20": [
+      {
+        "talk_title": "Drawing the Power of Jesus Christ into Our Lives",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/drawing-the-power-of-jesus-christ-into-our-lives?lang=eng"
+      },
+      {
+        "talk_title": "Our Father’s Plan",
+        "speaker": "Christoffel Golden, Jr.",
+        "date": "October 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/10/our-fathers-plan?lang=eng"
+      }
+    ],
+    "1 Peter 1:23": [
+      {
+        "talk_title": "Deep in Our Heart",
+        "speaker": "Douglas D. Holmes",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/16holmes?lang=eng"
+      },
+      {
+        "talk_title": "Have We Not Reason to Rejoice?",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/have-we-not-reason-to-rejoice?lang=eng"
+      },
+      {
+        "talk_title": "Jesus Christ—the Master Healer",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2005",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2005/10/jesus-christ-the-master-healer?lang=eng"
+      },
+      {
+        "talk_title": "The Challenge to Become",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/the-challenge-to-become?lang=eng"
+      }
+    ],
+    "1 Peter 2:13": [],
+    "1 Samuel 19:20": [],
+    "1 Samuel 31:12": [],
+    "1 Samuel 31:13": [
+      {
+        "talk_title": "Fast Day",
+        "speaker": "Howard W. Hunter",
+        "date": "October 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/10/fast-day?lang=eng"
+      }
+    ],
+    "1 Thessalonians 5:2": [
+      {
+        "talk_title": "“Thus Saith the Lord”",
+        "speaker": "Theodore M. Burton",
+        "date": "October 1971",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1971/10/thus-saith-the-lord?lang=eng"
+      }
+    ],
+    "1 Thessalonians 5:28": [],
+    "1 Timothy 2:1": [],
+    "1 Timothy 2:2": [
+      {
+        "talk_title": "Therefore They Hushed Their Fears",
+        "speaker": "David A. Bednar",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/therefore-they-hushed-their-fears?lang=eng"
+      }
+    ],
+    "2 Chronicles 15:6": [],
+    "2 Chronicles 23:10": [],
+    "2 Chronicles 24:12": [],
+    "2 Chronicles 29:16": [],
+    "2 Chronicles 29:33": [],
+    "2 Chronicles 31:6": [],
+    "2 Chronicles 36:7": [],
+    "2 Chronicles 36:8": [],
+    "2 Chronicles 7:11": [],
+    "2 Chronicles 8:16": [],
+    "2 Corinthians 10:15": [],
+    "2 Corinthians 10:16": [],
+    "2 Kings 11:11": [],
+    "2 Kings 12:13": [],
+    "2 Kings 24:13": [],
+    "2 Nephi 23:6": [],
+    "2 Nephi 2:1": [
+      {
+        "talk_title": "Children",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/children?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement Covers All Pain",
+        "speaker": "Kent F. Richards",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/the-atonement-covers-all-pain?lang=eng"
+      }
+    ],
+    "2 Nephi 2:12": [
+      {
+        "talk_title": "Agency: Essential to the Plan of Life",
+        "speaker": "Robert D. Hales",
+        "date": "October 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/10/agency-essential-to-the-plan-of-life?lang=eng"
+      }
+    ],
+    "2 Nephi 33:7": [],
+    "2 Nephi 9:15": [
+      {
+        "talk_title": "Cleansed by Repentance",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/51oaks?lang=eng"
+      },
+      {
+        "talk_title": "Cleansed by Repentance",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/51oaks?lang=eng"
+      },
+      {
+        "talk_title": "Remembering in Whom We Have Trusted",
+        "speaker": "Allen D. Haynie",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/remembering-in-whom-we-have-trusted?lang=eng"
+      },
+      {
+        "talk_title": "The Resurrection of Jesus Christ",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/04/the-resurrection-of-jesus-christ?lang=eng"
+      }
+    ],
+    "2 Samuel 11:26": [],
+    "2 Samuel 12:16": [
+      {
+        "talk_title": "Opening the Heavens for Help",
+        "speaker": "Russell M. Nelson",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/37nelson?lang=eng"
+      }
+    ],
+    "2 Samuel 20:19": [],
+    "3 Nephi 12:32": [],
+    "3 Nephi 12:9": [
+      {
+        "talk_title": "Alive in Christ",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/49oaks?lang=eng"
+      },
+      {
+        "talk_title": "Blessed Are the Peacemakers",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/10/12stevenson?lang=eng"
+      },
+      {
+        "talk_title": "Following Christ",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/18oaks?lang=eng"
+      },
+      {
+        "talk_title": "Peacemakers Needed",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/47nelson?lang=eng"
+      },
+      {
+        "talk_title": "“Blessed Are the Peacemakers”",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/10/blessed-are-the-peacemakers?lang=eng"
+      },
+      {
+        "talk_title": "The Canker of Contention",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/the-canker-of-contention?lang=eng"
+      },
+      {
+        "talk_title": "“Blessed Are the Peacemakers”",
+        "speaker": "Theodore M. Burton",
+        "date": "October 1974",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1974/10/blessed-are-the-peacemakers?lang=eng"
+      }
+    ],
+    "3 Nephi 25:5": [
+      {
+        "talk_title": "Keys, Covenants, and Easter",
+        "speaker": "Quentin L. Cook",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/56cook?lang=eng"
+      },
+      {
+        "talk_title": "Keys, Covenants, and Easter",
+        "speaker": "Quentin L. Cook",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/56cook?lang=eng"
+      },
+      {
+        "talk_title": "Be Thou an Example of the Believers",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/10/be-thou-an-example-of-the-believers?lang=eng"
+      }
+    ],
+    "4 Nephi 1:11": [
+      {
+        "talk_title": "With One Accord",
+        "speaker": "Reyna I. Aburto",
+        "date": "April 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/04/with-one-accord?lang=eng"
+      },
+      {
+        "talk_title": "With One Accord",
+        "speaker": "Reyna I. Aburto",
+        "date": "April 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/04/with-one-accord?lang=eng"
+      },
+      {
+        "talk_title": "Marriage: Watch and Learn",
+        "speaker": "L. Whitney Clayton",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/marriage-watch-and-learn?lang=eng"
+      }
+    ],
+    "Abraham 3:22": [
+      {
+        "talk_title": "Divine Helps for Mortality",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/47oaks?lang=eng"
+      },
+      {
+        "talk_title": "Why Marriage, Why Family",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/why-marriage-why-family?lang=eng"
+      },
+      {
+        "talk_title": "Successful Living of Gospel Principles",
+        "speaker": "David B. Haight",
+        "date": "October 1992",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1992/10/successful-living-of-gospel-principles?lang=eng"
+      },
+      {
+        "talk_title": "Where Is Wisdom?",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1992",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1992/10/where-is-wisdom?lang=eng"
+      },
+      {
+        "talk_title": "Ocean Currents and Family Influences",
+        "speaker": "Spencer W. Kimball",
+        "date": "October 1974",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1974/10/ocean-currents-and-family-influences?lang=eng"
+      },
+      {
+        "talk_title": "God Foreordains His Prophets and His People",
+        "speaker": "Bruce R. McConkie",
+        "date": "April 1974",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1974/04/god-foreordains-his-prophets-and-his-people?lang=eng"
+      }
+    ],
+    "Acts 10:26": [],
+    "Acts 13:2": [],
+    "Acts 13:3": [],
+    "Acts 14:3": [],
+    "Acts 15:35": [],
+    "Acts 18:12": [],
+    "Acts 18:16": [],
+    "Acts 20:15": [],
+    "Acts 21:16": [],
+    "Acts 23:16": [],
+    "Acts 25:10": [],
+    "Acts 25:17": [],
+    "Acts 27:9": [],
+    "Acts 7:48": [],
+    "Acts 8:4": [],
+    "Acts 8:48": [],
+    "Acts 9:26": [],
+    "Acts 9:4": [
+      {
+        "talk_title": "He Knows You by Name",
+        "speaker": "Clement M. Matswagothata",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/29matswagothata?lang=eng"
+      },
+      {
+        "talk_title": "“Yet Thou Art There”",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/10/yet-thou-art-there?lang=eng"
+      }
+    ],
+    "Alma 12:25": [
+      {
+        "talk_title": "Why Marriage, Why Family",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/why-marriage-why-family?lang=eng"
+      },
+      {
+        "talk_title": "Hold On",
+        "speaker": "Ann M. Dibb",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/hold-on?lang=eng"
+      },
+      {
+        "talk_title": "Now Is the Time to Prepare",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2005",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2005/04/now-is-the-time-to-prepare?lang=eng"
+      },
+      {
+        "talk_title": "Do Not Fear",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/do-not-fear?lang=eng"
+      },
+      {
+        "talk_title": "But If Not…",
+        "speaker": "Dennis E. Simmons",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/but-if-not?lang=eng"
+      },
+      {
+        "talk_title": "The Standard of Truth Has Been Erected",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-standard-of-truth-has-been-erected?lang=eng"
+      },
+      {
+        "talk_title": "Resurrection",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/resurrection?lang=eng"
+      }
+    ],
+    "Alma 12:26": [],
+    "Alma 12:30": [
+      {
+        "talk_title": "God’s Intent Is to Bring You Home",
+        "speaker": "Patrick Kearon",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/45kearon?lang=eng"
+      },
+      {
+        "talk_title": "Hold Up Your Light",
+        "speaker": "Marcus B. Nash",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/37nash?lang=eng"
+      },
+      {
+        "talk_title": "Spiritual Security",
+        "speaker": "Charles A. Didier",
+        "date": "April 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/04/spiritual-security?lang=eng"
+      },
+      {
+        "talk_title": "Home and Family: A Divine Eternal Pattern",
+        "speaker": "Gene R. Cook",
+        "date": "April 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/04/home-and-family-a-divine-eternal-pattern?lang=eng"
+      },
+      {
+        "talk_title": "Home and Family: A Divine Eternal Pattern",
+        "speaker": "Gene R. Cook",
+        "date": "April 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/04/home-and-family-a-divine-eternal-pattern?lang=eng"
+      }
+    ],
+    "Alma 12:32": [
+      {
+        "talk_title": "Choose You This Day",
+        "speaker": "Dale G. Renlund",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/choose-you-this-day?lang=eng"
+      },
+      {
+        "talk_title": "The Eternal Perspective of the Gospel",
+        "speaker": "Rafael E. Pino",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/the-eternal-perspective-of-the-gospel?lang=eng"
+      },
+      {
+        "talk_title": "The Great Plan of Happiness",
+        "speaker": "Earl C. Tingey",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "The Great Plan of Happiness",
+        "speaker": "Earl C. Tingey",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Keep an Eternal Perspective",
+        "speaker": "Jay E. Jensen",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/keep-an-eternal-perspective?lang=eng"
+      },
+      {
+        "talk_title": "Our Destiny",
+        "speaker": "L. Aldin Porter",
+        "date": "October 1999",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1999/10/our-destiny?lang=eng"
+      },
+      {
+        "talk_title": "Parents in Zion",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/10/parents-in-zion?lang=eng"
+      },
+      {
+        "talk_title": "Answers to Life’s Questions",
+        "speaker": "M. Russell Ballard",
+        "date": "April 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/04/answers-to-lifes-questions?lang=eng"
+      }
+    ],
+    "Alma 12:33": [],
+    "Alma 13:15": [
+      {
+        "talk_title": "The Power of the Priesthood",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/04/the-power-of-the-priesthood?lang=eng"
+      },
+      {
+        "talk_title": "Scriptural Witnesses",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/scriptural-witnesses?lang=eng"
+      },
+      {
+        "talk_title": "What’s in It for Me?",
+        "speaker": "James E. Faust",
+        "date": "October 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/10/whats-in-it-for-me?lang=eng"
+      }
+    ],
+    "Alma 17:16": [
+      {
+        "talk_title": "Do Not Fear",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/do-not-fear?lang=eng"
+      },
+      {
+        "talk_title": "The Standard of Truth Has Been Erected",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-standard-of-truth-has-been-erected?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      },
+      {
+        "talk_title": "For Time and All Eternity",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/for-time-and-all-eternity?lang=eng"
+      }
+    ],
+    "Alma 18:34": [
+      {
+        "talk_title": "Decisions for Eternity",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/decisions-for-eternity?lang=eng"
+      },
+      {
+        "talk_title": "Choices",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/choices?lang=eng"
+      }
+    ],
+    "Alma 18:39": [
+      {
+        "talk_title": "How Firm Our Foundation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/how-firm-our-foundation?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Keep an Eternal Perspective",
+        "speaker": "Jay E. Jensen",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/keep-an-eternal-perspective?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      },
+      {
+        "talk_title": "For Time and All Eternity",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/for-time-and-all-eternity?lang=eng"
+      }
+    ],
+    "Alma 1:2": [],
+    "Alma 22:12": [
+      {
+        "talk_title": "”The Great and Wonderful Love”",
+        "speaker": "Anthony D. Perkins",
+        "date": "October 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/10/the-great-and-wonderful-love?lang=eng"
+      },
+      {
+        "talk_title": "Choices",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/choices?lang=eng"
+      }
+    ],
+    "Alma 22:13": [
+      {
+        "talk_title": "“Ye Are the Temple of God”",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/ye-are-the-temple-of-god?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      }
+    ],
+    "Alma 2:9": [],
+    "Alma 34:16": [
+      {
+        "talk_title": "They Are Their Own Judges",
+        "speaker": "David A. Bednar",
+        "date": "October 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/10/51bednar?lang=eng"
+      },
+      {
+        "talk_title": "The Plan of Mercy",
+        "speaker": "James R. Rasband",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/33rasband?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement of Jesus Christ Provides the Ultimate Rescue",
+        "speaker": "Quentin L. Cook",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/16cook?lang=eng"
+      },
+      {
+        "talk_title": "Room in the Inn",
+        "speaker": "Gerrit W. Gong",
+        "date": "April 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/04/16gong?lang=eng"
+      },
+      {
+        "talk_title": "The Doctrine of Christ",
+        "speaker": "Brian K. Ashton",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/the-doctrine-of-christ?lang=eng"
+      },
+      {
+        "talk_title": "Free Forever, to Act for Themselves",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/free-forever-to-act-for-themselves?lang=eng"
+      },
+      {
+        "talk_title": "Redemption",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/redemption?lang=eng"
+      },
+      {
+        "talk_title": "The Divine Gift of Repentance",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/the-divine-gift-of-repentance?lang=eng"
+      },
+      {
+        "talk_title": "“Repent… That I May Heal You”",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/repent-that-i-may-heal-you?lang=eng"
+      },
+      {
+        "talk_title": "Arms of Safety",
+        "speaker": "Jay E. Jensen",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/arms-of-safety?lang=eng"
+      },
+      {
+        "talk_title": "Arms of Safety",
+        "speaker": "Jay E. Jensen",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/arms-of-safety?lang=eng"
+      },
+      {
+        "talk_title": "The Great Plan of Happiness",
+        "speaker": "Earl C. Tingey",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Repentance, a Blessing of Membership",
+        "speaker": "Richard G. Hinckley",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/repentance-a-blessing-of-membership?lang=eng"
+      },
+      {
+        "talk_title": "Be Not Deceived",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/10/be-not-deceived?lang=eng"
+      },
+      {
+        "talk_title": "Applying the Simple and Plain Gospel Principles in the Family",
+        "speaker": "Francisco J. Viñas",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/applying-the-simple-and-plain-gospel-principles-in-the-family?lang=eng"
+      },
+      {
+        "talk_title": "Christians in Belief and Action",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/christians-in-belief-and-action?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/the-atonement?lang=eng"
+      },
+      {
+        "talk_title": "Repentance",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/repentance?lang=eng"
+      },
+      {
+        "talk_title": "“Lest Ye Be Wearied and Faint in Your Minds”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/04/lest-ye-be-wearied-and-faint-in-your-minds?lang=eng"
+      },
+      {
+        "talk_title": "The Resurrection",
+        "speaker": "Hartman Rector, Jr.",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/the-resurrection?lang=eng"
+      },
+      {
+        "talk_title": "The Resurrection of Jesus",
+        "speaker": "Marion G. Romney",
+        "date": "April 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/04/the-resurrection-of-jesus?lang=eng"
+      }
+    ],
+    "Alma 34:31": [
+      {
+        "talk_title": "Because of Jesus Christ",
+        "speaker": "Dale G. Renlund",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/46renlund?lang=eng"
+      },
+      {
+        "talk_title": "Your Repentance Doesn’t Burden Jesus Christ; It Brightens His Joy",
+        "speaker": "Tamara W. Runia",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/43runia?lang=eng"
+      },
+      {
+        "talk_title": "The Powerful, Virtuous Cycle of the Doctrine of Christ",
+        "speaker": "Dale G. Renlund",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/43renlund?lang=eng"
+      },
+      {
+        "talk_title": "The Prodigal and the Road That Leads Home",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/45uchtdorf?lang=eng"
+      },
+      {
+        "talk_title": "Is the Plan Working?",
+        "speaker": "Adrián Ochoa",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/27ochoa?lang=eng"
+      },
+      {
+        "talk_title": "The Immediate Goodness of God",
+        "speaker": "Kyle S. McKay",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/55mckay?lang=eng"
+      },
+      {
+        "talk_title": "Choose You This Day",
+        "speaker": "Dale G. Renlund",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/choose-you-this-day?lang=eng"
+      },
+      {
+        "talk_title": "Wilt Thou Be Made Whole?",
+        "speaker": "Matthew L. Carpenter",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/wilt-thou-be-made-whole?lang=eng"
+      },
+      {
+        "talk_title": "One More Day",
+        "speaker": "Taylor G. Godoy",
+        "date": "April 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/04/one-more-day?lang=eng"
+      },
+      {
+        "talk_title": "The Great Plan of Redemption",
+        "speaker": "Linda S. Reeves",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/the-great-plan-of-redemption?lang=eng"
+      },
+      {
+        "talk_title": "Repentance: A Joyful Choice",
+        "speaker": "Dale G. Renlund",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/repentance-a-joyful-choice?lang=eng"
+      },
+      {
+        "talk_title": "The Gift of Grace",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/the-gift-of-grace?lang=eng"
+      },
+      {
+        "talk_title": "The Hope of God’s Light",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/the-hope-of-gods-light?lang=eng"
+      },
+      {
+        "talk_title": "Cleansing the Inner Temple",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/10/cleansing-the-inner-vessel?lang=eng"
+      },
+      {
+        "talk_title": "Now Is the Time to Prepare",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2005",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2005/04/now-is-the-time-to-prepare?lang=eng"
+      },
+      {
+        "talk_title": "Receiving Divine Assistance through the Grace of the Lord",
+        "speaker": "Gene R. Cook",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/receiving-divine-assistance-through-the-grace-of-the-lord?lang=eng"
+      }
+    ],
+    "Alma 39:18": [
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      },
+      {
+        "talk_title": "For Time and All Eternity",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/for-time-and-all-eternity?lang=eng"
+      }
+    ],
+    "Alma 42:11": [
+      {
+        "talk_title": "Hold On",
+        "speaker": "Ann M. Dibb",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/hold-on?lang=eng"
+      },
+      {
+        "talk_title": "“I Will Remember Your Sins No More”",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/i-will-remember-your-sins-no-more?lang=eng"
+      }
+    ],
+    "Alma 42:16": [
+      {
+        "talk_title": "Be True to God and His Work",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/57cook?lang=eng"
+      },
+      {
+        "talk_title": "The Pleasing Word of God",
+        "speaker": "Francisco J. Viñas",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/the-pleasing-word-of-god?lang=eng"
+      },
+      {
+        "talk_title": "“I Will Remember Your Sins No More”",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/i-will-remember-your-sins-no-more?lang=eng"
+      },
+      {
+        "talk_title": "The Brilliant Morning of Forgiveness",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/the-brilliant-morning-of-forgiveness?lang=eng"
+      },
+      {
+        "talk_title": "Our Lord and Savior",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/our-lord-and-savior?lang=eng"
+      },
+      {
+        "talk_title": "“What Think Ye of Christ?”",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/what-think-ye-of-christ?lang=eng"
+      },
+      {
+        "talk_title": "Atonement, Agency, Accountability",
+        "speaker": "Boyd K. Packer",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/atonement-agency-accountability?lang=eng"
+      },
+      {
+        "talk_title": "Happiness",
+        "speaker": "Jack H. Goaslind, Jr.",
+        "date": "April 1986",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1986/04/happiness?lang=eng"
+      },
+      {
+        "talk_title": "To Bear the Priesthood Worthily",
+        "speaker": "Spencer W. Kimball",
+        "date": "April 1975",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1975/04/to-bear-the-priesthood-worthily?lang=eng"
+      }
+    ],
+    "Alma 42:5": [
+      {
+        "talk_title": "The Father",
+        "speaker": "Brian K. Ashton",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/the-father?lang=eng"
+      },
+      {
+        "talk_title": "Valiant in the Testimony of Jesus",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/valiant-in-the-testimony-of-jesus?lang=eng"
+      },
+      {
+        "talk_title": "Hold On",
+        "speaker": "Ann M. Dibb",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/hold-on?lang=eng"
+      },
+      {
+        "talk_title": "Celestial Marriage",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/celestial-marriage?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      },
+      {
+        "talk_title": "For Time and All Eternity",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/for-time-and-all-eternity?lang=eng"
+      }
+    ],
+    "Alma 42:8": [
+      {
+        "talk_title": "Ensuring a Righteous Judgment",
+        "speaker": "James R. Rasband",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/13rasband?lang=eng"
+      },
+      {
+        "talk_title": "Giving Our Spirits Control over Our Bodies",
+        "speaker": "M. Russell Ballard",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/53ballard?lang=eng"
+      },
+      {
+        "talk_title": "Where Will This Lead?",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/35oaks?lang=eng"
+      },
+      {
+        "talk_title": "The Book of Mormon: What Would Your Life Be Like without It?",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/10/the-book-of-mormon-what-would-your-life-be-like-without-it?lang=eng"
+      },
+      {
+        "talk_title": "Our Father’s Glorious Plan",
+        "speaker": "Weatherford T. Clayton",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/our-fathers-glorious-plan?lang=eng"
+      },
+      {
+        "talk_title": "Valiant in the Testimony of Jesus",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/valiant-in-the-testimony-of-jesus?lang=eng"
+      },
+      {
+        "talk_title": "The Master Healer",
+        "speaker": "Carole M. Stephens",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/the-master-healer?lang=eng"
+      },
+      {
+        "talk_title": "Why Marriage, Why Family",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/why-marriage-why-family?lang=eng"
+      },
+      {
+        "talk_title": "The Book",
+        "speaker": "Allan F. Packer",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/the-book?lang=eng"
+      },
+      {
+        "talk_title": "No Other Gods",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/no-other-gods?lang=eng"
+      },
+      {
+        "talk_title": "Decisions for Eternity",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/decisions-for-eternity?lang=eng"
+      },
+      {
+        "talk_title": "Catch the Wave",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/catch-the-wave?lang=eng"
+      },
+      {
+        "talk_title": "Thanks Be to God",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/04/thanks-be-to-god?lang=eng"
+      },
+      {
+        "talk_title": "Counsel to Youth",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/counsel-to-youth?lang=eng"
+      },
+      {
+        "talk_title": "Establishing a Christ-Centered Home",
+        "speaker": "Richard J. Maynes",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/establishing-a-christ-centered-home?lang=eng"
+      },
+      {
+        "talk_title": "Guided by the Holy Spirit",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/guided-by-the-holy-spirit?lang=eng"
+      },
+      {
+        "talk_title": "Guided by the Holy Spirit",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/guided-by-the-holy-spirit?lang=eng"
+      },
+      {
+        "talk_title": "Cleansing the Inner Temple",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/10/cleansing-the-inner-vessel?lang=eng"
+      },
+      {
+        "talk_title": "Prayer and Promptings",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/prayer-and-promptings?lang=eng"
+      },
+      {
+        "talk_title": "Love and Law",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/love-and-law?lang=eng"
+      },
+      {
+        "talk_title": "Counsel to Young Men",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/04/counsel-to-young-men?lang=eng"
+      },
+      {
+        "talk_title": "Celestial Marriage",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/celestial-marriage?lang=eng"
+      },
+      {
+        "talk_title": "Do You Know Who You Are?",
+        "speaker": "Dean R. Burgess",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/do-you-know-who-you-are?lang=eng"
+      },
+      {
+        "talk_title": "Restoring Faith in the Family",
+        "speaker": "Kenneth Johnson",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/restoring-faith-in-the-family?lang=eng"
+      },
+      {
+        "talk_title": "A Book with a Promise",
+        "speaker": "Craig C. Christensen",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/a-book-with-a-promise?lang=eng"
+      },
+      {
+        "talk_title": "Salvation and Exaltation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/salvation-and-exaltation?lang=eng"
+      },
+      {
+        "talk_title": "The Great Plan of Happiness",
+        "speaker": "Marcus B. Nash",
+        "date": "October 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/10/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "The Great Plan of Happiness",
+        "speaker": "Earl C. Tingey",
+        "date": "April 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/04/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "The Book of Mormon: Another Testament of Jesus Christ—Plain and Precious Things",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2005",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2005/04/the-book-of-mormon-another-testament-of-jesus-christ-plain-and-precious-things?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement: All for All",
+        "speaker": "Bruce C. Hafen",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/the-atonement-all-for-all?lang=eng"
+      },
+      {
+        "talk_title": "Do Not Fear",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/do-not-fear?lang=eng"
+      },
+      {
+        "talk_title": "The Church Grows Stronger",
+        "speaker": "Gordon B. Hinckley",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/the-church-grows-stronger?lang=eng"
+      },
+      {
+        "talk_title": "The Standard of Truth Has Been Erected",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-standard-of-truth-has-been-erected?lang=eng"
+      },
+      {
+        "talk_title": "Press Forward and Be Steadfast",
+        "speaker": "Elaine S. Dalton",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/press-forward-and-be-steadfast?lang=eng"
+      },
+      {
+        "talk_title": "For Thy Good",
+        "speaker": "Richard C. Edgley",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/for-thy-good?lang=eng"
+      },
+      {
+        "talk_title": "Our Father’s Plan",
+        "speaker": "Christoffel Golden, Jr.",
+        "date": "October 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/10/our-fathers-plan?lang=eng"
+      },
+      {
+        "talk_title": "Personal Preparation for Temple Blessings",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/04/personal-preparation-for-temple-blessings?lang=eng"
+      },
+      {
+        "talk_title": "“The Touch of the Master’s Hand”",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/04/the-touch-of-the-masters-hand?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Keep an Eternal Perspective",
+        "speaker": "Jay E. Jensen",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/keep-an-eternal-perspective?lang=eng"
+      },
+      {
+        "talk_title": "We Are Children of God",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/10/we-are-children-of-god?lang=eng"
+      },
+      {
+        "talk_title": "Valued Companions",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/10/valued-companions?lang=eng"
+      },
+      {
+        "talk_title": "Washed Clean",
+        "speaker": "Boyd K. Packer",
+        "date": "April 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/04/washed-clean?lang=eng"
+      },
+      {
+        "talk_title": "The Joy of Living the Great Plan of Happiness",
+        "speaker": "Richard G. Scott",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/the-joy-of-living-the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Christians in Belief and Action",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/christians-in-belief-and-action?lang=eng"
+      },
+      {
+        "talk_title": "Christians in Belief and Action",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/christians-in-belief-and-action?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/the-atonement?lang=eng"
+      },
+      {
+        "talk_title": "Marriage and the Great Plan of Happiness",
+        "speaker": "Joe J. Christensen",
+        "date": "April 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/04/marriage-and-the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Answers to Life’s Questions",
+        "speaker": "M. Russell Ballard",
+        "date": "April 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/04/answers-to-lifes-questions?lang=eng"
+      },
+      {
+        "talk_title": "Hear the Prophet’s Voice and Obey",
+        "speaker": "Robert D. Hales",
+        "date": "April 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/04/hear-the-prophets-voice-and-obey?lang=eng"
+      },
+      {
+        "talk_title": "“The Great Plan of Happiness”",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "For Time and All Eternity",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/for-time-and-all-eternity?lang=eng"
+      },
+      {
+        "talk_title": "Doors of Death",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1992",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1992/04/doors-of-death?lang=eng"
+      },
+      {
+        "talk_title": "Joy and Mercy",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/joy-and-mercy?lang=eng"
+      },
+      {
+        "talk_title": "Funerals—A Time for Reverence",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/funerals-a-time-for-reverence?lang=eng"
+      }
+    ],
+    "Alma 53:13": [
+      {
+        "talk_title": "Keeping Our Covenants",
+        "speaker": "Richard J. Maynes",
+        "date": "October 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/10/keeping-our-covenants?lang=eng"
+      },
+      {
+        "talk_title": "The Greatest Generation of Missionaries",
+        "speaker": "M. Russell Ballard",
+        "date": "October 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/10/the-greatest-generation-of-missionaries?lang=eng"
+      }
+    ],
+    "Alma 56:7": [],
+    "Alma 60:26": [],
+    "Alma 62:8": [],
+    "Alma 7:5": [],
+    "Amos 2:12": [],
+    "Amos 5:18": [],
+    "Amos 5:20": [],
+    "Deuteronomy 14:22": [],
+    "Deuteronomy 14:28": [],
+    "Deuteronomy 26:12": [],
+    "Deuteronomy 5:14": [],
+    "Deuteronomy 5:20": [],
+    "Doctrine and Covenants 103:13": [],
+    "Doctrine and Covenants 104:60": [],
+    "Doctrine and Covenants 105:29": [],
+    "Doctrine and Covenants 121:7": [
+      {
+        "talk_title": "Our Heavenly Guidance System",
+        "speaker": "Sergio R. Vargas",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/34vargas?lang=eng"
+      },
+      {
+        "talk_title": "The Triumph of Hope",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/12andersen?lang=eng"
+      },
+      {
+        "talk_title": "Swallowed Up in the Joy of Christ",
+        "speaker": "Brian K. Taylor",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/46taylor?lang=eng"
+      },
+      {
+        "talk_title": "Swallowed Up in the Joy of Christ",
+        "speaker": "Brian K. Taylor",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/46taylor?lang=eng"
+      },
+      {
+        "talk_title": "After the Fourth Day",
+        "speaker": "W. Mark Bassett",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/55bassett?lang=eng"
+      },
+      {
+        "talk_title": "Courage to Proclaim the Truth",
+        "speaker": "Denelson Silva",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/34silva?lang=eng"
+      },
+      {
+        "talk_title": "Personal Peace in Challenging Times",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/46cook?lang=eng"
+      },
+      {
+        "talk_title": "Consistent and Resilient Trust",
+        "speaker": "L. Todd Budge",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/27budge?lang=eng"
+      },
+      {
+        "talk_title": "The Immediate Goodness of God",
+        "speaker": "Kyle S. McKay",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/55mckay?lang=eng"
+      },
+      {
+        "talk_title": "Joy and Spiritual Survival",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/joy-and-spiritual-survival?lang=eng"
+      },
+      {
+        "talk_title": "You Matter to Him",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/you-matter-to-him?lang=eng"
+      },
+      {
+        "talk_title": "Steadfast and Immovable",
+        "speaker": "Silvia H. Allred",
+        "date": "",
+        "url": "https://www.churchofjesuschrist.org/study/broadcasts/article/general-relief-society-meeting/2010/09/steadfast-and-immovable?lang=eng"
+      },
+      {
+        "talk_title": "Faith through Tribulation Brings Peace and Joy",
+        "speaker": "Robert D. Hales",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/faith-through-tribulation-brings-peace-and-joy?lang=eng"
+      },
+      {
+        "talk_title": "Sacrifice Brings Forth the Blessings of Heaven",
+        "speaker": "Robert K. Dellenbach",
+        "date": "October 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/10/sacrifice-brings-forth-the-blessings-of-heaven?lang=eng"
+      },
+      {
+        "talk_title": "“Behold, We Count Them Happy Which Endure”",
+        "speaker": "Robert D. Hales",
+        "date": "April 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/04/behold-we-count-them-happy-which-endure?lang=eng"
+      },
+      {
+        "talk_title": "The Power of Goodness",
+        "speaker": "Janette Hales Beckham",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/the-power-of-goodness?lang=eng"
+      },
+      {
+        "talk_title": "“Make Thee an Ark”",
+        "speaker": "W. Don Ladd",
+        "date": "October 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/10/make-thee-an-ark?lang=eng"
+      },
+      {
+        "talk_title": "“Murmur Not”",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/10/murmur-not?lang=eng"
+      },
+      {
+        "talk_title": "Overcoming Challenges along Life’s Way",
+        "speaker": "Joy F. Evans",
+        "date": "October 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/10/overcoming-challenges-along-lifes-way?lang=eng"
+      },
+      {
+        "talk_title": "Premortality, a Glorious Reality",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/10/premortality-a-glorious-reality?lang=eng"
+      },
+      {
+        "talk_title": "The Man of Christ",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1975",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1975/04/the-man-of-christ?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 124:38": [
+      {
+        "talk_title": "Decisions",
+        "speaker": "Gerald E. Melchin",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/decisions?lang=eng"
+      },
+      {
+        "talk_title": "Personal Temple Worship",
+        "speaker": "David B. Haight",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/personal-temple-worship?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 124:44": [],
+    "Doctrine and Covenants 128:12": [
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 128:22": [
+      {
+        "talk_title": "Prophets of God",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/10/46spannaus?lang=eng"
+      },
+      {
+        "talk_title": "Fear Not: Believe Only!",
+        "speaker": "Jeffrey R. Holland",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/23holland?lang=eng"
+      },
+      {
+        "talk_title": "To Be a Follower of Christ",
+        "speaker": "Alfred Kyungu",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/36kyungu?lang=eng"
+      },
+      {
+        "talk_title": "Preparing for the Second Coming of Christ",
+        "speaker": "Christoffel Golden, Jr.",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/27golden?lang=eng"
+      },
+      {
+        "talk_title": "And This Is Life Eternal",
+        "speaker": "C. Scott Grow",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/and-this-is-life-eternal?lang=eng"
+      },
+      {
+        "talk_title": "Meeting the Challenges of Today’s World",
+        "speaker": "Robert D. Hales",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/meeting-the-challenges-of-todays-world?lang=eng"
+      },
+      {
+        "talk_title": "The Sabbath Is a Delight",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/the-sabbath-is-a-delight?lang=eng"
+      },
+      {
+        "talk_title": "Roots and Branches",
+        "speaker": "Quentin L. Cook",
+        "date": "April 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/04/roots-and-branches?lang=eng"
+      },
+      {
+        "talk_title": "Redemption",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/redemption?lang=eng"
+      },
+      {
+        "talk_title": "Be Valiant in Courage, Strength, and Activity",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/10/be-valiant-in-courage-strength-and-activity?lang=eng"
+      },
+      {
+        "talk_title": "The Why of Priesthood Service",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/04/the-why-of-priesthood-service?lang=eng"
+      },
+      {
+        "talk_title": "The Divine Call of a Missionary",
+        "speaker": "Ronald A. Rasband",
+        "date": "April 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/04/the-divine-call-of-a-missionary?lang=eng"
+      },
+      {
+        "talk_title": "The Redemption of the Dead and the Testimony of Jesus",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/the-redemption-of-the-dead-and-the-testimony-of-jesus?lang=eng"
+      },
+      {
+        "talk_title": "Stay the Course—Keep the Faith",
+        "speaker": "Gordon B. Hinckley",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/stay-the-course-keep-the-faith?lang=eng"
+      },
+      {
+        "talk_title": "Duties, Rewards, and Risks",
+        "speaker": "M. Russell Ballard",
+        "date": "October 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/10/duties-rewards-and-risks?lang=eng"
+      },
+      {
+        "talk_title": "Becoming a Prepared People",
+        "speaker": "Barbara W. Winder",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/becoming-a-prepared-people?lang=eng"
+      },
+      {
+        "talk_title": "Tears, Trials, Trust, Testimony",
+        "speaker": "Thomas S. Monson",
+        "date": "April 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/04/tears-trials-trust-testimony?lang=eng"
+      },
+      {
+        "talk_title": "Counsel to the Saints",
+        "speaker": "Ezra Taft Benson",
+        "date": "April 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/04/counsel-to-the-saints?lang=eng"
+      },
+      {
+        "talk_title": "Our Responsibility to Take the Gospel to the Ends of the Earth",
+        "speaker": "Jack H. Goaslind, Jr.",
+        "date": "October 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/10/our-responsibility-to-take-the-gospel-to-the-ends-of-the-earth?lang=eng"
+      },
+      {
+        "talk_title": "The Lord Expects Righteousness",
+        "speaker": "Spencer W. Kimball",
+        "date": "October 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/10/the-lord-expects-righteousness?lang=eng"
+      },
+      {
+        "talk_title": "Eternal Links that Bind",
+        "speaker": "A. Theodore Tuttle",
+        "date": "April 1980",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1980/04/eternal-links-that-bind?lang=eng"
+      },
+      {
+        "talk_title": "Priesthood—Its Power and Vitality",
+        "speaker": "A. Theodore Tuttle",
+        "date": "April 1972",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1972/04/priesthood-its-power-and-vitality?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 128:8": [
+      {
+        "talk_title": "Covenant Belonging",
+        "speaker": "Gerrit W. Gong",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/41gong?lang=eng"
+      },
+      {
+        "talk_title": "The Spirit of Elijah",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/10/the-spirit-of-elijah?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 130:17": [],
+    "Doctrine and Covenants 132:11": [],
+    "Doctrine and Covenants 132:28": [
+      {
+        "talk_title": "How Firm Our Foundation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/how-firm-our-foundation?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 34:6": [
+      {
+        "talk_title": "Preparation for the Second Coming",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/preparation-for-the-second-coming?lang=eng"
+      },
+      {
+        "talk_title": "Missionary Work: A Major Responsibility",
+        "speaker": "Ezra Taft Benson",
+        "date": "April 1974",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1974/04/missionary-work-a-major-responsibility?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 38:1": [
+      {
+        "talk_title": "Hosanna and Hallelujah—The Living Jesus Christ: The Heart of Restoration and Easter",
+        "speaker": "Gerrit W. Gong",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/31gong?lang=eng"
+      },
+      {
+        "talk_title": "Windows of Light and Truth",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/windows-of-light-and-truth?lang=eng"
+      },
+      {
+        "talk_title": "Constancy amid Change",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/constancy-amid-change?lang=eng"
+      },
+      {
+        "talk_title": "Lessons from Eve",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/10/lessons-from-eve?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 38:41": [
+      {
+        "talk_title": "The Voice of Warning",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/the-voice-of-warning?lang=eng"
+      },
+      {
+        "talk_title": "Loving Others and Living with Differences",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/loving-others-and-living-with-differences?lang=eng"
+      },
+      {
+        "talk_title": "Testimony",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/testimony?lang=eng"
+      },
+      {
+        "talk_title": "The Message of the Restoration",
+        "speaker": "Charles A. Didier",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-message-of-the-restoration?lang=eng"
+      },
+      {
+        "talk_title": "Sharing the Gospel",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/10/sharing-the-gospel?lang=eng"
+      },
+      {
+        "talk_title": "The Canker of Contention",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/the-canker-of-contention?lang=eng"
+      },
+      {
+        "talk_title": "Alternate Voices",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/alternate-voices?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 41:5": [
+      {
+        "talk_title": "God among Us",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/04/12uchtdorf?lang=eng"
+      },
+      {
+        "talk_title": "Do It Now",
+        "speaker": "Donald L. Hallstrom",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/do-it-now?lang=eng"
+      },
+      {
+        "talk_title": "Spiritual Guides for Teachers of Righteousness",
+        "speaker": "Gene R. Cook",
+        "date": "April 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/04/spiritual-guides-for-teachers-of-righteousness?lang=eng"
+      },
+      {
+        "talk_title": "A Disciple of Christ",
+        "speaker": "Marion G. Romney",
+        "date": "October 1978",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1978/10/a-disciple-of-christ?lang=eng"
+      },
+      {
+        "talk_title": "“What Will a Man Give?”",
+        "speaker": "Mark E. Petersen",
+        "date": "October 1973",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1973/10/what-will-a-man-give?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 42:24": [
+      {
+        "talk_title": "Decisions for Eternity",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/decisions-for-eternity?lang=eng"
+      },
+      {
+        "talk_title": "Repentance and Change",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/repentance-and-change?lang=eng"
+      },
+      {
+        "talk_title": "The Standard of Truth Has Been Erected",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-standard-of-truth-has-been-erected?lang=eng"
+      },
+      {
+        "talk_title": "Living by Scriptural Guidance",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/living-by-scriptural-guidance?lang=eng"
+      },
+      {
+        "talk_title": "“Thou Shalt Have No Other Gods”",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/04/thou-shalt-have-no-other-gods?lang=eng"
+      },
+      {
+        "talk_title": "Eternal Laws of Happiness",
+        "speaker": "Lynn A. Mickelsen",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/eternal-laws-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Chastity: The Source of True Manhood",
+        "speaker": "Robert L. Backman",
+        "date": "October 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/10/chastity-the-source-of-true-manhood?lang=eng"
+      },
+      {
+        "talk_title": "Voices of the Past, of the Present, of the Future",
+        "speaker": "Spencer W. Kimball",
+        "date": "April 1971",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1971/04/voices-of-the-past-of-the-present-of-the-future?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 42:32": [],
+    "Doctrine and Covenants 42:33": [],
+    "Doctrine and Covenants 42:61": [
+      {
+        "talk_title": "Think Celestial!",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/51nelson?lang=eng"
+      },
+      {
+        "talk_title": "Embrace the Future with Faith",
+        "speaker": "Russell M. Nelson",
+        "date": "11 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/11/37nelson?lang=eng"
+      },
+      {
+        "talk_title": "Deep in Our Heart",
+        "speaker": "Douglas D. Holmes",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/16holmes?lang=eng"
+      },
+      {
+        "talk_title": "An Especially Noble Calling",
+        "speaker": "Joy D. Jones",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/14jones?lang=eng"
+      },
+      {
+        "talk_title": "The Blessing of Continuing Revelation to Prophets and Personal Revelation to Guide Our Lives",
+        "speaker": "Quentin L. Cook",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/52cook?lang=eng"
+      },
+      {
+        "talk_title": "Revelation for the Church, Revelation for Our Lives",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/04/revelation-for-the-church-revelation-for-our-lives?lang=eng"
+      },
+      {
+        "talk_title": "Therefore They Hushed Their Fears",
+        "speaker": "David A. Bednar",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/therefore-they-hushed-their-fears?lang=eng"
+      },
+      {
+        "talk_title": "The Power of the Priesthood in the Boy",
+        "speaker": "Tad R. Callister",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/the-power-of-the-priesthood-in-the-boy?lang=eng"
+      },
+      {
+        "talk_title": "Two Principles for Any Economy",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/two-principles-for-any-economy?lang=eng"
+      },
+      {
+        "talk_title": "Celestial Marriage",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/celestial-marriage?lang=eng"
+      },
+      {
+        "talk_title": "Pray Always",
+        "speaker": "David A. Bednar",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/pray-always?lang=eng"
+      },
+      {
+        "talk_title": "Even a Child Can Understand",
+        "speaker": "Gérald Caussé",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/even-a-child-can-understand?lang=eng"
+      },
+      {
+        "talk_title": "Testimony",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/testimony?lang=eng"
+      },
+      {
+        "talk_title": "The Key of the Knowledge of God",
+        "speaker": "James E. Faust",
+        "date": "October 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/10/the-key-of-the-knowledge-of-god?lang=eng"
+      },
+      {
+        "talk_title": "“I Stand at the Door, and Knock”",
+        "speaker": "Ronald T. Halverson",
+        "date": "October 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/10/i-stand-at-the-door-and-knock?lang=eng"
+      },
+      {
+        "talk_title": "Sweet Power of Prayer",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/sweet-power-of-prayer?lang=eng"
+      },
+      {
+        "talk_title": "Becoming a Great Benefit to Our Fellow Beings",
+        "speaker": "Spencer J. Condie",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/becoming-a-great-benefit-to-our-fellow-beings?lang=eng"
+      },
+      {
+        "talk_title": "“Ye Are the Temple of God”",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/ye-are-the-temple-of-god?lang=eng"
+      },
+      {
+        "talk_title": "“Search Me, O God, and Know My Heart”",
+        "speaker": "James E. Faust",
+        "date": "April 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/04/search-me-o-god-and-know-my-heart?lang=eng"
+      },
+      {
+        "talk_title": "A Living Network",
+        "speaker": "Chieko N. Okazaki",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/a-living-network?lang=eng"
+      },
+      {
+        "talk_title": "Reverence Invites Revelation",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/reverence-invites-revelation?lang=eng"
+      },
+      {
+        "talk_title": "Alternate Voices",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/alternate-voices?lang=eng"
+      },
+      {
+        "talk_title": "Protect the Spiritual Power Line",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/10/protect-the-spiritual-power-line?lang=eng"
+      },
+      {
+        "talk_title": "He Is the Son of God",
+        "speaker": "David B. Haight",
+        "date": "April 1976",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1976/04/he-is-the-son-of-god?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 43:17": [],
+    "Doctrine and Covenants 45:39": [],
+    "Doctrine and Covenants 49:17": [
+      {
+        "talk_title": "The Prophet Joseph Smith",
+        "speaker": "Lawrence E. Corbridge",
+        "date": "April 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/04/the-prophet-joseph-smith?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 49:3": [],
+    "Doctrine and Covenants 58:57": [],
+    "Doctrine and Covenants 59:14": [
+      {
+        "talk_title": "The Blessing of Keeping the Sabbath Day Holy",
+        "speaker": "H. Aldridge Gillespie",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/the-blessing-of-keeping-the-sabbath-day-holy?lang=eng"
+      },
+      {
+        "talk_title": "The Blessing of Keeping the Sabbath Day Holy",
+        "speaker": "H. Aldridge Gillespie",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/the-blessing-of-keeping-the-sabbath-day-holy?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 72:12": [],
+    "Doctrine and Covenants 74:1": [],
+    "Doctrine and Covenants 76:13": [
+      {
+        "talk_title": "The Test",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/the-test?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 84:91": [],
+    "Doctrine and Covenants 88:123": [
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Counsel to the Saints",
+        "speaker": "Ezra Taft Benson",
+        "date": "April 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/04/counsel-to-the-saints?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 88:139": [],
+    "Doctrine and Covenants 88:140": [],
+    "Doctrine and Covenants 88:76": [
+      {
+        "talk_title": "Lessons from the Lord’s Prayers",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/04/lessons-from-the-lords-prayers?lang=eng"
+      },
+      {
+        "talk_title": "The Blessings of a Proper Fast",
+        "speaker": "Carl B. Pratt",
+        "date": "October 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/10/the-blessings-of-a-proper-fast?lang=eng"
+      },
+      {
+        "talk_title": "Sweet Power of Prayer",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/sweet-power-of-prayer?lang=eng"
+      },
+      {
+        "talk_title": "Fast Day",
+        "speaker": "Howard W. Hunter",
+        "date": "October 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/10/fast-day?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 93:12": [
+      {
+        "talk_title": "Missionary Work: Sharing What Is in Your Heart",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/14uchtdorf?lang=eng"
+      },
+      {
+        "talk_title": "Exceeding Great and Precious Promises",
+        "speaker": "David A. Bednar",
+        "date": "October 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/10/exceeding-great-and-precious-promises?lang=eng"
+      },
+      {
+        "talk_title": "Teach Them the Word of God with All Diligence",
+        "speaker": "L. Tom Perry",
+        "date": "April 1999",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1999/04/teach-them-the-word-of-god-with-all-diligence?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 93:13": [
+      {
+        "talk_title": "All Who Have Endured Valiantly",
+        "speaker": "David A. Bednar",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/16bednar?lang=eng"
+      },
+      {
+        "talk_title": "One Percent Better",
+        "speaker": "Michael A. Dunn",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/54dunn?lang=eng"
+      },
+      {
+        "talk_title": "Be Ye Therefore Perfect—Eventually",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/10/be-ye-therefore-perfect-eventually?lang=eng"
+      },
+      {
+        "talk_title": "Be Ye Therefore Perfect—Eventually",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/10/be-ye-therefore-perfect-eventually?lang=eng"
+      },
+      {
+        "talk_title": "“I Have a Work for Thee”",
+        "speaker": "John C. Pingree, Jr.",
+        "date": "October 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/10/i-have-a-work-for-thee?lang=eng"
+      },
+      {
+        "talk_title": "Why the Church",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/why-the-church?lang=eng"
+      },
+      {
+        "talk_title": "Jesus the Christ",
+        "speaker": "Robert L. Backman",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/jesus-the-christ?lang=eng"
+      },
+      {
+        "talk_title": "“Called and Prepared from the Foundation of the World”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1986",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1986/04/called-and-prepared-from-the-foundation-of-the-world?lang=eng"
+      },
+      {
+        "talk_title": "A Personal Relationship with the Savior",
+        "speaker": "James E. Faust",
+        "date": "October 1976",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1976/10/a-personal-relationship-with-the-savior?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 93:20": [
+      {
+        "talk_title": "Ladder of Faith",
+        "speaker": "Larry S. Kacher",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/17kacher?lang=eng"
+      },
+      {
+        "talk_title": "The Father",
+        "speaker": "Brian K. Ashton",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/the-father?lang=eng"
+      },
+      {
+        "talk_title": "The Doctrine of Christ",
+        "speaker": "Brian K. Ashton",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/the-doctrine-of-christ?lang=eng"
+      },
+      {
+        "talk_title": "Our Father’s Plan—Big Enough for All His Children",
+        "speaker": "Quentin L. Cook",
+        "date": "April 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/04/our-fathers-plan-big-enough-for-all-his-children?lang=eng"
+      },
+      {
+        "talk_title": "Receiving Divine Assistance through the Grace of the Lord",
+        "speaker": "Gene R. Cook",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/receiving-divine-assistance-through-the-grace-of-the-lord?lang=eng"
+      },
+      {
+        "talk_title": "Receiving Divine Assistance through the Grace of the Lord",
+        "speaker": "Gene R. Cook",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/receiving-divine-assistance-through-the-grace-of-the-lord?lang=eng"
+      },
+      {
+        "talk_title": "“We Believe in Being Honest”",
+        "speaker": "Mark E. Petersen",
+        "date": "April 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/04/we-believe-in-being-honest?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 93:29": [
+      {
+        "talk_title": "“Here Am I, Send Me”",
+        "speaker": "Susan H. Porter",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/54porter?lang=eng"
+      },
+      {
+        "talk_title": "Eternal Truth",
+        "speaker": "John C. Pingree, Jr.",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/52pingree?lang=eng"
+      },
+      {
+        "talk_title": "O How Great the Plan of Our God!",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/o-how-great-the-plan-of-our-god?lang=eng"
+      },
+      {
+        "talk_title": "The Weak and the Simple of the Church",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/the-weak-and-the-simple-of-the-church?lang=eng"
+      },
+      {
+        "talk_title": "Mrs. Patton—the Story Continues",
+        "speaker": "Thomas S. Monson",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/mrs-patton-the-story-continues?lang=eng"
+      },
+      {
+        "talk_title": "How Choice a Seer!",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/how-choice-a-seer?lang=eng"
+      },
+      {
+        "talk_title": "“Put Your Shoulder to the Wheel”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/04/put-your-shoulder-to-the-wheel?lang=eng"
+      },
+      {
+        "talk_title": "Where Is Wisdom?",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1992",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1992/10/where-is-wisdom?lang=eng"
+      },
+      {
+        "talk_title": "“Called and Prepared from the Foundation of the World”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1986",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1986/04/called-and-prepared-from-the-foundation-of-the-world?lang=eng"
+      },
+      {
+        "talk_title": "Joseph Smith the Prophet",
+        "speaker": "David B. Haight",
+        "date": "October 1979",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1979/10/joseph-smith-the-prophet?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 93:35": [
+      {
+        "talk_title": "Rise Up, O Men of God",
+        "speaker": "Gordon B. Hinckley",
+        "date": "October 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/10/rise-up-o-men-of-god?lang=eng"
+      },
+      {
+        "talk_title": "Keeping the Temple Holy",
+        "speaker": "Gordon B. Hinckley",
+        "date": "April 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/04/keeping-the-temple-holy?lang=eng"
+      }
+    ],
+    "Doctrine and Covenants 93:7": [
+      {
+        "talk_title": "The Mystery of Life",
+        "speaker": "Boyd K. Packer",
+        "date": "October 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/10/the-mystery-of-life?lang=eng"
+      }
+    ],
+    "Ecclesiastes 5:10": [
+      {
+        "talk_title": "Peace, Be Still",
+        "speaker": "Thomas S. Monson",
+        "date": "October 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/10/peace-be-still?lang=eng"
+      },
+      {
+        "talk_title": "Dedication Day",
+        "speaker": "Thomas S. Monson",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/dedication-day?lang=eng"
+      }
+    ],
+    "Ecclesiastes 5:9": [],
+    "Ephesians 3:13": [],
+    "Ephesians 5:27": [],
+    "Ephesians 5:28": [],
+    "Ether 11:12": [],
+    "Ether 3:15": [
+      {
+        "talk_title": "Decisions for Eternity",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/decisions-for-eternity?lang=eng"
+      },
+      {
+        "talk_title": "Choices",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/choices?lang=eng"
+      }
+    ],
+    "Exodus 12:24": [],
+    "Exodus 12:43": [],
+    "Exodus 13:10": [],
+    "Exodus 13:24": [],
+    "Exodus 14:10": [],
+    "Exodus 16:26": [],
+    "Exodus 16:29": [],
+    "Exodus 16:30": [],
+    "Exodus 17:29": [],
+    "Exodus 20:10": [],
+    "Exodus 20:16": [
+      {
+        "talk_title": "More Diligent and Concerned at Home",
+        "speaker": "David A. Bednar",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/more-diligent-and-concerned-at-home?lang=eng"
+      },
+      {
+        "talk_title": "Live the Commandments",
+        "speaker": "David B. Haight",
+        "date": "April 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/04/live-the-commandments?lang=eng"
+      },
+      {
+        "talk_title": "Stand True and Faithful",
+        "speaker": "Gordon B. Hinckley",
+        "date": "April 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/04/stand-true-and-faithful?lang=eng"
+      },
+      {
+        "talk_title": "Eternal Laws of Happiness",
+        "speaker": "Lynn A. Mickelsen",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/eternal-laws-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "“Behold, the Enemy Is Combined”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/behold-the-enemy-is-combined-d-c-38-12?lang=eng"
+      },
+      {
+        "talk_title": "The Ultimate Inheritance—An Allegory",
+        "speaker": "Cree-L Kofford",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/the-ultimate-inheritance-an-allegory?lang=eng"
+      },
+      {
+        "talk_title": "“Hold Up Your Light”",
+        "speaker": "J. Richard Clarke",
+        "date": "April 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/04/hold-up-your-light?lang=eng"
+      }
+    ],
+    "Exodus 21:11": [],
+    "Exodus 29:26": [],
+    "Exodus 29:31": [],
+    "Exodus 31:26": [],
+    "Exodus 31:31": [],
+    "Exodus 33:13": [],
+    "Exodus 35:13": [],
+    "Exodus 35:2": [
+      {
+        "talk_title": "“Thou Shalt Have No Other Gods”",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/04/thou-shalt-have-no-other-gods?lang=eng"
+      }
+    ],
+    "Exodus 37:2": [],
+    "Ezekiel 13:2": [],
+    "Ezekiel 16:26": [],
+    "Ezekiel 16:34": [],
+    "Ezekiel 23:11": [],
+    "Ezekiel 23:29": [],
+    "Ezekiel 23:3": [],
+    "Ezekiel 42:26": [],
+    "Ezekiel 43:26": [],
+    "Ezra 5:1": [],
+    "Ezra 8:22": [],
+    "Ezra 8:23": [],
+    "Galatians 5:18": [],
+    "Galatians 5:19": [
+      {
+        "talk_title": "Repentance and Change",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/repentance-and-change?lang=eng"
+      },
+      {
+        "talk_title": "“Ye Are the Temple of God”",
+        "speaker": "Boyd K. Packer",
+        "date": "October 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/10/ye-are-the-temple-of-god?lang=eng"
+      }
+    ],
+    "Genesis 14:20": [
+      {
+        "talk_title": "Tithing: A Test of Faith with Eternal Blessings",
+        "speaker": "Robert D. Hales",
+        "date": "October 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/10/tithing-a-test-of-faith-with-eternal-blessings?lang=eng"
+      },
+      {
+        "talk_title": "The Law of Tithing",
+        "speaker": "Earl C. Tingey",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/the-law-of-tithing?lang=eng"
+      },
+      {
+        "talk_title": "Tithing",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/tithing?lang=eng"
+      }
+    ],
+    "Genesis 14:38": [],
+    "Genesis 1:1": [
+      {
+        "talk_title": "Gathering the Family of God",
+        "speaker": "Henry B. Eyring",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/gathering-the-family-of-god?lang=eng"
+      },
+      {
+        "talk_title": "Reverent and Clean",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 1986",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1986/04/reverent-and-clean?lang=eng"
+      },
+      {
+        "talk_title": "A Basis for Faith in the Living God",
+        "speaker": "N. Eldon Tanner",
+        "date": "October 1978",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1978/10/a-basis-for-faith-in-the-living-god?lang=eng"
+      }
+    ],
+    "Genesis 1:29": [],
+    "Genesis 1:3": [
+      {
+        "talk_title": "Words Matter",
+        "speaker": "Ronald A. Rasband",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/41rasband?lang=eng"
+      }
+    ],
+    "Genesis 2:2": [],
+    "Genesis 2:9": [],
+    "Genesis 34:21": [],
+    "Genesis 6:8": [],
+    "Hebrews 11:11": [],
+    "Hebrews 12:11": [
+      {
+        "talk_title": "The Father",
+        "speaker": "Brian K. Ashton",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/the-father?lang=eng"
+      },
+      {
+        "talk_title": "“As Many as I Love, I Rebuke and Chasten”",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/as-many-as-i-love-i-rebuke-and-chasten?lang=eng"
+      },
+      {
+        "talk_title": "More Than Conquerors through Him That Loved Us",
+        "speaker": "Paul V. Johnson",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/more-than-conquerors-through-him-that-loved-us?lang=eng"
+      },
+      {
+        "talk_title": "To Look, Reach, and Come unto Christ",
+        "speaker": "Anne C. Pingree",
+        "date": "October 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/10/to-look-reach-and-come-unto-christ?lang=eng"
+      },
+      {
+        "talk_title": "“Endure It Well”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/04/endure-it-well?lang=eng"
+      }
+    ],
+    "Hebrews 13:25": [],
+    "Hebrews 4:16": [
+      {
+        "talk_title": "Confidence in the Presence of God",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/57nelson?lang=eng"
+      },
+      {
+        "talk_title": "The Man Who Communed with Jehovah",
+        "speaker": "Kyle S. McKay",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/33mckay?lang=eng"
+      },
+      {
+        "talk_title": "Motions of a Hidden Fire",
+        "speaker": "Jeffrey R. Holland",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/13holland?lang=eng"
+      },
+      {
+        "talk_title": "Be Peaceable Followers of Christ",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/44cook?lang=eng"
+      },
+      {
+        "talk_title": "Infuriating Unfairness",
+        "speaker": "Dale G. Renlund",
+        "date": "April 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/04/25renlund?lang=eng"
+      },
+      {
+        "talk_title": "Divine Discontent",
+        "speaker": "Michelle D. Craig",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/divine-discontent?lang=eng"
+      },
+      {
+        "talk_title": "The Laborers in the Vineyard",
+        "speaker": "Jeffrey R. Holland",
+        "date": "April 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/04/the-laborers-in-the-vineyard?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement Covers All Pain",
+        "speaker": "Kent F. Richards",
+        "date": "April 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/04/the-atonement-covers-all-pain?lang=eng"
+      },
+      {
+        "talk_title": "Receiving Divine Assistance through the Grace of the Lord",
+        "speaker": "Gene R. Cook",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/receiving-divine-assistance-through-the-grace-of-the-lord?lang=eng"
+      },
+      {
+        "talk_title": "Patterns of Prayer",
+        "speaker": "Bruce R. McConkie",
+        "date": "April 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/04/patterns-of-prayer?lang=eng"
+      },
+      {
+        "talk_title": "“My Specialty Is Mercy”",
+        "speaker": "Marion D. Hanks",
+        "date": "October 1981",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1981/10/my-specialty-is-mercy?lang=eng"
+      }
+    ],
+    "Hebrews 4:4": [],
+    "Hebrews 6:28": [],
+    "Hebrews 7:9": [],
+    "Helaman 12:24": [
+      {
+        "talk_title": "Inviting Others to “Come unto Christ”",
+        "speaker": "Gene R. Cook",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/inviting-others-to-come-unto-christ?lang=eng"
+      }
+    ],
+    "Helaman 1:3": [],
+    "Helaman 1:9": [],
+    "Helaman 2:1": [],
+    "Helaman 5:1": [],
+    "Helaman 6:19": [],
+    "Helaman 8:27": [],
+    "Hosea 1:2": [],
+    "Isaiah 13:6": [],
+    "Isaiah 30:10": [
+      {
+        "talk_title": "Valiant Discipleship in the Latter Days",
+        "speaker": "Jörg Klebingat",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/53klebingat?lang=eng"
+      },
+      {
+        "talk_title": "Unwanted Messages",
+        "speaker": "James E. Faust",
+        "date": "October 1986",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1986/10/unwanted-messages?lang=eng"
+      }
+    ],
+    "Isaiah 30:20": [],
+    "Isaiah 31:10": [],
+    "Isaiah 31:20": [],
+    "Isaiah 32:18": [],
+    "Isaiah 33:18": [],
+    "Isaiah 34:8": [],
+    "Isaiah 58:2": [],
+    "Isaiah 58:3": [
+      {
+        "talk_title": "Opening the Heavens for Help",
+        "speaker": "Russell M. Nelson",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/37nelson?lang=eng"
+      }
+    ],
+    "Isaiah 59:2": [
+      {
+        "talk_title": "Trust Again",
+        "speaker": "Gerrit W. Gong",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/51gong?lang=eng"
+      },
+      {
+        "talk_title": "Forgiveness: The Ultimate Form of Love",
+        "speaker": "Marion D. Hanks",
+        "date": "October 1973",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1973/10/forgiveness-the-ultimate-form-of-love?lang=eng"
+      }
+    ],
+    "Isaiah 59:3": [],
+    "Jacob 2:28": [
+      {
+        "talk_title": "My Soul Delighteth in the Things of the Lord",
+        "speaker": "Susan W. Tanner",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/my-soul-delighteth-in-the-things-of-the-lord?lang=eng"
+      },
+      {
+        "talk_title": "The Virtues of Righteous Daughters of God",
+        "speaker": "James E. Faust",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/the-virtues-of-righteous-daughters-of-god?lang=eng"
+      }
+    ],
+    "James 3:17": [
+      {
+        "talk_title": "Personal Strength through the Atonement of Jesus Christ",
+        "speaker": "Richard G. Scott",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/personal-strength-through-the-atonement-of-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "Universal Application of the Gospel",
+        "speaker": "J. Kent Jolley",
+        "date": "October 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/10/universal-application-of-the-gospel?lang=eng"
+      }
+    ],
+    "James 4:5": [],
+    "James 4:6": [
+      {
+        "talk_title": "On Being Genuine",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/04/on-being-genuine?lang=eng"
+      },
+      {
+        "talk_title": "Receiving Divine Assistance through the Grace of the Lord",
+        "speaker": "Gene R. Cook",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/receiving-divine-assistance-through-the-grace-of-the-lord?lang=eng"
+      }
+    ],
+    "Jeremiah 23:13": [],
+    "Jeremiah 23:21": [],
+    "Jeremiah 23:25": [],
+    "Jeremiah 23:26": [],
+    "Jeremiah 24:21": [],
+    "Jeremiah 24:26": [],
+    "Jeremiah 25:37": [],
+    "Jeremiah 26:37": [],
+    "Jeremiah 27:15": [],
+    "Jeremiah 29:11": [
+      {
+        "talk_title": "Walking in Covenant Relationship with Christ",
+        "speaker": "Emily Belle Freeman",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/42freeman?lang=eng"
+      },
+      {
+        "talk_title": "Beauty for Ashes: The Healing Path of Forgiveness",
+        "speaker": "Kristin M. Yee",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/23yee?lang=eng"
+      }
+    ],
+    "Jeremiah 37:19": [],
+    "Jeremiah 39:19": [],
+    "Jeremiah 7:3": [],
+    "Jeremiah 7:4": [],
+    "Joel 3:14": [
+      {
+        "talk_title": "“Thou Shalt Have No Other Gods”",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/04/thou-shalt-have-no-other-gods?lang=eng"
+      },
+      {
+        "talk_title": "“Lest Ye Be Wearied and Faint in Your Minds”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/04/lest-ye-be-wearied-and-faint-in-your-minds?lang=eng"
+      },
+      {
+        "talk_title": "“Shine As Lights in the World”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/04/shine-as-lights-in-the-world?lang=eng"
+      }
+    ],
+    "John 13:34": [
+      {
+        "talk_title": "Ministering—“That Ye Love One Another; as I Have Loved You”",
+        "speaker": "Kristin M. Yee",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/14yee?lang=eng"
+      },
+      {
+        "talk_title": "Cheering Each Other On",
+        "speaker": "J. Anette Dennis",
+        "date": "October 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/10/32dennis?lang=eng"
+      },
+      {
+        "talk_title": "“I Am He”",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/41holland?lang=eng"
+      },
+      {
+        "talk_title": "Hallmarks of Happiness",
+        "speaker": "Gary B. Sabin",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/31sabin?lang=eng"
+      },
+      {
+        "talk_title": "Ministering",
+        "speaker": "Gerrit W. Gong",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/14gong?lang=eng"
+      },
+      {
+        "talk_title": "Peacemakers Needed",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/47nelson?lang=eng"
+      },
+      {
+        "talk_title": "His Yoke Is Easy and His Burden Is Light",
+        "speaker": "J. Anette Dennis",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/42dennis?lang=eng"
+      },
+      {
+        "talk_title": "Personal Peace in Challenging Times",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/46cook?lang=eng"
+      },
+      {
+        "talk_title": "Peace, Be Still",
+        "speaker": "Lisa L. Harkness",
+        "date": "11 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/11/42harkness?lang=eng"
+      },
+      {
+        "talk_title": "An Especially Noble Calling",
+        "speaker": "Joy D. Jones",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/14jones?lang=eng"
+      },
+      {
+        "talk_title": "“Come, Follow Me” by Practicing Christian Love and Service",
+        "speaker": "Robert D. Hales",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/come-follow-me-by-practicing-christian-love-and-service?lang=eng"
+      },
+      {
+        "talk_title": "“Come, Follow Me” by Practicing Christian Love and Service",
+        "speaker": "Robert D. Hales",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/come-follow-me-by-practicing-christian-love-and-service?lang=eng"
+      },
+      {
+        "talk_title": "He Asks Us to Be His Hands",
+        "speaker": "Cheryl A. Esplin",
+        "date": "April 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/04/he-asks-us-to-be-his-hands?lang=eng"
+      },
+      {
+        "talk_title": "I Stand All Amazed",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/i-stand-all-amazed?lang=eng"
+      },
+      {
+        "talk_title": "Loving Others and Living with Differences",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/loving-others-and-living-with-differences?lang=eng"
+      },
+      {
+        "talk_title": "Your Wonderful Journey Home",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "",
+        "url": "https://www.churchofjesuschrist.org/study/broadcasts/article/general-young-women-meeting/2013/03/your-wonderful-journey-home?lang=eng"
+      },
+      {
+        "talk_title": "He Truly Loves Us",
+        "speaker": "Paul E. Koelliker",
+        "date": "April 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/04/he-truly-loves-us?lang=eng"
+      },
+      {
+        "talk_title": "Finding Joy in the Journey",
+        "speaker": "Thomas S. Monson",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/finding-joy-in-the-journey?lang=eng"
+      },
+      {
+        "talk_title": "Don’t Leave for Tomorrow What You Can Do Today",
+        "speaker": "Claudio R. M. Costa",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/don-t-leave-for-tomorrow-what-you-can-do-today?lang=eng"
+      },
+      {
+        "talk_title": "The Great Commandment",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/the-great-commandment?lang=eng"
+      },
+      {
+        "talk_title": "Come, Follow Me",
+        "speaker": "William W. Parmley",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/come-follow-me?lang=eng"
+      },
+      {
+        "talk_title": "The Peaceable Things of the Kingdom",
+        "speaker": "M. Russell Ballard",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/the-peaceable-things-of-the-kingdom?lang=eng"
+      },
+      {
+        "talk_title": "Charity: Perfect and Everlasting Love",
+        "speaker": "Gene R. Cook",
+        "date": "April 2002",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2002/04/charity-perfect-and-everlasting-love?lang=eng"
+      },
+      {
+        "talk_title": "This Is Our Day",
+        "speaker": "James E. Faust",
+        "date": "April 1999",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1999/04/this-is-our-day?lang=eng"
+      },
+      {
+        "talk_title": "Care for New Converts",
+        "speaker": "Carl B. Pratt",
+        "date": "October 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/10/care-for-new-converts?lang=eng"
+      },
+      {
+        "talk_title": "Powerful Ideas",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/powerful-ideas?lang=eng"
+      },
+      {
+        "talk_title": "“What Manner of Men Ought Ye to Be?”",
+        "speaker": "Howard W. Hunter",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/what-manner-of-men-ought-ye-to-be?lang=eng"
+      },
+      {
+        "talk_title": "A Child’s Love Matured",
+        "speaker": "Albert Choules, Jr.",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/a-childs-love-matured?lang=eng"
+      },
+      {
+        "talk_title": "A Child’s Love Matured",
+        "speaker": "Albert Choules, Jr.",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/a-childs-love-matured?lang=eng"
+      },
+      {
+        "talk_title": "Love of Christ",
+        "speaker": "C. Max Caldwell",
+        "date": "October 1992",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1992/10/love-of-christ?lang=eng"
+      },
+      {
+        "talk_title": "Be Thou an Example",
+        "speaker": "Ruth B. Wright",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/be-thou-an-example?lang=eng"
+      },
+      {
+        "talk_title": "Love",
+        "speaker": "W. Eugene Hansen",
+        "date": "October 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/10/love?lang=eng"
+      },
+      {
+        "talk_title": "Stand for Truth and Righteousness",
+        "speaker": "Ardeth Greene Kapp",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/stand-for-truth-and-righteousness?lang=eng"
+      },
+      {
+        "talk_title": "“What Think Ye of Christ?”",
+        "speaker": "Douglas H. Smith",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/what-think-ye-of-christ?lang=eng"
+      },
+      {
+        "talk_title": "Finding Joy in Life",
+        "speaker": "Barbara W. Winder",
+        "date": "October 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/10/finding-joy-in-life?lang=eng"
+      },
+      {
+        "talk_title": "A Doorway Called Love",
+        "speaker": "Thomas S. Monson",
+        "date": "October 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/10/a-doorway-called-love?lang=eng"
+      },
+      {
+        "talk_title": "“As I Have Loved You”",
+        "speaker": "Robert L. Backman",
+        "date": "October 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/10/as-i-have-loved-you?lang=eng"
+      },
+      {
+        "talk_title": "The Gospel of Love",
+        "speaker": "Loren C. Dunn",
+        "date": "October 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/10/the-gospel-of-love?lang=eng"
+      },
+      {
+        "talk_title": "Train Up a Child",
+        "speaker": "L. Tom Perry",
+        "date": "April 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/04/train-up-a-child?lang=eng"
+      },
+      {
+        "talk_title": "Application of Welfare Principles in the Home: A Key to Many Family Problems",
+        "speaker": "Barbara B. Smith",
+        "date": "October 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/10/application-of-welfare-principles-in-the-home-a-key-to-many-family-problems?lang=eng"
+      },
+      {
+        "talk_title": "The Meaning of Maturity",
+        "speaker": "Derek A. Cuthbert",
+        "date": "October 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/10/the-meaning-of-maturity?lang=eng"
+      },
+      {
+        "talk_title": "Employment Challenges in the 1980s",
+        "speaker": "J. Thomas Fyans",
+        "date": "April 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/04/employment-challenges-in-the-1980s?lang=eng"
+      },
+      {
+        "talk_title": "In Saving Others We Save Ourselves",
+        "speaker": "F. Burton Howard",
+        "date": "April 1981",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1981/04/in-saving-others-we-save-ourselves?lang=eng"
+      },
+      {
+        "talk_title": "Send Missionaries from Every Nation",
+        "speaker": "Yoshihiko Kikuchi",
+        "date": "October 1979",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1979/10/send-missionaries-from-every-nation?lang=eng"
+      },
+      {
+        "talk_title": "The Gift of Love",
+        "speaker": "Rex D. Pinegar",
+        "date": "October 1978",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1978/10/the-gift-of-love?lang=eng"
+      },
+      {
+        "talk_title": "Practicing What We Preach",
+        "speaker": "Marion D. Hanks",
+        "date": "April 1971",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1971/04/practicing-what-we-preach?lang=eng"
+      }
+    ],
+    "John 13:36": [],
+    "John 15:12": [
+      {
+        "talk_title": "Eternal Truth",
+        "speaker": "John C. Pingree, Jr.",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/52pingree?lang=eng"
+      },
+      {
+        "talk_title": "One in Christ",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/41christofferson?lang=eng"
+      },
+      {
+        "talk_title": "Hosanna to the Most High God",
+        "speaker": "Ronald A. Rasband",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/53rasband?lang=eng"
+      },
+      {
+        "talk_title": "The Teachings of Jesus Christ",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/04/51oaks?lang=eng"
+      },
+      {
+        "talk_title": "All Nations, Kindreds, and Tongues",
+        "speaker": "Gerrit W. Gong",
+        "date": "11 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/11/24gong?lang=eng"
+      },
+      {
+        "talk_title": "Christ: The Light That Shines in Darkness",
+        "speaker": "Sharon Eubank",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/42eubank?lang=eng"
+      },
+      {
+        "talk_title": "Believe, Love, Do",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/believe-love-do?lang=eng"
+      },
+      {
+        "talk_title": "“Be With and Strengthen Them”",
+        "speaker": "Jeffrey R. Holland",
+        "date": "April 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/04/be-with-and-strengthen-them?lang=eng"
+      },
+      {
+        "talk_title": "“Abide in My Love”",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/abide-in-my-love?lang=eng"
+      },
+      {
+        "talk_title": "Loving Others and Living with Differences",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/loving-others-and-living-with-differences?lang=eng"
+      },
+      {
+        "talk_title": "The Cost—and Blessings—of Discipleship",
+        "speaker": "Jeffrey R. Holland",
+        "date": "April 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/04/the-cost-and-blessings-of-discipleship?lang=eng"
+      },
+      {
+        "talk_title": "Your Wonderful Journey Home",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "",
+        "url": "https://www.churchofjesuschrist.org/study/broadcasts/article/general-young-women-meeting/2013/03/your-wonderful-journey-home?lang=eng"
+      },
+      {
+        "talk_title": "First Observe, Then Serve",
+        "speaker": "Linda K. Burton",
+        "date": "October 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/10/first-observe-then-serve?lang=eng"
+      },
+      {
+        "talk_title": "Charity Never Faileth",
+        "speaker": "Thomas S. Monson",
+        "date": "",
+        "url": "https://www.churchofjesuschrist.org/study/broadcasts/article/general-relief-society-meeting/2010/09/charity-never-faileth?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Knowing God",
+        "speaker": "Bernard P. Brockbank",
+        "date": "April 1972",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1972/04/knowing-god?lang=eng"
+      }
+    ],
+    "John 15:17": [
+      {
+        "talk_title": "Loving Others and Living with Differences",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/loving-others-and-living-with-differences?lang=eng"
+      }
+    ],
+    "John 17:5": [],
+    "John 18:15": [],
+    "John 19:26": [
+      {
+        "talk_title": "God’s Favourite",
+        "speaker": "Karl D. Hirst",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/14hirst?lang=eng"
+      },
+      {
+        "talk_title": "They Showed the Way",
+        "speaker": "Thomas S. Monson",
+        "date": "April 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/04/they-showed-the-way?lang=eng"
+      },
+      {
+        "talk_title": "Jesus Is Our Savior",
+        "speaker": "David B. Haight",
+        "date": "April 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/04/jesus-is-our-savior?lang=eng"
+      }
+    ],
+    "John 19:27": [
+      {
+        "talk_title": "Behold Thy Mother",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/behold-thy-mother?lang=eng"
+      },
+      {
+        "talk_title": "Waiting upon the Lord: Thy Will Be Done",
+        "speaker": "Robert D. Hales",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/waiting-upon-the-lord-thy-will-be-done?lang=eng"
+      },
+      {
+        "talk_title": "They Showed the Way",
+        "speaker": "Thomas S. Monson",
+        "date": "April 1997",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1997/04/they-showed-the-way?lang=eng"
+      },
+      {
+        "talk_title": "Jesus Is Our Savior",
+        "speaker": "David B. Haight",
+        "date": "April 1982",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1982/04/jesus-is-our-savior?lang=eng"
+      }
+    ],
+    "John 1:16": [
+      {
+        "talk_title": "Without Guile",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/without-guile?lang=eng"
+      }
+    ],
+    "John 1:2": [],
+    "John 20:2": [
+      {
+        "talk_title": "God’s Favourite",
+        "speaker": "Karl D. Hirst",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/14hirst?lang=eng"
+      },
+      {
+        "talk_title": "The Resurrection of Jesus Christ",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/04/the-resurrection-of-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "This Glorious Easter Morn",
+        "speaker": "Gordon B. Hinckley",
+        "date": "April 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/04/this-glorious-easter-morn?lang=eng"
+      },
+      {
+        "talk_title": "The Resurrection",
+        "speaker": "F. Melvin Hammond",
+        "date": "April 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/04/the-resurrection?lang=eng"
+      },
+      {
+        "talk_title": "Evidences of the Resurrection",
+        "speaker": "Howard W. Hunter",
+        "date": "April 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/04/evidences-of-the-resurrection?lang=eng"
+      }
+    ],
+    "John 20:3": [],
+    "John 9:28": [],
+    "Jonah 3:2": [],
+    "Joseph Smith--History 1:58": [],
+    "Joseph Smith--Matthew 1:41": [
+      {
+        "talk_title": "Put Off the Natural Man, and Come Off Conqueror",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/put-off-the-natural-man-and-come-off-conqueror?lang=eng"
+      }
+    ],
+    "Joseph Smith--Matthew 1:43": [],
+    "Joshua 24:25": [],
+    "Leviticus 22:9": [],
+    "Leviticus 23:3": [
+      {
+        "talk_title": "“Thou Shalt Have No Other Gods”",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/04/thou-shalt-have-no-other-gods?lang=eng"
+      },
+      {
+        "talk_title": "The Lord’s Day",
+        "speaker": "James E. Faust",
+        "date": "October 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/10/the-lords-day?lang=eng"
+      }
+    ],
+    "Leviticus 27:30": [
+      {
+        "talk_title": "Will a Man Rob God?",
+        "speaker": "Yoshihiko Kikuchi",
+        "date": "April 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/04/will-a-man-rob-god?lang=eng"
+      },
+      {
+        "talk_title": "Tithing: A Privilege",
+        "speaker": "Ronald E. Poelman",
+        "date": "April 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/04/tithing-a-privilege?lang=eng"
+      }
+    ],
+    "Leviticus 27:32": [],
+    "Leviticus 28:30": [],
+    "Leviticus 28:32": [],
+    "Leviticus 8:22": [],
+    "Leviticus 8:29": [],
+    "Leviticus 8:33": [],
+    "Luke 10:5": [
+      {
+        "talk_title": "This Is Our Day",
+        "speaker": "James E. Faust",
+        "date": "April 1999",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1999/04/this-is-our-day?lang=eng"
+      }
+    ],
+    "Luke 11:42": [],
+    "Luke 14:20": [],
+    "Luke 16:18": [],
+    "Luke 17:27": [],
+    "Luke 18:12": [
+      {
+        "talk_title": "The Pharisee and the Publican",
+        "speaker": "Howard W. Hunter",
+        "date": "April 1984",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1984/04/the-pharisee-and-the-publican?lang=eng"
+      }
+    ],
+    "Luke 18:24": [],
+    "Luke 19:12": [],
+    "Luke 3:3": [],
+    "Luke 9:6": [
+      {
+        "talk_title": "He Heals the Heavy Laden",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/10/he-heals-the-heavy-laden?lang=eng"
+      }
+    ],
+    "Malachi 4:5": [
+      {
+        "talk_title": "Keys, Covenants, and Easter",
+        "speaker": "Quentin L. Cook",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/56cook?lang=eng"
+      },
+      {
+        "talk_title": "The Character of Christ",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/51christofferson?lang=eng"
+      },
+      {
+        "talk_title": "Confidence in the Presence of God",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/57nelson?lang=eng"
+      },
+      {
+        "talk_title": "Hosanna and Hallelujah—The Living Jesus Christ: The Heart of Restoration and Easter",
+        "speaker": "Gerrit W. Gong",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/31gong?lang=eng"
+      },
+      {
+        "talk_title": "Preparing for the Lord’s Return",
+        "speaker": "D. Todd Christofferson",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/44christofferson?lang=eng"
+      },
+      {
+        "talk_title": "Be Thou an Example of the Believers",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/10/be-thou-an-example-of-the-believers?lang=eng"
+      },
+      {
+        "talk_title": "Are We Keeping Pace?",
+        "speaker": "M. Russell Ballard",
+        "date": "October 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/10/are-we-keeping-pace?lang=eng"
+      }
+    ],
+    "Mark 10:10": [],
+    "Mark 10:12": [],
+    "Mark 13:19": [],
+    "Mark 14:56": [],
+    "Mark 14:57": [],
+    "Mark 14:59": [],
+    "Mark 16:14": [
+      {
+        "talk_title": "’Tis Eastertide: No One Walks Alone",
+        "speaker": "Gerrit W. Gong",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/58gong?lang=eng"
+      },
+      {
+        "talk_title": "“If a Man Die, Shall He Live Again?”",
+        "speaker": "Carlos E. Asay",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/if-a-man-die-shall-he-live-again?lang=eng"
+      },
+      {
+        "talk_title": "The Supernal Gift of the Atonement",
+        "speaker": "James E. Faust",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/the-supernal-gift-of-the-atonement?lang=eng"
+      }
+    ],
+    "Mark 8:34": [
+      {
+        "talk_title": "Lost Luggage, Redeemed Souls",
+        "speaker": "Gary E. Stevenson",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/23stevenson?lang=eng"
+      },
+      {
+        "talk_title": "We Believe in Being Chaste",
+        "speaker": "David A. Bednar",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/we-believe-in-being-chaste?lang=eng"
+      },
+      {
+        "talk_title": "Being a More Christian Christian",
+        "speaker": "Robert D. Hales",
+        "date": "October 2012",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2012/10/being-a-more-christian-christian?lang=eng"
+      },
+      {
+        "talk_title": "Never Leave Him",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/10/never-leave-him?lang=eng"
+      },
+      {
+        "talk_title": "The Way",
+        "speaker": "Lawrence E. Corbridge",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/the-way?lang=eng"
+      },
+      {
+        "talk_title": "“Exceeding Great and Precious Promises”",
+        "speaker": "Howard W. Hunter",
+        "date": "October 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/10/exceeding-great-and-precious-promises?lang=eng"
+      },
+      {
+        "talk_title": "Take Up His Cross",
+        "speaker": "Han In Sang",
+        "date": "April 1992",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1992/04/take-up-his-cross?lang=eng"
+      }
+    ],
+    "Mark 8:35": [
+      {
+        "talk_title": "No Greater Joy Than to Know That They Know",
+        "speaker": "K. Brett Nattress",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/no-greater-joy-than-to-know-that-they-know?lang=eng"
+      },
+      {
+        "talk_title": "Your Sacred Duty to Minister",
+        "speaker": "David L. Beck",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/your-sacred-duty-to-minister?lang=eng"
+      },
+      {
+        "talk_title": "”The Great and Wonderful Love”",
+        "speaker": "Anthony D. Perkins",
+        "date": "October 2006",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2006/10/the-great-and-wonderful-love?lang=eng"
+      },
+      {
+        "talk_title": "Strengthen Thy Brethren",
+        "speaker": "Robert J. Whetten",
+        "date": "April 2005",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2005/04/strengthen-thy-brethren?lang=eng"
+      }
+    ],
+    "Mark 9:27": [
+      {
+        "talk_title": "His Hand Ready to Help Us",
+        "speaker": "Juan Pablo Villar",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/23villar?lang=eng"
+      },
+      {
+        "talk_title": "The Lord Thy God Will Hold Thy Hand",
+        "speaker": "W. Craig Zwick",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-lord-thy-god-will-hold-thy-hand?lang=eng"
+      },
+      {
+        "talk_title": "He Took Him by the Hand",
+        "speaker": "Marvin J. Ashton",
+        "date": "October 1973",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1973/10/he-took-him-by-the-hand?lang=eng"
+      }
+    ],
+    "Mark 9:29": [
+      {
+        "talk_title": "Sweet Power of Prayer",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/sweet-power-of-prayer?lang=eng"
+      },
+      {
+        "talk_title": "“Help Thou Mine Unbelief”",
+        "speaker": "L. Whitney Clayton",
+        "date": "October 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/10/help-thou-mine-unbelief?lang=eng"
+      }
+    ],
+    "Matthew 10:19": [],
+    "Matthew 10:24": [],
+    "Matthew 10:30": [
+      {
+        "talk_title": "“O, Divine Redeemer”",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1981",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1981/10/o-divine-redeemer?lang=eng"
+      }
+    ],
+    "Matthew 10:37": [
+      {
+        "talk_title": "Decisions for Eternity",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/decisions-for-eternity?lang=eng"
+      },
+      {
+        "talk_title": "The Great Commandment—Love the Lord",
+        "speaker": "Ezra Taft Benson",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/the-great-commandment-love-the-lord?lang=eng"
+      }
+    ],
+    "Matthew 11:13": [],
+    "Matthew 15:18": [],
+    "Matthew 15:19": [
+      {
+        "talk_title": "The Lord Looketh on the Heart",
+        "speaker": "Ronald M. Barcellos",
+        "date": "October 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/10/14barcellos?lang=eng"
+      }
+    ],
+    "Matthew 16:24": [
+      {
+        "talk_title": "Lost Luggage, Redeemed Souls",
+        "speaker": "Gary E. Stevenson",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/23stevenson?lang=eng"
+      },
+      {
+        "talk_title": "Jesus Christ at the Center of Our Lives",
+        "speaker": "José L. Alonso",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/24alonso?lang=eng"
+      },
+      {
+        "talk_title": "Temples, Houses of the Lord Dotting the Earth",
+        "speaker": "Neil L. Andersen",
+        "date": "April 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/04/55andersen?lang=eng"
+      },
+      {
+        "talk_title": "Lifted Up upon the Cross",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/41holland?lang=eng"
+      },
+      {
+        "talk_title": "That They Might Know Thee",
+        "speaker": "Jonathan S. Schmitt",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/53schmitt?lang=eng"
+      },
+      {
+        "talk_title": "Fear Not: Believe Only!",
+        "speaker": "Jeffrey R. Holland",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/23holland?lang=eng"
+      },
+      {
+        "talk_title": "Exercising Our Spiritual Muscles",
+        "speaker": "Juan Pablo Villar",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/52villar?lang=eng"
+      },
+      {
+        "talk_title": "The Living Bread Which Came Down from Heaven",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/10/the-living-bread-which-came-down-from-heaven?lang=eng"
+      },
+      {
+        "talk_title": "“If Ye Had Known Me”",
+        "speaker": "David A. Bednar",
+        "date": "October 2016",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2016/10/if-ye-had-known-me?lang=eng"
+      },
+      {
+        "talk_title": "Come, Join with Us",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/come-join-with-us?lang=eng"
+      },
+      {
+        "talk_title": "We Believe in Being Chaste",
+        "speaker": "David A. Bednar",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/we-believe-in-being-chaste?lang=eng"
+      },
+      {
+        "talk_title": "“Repent… That I May Heal You”",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/repent-that-i-may-heal-you?lang=eng"
+      },
+      {
+        "talk_title": "The Twelve",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/the-twelve?lang=eng"
+      },
+      {
+        "talk_title": "Come, Follow Me",
+        "speaker": "William W. Parmley",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/come-follow-me?lang=eng"
+      },
+      {
+        "talk_title": "“Exceeding Great and Precious Promises”",
+        "speaker": "Howard W. Hunter",
+        "date": "October 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/10/exceeding-great-and-precious-promises?lang=eng"
+      },
+      {
+        "talk_title": "“What Manner of Men Ought Ye to Be?”",
+        "speaker": "Howard W. Hunter",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/what-manner-of-men-ought-ye-to-be?lang=eng"
+      },
+      {
+        "talk_title": "A Crown of Thorns, a Crown of Glory",
+        "speaker": "James E. Faust",
+        "date": "April 1991",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1991/04/a-crown-of-thorns-a-crown-of-glory?lang=eng"
+      },
+      {
+        "talk_title": "What Manner of Men Ought We to Be?",
+        "speaker": "Ezra Taft Benson",
+        "date": "October 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/10/what-manner-of-men-ought-we-to-be?lang=eng"
+      }
+    ],
+    "Matthew 16:25": [
+      {
+        "talk_title": "Ministering—“That Ye Love One Another; as I Have Loved You”",
+        "speaker": "Kristin M. Yee",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/14yee?lang=eng"
+      },
+      {
+        "talk_title": "God’s Favourite",
+        "speaker": "Karl D. Hirst",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/14hirst?lang=eng"
+      },
+      {
+        "talk_title": "Pressing toward the Mark",
+        "speaker": "Edward Dube",
+        "date": "April 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/04/44dube?lang=eng"
+      },
+      {
+        "talk_title": "Wounded",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/wounded?lang=eng"
+      },
+      {
+        "talk_title": "Believe, Love, Do",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/believe-love-do?lang=eng"
+      },
+      {
+        "talk_title": "My Heart Pondereth Them Continually",
+        "speaker": "Devin G. Durrant",
+        "date": "October 2015",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2015/10/my-heart-pondereth-them-continually?lang=eng"
+      },
+      {
+        "talk_title": "Personal Strength through the Atonement of Jesus Christ",
+        "speaker": "Richard G. Scott",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/personal-strength-through-the-atonement-of-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "Four Titles",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/four-titles?lang=eng"
+      },
+      {
+        "talk_title": "Obedience—Life’s Great Challenge",
+        "speaker": "Donald L. Staheli",
+        "date": "April 1998",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1998/04/obedience-lifes-great-challenge?lang=eng"
+      },
+      {
+        "talk_title": "“Be of Good Cheer”",
+        "speaker": "Marvin J. Ashton",
+        "date": "April 1986",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1986/04/be-of-good-cheer?lang=eng"
+      }
+    ],
+    "Matthew 17:21": [
+      {
+        "talk_title": "Opening the Heavens for Help",
+        "speaker": "Russell M. Nelson",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/37nelson?lang=eng"
+      },
+      {
+        "talk_title": "Sweet Power of Prayer",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/sweet-power-of-prayer?lang=eng"
+      },
+      {
+        "talk_title": "“Help Thou Mine Unbelief”",
+        "speaker": "L. Whitney Clayton",
+        "date": "October 2001",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2001/10/help-thou-mine-unbelief?lang=eng"
+      },
+      {
+        "talk_title": "Put Off the Natural Man, and Come Off Conqueror",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/put-off-the-natural-man-and-come-off-conqueror?lang=eng"
+      },
+      {
+        "talk_title": "Do Not Despair",
+        "speaker": "Ezra Taft Benson",
+        "date": "October 1974",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1974/10/do-not-despair?lang=eng"
+      }
+    ],
+    "Matthew 19:9": [],
+    "Matthew 22:24": [],
+    "Matthew 22:25": [],
+    "Matthew 24:37": [
+      {
+        "talk_title": "“Take Especial Care of Your Family”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/take-especial-care-of-your-family?lang=eng"
+      },
+      {
+        "talk_title": "“Behold, the Enemy Is Combined”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/04/behold-the-enemy-is-combined-d-c-38-12?lang=eng"
+      },
+      {
+        "talk_title": "A Royal Generation",
+        "speaker": "Dean L. Larsen",
+        "date": "April 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/04/a-royal-generation?lang=eng"
+      },
+      {
+        "talk_title": "Keep the Commandments",
+        "speaker": "Sterling W. Sill",
+        "date": "October 1972",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1972/10/keep-the-commandments?lang=eng"
+      }
+    ],
+    "Matthew 24:39": [
+      {
+        "talk_title": "“For I Will Lead You Along”",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/for-i-will-lead-you-along?lang=eng"
+      }
+    ],
+    "Matthew 24:44": [
+      {
+        "talk_title": "Preparation for the Second Coming",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/04/preparation-for-the-second-coming?lang=eng"
+      }
+    ],
+    "Matthew 3:1": [],
+    "Matthew 3:27": [],
+    "Matthew 4:2": [
+      {
+        "talk_title": "Building a Life Resistant to the Adversary",
+        "speaker": "Jorge F. Zeballos",
+        "date": "October 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/10/27zeballos?lang=eng"
+      },
+      {
+        "talk_title": "Fast Day",
+        "speaker": "Howard W. Hunter",
+        "date": "October 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/10/fast-day?lang=eng"
+      }
+    ],
+    "Matthew 5:32": [],
+    "Mormon 3:20": [
+      {
+        "talk_title": "Love All; Love Each",
+        "speaker": "Gérald Caussé",
+        "date": "April 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/04/27causse?lang=eng"
+      },
+      {
+        "talk_title": "Ensuring a Righteous Judgment",
+        "speaker": "James R. Rasband",
+        "date": "5 2020",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2020/05/13rasband?lang=eng"
+      },
+      {
+        "talk_title": "Our Lord and Savior",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/our-lord-and-savior?lang=eng"
+      }
+    ],
+    "Mormon 3:22": [
+      {
+        "talk_title": "Cleansed by Repentance",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2019",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2019/04/51oaks?lang=eng"
+      }
+    ],
+    "Mormon 6:21": [
+      {
+        "talk_title": "Scriptural Witnesses",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/scriptural-witnesses?lang=eng"
+      }
+    ],
+    "Mormon 7:6": [
+      {
+        "talk_title": "Resurrection",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/resurrection?lang=eng"
+      }
+    ],
+    "Moroni 7:3": [
+      {
+        "talk_title": "Personal Preparation to Meet the Savior",
+        "speaker": "Dale G. Renlund",
+        "date": "April 2025",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2025/04/25renlund?lang=eng"
+      },
+      {
+        "talk_title": "Be Peaceable Followers of Christ",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/44cook?lang=eng"
+      },
+      {
+        "talk_title": "Be Peaceable Followers of Christ",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/44cook?lang=eng"
+      },
+      {
+        "talk_title": "Following Jesus: Being a Peacemaker",
+        "speaker": "Neil L. Andersen",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/15andersen?lang=eng"
+      },
+      {
+        "talk_title": "We Are The Church of Jesus Christ of Latter-day Saints",
+        "speaker": "Reyna I. Aburto",
+        "date": "April 2022",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2022/04/13aburto?lang=eng"
+      },
+      {
+        "talk_title": "The Book of Mormon: Another Testament of Jesus Christ—Plain and Precious Things",
+        "speaker": "Boyd K. Packer",
+        "date": "April 2005",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2005/04/the-book-of-mormon-another-testament-of-jesus-christ-plain-and-precious-things?lang=eng"
+      },
+      {
+        "talk_title": "Personal Integrity",
+        "speaker": "Joseph B. Wirthlin",
+        "date": "April 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/04/personal-integrity?lang=eng"
+      },
+      {
+        "talk_title": "“The Peaceable Followers of Christ”",
+        "speaker": "L. Tom Perry",
+        "date": "October 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/10/the-peaceable-followers-of-christ?lang=eng"
+      }
+    ],
+    "Moroni 7:4": [],
+    "Moses 1:33": [
+      {
+        "talk_title": "The Correct Name of the Church",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2018",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2018/10/the-correct-name-of-the-church?lang=eng"
+      },
+      {
+        "talk_title": "Drawing the Power of Jesus Christ into Our Lives",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/drawing-the-power-of-jesus-christ-into-our-lives?lang=eng"
+      },
+      {
+        "talk_title": "The Godhead and the Plan of Salvation",
+        "speaker": "Dallin H. Oaks",
+        "date": "April 2017",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2017/04/the-godhead-and-the-plan-of-salvation?lang=eng"
+      },
+      {
+        "talk_title": "Receiving a Testimony of Light and Truth",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/receiving-a-testimony-of-light-and-truth?lang=eng"
+      },
+      {
+        "talk_title": "“This Is My Work and Glory”",
+        "speaker": "M. Russell Ballard",
+        "date": "April 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/04/this-is-my-work-and-glory?lang=eng"
+      },
+      {
+        "talk_title": "You Matter to Him",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/you-matter-to-him?lang=eng"
+      },
+      {
+        "talk_title": "Gaining a Testimony of God the Father; His Son, Jesus Christ; and the Holy Ghost",
+        "speaker": "Robert D. Hales",
+        "date": "April 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/04/gaining-a-testimony-of-god-the-father-his-son-jesus-christ-and-the-holy-ghost?lang=eng"
+      },
+      {
+        "talk_title": "Scriptural Witnesses",
+        "speaker": "Russell M. Nelson",
+        "date": "October 2007",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2007/10/scriptural-witnesses?lang=eng"
+      },
+      {
+        "talk_title": "How Choice a Seer!",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/how-choice-a-seer?lang=eng"
+      },
+      {
+        "talk_title": "The Creation",
+        "speaker": "Russell M. Nelson",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/the-creation?lang=eng"
+      },
+      {
+        "talk_title": "Content with the Things Allotted unto Us",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/content-with-the-things-allotted-unto-us?lang=eng"
+      },
+      {
+        "talk_title": "We Are Creators",
+        "speaker": "Mary Ellen W. Smoot",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/we-are-creators?lang=eng"
+      },
+      {
+        "talk_title": "Our Destiny",
+        "speaker": "L. Aldin Porter",
+        "date": "October 1999",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1999/10/our-destiny?lang=eng"
+      },
+      {
+        "talk_title": "The Atonement",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/the-atonement?lang=eng"
+      },
+      {
+        "talk_title": "The Unique Message of Jesus Christ",
+        "speaker": "Robert D. Hales",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/the-unique-message-of-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "Your Personal Checklist for a Successful Eternal Flight",
+        "speaker": "Hugh W. Pinnock",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/your-personal-checklist-for-a-successful-eternal-flight?lang=eng"
+      },
+      {
+        "talk_title": "“From the Beginning”",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/from-the-beginning?lang=eng"
+      },
+      {
+        "talk_title": "Irony: The Crust on the Bread of Adversity",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/irony-the-crust-on-the-bread-of-adversity?lang=eng"
+      },
+      {
+        "talk_title": "Irony: The Crust on the Bread of Adversity",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/irony-the-crust-on-the-bread-of-adversity?lang=eng"
+      },
+      {
+        "talk_title": "“Yet Thou Art There”",
+        "speaker": "Neal A. Maxwell",
+        "date": "October 1987",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1987/10/yet-thou-art-there?lang=eng"
+      },
+      {
+        "talk_title": "Creator and Savior",
+        "speaker": "Mark E. Petersen",
+        "date": "April 1983",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/04/creator-and-savior?lang=eng"
+      },
+      {
+        "talk_title": "“What Think Ye of Christ?” “Whom Say Ye That I Am?”",
+        "speaker": "Robert D. Hales",
+        "date": "April 1979",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1979/04/what-think-ye-of-christ-whom-say-ye-that-i-am?lang=eng"
+      }
+    ],
+    "Moses 2:1": [
+      {
+        "talk_title": "The Things of My Soul",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2021",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2021/10/26rasband?lang=eng"
+      },
+      {
+        "talk_title": "Eternal Life—to Know Our Heavenly Father and His Son, Jesus Christ",
+        "speaker": "Robert D. Hales",
+        "date": "October 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/10/eternal-life-to-know-our-heavenly-father-and-his-son-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "Seeking to Know God, Our Heavenly Father, and His Son, Jesus Christ",
+        "speaker": "Robert D. Hales",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/seeking-to-know-god-our-heavenly-father-and-his-son-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "Content with the Things Allotted unto Us",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 2000",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2000/04/content-with-the-things-allotted-unto-us?lang=eng"
+      },
+      {
+        "talk_title": "“We Need a Listening Ear”",
+        "speaker": "Spencer W. Kimball",
+        "date": "October 1979",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1979/10/we-need-a-listening-ear?lang=eng"
+      }
+    ],
+    "Moses 2:27": [
+      {
+        "talk_title": "The Words of Christ and the Holy Ghost Will Lead Us to the Truth",
+        "speaker": "Takashi Wada",
+        "date": "October 2024",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2024/10/52wada?lang=eng"
+      },
+      {
+        "talk_title": "The Moral Force of Women",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2013",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2013/10/the-moral-force-of-women?lang=eng"
+      },
+      {
+        "talk_title": "Seeking to Know God, Our Heavenly Father, and His Son, Jesus Christ",
+        "speaker": "Robert D. Hales",
+        "date": "October 2009",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2009/10/seeking-to-know-god-our-heavenly-father-and-his-son-jesus-christ?lang=eng"
+      },
+      {
+        "talk_title": "God Loves and Helps All of His Children",
+        "speaker": "Keith B. McMullin",
+        "date": "October 2008",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2008/10/god-loves-and-helps-all-of-his-children?lang=eng"
+      },
+      {
+        "talk_title": "The Joy of Living the Great Plan of Happiness",
+        "speaker": "Richard G. Scott",
+        "date": "October 1996",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1996/10/the-joy-of-living-the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "“The Great Plan of Happiness”",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 1993",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1993/10/the-great-plan-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Choices",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/choices?lang=eng"
+      },
+      {
+        "talk_title": "Atonement, Agency, Accountability",
+        "speaker": "Boyd K. Packer",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/atonement-agency-accountability?lang=eng"
+      }
+    ],
+    "Moses 3:2": [],
+    "Mosiah 11:5": [],
+    "Mosiah 13:18": [],
+    "Mosiah 13:23": [
+      {
+        "talk_title": "“Hold Up Your Light”",
+        "speaker": "J. Richard Clarke",
+        "date": "April 1985",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1985/04/hold-up-your-light?lang=eng"
+      }
+    ],
+    "Mosiah 13:33": [
+      {
+        "talk_title": "Perilous Times",
+        "speaker": "Cecil O. Samuelson, Jr.",
+        "date": "October 2004",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2004/10/perilous-times?lang=eng"
+      }
+    ],
+    "Mosiah 23:17": [],
+    "Mosiah 7:27": [
+      {
+        "talk_title": "Brothers and Sisters in Christ",
+        "speaker": "Ulisses Soares",
+        "date": "October 2023",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2023/10/34soares?lang=eng"
+      },
+      {
+        "talk_title": "Eternal Laws of Happiness",
+        "speaker": "Lynn A. Mickelsen",
+        "date": "October 1995",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1995/10/eternal-laws-of-happiness?lang=eng"
+      },
+      {
+        "talk_title": "Choices",
+        "speaker": "Russell M. Nelson",
+        "date": "October 1990",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1990/10/choices?lang=eng"
+      },
+      {
+        "talk_title": "Atonement, Agency, Accountability",
+        "speaker": "Boyd K. Packer",
+        "date": "April 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/04/atonement-agency-accountability?lang=eng"
+      }
+    ],
+    "Nahum 3:4": [],
+    "Nehemiah 10:37": [],
+    "Nehemiah 10:38": [],
+    "Nehemiah 13:12": [],
+    "Numbers 15:15": [],
+    "Numbers 18:26": [],
+    "Numbers 19:12": [],
+    "Numbers 19:19": [],
+    "Numbers 28:25": [],
+    "Numbers 29:32": [],
+    "Numbers 7:48": [],
+    "Numbers 9:14": [],
+    "Proverbs 12:1": [],
+    "Proverbs 12:17": [],
+    "Proverbs 13:28": [],
+    "Proverbs 14:5": [],
+    "Proverbs 16:16": [],
+    "Proverbs 17:17": [
+      {
+        "talk_title": "“You Are My Hands”",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2010",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2010/04/you-are-my-hands?lang=eng"
+      }
+    ],
+    "Proverbs 17:19": [],
+    "Proverbs 17:4": [],
+    "Proverbs 17:8": [],
+    "Proverbs 19:16": [
+      {
+        "talk_title": "Care for the Life of the Soul",
+        "speaker": "Neal A. Maxwell",
+        "date": "April 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/04/care-for-the-life-of-the-soul?lang=eng"
+      }
+    ],
+    "Proverbs 19:27": [],
+    "Proverbs 19:5": [],
+    "Proverbs 19:9": [],
+    "Proverbs 21:17": [],
+    "Proverbs 21:28": [],
+    "Proverbs 24:10": [],
+    "Proverbs 3:34": [],
+    "Proverbs 6:19": [
+      {
+        "talk_title": "The Canker of Contention",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1989",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1989/04/the-canker-of-contention?lang=eng"
+      }
+    ],
+    "Psalms 109:24": [],
+    "Psalms 10:6": [],
+    "Psalms 27:4": [],
+    "Psalms 65:10": [],
+    "Psalms 69:10": [],
+    "Psalms 88:12": [],
+    "Psalms 93:7": [],
+    "Psalms 94:13": [],
+    "Psalms 99:7": [],
+    "Revelation 17:2": [],
+    "Revelation 18:3": [],
+    "Romans 11:6": [],
+    "Romans 13:2": [],
+    "Romans 13:8": [
+      {
+        "talk_title": "“Teach Us Tolerance and Love”",
+        "speaker": "Russell M. Nelson",
+        "date": "April 1994",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1994/04/teach-us-tolerance-and-love?lang=eng"
+      }
+    ],
+    "Romans 15:20": [],
+    "Romans 1:1": [
+      {
+        "talk_title": "The Grandeur of God",
+        "speaker": "Jeffrey R. Holland",
+        "date": "October 2003",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2003/10/the-grandeur-of-god?lang=eng"
+      }
+    ],
+    "Romans 1:15": [],
+    "Romans 2:22": [],
+    "Romans 5:15": [
+      {
+        "talk_title": "The Supernal Gift of the Atonement",
+        "speaker": "James E. Faust",
+        "date": "October 1988",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/1988/10/the-supernal-gift-of-the-atonement?lang=eng"
+      }
+    ],
+    "Romans 5:3": [
+      {
+        "talk_title": "Grateful in Any Circumstances",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "April 2014",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2014/04/grateful-in-any-circumstances?lang=eng"
+      },
+      {
+        "talk_title": "Waiting upon the Lord: Thy Will Be Done",
+        "speaker": "Robert D. Hales",
+        "date": "October 2011",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2011/10/waiting-upon-the-lord-thy-will-be-done?lang=eng"
+      }
+    ],
+    "Romans 7:2": [],
+    "Romans 7:3": [],
+    "Song of Solomon 6:7": [],
+    "Zechariah 14:1": [],
+    "Zechariah 4:7": [],
+    "Zechariah 7:5": [],
+    "Zechariah 8:9": [],
+    "Zephaniah 1:14": []
   }
 }
