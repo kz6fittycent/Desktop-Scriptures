@@ -310,12 +310,56 @@ def _extract_json_array(content: str) -> list[str]:
     return [item for item in data if isinstance(item, str)]
 
 
+# A book name shaped like a proper noun - Capitalized word(s), optionally
+# led by a book number (1-4) - followed immediately by a chapter number
+# and optional verse/verse-range. Extends past one capitalized word only
+# through a lowercase "and"/"of" joiner ("Doctrine and Covenants", "Song
+# of Solomon"), never through another bare capitalized word directly -
+# otherwise an ordinary capitalized word earlier in the same sentence
+# ("See Doctrine and Covenants...") would get swallowed into the book
+# name too. Deliberately NOT anchored to the whole string (unlike
+# _REFERENCE_RE) - this scans for a reference occurring anywhere inside a
+# larger block of prose.
+_PROSE_REFERENCE_RE = re.compile(
+    r"\b(?P<book>(?:[1-4]\s)?[A-Z][a-zA-Z]+(?:\s(?:and|of)\s[A-Z][a-zA-Z]+)*)"
+    r"\s+(?P<chapter>\d{1,3})(?::(?P<start>\d{1,3})(?:-(?P<end>\d{1,3}))?)?\b"
+)
+
+
+def _extract_candidates(content: str) -> list[str]:
+    """Every candidate reference string worth trying to resolve, from the
+    model's raw reply. Tries the requested bare-JSON-array format first;
+    if that finds nothing at all - a smaller or less compliant model
+    ignoring the "just a JSON array" instruction and answering in prose
+    instead is common enough, especially on a question phrased like
+    general trivia rather than an obvious "find me a verse" ask - falls
+    back to scanning the raw prose for reference-shaped substrings
+    instead of giving up. This can't introduce new hallucination risk:
+    whatever it finds, compliant or scanned, still goes through the exact
+    same resolve_references validation before anything reaches the user,
+    so a false-positive-looking scan match (e.g. "Chapter 3") that isn't
+    a real book name simply fails to resolve and is dropped the same way
+    a genuine hallucination already would be."""
+    candidates = _extract_json_array(content)
+    if candidates:
+        return candidates
+    return [m.group(0).strip() for m in _PROSE_REFERENCE_RE.finditer(content)]
+
+
 class QuestionAsker(QObject):
     """Sends one question to the configured AI endpoint and resolves its
-    answer against `conn`. `succeeded(list[AskedReference])` or
-    `failed(str, needs_api_key: bool)` fires exactly once - keep a
+    answer against `conn`. `succeeded(list[AskedReference], raw_content)`
+    or `failed(str, needs_api_key: bool)` fires exactly once - keep a
     reference to this object until one does (see ai_client.py's
     ConnectionTester for why).
+
+    `raw_content` is the model's own unprocessed reply text, carried
+    through purely as a diagnostic - never shown as if it were an answer.
+    When no reference in it resolved (the model didn't know a real one,
+    ignored the "just a JSON array" instruction and wrote prose instead,
+    or something else entirely), the caller can show it so the user (and
+    whoever's debugging a report like "it said no matches") can actually
+    see why, instead of an unexplained empty result.
 
     `history` carries prior turns forward for a follow-up refinement
     ("just the ones about baptism") to have context - each entry is
@@ -326,7 +370,7 @@ class QuestionAsker(QObject):
     accumulate its own commentary turn over turn - grounding holds across
     the whole conversation, not just the first message."""
 
-    succeeded = Signal(list)
+    succeeded = Signal(list, str)
     failed = Signal(str, bool)
 
     def __init__(
@@ -369,5 +413,5 @@ class QuestionAsker(QObject):
             self.failed.emit("The AI endpoint's response wasn't in the expected format.", False)
             return
 
-        candidates = _extract_json_array(content)
-        self.succeeded.emit(resolve_references(self.conn, candidates))
+        candidates = _extract_candidates(content)
+        self.succeeded.emit(resolve_references(self.conn, candidates), content)

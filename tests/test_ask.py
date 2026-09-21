@@ -25,7 +25,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import scriptures.citations as citations_module  # noqa: E402
-from scriptures.ask import _extract_json_array, _parse_reference, resolve_references  # noqa: E402
+from scriptures.ask import (  # noqa: E402
+    _extract_candidates,
+    _extract_json_array,
+    _parse_reference,
+    resolve_references,
+)
 from scriptures.db import connect  # noqa: E402
 
 
@@ -219,6 +224,31 @@ def test_extract_json_array() -> None:
     print("test_extract_json_array: PASSED")
 
 
+def test_extract_candidates_falls_back_to_prose_scan() -> None:
+    """The actual bug report: a model that ignores the "just a bare JSON
+    array" instruction and answers in ordinary prose instead - common
+    enough with smaller/local models, especially on a question phrased
+    like general trivia - must still have its answer found, not silently
+    discarded as "no matches"."""
+    # Compliant JSON is still used as-is when present - no scanning needed.
+    assert _extract_candidates('["Alma 32:21"]') == ["Alma 32:21"]
+
+    # No JSON at all - falls back to scanning the prose itself.
+    prose = (
+        'The term "Christians" was first used in Acts 11:26, where it '
+        "says the disciples were called Christians first in Antioch."
+    )
+    assert _extract_candidates(prose) == ["Acts 11:26"]
+
+    # Multi-word book names (joined by "and"/"of") still scan correctly.
+    prose2 = "See Doctrine and Covenants 76:22, or perhaps Song of Solomon 2:1."
+    assert _extract_candidates(prose2) == ["Doctrine and Covenants 76:22", "Song of Solomon 2:1"]
+
+    # Genuinely reference-free prose yields nothing to try - not an error.
+    assert _extract_candidates("I'm not sure about that one.") == []
+    print("test_extract_candidates_falls_back_to_prose_scan: PASSED")
+
+
 def test_resolve_attaches_real_citations() -> None:
     """A resolved reference picks up any already-harvested General
     Conference talks that cite it (see ask.py's module docstring) -
@@ -264,5 +294,6 @@ if __name__ == "__main__":
     test_malformed_and_non_string_candidates_are_dropped()
     test_duplicates_and_ordering_and_cap()
     test_extract_json_array()
+    test_extract_candidates_falls_back_to_prose_scan()
     test_resolve_attaches_real_citations()
     print("All ask.py tests passed.")

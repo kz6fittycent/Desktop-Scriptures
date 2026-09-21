@@ -148,7 +148,9 @@ class AiConversationSection(QWidget):
         self._asker = QuestionAsker(
             self.conn, self.ai_config, question, history=list(self._history), parent=self
         )
-        self._asker.succeeded.connect(lambda refs: self._on_succeeded(question, refs))
+        self._asker.succeeded.connect(
+            lambda refs, raw_content: self._on_succeeded(question, refs, raw_content)
+        )
         self._asker.failed.connect(self._on_failed)
 
     def _clear_placeholder(self) -> None:
@@ -157,7 +159,9 @@ class AiConversationSection(QWidget):
             self._pending_placeholder.deleteLater()
             self._pending_placeholder = None
 
-    def _on_succeeded(self, question: str, references: list[AskedReference]) -> None:
+    def _on_succeeded(
+        self, question: str, references: list[AskedReference], raw_content: str
+    ) -> None:
         self._asker = None
         self._clear_placeholder()
         self._set_busy(False)
@@ -166,6 +170,15 @@ class AiConversationSection(QWidget):
             note = QLabel("No matches for that.")
             note.setObjectName("resultSecondary")
             self._thread_layout.addWidget(note)
+            # Diagnostic only, never presented as an answer - shows
+            # exactly what the model actually replied with, so "why did
+            # this find nothing" (the model didn't know a real one,
+            # ignored the "just a JSON array" instruction, or something
+            # else) is visible rather than a silent dead end.
+            raw_label = QLabel(f"AI's raw response: {truncate_text(raw_content, limit=400)}")
+            raw_label.setObjectName("resultSecondary")
+            raw_label.setWordWrap(True)
+            self._thread_layout.addWidget(raw_label)
             return
         for ref in references:
             row = ResultRow(ref.chapter_id, ref.reference, truncate_text(ref.text))
