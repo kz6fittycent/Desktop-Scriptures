@@ -130,6 +130,9 @@ class MainWindow(QMainWindow):
         self._app_theme = get_setting(conn, "app_theme", "light")
         if self._app_theme not in theming.APP_THEMES:
             self._app_theme = "light"
+        self._app_accent = get_setting(conn, "app_accent", theming.DEFAULT_ACCENT)
+        if self._app_accent not in theming.ACCENT_HUES:
+            self._app_accent = theming.DEFAULT_ACCENT
         self._reading_scheme = get_setting(conn, "reading_scheme", "day")
         if self._reading_scheme not in theming.READING_SCHEMES:
             self._reading_scheme = "day"
@@ -145,7 +148,7 @@ class MainWindow(QMainWindow):
         self.resize(1000, 700)
 
         self._build_menu()
-        theming.apply_app_theme(QApplication.instance(), self._app_theme)
+        theming.apply_app_theme(QApplication.instance(), self._app_theme, self._app_accent)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -220,6 +223,24 @@ class MainWindow(QMainWindow):
             action.triggered.connect(lambda checked=False, n=name: self._set_app_theme(n))
             theme_group.addAction(action)
             theme_menu.addAction(action)
+
+        # Which hue cards/buttons/links use, independent of light/dark
+        # above - see theme.py's ACCENT_HUES for naming/design rationale.
+        # Each swatch icon uses that accent's light-mode primary color
+        # regardless of the app's current theme, so the menu always shows
+        # a clear, recognizable version of the hue rather than dark mode's
+        # more muted variant.
+        accent_menu = menu.addMenu("Accent Color")
+        accent_group = QActionGroup(self)
+        accent_group.setExclusive(True)
+        for name in theming.ACCENT_HUES:
+            swatch = theming.get_app_palette("light", name).primary
+            action = QAction(name, self, checkable=True)
+            action.setIcon(self._swatch_icon(swatch))
+            action.setChecked(name == self._app_accent)
+            action.triggered.connect(lambda checked=False, n=name: self._set_app_accent(n))
+            accent_group.addAction(action)
+            accent_menu.addAction(action)
 
         scheme_menu = menu.addMenu("Reading Colors")
         scheme_group = QActionGroup(self)
@@ -482,7 +503,16 @@ class MainWindow(QMainWindow):
     def _set_app_theme(self, name: str) -> None:
         self._app_theme = name
         set_setting(self.conn, "app_theme", name)
-        theming.apply_app_theme(QApplication.instance(), name)
+        theming.apply_app_theme(QApplication.instance(), name, self._app_accent)
+
+    def _set_app_accent(self, name: str) -> None:
+        self._app_accent = name
+        set_setting(self.conn, "app_accent", name)
+        theming.apply_app_theme(QApplication.instance(), self._app_theme, name)
+        # Night reading colors' verse-number tint tracks the accent too
+        # (see theme.py's get_reading_palette) - only visible effect if
+        # that's the active reading scheme.
+        self._apply_reading_theme()
 
     def _set_reading_scheme(self, name: str) -> None:
         self._reading_scheme = name
@@ -510,7 +540,7 @@ class MainWindow(QMainWindow):
 
     def _apply_reading_theme(self) -> None:
         if self._current_reading_view is not None:
-            palette = theming.READING_PALETTES[self._reading_scheme]
+            palette = theming.get_reading_palette(self._reading_scheme, self._app_accent)
             self._current_reading_view.apply_theme(
                 palette, self._font_family, self._font_size
             )
@@ -972,7 +1002,7 @@ class MainWindow(QMainWindow):
 
         verses = get_verses(self.conn, chapter_id)
         title = verses[0].reference.rsplit(":", 1)[0] if verses else book.name
-        palette = theming.READING_PALETTES[self._reading_scheme]
+        palette = theming.get_reading_palette(self._reading_scheme, self._app_accent)
         prev_target = self._adjacent_chapter(volume, testament, book, chapter, -1)
         next_target = self._adjacent_chapter(volume, testament, book, chapter, 1)
         view = ReadingView(

@@ -1,11 +1,15 @@
-"""Theming: app chrome light/dark, reading color scheme, font, and zoom.
+"""Theming: app chrome light/dark, accent color, reading color scheme,
+font, and zoom.
 
-Two independent axes, matching the product decision that you can read in
-sepia while the app chrome is dark (or any other combination):
+Three independent axes, matching the product decision that you can read in
+sepia while the app chrome is dark and accented in orange (or any other
+combination):
 
 - App theme (light/dark): window chrome, cards, breadcrumb, menus - applied
   as a QApplication-wide stylesheet, Material Design-inspired (rounded
-  surfaces, a primary accent color, elevation shadows on cards).
+  surfaces, elevation shadows on cards).
+- Accent color: which hue cards/buttons/links use within that chrome - see
+  ACCENT_HUES below.
 - Reading color scheme (day/night/sepia): the verse text background and
   foreground in ReadingView only.
 
@@ -14,12 +18,71 @@ Font family and zoom (text size) also apply to the reading view.
 
 from __future__ import annotations
 
+import colorsys
 from dataclasses import dataclass
 
 from PySide6.QtGui import QFontDatabase
 
 APP_THEMES = ("light", "dark")
 READING_SCHEMES = ("day", "night", "sepia")
+
+# Accent color: which hue cards/buttons/links use throughout the app,
+# independent of light/dark App Theme the same way Reading Colors is -
+# named after (and, per product decision, only loosely inspired by, not
+# copied pixel-for-pixel from) Ubuntu's own Yaru accent-color picker,
+# plus the app's original indigo/purple as "Purple" so an existing
+# install's look doesn't change under anyone who never touches this
+# setting. Every accent shares the exact same lightness/saturation
+# "recipe" per palette role (see _ACCENT_RECIPE below, calibrated from
+# that original hand-picked indigo palette) and differs only in hue, so
+# no accent can end up looking less finished or lower-contrast than
+# another - they're all the same design, rotated to a different hue.
+ACCENT_HUES: dict[str, float] = {
+    "Purple": 231,
+    "Blue": 205,
+    "Teal": 168,
+    "Sage": 100,
+    "Orange": 15,
+    "Red": 352,
+    "Magenta": 322,
+}
+DEFAULT_ACCENT = "Purple"
+
+# (lightness, saturation) pairs, one per AppPalette field that varies by
+# accent, calibrated by extracting them from the original hand-picked
+# indigo palette (hue 231 deg) below - so DEFAULT_ACCENT reproduces that
+# exact palette, and every other accent is the identical recipe at a
+# different hue.
+_ACCENT_RECIPE: dict[str, dict[str, tuple[float, float]]] = {
+    "light": {
+        "primary": (0.478, 0.484),
+        "primary_hover": (0.406, 0.536),
+        "card_bg": (0.937, 0.438),
+        "card_hover_bg": (0.843, 0.450),
+        "card_text": (0.367, 0.572),
+    },
+    "dark": {
+        "primary": (0.775, 1.000),
+        "primary_hover": (0.661, 0.988),
+        "card_bg": (0.276, 0.277),
+        "card_hover_bg": (0.343, 0.280),
+        "card_text": (0.857, 0.534),
+    },
+}
+
+
+def _hls_to_hex(hue_degrees: float, lightness: float, saturation: float) -> str:
+    r, g, b = colorsys.hls_to_rgb(hue_degrees / 360, lightness, saturation)
+    return "#{:02X}{:02X}{:02X}".format(round(r * 255), round(g * 255), round(b * 255))
+
+
+def _accent_fields(accent: str, mode: str) -> dict[str, str]:
+    """The accent-dependent AppPalette fields (primary/primary_hover/
+    card_bg/card_hover_bg/card_text) for one accent color in one App
+    Theme mode - see _ACCENT_RECIPE above."""
+    hue = ACCENT_HUES.get(accent, ACCENT_HUES[DEFAULT_ACCENT])
+    return {field: _hls_to_hex(hue, l, s) for field, (l, s) in _ACCENT_RECIPE[mode].items()}
+
 
 MIN_FONT_SIZE = 10
 MAX_FONT_SIZE = 28
@@ -75,20 +138,29 @@ class ReadingPalette:
     title_border: str
 
 
-READING_PALETTES: dict[str, ReadingPalette] = {
+# "night"'s verse_number isn't listed here - it tracks whichever accent
+# color is chosen (see get_reading_palette below), matching the dark App
+# Theme's own primary color exactly so the reading card doesn't look like
+# a different app from the chrome around it.
+_STATIC_READING_PALETTES: dict[str, ReadingPalette] = {
     "day": ReadingPalette(
         background="#FFFFFF", text="#1A1A1A", verse_number="#3A5C8A", title_border="#CCCCCC"
-    ),
-    # Matches the dark App Theme's surface/text/primary/border exactly
-    # (APP_PALETTES["dark"]) rather than its own separate near-black, so
-    # the reading card doesn't look darker than the chrome around it.
-    "night": ReadingPalette(
-        background="#343436", text="#E8E8E8", verse_number="#8C9EFF", title_border="#48484A"
     ),
     "sepia": ReadingPalette(
         background="#F4ECD8", text="#3B2F1E", verse_number="#8B5E34", title_border="#D8C9A3"
     ),
 }
+
+
+def get_reading_palette(scheme: str, accent: str = DEFAULT_ACCENT) -> ReadingPalette:
+    if scheme == "night":
+        return ReadingPalette(
+            background="#343436",
+            text="#E8E8E8",
+            verse_number=_accent_fields(accent, "dark")["primary"],
+            title_border="#48484A",
+        )
+    return _STATIC_READING_PALETTES[scheme]
 
 
 @dataclass(frozen=True)
@@ -123,25 +195,20 @@ class AppPalette:
     card_text: str
 
 
-# Material Design-inspired: an indigo primary accent, soft indigo-tinted
-# card surfaces (rather than a single saturated fill color), and elevation
-# communicated with a drop shadow (applied in code - QSS has no box-shadow)
-# instead of hard 1px borders everywhere.
-APP_PALETTES: dict[str, AppPalette] = {
-    "light": AppPalette(
+# Structural fields that don't depend on accent color - window/surface/
+# border/text colors, Material Design-inspired (rounded surfaces,
+# elevation communicated with a drop shadow applied in code, since QSS
+# has no box-shadow, instead of hard 1px borders everywhere).
+_BASE_PALETTE_FIELDS: dict[str, dict[str, str]] = {
+    "light": dict(
         window_bg="#F3F4F8",
         text="#1A1A1A",
         surface="#FFFFFF",
         border="#E1E3E8",
         hover_bg="#EDEFF5",
         muted="#6B7280",
-        primary="#3F51B5",
-        primary_hover="#303F9F",
-        card_bg="#E8EAF6",
-        card_hover_bg="#C5CAE9",
-        card_text="#283593",
     ),
-    "dark": AppPalette(
+    "dark": dict(
         # A neutral dark gray rather than near-black - easier on the eyes
         # for extended reading than the higher-contrast Material default.
         window_bg="#2A2A2C",
@@ -150,17 +217,16 @@ APP_PALETTES: dict[str, AppPalette] = {
         border="#48484A",
         hover_bg="#3C3C3E",
         muted="#A3A3A8",
-        primary="#8C9EFF",
-        primary_hover="#536DFE",
-        card_bg="#33375A",
-        card_hover_bg="#3F4570",
-        card_text="#C7CCEE",
     ),
 }
 
 
-def app_stylesheet(theme: str) -> str:
-    p = APP_PALETTES[theme]
+def get_app_palette(theme: str, accent: str = DEFAULT_ACCENT) -> AppPalette:
+    return AppPalette(**_BASE_PALETTE_FIELDS[theme], **_accent_fields(accent, theme))
+
+
+def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
+    p = get_app_palette(theme, accent)
     return f"""
         QMainWindow, QWidget {{
             background-color: {p.window_bg};
@@ -501,5 +567,5 @@ def app_stylesheet(theme: str) -> str:
     """
 
 
-def apply_app_theme(app, theme: str) -> None:
-    app.setStyleSheet(app_stylesheet(theme))
+def apply_app_theme(app, theme: str, accent: str = DEFAULT_ACCENT) -> None:
+    app.setStyleSheet(app_stylesheet(theme, accent))
