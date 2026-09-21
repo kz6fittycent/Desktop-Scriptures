@@ -149,7 +149,7 @@ class AiConversationSection(QWidget):
             self.conn, self.ai_config, question, history=list(self._history), parent=self
         )
         self._asker.succeeded.connect(
-            lambda refs, raw_content: self._on_succeeded(question, refs, raw_content)
+            lambda refs, raw_content, misses: self._on_succeeded(question, refs, raw_content, misses)
         )
         self._asker.failed.connect(self._on_failed)
 
@@ -160,7 +160,11 @@ class AiConversationSection(QWidget):
             self._pending_placeholder = None
 
     def _on_succeeded(
-        self, question: str, references: list[AskedReference], raw_content: str
+        self,
+        question: str,
+        references: list[AskedReference],
+        raw_content: str,
+        unresolved: list[str],
     ) -> None:
         self._asker = None
         self._clear_placeholder()
@@ -190,6 +194,19 @@ class AiConversationSection(QWidget):
             # necessarily partial.
             for citation in ref.citations:
                 self._thread_layout.addWidget(_TalkRow(citation))
+        if unresolved:
+            # The partial-miss case: some references resolved (shown
+            # above), but the model also proposed at least one more that
+            # didn't - without this, that would be silently invisible
+            # (only a *complete* miss shows the raw response). Diagnostic
+            # only, same as that raw-response note - not a suggestion
+            # that this reference is real, just what was tried.
+            missed_label = QLabel(
+                "The AI also mentioned, but a match wasn't found for: " + ", ".join(unresolved)
+            )
+            missed_label.setObjectName("resultSecondary")
+            missed_label.setWordWrap(True)
+            self._thread_layout.addWidget(missed_label)
 
     def _on_failed(self, message: str, needs_api_key: bool) -> None:
         self._asker = None

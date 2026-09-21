@@ -292,6 +292,20 @@ def resolve_references(conn: sqlite3.Connection, candidates: list[str]) -> list[
     return resolved
 
 
+def unresolved_candidates(conn: sqlite3.Connection, candidates: list[str]) -> list[str]:
+    """Which of these candidate strings _resolve_one couldn't turn into
+    real content - a diagnostic for the partial-miss case resolve_references
+    itself can't surface: when the model suggests several references and
+    only some resolve, the ones that silently got dropped are otherwise
+    invisible (only a *complete* miss gets shown, via QuestionAsker's own
+    raw_content). Recomputes resolution rather than diffing against
+    resolve_references' own output, since a resolved AskedReference's
+    `reference` can differ from the candidate string that produced it
+    (e.g. "D&C 76:22" resolves to "Doctrine and Covenants 76:22") -
+    cheap enough at the handful of candidates a single answer ever has."""
+    return [c for c in candidates if isinstance(c, str) and _resolve_one(conn, c) is None]
+
+
 def _extract_json_array(content: str) -> list[str]:
     """The model was asked for bare JSON, but is asked nicely, not
     forced - this tolerates a markdown code fence or stray prose around
@@ -359,7 +373,11 @@ class QuestionAsker(QObject):
     ignored the "just a JSON array" instruction and wrote prose instead,
     or something else entirely), the caller can show it so the user (and
     whoever's debugging a report like "it said no matches") can actually
-    see why, instead of an unexplained empty result.
+    see why, instead of an unexplained empty result. `unresolved` is the
+    partial-miss counterpart: any candidate the model proposed that
+    didn't resolve, even when others did - without this, "the model also
+    suggested something that got silently dropped" would be invisible
+    whenever at least one other reference succeeded.
 
     `history` carries prior turns forward for a follow-up refinement
     ("just the ones about baptism") to have context - each entry is
@@ -370,7 +388,7 @@ class QuestionAsker(QObject):
     accumulate its own commentary turn over turn - grounding holds across
     the whole conversation, not just the first message."""
 
-    succeeded = Signal(list, str)
+    succeeded = Signal(list, str, list)
     failed = Signal(str, bool)
 
     def __init__(
@@ -414,4 +432,6 @@ class QuestionAsker(QObject):
             return
 
         candidates = _extract_candidates(content)
-        self.succeeded.emit(resolve_references(self.conn, candidates), content)
+        resolved = resolve_references(self.conn, candidates)
+        misses = unresolved_candidates(self.conn, candidates)
+        self.succeeded.emit(resolved, content, misses)

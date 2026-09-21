@@ -30,6 +30,7 @@ from scriptures.ask import (  # noqa: E402
     _extract_json_array,
     _parse_reference,
     resolve_references,
+    unresolved_candidates,
 )
 from scriptures.db import connect  # noqa: E402
 
@@ -121,6 +122,21 @@ def test_resolve_abbreviated_references() -> None:
         refs = {r.reference for r in results}
         assert refs == {"Doctrine and Covenants 76:22", "Joseph Smith--History 1:17", "3 Nephi 11:1"}
         print("test_resolve_abbreviated_references: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
+def test_unresolved_candidates_reports_partial_misses() -> None:
+    """The partial-miss diagnostic: when the model suggests several
+    references and only some resolve, the ones that got silently dropped
+    must still be visible somewhere - this is what makes that possible."""
+    conn, tmp_root = _make_db()
+    try:
+        candidates = ["3 Nephi 11:1", "Genesis 1:1", "not a reference", 42]
+        assert resolve_references(conn, candidates) != []
+        misses = unresolved_candidates(conn, candidates)
+        assert misses == ["Genesis 1:1", "not a reference"]
+        print("test_unresolved_candidates_reports_partial_misses: PASSED")
     finally:
         shutil.rmtree(tmp_root, ignore_errors=True)
 
@@ -286,6 +302,7 @@ if __name__ == "__main__":
     test_parse_reference()
     test_parse_reference_normalizes_abbreviations()
     test_resolve_abbreviated_references()
+    test_unresolved_candidates_reports_partial_misses()
     test_resolve_single_verse()
     test_resolve_verse_range()
     test_resolve_whole_chapter()
