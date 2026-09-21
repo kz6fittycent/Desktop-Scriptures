@@ -151,6 +151,9 @@ END;
 -- ---------------------------------------------------------------------
 
 -- A note attaches to either a verse or a whole chapter (exactly one of the two).
+-- `deleted_at` (NULL = active) makes a "deletion" a tombstone rather than a
+-- disappearing row, so a sync partner that hasn't merged yet still learns
+-- about it - see sync.py. Every query that lists notes filters these out.
 CREATE TABLE IF NOT EXISTS notes (
     id          INTEGER PRIMARY KEY,
     verse_id    INTEGER REFERENCES verses(id),
@@ -158,6 +161,7 @@ CREATE TABLE IF NOT EXISTS notes (
     text        TEXT NOT NULL,
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at  TEXT,
     CHECK ((verse_id IS NOT NULL) + (chapter_id IS NOT NULL) = 1)
 );
 
@@ -187,12 +191,17 @@ CREATE TABLE IF NOT EXISTS tags (
     name  TEXT NOT NULL UNIQUE COLLATE NOCASE
 );
 
+-- `updated_at`/`deleted_at` support sync's last-write-wins merge the same
+-- way as notes above - removing a tag is setting `deleted_at`, not
+-- deleting the row, so other devices learn about the removal too.
 CREATE TABLE IF NOT EXISTS tag_assignments (
     id          INTEGER PRIMARY KEY,
     tag_id      INTEGER NOT NULL REFERENCES tags(id),
     verse_id    INTEGER REFERENCES verses(id),
     chapter_id  INTEGER REFERENCES chapters(id),
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at  TEXT,
     CHECK ((verse_id IS NOT NULL) + (chapter_id IS NOT NULL) = 1)
 );
 
@@ -209,7 +218,9 @@ CREATE TABLE IF NOT EXISTS highlights (
     color         TEXT NOT NULL CHECK (color IN ('yellow', 'pink', 'orange')),
     start_offset  INTEGER NOT NULL,
     end_offset    INTEGER NOT NULL,
-    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at    TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_highlights_verse ON highlights(verse_id);
@@ -219,7 +230,8 @@ CREATE INDEX IF NOT EXISTS idx_highlights_verse ON highlights(verse_id);
 CREATE TABLE IF NOT EXISTS reading_log (
     id          INTEGER PRIMARY KEY,
     read_date   TEXT NOT NULL UNIQUE,   -- ISO date, e.g. "2026-09-14"
-    chapter_id  INTEGER REFERENCES chapters(id)  -- last chapter opened that day (informational)
+    chapter_id  INTEGER REFERENCES chapters(id),  -- last chapter opened that day (informational)
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 -- Recent-reads history for the "Resume Reading" dropdown: one row per
@@ -236,7 +248,11 @@ CREATE TABLE IF NOT EXISTS reading_history (
 
 CREATE INDEX IF NOT EXISTS idx_reading_history_chapter ON reading_history(chapter_id);
 
--- Simple key/value settings store: theme, font, color scheme, zoom level, etc.
+-- Simple key/value settings store: theme, font, color scheme, zoom level,
+-- etc. Also holds this installation's own `device_id` (a UUID, generated
+-- once by db.py on first run and never changed) - this row is never itself
+-- synced by sync.py, since it identifies one specific device, not shared
+-- state.
 CREATE TABLE IF NOT EXISTS settings (
     key    TEXT PRIMARY KEY,
     value  TEXT NOT NULL

@@ -8,6 +8,7 @@ path relative to the project.
 from __future__ import annotations
 
 import sqlite3
+import uuid
 from pathlib import Path
 
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
@@ -28,10 +29,12 @@ def connect(db_path: Path) -> sqlite3.Connection:
 def _ensure_schema(conn: sqlite3.Connection) -> None:
     _migrate_whole_verse_highlights(conn)
     _migrate_add_chapter_metadata_columns(conn)
+    _migrate_add_sync_columns(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
     _backfill_reading_history(conn)
+    _ensure_device_id(conn)
     conn.commit()
 
 
@@ -108,6 +111,73 @@ def _migrate_add_chapter_metadata_columns(conn: sqlite3.Connection) -> None:
     conn.execute("ALTER TABLE chapters ADD COLUMN title TEXT")
     conn.execute("ALTER TABLE chapters ADD COLUMN speaker TEXT")
     conn.execute("ALTER TABLE chapters ADD COLUMN discourse_date TEXT")
+
+
+def _migrate_add_sync_columns(conn: sqlite3.Connection) -> None:
+    """`updated_at`/`deleted_at` (see sync.py) were added to tag_assignments/
+    highlights/reading_log after those tables already existed for anyone
+    upgrading - `ALTER TABLE ... ADD COLUMN` can't carry a non-constant
+    default like `datetime('now')` the way a fresh `CREATE TABLE` in
+    schema.sql can, so each column is added plain here and then backfilled:
+    `updated_at` to the row's own `created_at` (the closest thing to a real
+    "last changed" time a pre-existing row has - reading_log has no
+    created_at, so its read_date stands in instead), and `deleted_at` is
+    left NULL, which is already its correct "not deleted" value. notes
+    already had `updated_at`; only `deleted_at` is new there.
+    """
+    _add_column_if_missing(conn, "notes", "deleted_at", "TEXT")
+
+    if _add_column_if_missing(conn, "tag_assignments", "updated_at", "TEXT"):
+        conn.execute(
+            "UPDATE tag_assignments SET updated_at = created_at WHERE updated_at IS NULL"
+        )
+    _add_column_if_missing(conn, "tag_assignments", "deleted_at", "TEXT")
+
+    if _add_column_if_missing(conn, "highlights", "updated_at", "TEXT"):
+        conn.execute(
+            "UPDATE highlights SET updated_at = created_at WHERE updated_at IS NULL"
+        )
+    _add_column_if_missing(conn, "highlights", "deleted_at", "TEXT")
+
+    if _add_column_if_missing(conn, "reading_log", "updated_at", "TEXT"):
+        conn.execute(
+            "UPDATE reading_log SET updated_at = read_date || 'T00:00:00' "
+            "WHERE updated_at IS NULL"
+        )
+
+
+def _add_column_if_missing(
+    conn: sqlite3.Connection, table: str, column: str, declaration: str
+) -> bool:
+    """Adds `column` to `table` if the table already exists and doesn't
+    already have it. Returns True exactly when the column was just added,
+    so callers know whether a backfill is needed - False either means
+    there's nothing to backfill (column was already there) or the table
+    doesn't exist yet (a fresh database, where schema.sql's own
+    `CREATE TABLE` will include the column from the start)."""
+    table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (table,)
+    ).fetchone()
+    if not table_exists:
+        return False
+    columns = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+    if column in columns:
+        return False
+    conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {declaration}")
+    return True
+
+
+def _ensure_device_id(conn: sqlite3.Connection) -> None:
+    """This installation's permanent identity for sync.py - a UUID
+    generated once on first run and never changed afterward, so this
+    device's exported filename (device-<id>.json) stays stable across
+    restarts. Never itself synced - each device generates its own."""
+    existing = conn.execute("SELECT 1 FROM settings WHERE key = 'device_id'").fetchone()
+    if existing:
+        return
+    conn.execute(
+        "INSERT INTO settings (key, value) VALUES ('device_id', ?)", (str(uuid.uuid4()),)
+    )
 
 
 def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> None:

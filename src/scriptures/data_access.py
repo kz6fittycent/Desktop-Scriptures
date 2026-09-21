@@ -270,6 +270,12 @@ def set_setting(conn: sqlite3.Connection, key: str, value: str) -> None:
     conn.commit()
 
 
+def get_device_id(conn: sqlite3.Connection) -> str:
+    """This installation's permanent sync identity - see db.py's
+    `_ensure_device_id`, which guarantees this is always present."""
+    return get_setting(conn, "device_id")
+
+
 def get_highlights(conn: sqlite3.Connection, chapter_id: int) -> dict[int, list[Highlight]]:
     """verse_id -> that verse's highlighted ranges (there can be more than
     one per verse), for drawing highlight backgrounds without an N+1
@@ -278,7 +284,7 @@ def get_highlights(conn: sqlite3.Connection, chapter_id: int) -> dict[int, list[
     rows = conn.execute(
         "SELECT h.id, h.verse_id, h.color, h.start_offset, h.end_offset "
         "FROM highlights h JOIN verses v ON v.id = h.verse_id "
-        "WHERE v.chapter_id = ? ORDER BY h.start_offset",
+        "WHERE v.chapter_id = ? AND h.deleted_at IS NULL ORDER BY h.start_offset",
         (chapter_id,),
     ).fetchall()
     by_verse: dict[int, list[Highlight]] = {}
@@ -297,7 +303,8 @@ def add_highlight(
     removed first - the newest selection always wins over what it covers."""
     _delete_overlapping(conn, verse_id, start_offset, end_offset)
     conn.execute(
-        "INSERT INTO highlights (verse_id, color, start_offset, end_offset) VALUES (?, ?, ?, ?)",
+        "INSERT INTO highlights (verse_id, color, start_offset, end_offset, updated_at) "
+        "VALUES (?, ?, ?, ?, datetime('now'))",
         (verse_id, color, start_offset, end_offset),
     )
     conn.commit()
@@ -316,8 +323,11 @@ def _delete_overlapping(
     conn: sqlite3.Connection, verse_id: int, start_offset: int, end_offset: int
 ) -> None:
     # Two [start, end) ranges overlap iff each starts before the other ends.
+    # A soft delete (tombstone), not a real DELETE, so a sync partner that
+    # hasn't merged yet still learns this range was removed - see sync.py.
     conn.execute(
-        "DELETE FROM highlights WHERE verse_id = ? AND start_offset < ? AND end_offset > ?",
+        "UPDATE highlights SET deleted_at = datetime('now'), updated_at = datetime('now') "
+        "WHERE verse_id = ? AND start_offset < ? AND end_offset > ? AND deleted_at IS NULL",
         (verse_id, end_offset, start_offset),
     )
 
@@ -327,8 +337,8 @@ def get_annotated_verse_ids(conn: sqlite3.Connection, chapter_id: int) -> set[in
     indicator badges without an N+1 query per verse."""
     rows = conn.execute(
         "SELECT v.id FROM verses v WHERE v.chapter_id = ? AND ("
-        "EXISTS (SELECT 1 FROM notes n WHERE n.verse_id = v.id) OR "
-        "EXISTS (SELECT 1 FROM tag_assignments ta WHERE ta.verse_id = v.id))",
+        "EXISTS (SELECT 1 FROM notes n WHERE n.verse_id = v.id AND n.deleted_at IS NULL) OR "
+        "EXISTS (SELECT 1 FROM tag_assignments ta WHERE ta.verse_id = v.id AND ta.deleted_at IS NULL))",
         (chapter_id,),
     ).fetchall()
     return {r["id"] for r in rows}
@@ -345,7 +355,7 @@ def get_note(
     target = verse_id if verse_id is not None else chapter_id
     r = conn.execute(
         f"SELECT id, text, verse_id, chapter_id, updated_at FROM notes "
-        f"WHERE {column} = ? ORDER BY id DESC LIMIT 1",
+        f"WHERE {column} = ? AND deleted_at IS NULL ORDER BY id DESC LIMIT 1",
         (target,),
     ).fetchone()
     return Note(r["id"], r["text"], r["verse_id"], r["chapter_id"], r["updated_at"]) if r else None
@@ -374,7 +384,13 @@ def save_note(
 
 
 def delete_note(conn: sqlite3.Connection, note_id: int) -> None:
-    conn.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+    """Soft delete (tombstone), not a real DELETE, so a sync partner that
+    hasn't merged yet still learns this note was removed - see sync.py."""
+    conn.execute(
+        "UPDATE notes SET deleted_at = datetime('now'), updated_at = datetime('now') "
+        "WHERE id = ?",
+        (note_id,),
+    )
     conn.commit()
 
 
@@ -386,7 +402,7 @@ def get_tags(
     rows = conn.execute(
         f"SELECT t.id, t.name FROM tags t "
         f"JOIN tag_assignments ta ON ta.tag_id = t.id "
-        f"WHERE ta.{column} = ? ORDER BY t.name COLLATE NOCASE",
+        f"WHERE ta.{column} = ? AND ta.deleted_at IS NULL ORDER BY t.name COLLATE NOCASE",
         (target,),
     ).fetchall()
     return [Tag(r["id"], r["name"]) for r in rows]
@@ -404,14 +420,24 @@ def add_tag(
         return
     conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (name,))
     tag_id = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()["id"]
-    already = conn.execute(
-        "SELECT 1 FROM tag_assignments WHERE tag_id = ? AND verse_id IS ? AND chapter_id IS ?",
+    existing = conn.execute(
+        "SELECT id, deleted_at FROM tag_assignments "
+        "WHERE tag_id = ? AND verse_id IS ? AND chapter_id IS ?",
         (tag_id, verse_id, chapter_id),
     ).fetchone()
-    if not already:
+    if existing is None:
         conn.execute(
-            "INSERT INTO tag_assignments (tag_id, verse_id, chapter_id) VALUES (?, ?, ?)",
+            "INSERT INTO tag_assignments (tag_id, verse_id, chapter_id, updated_at) "
+            "VALUES (?, ?, ?, datetime('now'))",
             (tag_id, verse_id, chapter_id),
+        )
+    elif existing["deleted_at"] is not None:
+        # Previously removed, re-added now - revive the same row (by its
+        # natural key) rather than insert a duplicate.
+        conn.execute(
+            "UPDATE tag_assignments SET deleted_at = NULL, updated_at = datetime('now') "
+            "WHERE id = ?",
+            (existing["id"],),
         )
     conn.commit()
 
@@ -423,8 +449,11 @@ def remove_tag(
     verse_id: int | None = None,
     chapter_id: int | None = None,
 ) -> None:
+    """Soft delete (tombstone), not a real DELETE, so a sync partner that
+    hasn't merged yet still learns this tag was removed - see sync.py."""
     conn.execute(
-        "DELETE FROM tag_assignments WHERE tag_id = ? AND verse_id IS ? AND chapter_id IS ?",
+        "UPDATE tag_assignments SET deleted_at = datetime('now'), updated_at = datetime('now') "
+        "WHERE tag_id = ? AND verse_id IS ? AND chapter_id IS ? AND deleted_at IS NULL",
         (tag_id, verse_id, chapter_id),
     )
     conn.commit()
@@ -507,7 +536,7 @@ def search_notes(conn: sqlite3.Connection, query: str, limit: int = 40) -> list[
         "LEFT JOIN verses v ON v.id = n.verse_id "
         "LEFT JOIN chapters c ON c.id = n.chapter_id "
         "LEFT JOIN books b ON b.id = c.book_id "
-        "WHERE notes_fts MATCH ? ORDER BY rank LIMIT ?",
+        "WHERE notes_fts MATCH ? AND n.deleted_at IS NULL ORDER BY rank LIMIT ?",
         (_fts_phrase(query), limit),
     ).fetchall()
     return [NoteResult(r["id"], r["text"], r["chapter_id"], r["reference"]) for r in rows]
@@ -525,6 +554,7 @@ def get_all_notes(conn: sqlite3.Connection) -> list[NoteResult]:
         "JOIN chapters c ON c.id = COALESCE(v.chapter_id, n.chapter_id) "
         "JOIN books b ON b.id = c.book_id "
         "JOIN volumes vol ON vol.id = b.volume_id "
+        "WHERE n.deleted_at IS NULL "
         "ORDER BY vol.sort_order, b.sort_order, c.chapter_number, "
         "COALESCE(v.verse_number, 0)"
     ).fetchall()
@@ -552,7 +582,7 @@ def get_tag_targets(conn: sqlite3.Connection, tag_id: int, limit: int = 100) -> 
         "LEFT JOIN verses v ON v.id = ta.verse_id "
         "LEFT JOIN chapters c ON c.id = ta.chapter_id "
         "LEFT JOIN books b ON b.id = c.book_id "
-        "WHERE ta.tag_id = ? ORDER BY reference LIMIT ?",
+        "WHERE ta.tag_id = ? AND ta.deleted_at IS NULL ORDER BY reference LIMIT ?",
         (tag_id, limit),
     ).fetchall()
     return [TaggedItem(r["chapter_id"], r["reference"]) for r in rows]
@@ -564,8 +594,10 @@ def record_reading(conn: sqlite3.Connection, chapter_id: int, read_date: str) ->
     this visit for the "Resume Reading" history (see reading_history's
     schema comment on why that one's a plain insert, not an upsert)."""
     conn.execute(
-        "INSERT INTO reading_log (read_date, chapter_id) VALUES (?, ?) "
-        "ON CONFLICT(read_date) DO UPDATE SET chapter_id = excluded.chapter_id",
+        "INSERT INTO reading_log (read_date, chapter_id, updated_at) "
+        "VALUES (?, ?, datetime('now')) "
+        "ON CONFLICT(read_date) DO UPDATE SET "
+        "chapter_id = excluded.chapter_id, updated_at = datetime('now')",
         (read_date, chapter_id),
     )
     conn.execute("INSERT INTO reading_history (chapter_id) VALUES (?)", (chapter_id,))
