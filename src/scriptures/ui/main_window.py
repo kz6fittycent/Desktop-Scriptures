@@ -100,7 +100,7 @@ READING_STREAK_DWELL_MS = 5000
 SYNC_FOLDER_SETTING = "sync_folder_path"
 LAST_SYNC_SETTING = "last_sync_at"
 
-# Settings keys backing the Ask menu's AI Settings - local-only like the
+# Settings keys backing the AI Integration menu's AI Settings - local-only like the
 # Sync settings above (never touched by sync.py, never leaves this
 # device), holding the user's own bring-your-own AI endpoint config.
 AI_ENABLED_SETTING = "ai_enabled"
@@ -366,14 +366,14 @@ class MainWindow(QMainWindow):
         self._update_sync_status()
 
         # Opt-in, bring-your-own-endpoint AI-assisted search - see
-        # ai_client.py's module docstring for the full design. "Ask a
-        # Question..." (Stage 2/3) will join this menu alongside AI
-        # Settings.
-        ask_menu = self.menuBar().addMenu("As&k")
+        # ai_client.py's module docstring for the full design. The
+        # feature itself lives in the search bar (see search_view.py);
+        # this menu only holds its configuration.
+        ai_menu = self.menuBar().addMenu("&AI Integration")
 
         ai_settings_action = QAction("AI Settings...", self)
         ai_settings_action.triggered.connect(self._show_ai_settings)
-        ask_menu.addAction(ai_settings_action)
+        ai_menu.addAction(ai_settings_action)
 
         # No "About" dialog - the dropdown itself carries the same
         # verbiage a popup would have (version, the unofficial-app
@@ -640,8 +640,8 @@ class MainWindow(QMainWindow):
         self._on_chapter_clicked(volume, testament, book, chapter_id)
 
     # ------------------------------------------------------------------
-    # Ask (opt-in, bring-your-own-endpoint AI-assisted search - see
-    # ai_client.py's module docstring for the full design)
+    # AI Integration (opt-in, bring-your-own-endpoint AI-assisted search -
+    # see ai_client.py's module docstring for the full design)
     # ------------------------------------------------------------------
 
     def _show_ai_settings(self) -> None:

@@ -1,5 +1,6 @@
-"""Client for the user's own, self-configured AI endpoint (see the Ask
-menu in main_window.py and AiSettingsDialog in ui/ai_settings_dialog.py).
+"""Client for the user's own, self-configured AI endpoint (see the AI
+Integration menu in main_window.py and AiSettingsDialog in
+ui/ai_settings_dialog.py).
 
 Talks to any OpenAI-compatible chat-completions API - this covers OpenAI
 itself, several other hosted providers that offer an OpenAI-compatible

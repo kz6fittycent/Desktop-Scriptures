@@ -1,6 +1,6 @@
-"""AI Settings dialog (see main_window.py's Ask menu and ai_client.py's
-module docstring for the overall design: an opt-in, bring-your-own-
-endpoint AI-assisted search, never a built-in provider).
+"""AI Settings dialog (see main_window.py's AI Integration menu and
+ai_client.py's module docstring for the overall design: an opt-in,
+bring-your-own-endpoint AI-assisted search, never a built-in provider).
 
 Alpaca-style configuration: a base URL and API key for any OpenAI-
 compatible chat-completions endpoint (OpenAI itself, another hosted
