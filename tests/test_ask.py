@@ -24,6 +24,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+import scriptures.citations as citations_module  # noqa: E402
 from scriptures.ask import _extract_json_array, _parse_reference, resolve_references  # noqa: E402
 from scriptures.db import connect  # noqa: E402
 
@@ -173,6 +174,39 @@ def test_extract_json_array() -> None:
     print("test_extract_json_array: PASSED")
 
 
+def test_resolve_attaches_real_citations() -> None:
+    """A resolved reference picks up any already-harvested General
+    Conference talks that cite it (see ask.py's module docstring) -
+    never anything the model itself suggested. Monkeypatches
+    citations.py's module-level cache directly rather than touching the
+    real data/verse_citations.json, so this is exact and repo-data-
+    independent."""
+    conn, tmp_root = _make_db()
+    original_cache = citations_module._citations_cache
+    try:
+        citations_module._citations_cache = {
+            "3 Nephi 11:1": [
+                {
+                    "talk_title": "A Sample Talk",
+                    "speaker": "Elder Someone",
+                    "date": "April 2020",
+                    "url": "https://example.com/talk",
+                }
+            ]
+        }
+        results = resolve_references(conn, ["3 Nephi 11:1", "3 Nephi 11:2"])
+        by_ref = {r.reference: r for r in results}
+        assert len(by_ref["3 Nephi 11:1"].citations) == 1
+        assert by_ref["3 Nephi 11:1"].citations[0].talk_title == "A Sample Talk"
+        # A verse with nothing harvested for it just gets an empty list,
+        # not an error - most verses will be in this state.
+        assert by_ref["3 Nephi 11:2"].citations == []
+        print("test_resolve_attaches_real_citations: PASSED")
+    finally:
+        citations_module._citations_cache = original_cache
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     test_parse_reference()
     test_resolve_single_verse()
@@ -183,4 +217,5 @@ if __name__ == "__main__":
     test_malformed_and_non_string_candidates_are_dropped()
     test_duplicates_and_ordering_and_cap()
     test_extract_json_array()
+    test_resolve_attaches_real_citations()
     print("All ask.py tests passed.")

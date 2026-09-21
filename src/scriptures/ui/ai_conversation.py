@@ -16,17 +16,66 @@ from __future__ import annotations
 
 import sqlite3
 
-from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from scriptures.ai_client import AiConfig
 from scriptures.ask import AskedReference, QuestionAsker
+from scriptures.citations import Citation
 from scriptures.ui.result_row import ResultRow, truncate_text
 
 DISCLAIMER = (
     "This only suggests real matches from Desktop Scriptures' own text - "
     "it can't discuss doctrine or explain further."
 )
+
+
+class _TalkRow(QFrame):
+    """One citing talk for a suggested verse: title + "speaker · date",
+    clickable out to churchofjesuschrist.org - same interaction as the
+    Citations tab's and Topical Guide's own talk rows (a separate small
+    copy, not a shared import, matching those two's own precedent: each
+    takes a differently-sourced dataclass with the same shape)."""
+
+    def __init__(self, citation: Citation, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setObjectName("resultRow")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setToolTip("Open this talk at churchofjesuschrist.org")
+        self._url = citation.url
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 8, 12, 8)
+        layout.setSpacing(2)
+
+        title = QLabel(citation.talk_title)
+        title.setObjectName("resultPrimary")
+        title.setWordWrap(True)
+        layout.addWidget(title)
+
+        # "General Conference talk" spelled out, unlike the Citations tab's
+        # own _TalkRow - there, section context alone already makes it
+        # obvious; here, a talk row sits directly beneath a verse row with
+        # no section header between them, so it needs its own cue.
+        subtitle = QLabel(f"General Conference talk · {citation.speaker} · {citation.date}")
+        subtitle.setObjectName("resultSecondary")
+        subtitle.setWordWrap(True)
+        layout.addWidget(subtitle)
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if event.button() == Qt.MouseButton.LeftButton:
+            QDesktopServices.openUrl(QUrl(self._url))
+        super().mousePressEvent(event)
 
 
 class AiConversationSection(QWidget):
@@ -122,6 +171,12 @@ class AiConversationSection(QWidget):
             row = ResultRow(ref.chapter_id, ref.reference, truncate_text(ref.text))
             row.clicked.connect(self.result_selected)
             self._thread_layout.addWidget(row)
+            # Real, already-harvested citing talks for this reference (see
+            # ask.py's module docstring) - only shown when this particular
+            # verse happens to have any; most won't, since harvesting is
+            # necessarily partial.
+            for citation in ref.citations:
+                self._thread_layout.addWidget(_TalkRow(citation))
 
     def _on_failed(self, message: str, needs_api_key: bool) -> None:
         self._asker = None

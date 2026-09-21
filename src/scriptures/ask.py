@@ -12,6 +12,16 @@ verse's real, indexed text - never anything the model itself wrote. A
 made-up or misremembered reference is silently dropped rather than
 surfaced as a "maybe".
 
+Each resolved reference is also enriched with any General Conference
+talks already known to cite it (citations.py's same local,
+pre-harvested data the Citations tab and Topical Guide already read) -
+this is a plain local lookup, not something the model is ever asked
+for, so it carries none of the hallucination risk a "suggest a talk"
+prompt would. Coverage is necessarily partial: only verses that some
+Topical Guide topic's search already surfaced (or that were in the
+original Scripture of the Day pool) have any citations harvested at
+all - see build_topical_guide.py.
+
 This deliberately only covers the standard, citation-style volumes (Holy
 Bible, Book of Mormon, Doctrine and Covenants, Pearl of Great Price,
 Joseph Smith Translation) - Journal of Discourses and Lectures on Faith
@@ -26,13 +36,19 @@ from __future__ import annotations
 import json
 import re
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply
 
 from scriptures.ai_client import AUTH_ERRORS, AiConfig, build_request
+from scriptures.citations import Citation, get_citations
 from scriptures.data_access import get_chapter_by_loose_reference, get_verse_by_loose_reference
+
+# Cap on how many citing talks are attached per resolved reference - a
+# heavily-cited verse (e.g. John 3:16) could otherwise pad out a single
+# search result with dozens of talks.
+MAX_CITATIONS_PER_REFERENCE = 5
 
 # Cap on how many candidate references the model is asked for (and, as a
 # backstop, how many this will ever act on even if it returns more) - a
@@ -61,12 +77,15 @@ SYSTEM_PROMPT = (
 class AskedReference:
     """One AI-suggested reference, already resolved against the local
     database - `text` and `reference` always come from there, never from
-    the model's own output."""
+    the model's own output. `citations` (possibly empty) are real,
+    already-harvested General Conference talks known to cite this
+    reference - see this module's own docstring."""
 
     chapter_id: int
     verse_id: int | None
     reference: str
     text: str
+    citations: list[Citation] = field(default_factory=list)
 
 
 class AskError(Exception):
@@ -99,6 +118,23 @@ def _parse_reference(text: str) -> tuple[str, int, int | None, int | None] | Non
     return book, chapter, start, end
 
 
+def _citations_for(references: list[str]) -> list[Citation]:
+    """Real, already-harvested citing talks for any of these verse
+    references, deduplicated by URL (the same talk often cites more than
+    one verse in a range or chapter), capped at MAX_CITATIONS_PER_REFERENCE."""
+    seen_urls: set[str] = set()
+    result: list[Citation] = []
+    for reference in references:
+        for citation in get_citations(reference):
+            if citation.url in seen_urls:
+                continue
+            seen_urls.add(citation.url)
+            result.append(citation)
+            if len(result) >= MAX_CITATIONS_PER_REFERENCE:
+                return result
+    return result
+
+
 def _resolve_one(conn: sqlite3.Connection, candidate: str) -> AskedReference | None:
     parsed = _parse_reference(candidate)
     if parsed is None:
@@ -117,7 +153,8 @@ def _resolve_one(conn: sqlite3.Connection, candidate: str) -> AskedReference | N
             return None
         label = f"{book} {chapter_number}"
         snippet = " ".join(r["text"] for r in rows)
-        return AskedReference(chapter.id, None, label, snippet)
+        citations = _citations_for([r["reference"] for r in rows])
+        return AskedReference(chapter.id, None, label, snippet, citations)
 
     verse_end = verse_end or verse_start
     matched_verses = []
@@ -131,10 +168,11 @@ def _resolve_one(conn: sqlite3.Connection, candidate: str) -> AskedReference | N
     chapter_id = matched_verses[0].chapter_id
     if len(matched_verses) == 1:
         v = matched_verses[0]
-        return AskedReference(chapter_id, v.id, v.reference, v.text)
+        return AskedReference(chapter_id, v.id, v.reference, v.text, _citations_for([v.reference]))
     label = f"{book} {chapter_number}:{verse_start}-{verse_end}"
     snippet = " ".join(v.text for v in matched_verses)
-    return AskedReference(chapter_id, matched_verses[0].id, label, snippet)
+    citations = _citations_for([v.reference for v in matched_verses])
+    return AskedReference(chapter_id, matched_verses[0].id, label, snippet, citations)
 
 
 def resolve_references(conn: sqlite3.Connection, candidates: list[str]) -> list[AskedReference]:
