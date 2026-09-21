@@ -18,7 +18,7 @@ from PySide6.QtCore import QPoint, QSize, QTimer, Qt
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
-    QFileDialog,
+    QDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -65,6 +65,7 @@ from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.export import export_notes
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
+from scriptures.ui.sync_dialog import SyncFolderDialog
 from scriptures.ui.topical_guide_view import TopicDetailView
 from scriptures.ui import theme as theming
 
@@ -511,17 +512,14 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _choose_sync_folder(self) -> None:
-        current = get_setting(self.conn, SYNC_FOLDER_SETTING, "")
-        start_dir = current if current and Path(current).is_dir() else str(Path.home())
-        chosen = QFileDialog.getExistingDirectory(
-            self,
-            "Choose Sync Folder (e.g. your Nextcloud, OneDrive, or Google Drive folder)",
-            start_dir,
-        )
-        if not chosen:
+        current = get_setting(self.conn, SYNC_FOLDER_SETTING)
+        dialog = SyncFolderDialog(current, self)
+        if dialog.exec() != QDialog.DialogCode.Accepted or dialog.chosen_path is None:
             return
-        set_setting(self.conn, SYNC_FOLDER_SETTING, chosen)
-        self._update_sync_status()
+        set_setting(self.conn, SYNC_FOLDER_SETTING, str(dialog.chosen_path))
+        # "...and once confirmed, the app creates the folder and syncing
+        # begins" - _sync_now() re-reads the setting just written above.
+        self._sync_now()
 
     def _sync_now(self) -> None:
         folder = get_setting(self.conn, SYNC_FOLDER_SETTING)
