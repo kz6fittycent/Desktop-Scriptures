@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
+from scriptures.ai_client import AiConfig
 from scriptures.data_access import (
     Book,
     Chapter,
@@ -856,10 +857,26 @@ class MainWindow(QMainWindow):
             return
         self._path = [{"label": "Search", "action": self._run_search}]
         self._update_breadcrumb()
-        view = SearchView(self.conn)
+        view = SearchView(self.conn, ai_config=self._current_ai_config())
         view.result_selected.connect(self._on_search_result_selected)
         view.set_query(query)
         self._set_content(view)
+
+    def _current_ai_config(self) -> AiConfig | None:
+        """None means "don't even try" - AI-assisted search is off, or on
+        but missing the one thing (a base URL) it can't run without. An
+        API key is deliberately not required here either - see
+        ai_client.py's module docstring."""
+        if get_setting(self.conn, AI_ENABLED_SETTING) != "true":
+            return None
+        base_url = get_setting(self.conn, AI_BASE_URL_SETTING, "")
+        if not base_url:
+            return None
+        return AiConfig(
+            base_url=base_url,
+            api_key=get_setting(self.conn, AI_API_KEY_SETTING, ""),
+            model=get_setting(self.conn, AI_MODEL_SETTING, ""),
+        )
 
     def _on_search_result_selected(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)

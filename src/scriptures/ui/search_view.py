@@ -1,12 +1,16 @@
-"""Search results view: keywords, references, tags, and notes.
+"""Search results view: keywords, references, tags, notes, and (when
+configured - see ai_client.py's module docstring) AI-suggested matches.
 
 The search box itself lives in MainWindow's persistent header (always
 visible, not tucked behind a menu) - this widget only renders results for
-whatever query MainWindow hands it via `set_query()`.
+whatever query MainWindow hands it via `set_query()`. There's no separate
+"Ask a Question" flow: the same box that finds "John 3:16" also answers
+"how did Christ organize the Nephite church", by product decision - one
+place to search, not two.
 
-Four independent lookups run on every query and are shown as labeled
-sections, each only appearing when it has results. Tags and notes are
-your own annotations, so they're shown first, ahead of the scripture
+Four independent LOCAL lookups run on every query and are shown as
+labeled sections, each only appearing when it has results. Tags and notes
+are your own annotations, so they're shown first, ahead of the scripture
 matches themselves:
 - Tags: tag-name matches, with every verse/chapter that tag is attached
   to listed directly underneath - no separate drill-down click needed
@@ -14,6 +18,14 @@ matches themselves:
 - Chapters: book/chapter name matches (e.g. "Genesis 1", "Alma")
 - Verses: a direct reference match (e.g. "John 3:16") first, then a
   keyword (FTS5) match over scripture text, deduplicated by verse
+
+If an AiConfig is supplied, a fifth, asynchronous lookup also runs: the
+query is sent to ask.py as a natural-language question, and whatever
+comes back (already validated against this same local database - see
+ask.py's own module docstring) is shown as a "Suggested by AI" section
+above all the others, once it arrives - these queries are typically
+full sentences a keyword search wouldn't match well at all, so this is
+additive, not a replacement for the sections above.
 
 Clicking any result emits `result_selected(chapter_id)`; MainWindow
 resolves that chapter's full volume/testament/book path and navigates
@@ -30,12 +42,15 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QVBoxLayout,
     QWidget,
 )
 
+from scriptures.ai_client import AiConfig
+from scriptures.ask import AskedReference, QuestionAsker
 from scriptures.data_access import (
     get_tag_targets,
     search_chapters,
@@ -90,10 +105,18 @@ class ResultRow(QFrame):
 class SearchView(QWidget):
     result_selected = Signal(int)
 
-    def __init__(self, conn: sqlite3.Connection, parent: QWidget | None = None):
+    def __init__(
+        self,
+        conn: sqlite3.Connection,
+        ai_config: AiConfig | None = None,
+        parent: QWidget | None = None,
+    ):
         super().__init__(parent)
         self.conn = conn
+        self.ai_config = ai_config
         self._query = ""
+        self._asker: QuestionAsker | None = None
+        self._ai_placeholder: QLabel | None = None
 
         outer = QVBoxLayout(self)
 
@@ -162,6 +185,21 @@ class SearchView(QWidget):
             self._show_message("Start typing to search.")
             return
         self._clear_results()
+        self._ai_placeholder = None
+
+        # Started first so its placeholder renders above the synchronous
+        # local sections below, and replaced by the real section (or
+        # quietly removed) once the async response arrives - see
+        # _on_ai_succeeded/_on_ai_failed. A query like a full question is
+        # exactly the shape the local sections below rarely match well at
+        # all, so this is additive, never a replacement for them.
+        if self.ai_config is not None:
+            self._ai_placeholder = QLabel("Asking AI...")
+            self._ai_placeholder.setObjectName("resultSecondary")
+            self._results_layout.addWidget(self._ai_placeholder)
+            self._asker = QuestionAsker(self.conn, self.ai_config, query, parent=self)
+            self._asker.succeeded.connect(self._on_ai_succeeded)
+            self._asker.failed.connect(self._on_ai_failed)
 
         matched_tags = search_tags_by_name(self.conn, query)
         note_rows = [
@@ -193,8 +231,57 @@ class SearchView(QWidget):
         self._add_section("Chapters", chapter_rows)
         self._add_section("Verses", verse_rows)
 
+        # Not _show_message() - that clears the whole layout, which would
+        # also wipe the AI placeholder/section above if one is pending or
+        # already showing. A plain inline note alongside it instead.
         if not (chapter_rows or verse_rows or note_rows or matched_tags):
-            self._show_message(f'No results for "{query}".')
-            return
+            no_keyword_results = QLabel(
+                f'No keyword results for "{query}".'
+                if self.ai_config is not None
+                else f'No results for "{query}".'
+            )
+            no_keyword_results.setObjectName("resultSecondary")
+            no_keyword_results.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._results_layout.addWidget(no_keyword_results)
 
         self._results_layout.addStretch(1)
+
+    def _on_ai_succeeded(self, references: list[AskedReference]) -> None:
+        self._asker = None
+        if self._ai_placeholder is not None:
+            self._ai_placeholder.hide()
+            self._ai_placeholder.deleteLater()
+            self._ai_placeholder = None
+        if not references:
+            return
+        rows = [
+            ResultRow(ref.chapter_id, ref.reference, _truncate(ref.text)) for ref in references
+        ]
+        # Inserted at the top (index 0), not appended - see set_query's
+        # comment on why the AI section leads.
+        header = QLabel("Suggested by AI")
+        header.setObjectName("searchSectionHeader")
+        self._results_layout.insertWidget(0, header)
+        for offset, row in enumerate(rows, start=1):
+            row.clicked.connect(self.result_selected)
+            self._results_layout.insertWidget(offset, row)
+
+    def _on_ai_failed(self, message: str, needs_api_key: bool) -> None:
+        self._asker = None
+        if self._ai_placeholder is not None:
+            self._ai_placeholder.hide()
+            self._ai_placeholder.deleteLater()
+            self._ai_placeholder = None
+        if not needs_api_key:
+            # An ordinary network hiccup mid-search shouldn't interrupt
+            # the user with a dialog - the keyword/tag/note results below
+            # are unaffected either way, so this fails quietly.
+            return
+        QMessageBox.warning(
+            self,
+            "AI Search",
+            "The configured AI endpoint rejected the request for an "
+            "authentication reason - it likely requires an API key. Add "
+            "one under Ask → AI Settings..., or leave it blank if "
+            "you're using a local server that doesn't need one.",
+        )
