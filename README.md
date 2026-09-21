@@ -48,12 +48,12 @@ sudo snap install desktop-scriptures
 Features under consideration for future versions:
 
 - [x] Reading history (v1.3 - Resume Reading now shows your last 5 chapters, most recent first)
-- [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar, then refine it conversationally with follow-ups, and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server; see the AI Integration menu)
+- [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar, then refine it conversationally with follow-ups, and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server; see the AI Integration menu - v2.0.1 also surfaces any General Conference talks already known to cite a suggested verse)
 - [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
 - [ ] Apocrypha?
 - [ ] Wiki
 - [x] JST (v1.3)
-- [x] Topical Guide
+- [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics)
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
 - [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
 - [ ] Listen to the scriptures - voice capability
