@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -71,7 +72,9 @@ class AiSettingsDialog(QDialog):
         key_row = QHBoxLayout()
         self._api_key_edit = QLineEdit(api_key)
         self._api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
-        self._api_key_edit.setPlaceholderText("sk-...")
+        self._api_key_edit.setPlaceholderText(
+            "sk-... (optional - leave blank for a local server that doesn't need one)"
+        )
         show_button = QPushButton("Show")
         show_button.setCheckable(True)
         show_button.toggled.connect(self._toggle_key_visibility)
@@ -109,19 +112,36 @@ class AiSettingsDialog(QDialog):
 
     def _test_connection(self) -> None:
         base_url = self._base_url_edit.text().strip()
-        api_key = self._api_key_edit.text().strip()
-        if not base_url or not api_key:
-            self._test_status_label.setText("Enter a base URL and API key first.")
+        if not base_url:
+            self._test_status_label.setText("Enter a base URL first.")
             return
         self._test_status_label.setText("Testing...")
+        api_key = self._api_key_edit.text().strip()
         config = AiConfig(base_url=base_url, api_key=api_key, model=self._model_edit.text().strip())
         self._tester = ConnectionTester(config, parent=self)
-        self._tester.finished.connect(self._on_test_finished)
+        self._tester.finished.connect(
+            lambda ok, message, needs_key: self._on_test_finished(ok, message, needs_key, bool(api_key))
+        )
 
-    def _on_test_finished(self, ok: bool, message: str) -> None:
+    def _on_test_finished(self, ok: bool, message: str, needs_api_key: bool, had_key: bool) -> None:
         prefix = "✅" if ok else "⚠️"
         self._test_status_label.setText(f"{prefix} {message}")
         self._tester = None
+        if not needs_api_key:
+            return
+        if had_key:
+            body = (
+                "This endpoint rejected the API key you entered (authentication "
+                "error). Double-check the key and try again."
+            )
+        else:
+            body = (
+                "This endpoint requires an API key to connect. If you're using "
+                "a hosted provider like OpenAI, enter your API key above and "
+                "try again - a locally-running server (like Ollama or a local "
+                "LLM snap) usually doesn't need one."
+            )
+        QMessageBox.warning(self, "AI Settings", body)
 
     @property
     def enabled(self) -> bool:
