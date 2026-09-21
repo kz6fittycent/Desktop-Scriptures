@@ -49,7 +49,11 @@ SYSTEM_PROMPT = (
     "Each reference must be a real book name, chapter number, and "
     "optionally a verse or verse range (e.g. \"Alma 32:21\", \"Doctrine and "
     'Covenants 76", "1 Nephi 3:7"). If nothing in these books is clearly '
-    "relevant, reply with an empty array []."
+    "relevant, reply with an empty array []. The conversation may include "
+    "your own earlier replies (each still just a bare JSON array) and a "
+    "follow-up refining what's wanted (e.g. \"just the ones about "
+    'baptism") - narrow or adjust your previous answer accordingly, still '
+    "following the same rules."
 )
 
 
@@ -182,26 +186,38 @@ class QuestionAsker(QObject):
     answer against `conn`. `succeeded(list[AskedReference])` or
     `failed(str, needs_api_key: bool)` fires exactly once - keep a
     reference to this object until one does (see ai_client.py's
-    ConnectionTester for why)."""
+    ConnectionTester for why).
+
+    `history` carries prior turns forward for a follow-up refinement
+    ("just the ones about baptism") to have context - each entry is
+    (question, reference strings previously shown for it). Critically,
+    the "assistant" side of that history is never prose the model wrote:
+    it's always the same bare JSON reference list already validated and
+    shown to the user, re-fed back verbatim. The model never gets to
+    accumulate its own commentary turn over turn - grounding holds across
+    the whole conversation, not just the first message."""
 
     succeeded = Signal(list)
     failed = Signal(str, bool)
 
     def __init__(
-        self, conn: sqlite3.Connection, config: AiConfig, question: str, parent: QObject | None = None
+        self,
+        conn: sqlite3.Connection,
+        config: AiConfig,
+        question: str,
+        history: list[tuple[str, list[str]]] = (),
+        parent: QObject | None = None,
     ):
         super().__init__(parent)
         self.conn = conn
         self._manager = QNetworkAccessManager(self)
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        for prior_question, prior_references in history:
+            messages.append({"role": "user", "content": prior_question})
+            messages.append({"role": "assistant", "content": json.dumps(prior_references)})
+        messages.append({"role": "user", "content": question})
         payload = json.dumps(
-            {
-                "model": config.model or "gpt-4o-mini",
-                "temperature": 0.2,
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": question},
-                ],
-            }
+            {"model": config.model or "gpt-4o-mini", "temperature": 0.2, "messages": messages}
         ).encode("utf-8")
         self._reply = self._manager.post(build_request(config, "/chat/completions"), payload)
         self._reply.finished.connect(self._on_finished)

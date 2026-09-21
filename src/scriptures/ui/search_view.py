@@ -20,12 +20,15 @@ matches themselves:
   keyword (FTS5) match over scripture text, deduplicated by verse
 
 If an AiConfig is supplied, a fifth, asynchronous lookup also runs: the
-query is sent to ask.py as a natural-language question, and whatever
-comes back (already validated against this same local database - see
-ask.py's own module docstring) is shown as a "Suggested by AI" section
-above all the others, once it arrives - these queries are typically
-full sentences a keyword search wouldn't match well at all, so this is
-additive, not a replacement for the sections above.
+query is sent to ask.py as a natural-language question, and an
+AiConversationSection (see ui/ai_conversation.py) renders whatever comes
+back - already validated against this same local database - as a
+"Suggested by AI" section above all the others, once it arrives. That
+section also lets the user send follow-up refinements ("no, just the
+ones about baptism") without starting a new top-level search - these
+queries are typically full sentences a keyword search wouldn't match
+well at all, so this is additive, not a replacement for the sections
+below it.
 
 Clicking any result emits `result_selected(chapter_id)`; MainWindow
 resolves that chapter's full volume/testament/book path and navigates
@@ -39,10 +42,8 @@ import sqlite3
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
-    QFrame,
     QHBoxLayout,
     QLabel,
-    QMessageBox,
     QPushButton,
     QScrollArea,
     QVBoxLayout,
@@ -50,7 +51,6 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures.ai_client import AiConfig
-from scriptures.ask import AskedReference, QuestionAsker
 from scriptures.data_access import (
     get_tag_targets,
     search_chapters,
@@ -59,47 +59,9 @@ from scriptures.data_access import (
     search_verse_references,
     search_verses,
 )
+from scriptures.ui.ai_conversation import AiConversationSection
 from scriptures.ui.export import export_search_results
-
-
-def _truncate(text: str, limit: int = 140) -> str:
-    text = " ".join(text.split())
-    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
-
-
-class ResultRow(QFrame):
-    """A single clickable search result: a bold primary line (usually a
-    reference) and an optional secondary line (a snippet)."""
-
-    clicked = Signal(int)
-
-    def __init__(
-        self, chapter_id: int, primary_text: str, secondary_text: str = "", parent: QWidget | None = None
-    ):
-        super().__init__(parent)
-        self.chapter_id = chapter_id
-        self.setObjectName("resultRow")
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 8, 12, 8)
-        layout.setSpacing(2)
-
-        primary = QLabel(primary_text)
-        primary.setObjectName("resultPrimary")
-        primary.setWordWrap(True)
-        layout.addWidget(primary)
-
-        if secondary_text:
-            secondary = QLabel(secondary_text)
-            secondary.setObjectName("resultSecondary")
-            secondary.setWordWrap(True)
-            layout.addWidget(secondary)
-
-    def mousePressEvent(self, event):  # noqa: N802 (Qt naming convention)
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit(self.chapter_id)
-        super().mousePressEvent(event)
+from scriptures.ui.result_row import ResultRow, truncate_text as _truncate
 
 
 class SearchView(QWidget):
@@ -115,8 +77,7 @@ class SearchView(QWidget):
         self.conn = conn
         self.ai_config = ai_config
         self._query = ""
-        self._asker: QuestionAsker | None = None
-        self._ai_placeholder: QLabel | None = None
+        self._ai_section: AiConversationSection | None = None
 
         outer = QVBoxLayout(self)
 
@@ -185,21 +146,17 @@ class SearchView(QWidget):
             self._show_message("Start typing to search.")
             return
         self._clear_results()
-        self._ai_placeholder = None
+        self._ai_section = None
 
-        # Started first so its placeholder renders above the synchronous
-        # local sections below, and replaced by the real section (or
-        # quietly removed) once the async response arrives - see
-        # _on_ai_succeeded/_on_ai_failed. A query like a full question is
-        # exactly the shape the local sections below rarely match well at
-        # all, so this is additive, never a replacement for them.
+        # Started first so it renders above the synchronous local sections
+        # below - a query like a full question is exactly the shape those
+        # rarely match well at all, so this is additive, never a
+        # replacement for them. AiConversationSection owns its own
+        # placeholder/results/follow-up input from here on.
         if self.ai_config is not None:
-            self._ai_placeholder = QLabel("Asking AI...")
-            self._ai_placeholder.setObjectName("resultSecondary")
-            self._results_layout.addWidget(self._ai_placeholder)
-            self._asker = QuestionAsker(self.conn, self.ai_config, query, parent=self)
-            self._asker.succeeded.connect(self._on_ai_succeeded)
-            self._asker.failed.connect(self._on_ai_failed)
+            self._ai_section = AiConversationSection(self.conn, self.ai_config, query, parent=self)
+            self._ai_section.result_selected.connect(self.result_selected)
+            self._results_layout.addWidget(self._ai_section)
 
         matched_tags = search_tags_by_name(self.conn, query)
         note_rows = [
@@ -245,43 +202,3 @@ class SearchView(QWidget):
             self._results_layout.addWidget(no_keyword_results)
 
         self._results_layout.addStretch(1)
-
-    def _on_ai_succeeded(self, references: list[AskedReference]) -> None:
-        self._asker = None
-        if self._ai_placeholder is not None:
-            self._ai_placeholder.hide()
-            self._ai_placeholder.deleteLater()
-            self._ai_placeholder = None
-        if not references:
-            return
-        rows = [
-            ResultRow(ref.chapter_id, ref.reference, _truncate(ref.text)) for ref in references
-        ]
-        # Inserted at the top (index 0), not appended - see set_query's
-        # comment on why the AI section leads.
-        header = QLabel("Suggested by AI")
-        header.setObjectName("searchSectionHeader")
-        self._results_layout.insertWidget(0, header)
-        for offset, row in enumerate(rows, start=1):
-            row.clicked.connect(self.result_selected)
-            self._results_layout.insertWidget(offset, row)
-
-    def _on_ai_failed(self, message: str, needs_api_key: bool) -> None:
-        self._asker = None
-        if self._ai_placeholder is not None:
-            self._ai_placeholder.hide()
-            self._ai_placeholder.deleteLater()
-            self._ai_placeholder = None
-        if not needs_api_key:
-            # An ordinary network hiccup mid-search shouldn't interrupt
-            # the user with a dialog - the keyword/tag/note results below
-            # are unaffected either way, so this fails quietly.
-            return
-        QMessageBox.warning(
-            self,
-            "AI Search",
-            "The configured AI endpoint rejected the request for an "
-            "authentication reason - it likely requires an API key. Add "
-            "one under Ask → AI Settings..., or leave it blank if "
-            "you're using a local server that doesn't need one.",
-        )
