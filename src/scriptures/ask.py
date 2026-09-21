@@ -81,6 +81,17 @@ MAX_CITATIONS_PER_REFERENCE = 5
 # short, focused list is more useful than an exhaustive one.
 MAX_REFERENCES = 6
 
+# How many *additional* results the local keyword search (see module
+# docstring) is always guaranteed room for, on top of whatever the model
+# itself already suggested - reserved capacity, not a shared pool. If it
+# instead had to compete for space within MAX_REFERENCES, a model that
+# fills every slot with its own picks (plausible for a question with
+# several well-known answers, e.g. several different Bible verses all
+# using the same word) would leave the local search zero room to
+# contribute even one more real, independent match - exactly the bug
+# this constant exists to prevent.
+LOCAL_SUPPLEMENT_LIMIT = 3
+
 SYSTEM_PROMPT = (
     "You help locate passages in the LDS standard works (the Holy Bible, "
     "the Book of Mormon, the Doctrine and Covenants, the Pearl of Great "
@@ -395,16 +406,30 @@ def _merge_references(
 ) -> list[AskedReference]:
     """`primary` (whatever the AI itself suggested and validated) always
     leads; `supplementary` (the local keyword search) only fills in
-    references not already present, up to `cap` total."""
-    seen = {(r.chapter_id, r.verse_id) for r in primary}
+    references not already present, up to `cap` total.
+
+    Also dedupes by the *displayed* reference string, not just by
+    (chapter_id, verse_id) - the Joseph Smith Translation reuses the
+    King James Bible's own book/chapter/verse numbering (see schema.sql's
+    comment on topic_verses), and JST's own translation changes can shift
+    later verses in a chapter out of sync with the KJV's numbering, so
+    e.g. "Acts 28:28" can be a real, different verse in each volume. Both
+    are still genuine, resolvable content - but showing two rows both
+    labeled "Acts 28:28" with no volume shown would read as a confusing
+    exact duplicate rather than two distinct verses, so once a reference
+    string is spoken for, a same-labeled verse from the other volume is
+    treated as already covered rather than shown a second time."""
+    seen_keys = {(r.chapter_id, r.verse_id) for r in primary}
+    seen_references = {r.reference for r in primary}
     merged = list(primary)
     for ref in supplementary:
         if len(merged) >= cap:
             break
         key = (ref.chapter_id, ref.verse_id)
-        if key in seen:
+        if key in seen_keys or ref.reference in seen_references:
             continue
-        seen.add(key)
+        seen_keys.add(key)
+        seen_references.add(ref.reference)
         merged.append(ref)
     return merged
 
@@ -548,7 +573,21 @@ class QuestionAsker(QObject):
 
         if self._is_initial_question:
             keywords = _extract_keywords(self.question)
-            local_matches = _search_local_verses_by_keywords(self.conn, keywords, MAX_REFERENCES)
-            resolved = _merge_references(resolved, local_matches, MAX_REFERENCES)
+            # Over-fetched well past LOCAL_SUPPLEMENT_LIMIT - the top
+            # bm25 matches for a common word can easily be entirely the
+            # same verses the model already suggested (its own picks are
+            # often the most obviously relevant ones too), which would
+            # leave nothing left to fill the reserved slots with after
+            # _merge_references dedupes them back out. Fetching this many
+            # up front means a genuinely new match further down the
+            # ranking still has room to be found.
+            local_matches = _search_local_verses_by_keywords(
+                self.conn, keywords, LOCAL_SUPPLEMENT_LIMIT + MAX_REFERENCES
+            )
+            # Reserved capacity, not shared with MAX_REFERENCES - see
+            # LOCAL_SUPPLEMENT_LIMIT's own comment for why.
+            resolved = _merge_references(
+                resolved, local_matches, len(resolved) + LOCAL_SUPPLEMENT_LIMIT
+            )
 
         self.succeeded.emit(resolved, content, misses)

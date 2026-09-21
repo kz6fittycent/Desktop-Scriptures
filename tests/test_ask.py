@@ -26,6 +26,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import scriptures.citations as citations_module  # noqa: E402
 from scriptures.ask import (  # noqa: E402
+    AskedReference,
     _extract_candidates,
     _extract_json_array,
     _extract_keywords,
@@ -186,6 +187,23 @@ def test_merge_references_supplements_without_duplicating() -> None:
         print("test_merge_references_supplements_without_duplicating: PASSED")
     finally:
         shutil.rmtree(tmp_root, ignore_errors=True)
+
+
+def test_merge_references_dedupes_by_displayed_reference_too() -> None:
+    """The Joseph Smith Translation reuses the King James Bible's own
+    numbering, and JST's own translation changes can shift a later verse
+    in a chapter out of sync with it - so "Acts 28:28" can be a real,
+    different verse (different id) in each volume. Both are genuine
+    content, but showing two rows both labeled "Acts 28:28" with no
+    volume shown would read as a confusing exact duplicate rather than
+    two distinct verses - so once a reference string is spoken for, a
+    same-labeled verse from the other volume is treated as already
+    covered, not shown a second time."""
+    bible_verse = AskedReference(1, 101, "Acts 28:28", "Bible wording", [])
+    jst_verse = AskedReference(2, 202, "Acts 28:28", "JST wording", [])
+    merged = _merge_references([bible_verse], [jst_verse], cap=5)
+    assert merged == [bible_verse]
+    print("test_merge_references_dedupes_by_displayed_reference_too: PASSED")
 
 
 def test_resolve_single_verse() -> None:
@@ -353,6 +371,7 @@ if __name__ == "__main__":
     test_extract_keywords()
     test_search_local_verses_by_keywords_is_prefix_matched()
     test_merge_references_supplements_without_duplicating()
+    test_merge_references_dedupes_by_displayed_reference_too()
     test_resolve_single_verse()
     test_resolve_verse_range()
     test_resolve_whole_chapter()
