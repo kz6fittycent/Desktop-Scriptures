@@ -284,6 +284,16 @@ class MainWindow(QMainWindow):
 
         sync_menu = self.menuBar().addMenu("Sy&nc")
 
+        sync_menu.addAction(
+            self._help_menu_label(
+                "Point this at a folder kept in sync by Nextcloud, OneDrive, "
+                "Google Drive, Dropbox, or similar - this app never talks to "
+                "any cloud service directly, it just reads and writes small "
+                "files there."
+            )
+        )
+        sync_menu.addSeparator()
+
         choose_folder_action = QAction("Choose Sync Folder...", self)
         choose_folder_action.triggered.connect(self._choose_sync_folder)
         sync_menu.addAction(choose_folder_action)
@@ -503,7 +513,11 @@ class MainWindow(QMainWindow):
     def _choose_sync_folder(self) -> None:
         current = get_setting(self.conn, SYNC_FOLDER_SETTING, "")
         start_dir = current if current and Path(current).is_dir() else str(Path.home())
-        chosen = QFileDialog.getExistingDirectory(self, "Choose Sync Folder", start_dir)
+        chosen = QFileDialog.getExistingDirectory(
+            self,
+            "Choose Sync Folder (e.g. your Nextcloud, OneDrive, or Google Drive folder)",
+            start_dir,
+        )
         if not chosen:
             return
         set_setting(self.conn, SYNC_FOLDER_SETTING, chosen)
