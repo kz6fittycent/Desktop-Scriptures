@@ -12,11 +12,13 @@ from __future__ import annotations
 import sqlite3
 from datetime import date
 from html import escape
+from pathlib import Path
 
 from PySide6.QtCore import QPoint, QSize, QTimer, Qt
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
+    QFileDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -57,6 +59,7 @@ from scriptures.data_access import (
     set_setting,
 )
 from scriptures.sotd import get_scripture_of_the_day
+from scriptures.sync import sync_now
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.export import export_notes
@@ -86,6 +89,13 @@ HELP_MENU_TEXT_WIDTH = 280
 # toward the reading streak - long enough that clicking through chapters
 # (e.g. browsing to find a passage) doesn't rack up "reads" you didn't do.
 READING_STREAK_DWELL_MS = 5000
+
+# Settings keys backing the Sync menu - both device-specific (which folder
+# THIS installation should read/write, when THIS installation last synced),
+# so they live in the local settings table like the theme/font choices
+# above, never inside anything sync.py itself reads or writes.
+SYNC_FOLDER_SETTING = "sync_folder_path"
+LAST_SYNC_SETTING = "last_sync_at"
 
 
 class MainWindow(QMainWindow):
@@ -272,6 +282,37 @@ class MainWindow(QMainWindow):
         highlight_group.addAction(clear_highlight_action)
         highlight_menu.addAction(clear_highlight_action)
 
+        sync_menu = self.menuBar().addMenu("Sy&nc")
+
+        choose_folder_action = QAction("Choose Sync Folder...", self)
+        choose_folder_action.triggered.connect(self._choose_sync_folder)
+        sync_menu.addAction(choose_folder_action)
+
+        sync_menu.addSeparator()
+
+        self._sync_now_action = QAction("Sync Now", self)
+        self._sync_now_action.triggered.connect(self._sync_now)
+        sync_menu.addAction(self._sync_now_action)
+
+        sync_menu.addSeparator()
+
+        # Word-wrapped QWidgetAction, same reasoning as the Help menu's
+        # own labels below: a plain QAction's text never wraps, so a long
+        # folder path would otherwise just grow the menu past the window.
+        self._sync_status_label = QLabel()
+        self._sync_status_label.setWordWrap(True)
+        self._sync_status_label.setMaximumWidth(HELP_MENU_TEXT_WIDTH)
+        self._sync_status_label.setContentsMargins(12, 4, 12, 4)
+        sync_status_action = QWidgetAction(self)
+        sync_status_action.setDefaultWidget(self._sync_status_label)
+        sync_menu.addAction(sync_status_action)
+
+        # Refreshed on open too, not just right after an action - the
+        # folder could disappear (an unmounted drive, an uninstalled cloud
+        # client) at any time while this menu sits closed.
+        sync_menu.aboutToShow.connect(self._update_sync_status)
+        self._update_sync_status()
+
         # No "About" dialog - the dropdown itself carries the same
         # verbiage a popup would have (version, the unofficial-app
         # disclaimer required by the project's own stated policy, and
@@ -452,6 +493,76 @@ class MainWindow(QMainWindow):
             self._current_reading_view.apply_theme(
                 palette, self._font_family, self._font_size
             )
+
+    # ------------------------------------------------------------------
+    # Sync (see sync.py - this app never talks to any cloud provider's
+    # API, it just reads/writes small JSON files in a folder some other,
+    # already-running cloud client keeps synced)
+    # ------------------------------------------------------------------
+
+    def _choose_sync_folder(self) -> None:
+        current = get_setting(self.conn, SYNC_FOLDER_SETTING, "")
+        start_dir = current if current and Path(current).is_dir() else str(Path.home())
+        chosen = QFileDialog.getExistingDirectory(self, "Choose Sync Folder", start_dir)
+        if not chosen:
+            return
+        set_setting(self.conn, SYNC_FOLDER_SETTING, chosen)
+        self._update_sync_status()
+
+    def _sync_now(self) -> None:
+        folder = get_setting(self.conn, SYNC_FOLDER_SETTING)
+        if not folder:
+            return
+        try:
+            sync_now(self.conn, Path(folder))
+        except FileNotFoundError:
+            QMessageBox.warning(
+                self,
+                "Sync",
+                f"The sync folder no longer exists:\n{folder}\n\n"
+                'Choose a new one under Sync → "Choose Sync Folder...".',
+            )
+            self._update_sync_status()
+            return
+        now = self.conn.execute("SELECT datetime('now')").fetchone()[0]
+        set_setting(self.conn, LAST_SYNC_SETTING, now)
+        self._update_sync_status()
+        # Sync can only ever change notes/tags/highlights/the reading
+        # streak - the only screen any of that shows live is the reading
+        # view (its side panel and inline highlights) and the streak
+        # badge; nothing else on screen needs rebuilding.
+        self._refresh_current_view()
+        self._update_streak_display()
+
+    def _update_sync_status(self) -> None:
+        folder = get_setting(self.conn, SYNC_FOLDER_SETTING)
+        if not folder:
+            self._sync_status_label.setText("No sync folder configured.")
+            self._sync_now_action.setEnabled(False)
+            return
+        if not Path(folder).is_dir():
+            self._sync_status_label.setText(
+                f"Sync folder no longer exists:\n{folder}"
+            )
+            self._sync_now_action.setEnabled(False)
+            return
+        self._sync_now_action.setEnabled(True)
+        last_sync_at = get_setting(self.conn, LAST_SYNC_SETTING)
+        when = f"Last synced: {last_sync_at} UTC" if last_sync_at else "Never synced"
+        self._sync_status_label.setText(f"Folder: {folder}\n{when}")
+
+    def _refresh_current_view(self) -> None:
+        """Re-renders the chapter currently on screen, if any, so a note/
+        tag/highlight another device just contributed shows up right away
+        instead of waiting for the next navigation."""
+        if self._current_reading_view is None:
+            return
+        chapter_id = self._current_reading_view.chapter_id
+        location = get_chapter_location(self.conn, chapter_id)
+        if location is None:
+            return
+        volume, testament, book, _chapter = location
+        self._on_chapter_clicked(volume, testament, book, chapter_id)
 
     def _on_side_tab_changed(self, index: int) -> None:
         self._side_tab_index = index
