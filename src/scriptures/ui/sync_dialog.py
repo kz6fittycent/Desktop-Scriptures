@@ -1,4 +1,4 @@
-"""Guided "Choose Sync Folder" dialog (see main_window.py's Sync menu and
+"""Guided "Sync Options" dialog (see main_window.py's Sync menu and
 sync.py's module docstring for the overall cloud-folder sync design).
 
 Rather than dropping the user straight into a bare folder picker, this
@@ -54,7 +54,7 @@ class SyncFolderDialog(QDialog):
 
     def __init__(self, current_path: str | None, parent: QWidget | None = None):
         super().__init__(parent)
-        self.setWindowTitle("Choose Sync Folder")
+        self.setWindowTitle("Sync Options")
         self.setMinimumWidth(420)
         self.chosen_path: Path | None = None
 

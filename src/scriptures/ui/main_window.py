@@ -285,19 +285,15 @@ class MainWindow(QMainWindow):
 
         sync_menu = self.menuBar().addMenu("Sy&nc")
 
-        sync_menu.addAction(
-            self._help_menu_label(
-                "Point this at a folder kept in sync by Nextcloud, OneDrive, "
-                "Google Drive, Dropbox, or similar - this app never talks to "
-                "any cloud service directly, it just reads and writes small "
-                "files there."
-            )
-        )
-        sync_menu.addSeparator()
-
-        choose_folder_action = QAction("Choose Sync Folder...", self)
-        choose_folder_action.triggered.connect(self._choose_sync_folder)
-        sync_menu.addAction(choose_folder_action)
+        # "Sync Options...", not "Choose Sync Folder...": what the user is
+        # actually picking in the dialog this opens is a cloud syncing
+        # solution (Nextcloud/OneDrive/etc.) - the folder underneath it is
+        # just where that choice lands, not the point of the click. The
+        # dialog itself carries the "point this at a cloud-synced folder"
+        # explanation, so it doesn't need repeating here too.
+        sync_options_action = QAction("Sync Options...", self)
+        sync_options_action.triggered.connect(self._show_sync_options)
+        sync_menu.addAction(sync_options_action)
 
         sync_menu.addSeparator()
 
@@ -307,15 +303,29 @@ class MainWindow(QMainWindow):
 
         sync_menu.addSeparator()
 
-        # Word-wrapped QWidgetAction, same reasoning as the Help menu's
-        # own labels below: a plain QAction's text never wraps, so a long
-        # folder path would otherwise just grow the menu past the window.
-        self._sync_status_label = QLabel()
-        self._sync_status_label.setWordWrap(True)
-        self._sync_status_label.setMaximumWidth(HELP_MENU_TEXT_WIDTH)
-        self._sync_status_label.setContentsMargins(12, 4, 12, 4)
+        # Two stacked labels in their own small widget (QWidgetAction, same
+        # reasoning as the Help menu's own labels below: a plain QAction's
+        # text never wraps, so a long folder path would otherwise just
+        # grow the menu past the window) - a short headline (an emoji
+        # glyph doubles as its status icon, no separate image asset
+        # needed) plus a muted detail line underneath for the folder path
+        # and last-sync time.
+        sync_status_widget = QWidget()
+        sync_status_layout = QVBoxLayout(sync_status_widget)
+        sync_status_layout.setContentsMargins(12, 4, 12, 4)
+        sync_status_layout.setSpacing(2)
+
+        self._sync_status_line = QLabel()
+        sync_status_layout.addWidget(self._sync_status_line)
+
+        self._sync_status_detail = QLabel()
+        self._sync_status_detail.setObjectName("resultSecondary")
+        self._sync_status_detail.setWordWrap(True)
+        self._sync_status_detail.setMaximumWidth(HELP_MENU_TEXT_WIDTH)
+        sync_status_layout.addWidget(self._sync_status_detail)
+
         sync_status_action = QWidgetAction(self)
-        sync_status_action.setDefaultWidget(self._sync_status_label)
+        sync_status_action.setDefaultWidget(sync_status_widget)
         sync_menu.addAction(sync_status_action)
 
         # Refreshed on open too, not just right after an action - the
@@ -511,7 +521,7 @@ class MainWindow(QMainWindow):
     # already-running cloud client keeps synced)
     # ------------------------------------------------------------------
 
-    def _choose_sync_folder(self) -> None:
+    def _show_sync_options(self) -> None:
         current = get_setting(self.conn, SYNC_FOLDER_SETTING)
         dialog = SyncFolderDialog(current, self)
         if dialog.exec() != QDialog.DialogCode.Accepted or dialog.chosen_path is None:
@@ -532,7 +542,7 @@ class MainWindow(QMainWindow):
                 self,
                 "Sync",
                 f"The sync folder no longer exists:\n{folder}\n\n"
-                'Choose a new one under Sync → "Choose Sync Folder...".',
+                'Choose a new one under Sync → "Sync Options...".',
             )
             self._update_sync_status()
             return
@@ -549,19 +559,22 @@ class MainWindow(QMainWindow):
     def _update_sync_status(self) -> None:
         folder = get_setting(self.conn, SYNC_FOLDER_SETTING)
         if not folder:
-            self._sync_status_label.setText("No sync folder configured.")
+            self._sync_status_line.setText("No sync folder configured.")
+            self._sync_status_detail.setVisible(False)
             self._sync_now_action.setEnabled(False)
             return
         if not Path(folder).is_dir():
-            self._sync_status_label.setText(
-                f"Sync folder no longer exists:\n{folder}"
-            )
+            self._sync_status_line.setText("⚠️ Sync folder no longer exists")
+            self._sync_status_detail.setText(folder)
+            self._sync_status_detail.setVisible(True)
             self._sync_now_action.setEnabled(False)
             return
         self._sync_now_action.setEnabled(True)
+        self._sync_status_line.setText("✅ Sync folder connected")
         last_sync_at = get_setting(self.conn, LAST_SYNC_SETTING)
-        when = f"Last synced: {last_sync_at} UTC" if last_sync_at else "Never synced"
-        self._sync_status_label.setText(f"Folder: {folder}\n{when}")
+        when = f"Last synced: {last_sync_at} UTC" if last_sync_at else "Never synced yet"
+        self._sync_status_detail.setText(f"{folder}\n{when}")
+        self._sync_status_detail.setVisible(True)
 
     def _refresh_current_view(self) -> None:
         """Re-renders the chapter currently on screen, if any, so a note/
