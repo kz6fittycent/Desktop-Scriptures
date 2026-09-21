@@ -59,6 +59,7 @@ text, so it catches exactly this kind of gap.
 
 from __future__ import annotations
 
+import itertools
 import json
 import re
 import sqlite3
@@ -383,21 +384,47 @@ def _search_local_verses_by_keywords(
     plain token matching with no stemming, and scripture text is
     overwhelmingly archaic/inflected (-eth, -ed, plurals), so a bare exact
     match on the word as typed would miss most of the very forms the
-    question is actually asking about."""
+    question is actually asking about.
+
+    Interleaved one-per-volume, not taken straight off the top of the
+    global bm25 ranking - the Holy Bible is vastly larger than the Book
+    of Mormon (or any other volume here), so for an ordinary word a
+    flat, all-volumes-pooled ranking is dominated by sheer Bible verse
+    count almost by default, not by actual relevance; a real, on-topic
+    Book of Mormon match could easily rank 4th or 5th overall while
+    still being the single best match *within* its own volume. Each
+    volume's own best-to-worst order is preserved; only the interleaving
+    across volumes changes, so within one volume this is still exactly
+    the same bm25 ranking as before."""
     if not keywords:
         return []
     match_query = " OR ".join(f'"{kw}"*' for kw in keywords)
     rows = conn.execute(
-        "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
+        "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id, vol.id AS volume_id "
         "FROM verses_fts JOIN verses v ON v.id = verses_fts.rowid "
-        "WHERE verses_fts MATCH ? ORDER BY rank LIMIT ?",
-        (match_query, limit),
+        "JOIN chapters c ON c.id = v.chapter_id "
+        "JOIN books b ON b.id = c.book_id "
+        "JOIN volumes vol ON vol.id = b.volume_id "
+        "WHERE verses_fts MATCH ? ORDER BY rank",
+        (match_query,),
     ).fetchall()
+
+    by_volume: dict[int, list[sqlite3.Row]] = {}
+    for row in rows:
+        by_volume.setdefault(row["volume_id"], []).append(row)
+
+    interleaved = [
+        row
+        for group in itertools.zip_longest(*by_volume.values())
+        for row in group
+        if row is not None
+    ][:limit]
+
     return [
         AskedReference(
             row["chapter_id"], row["id"], row["reference"], row["text"], _citations_for([row["reference"]])
         )
-        for row in rows
+        for row in interleaved
     ]
 
 
