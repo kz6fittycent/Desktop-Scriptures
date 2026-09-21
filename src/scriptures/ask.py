@@ -29,6 +29,16 @@ address content by speaker/title or lecture number, not a chapter:verse
 citation a model would ever guess at, so a question that's really about
 one of those just won't resolve to anything here, the same as any other
 unresolvable guess.
+
+Book names are also normalized against standard LDS citation
+abbreviations (_BOOK_ALIASES) before resolution - "D&C" in particular
+isn't a rare style choice, it's how Doctrine and Covenants is almost
+always actually cited, far more often than spelling it out, so without
+this every D&C (and much of the Book of Mormon/Pearl of Great Price)
+reference a model naturally reaches for would silently fail to resolve
+while Bible references - rarely abbreviated in general writing - kept
+working fine. That asymmetry ("the Bible always shows up, everything
+else is missing") is exactly the bug this fixes.
 """
 
 from __future__ import annotations
@@ -111,11 +121,92 @@ def _parse_reference(text: str) -> tuple[str, int, int | None, int | None] | Non
     match = _REFERENCE_RE.match(text.strip())
     if not match:
         return None
-    book = match.group("book").strip()
+    book = _canonical_book_name(match.group("book").strip())
     chapter = int(match.group("chapter"))
     start = int(match.group("start")) if match.group("start") else None
     end = int(match.group("end")) if match.group("end") else None
     return book, chapter, start, end
+
+
+# Standard LDS citation abbreviations, keyed by their _normalize_book_key
+# form, mapped to this database's own exact book name. "D&C" in
+# particular isn't an edge case - it's how Doctrine and Covenants is
+# almost always actually cited, far more often than the spelled-out
+# name, so a model reaching for it is the norm, not a rare miss; the
+# same pattern (a common abbreviation the model reaches for, that the
+# database's own full name doesn't match) shows up throughout the Book
+# of Mormon and Pearl of Great Price too. Without this, every one of
+# these would silently fail to resolve while any Bible book (rarely
+# abbreviated in general writing, and never needing this table to work)
+# resolves fine - which is exactly the "Bible always shows up, everything
+# else is missing" bug this fixes.
+_BOOK_ALIASES: dict[str, str] = {
+    "d&c": "Doctrine and Covenants",
+    "dc": "Doctrine and Covenants",
+    "od 1": "Official Declaration 1",
+    "od1": "Official Declaration 1",
+    "od 2": "Official Declaration 2",
+    "od2": "Official Declaration 2",
+    "1 ne": "1 Nephi",
+    "2 ne": "2 Nephi",
+    "3 ne": "3 Nephi",
+    "4 ne": "4 Nephi",
+    "w of m": "Words of Mormon",
+    "wom": "Words of Mormon",
+    "hel": "Helaman",
+    "morm": "Mormon",
+    "moro": "Moroni",
+    "js-h": "Joseph Smith--History",
+    "jsh": "Joseph Smith--History",
+    "joseph smith-history": "Joseph Smith--History",
+    "js-m": "Joseph Smith--Matthew",
+    "jsm": "Joseph Smith--Matthew",
+    "joseph smith-matthew": "Joseph Smith--Matthew",
+    "a of f": "Articles of Faith",
+    "aof": "Articles of Faith",
+    "abr": "Abraham",
+    # Holy Bible / JST (same abbreviated book names, common enough in
+    # general writing that these are worth covering too, even though the
+    # bug report was specifically about the LDS-only volumes above).
+    "gen": "Genesis", "ex": "Exodus", "exod": "Exodus", "lev": "Leviticus",
+    "num": "Numbers", "deut": "Deuteronomy", "josh": "Joshua", "judg": "Judges",
+    "1 sam": "1 Samuel", "2 sam": "2 Samuel", "1 kgs": "1 Kings", "2 kgs": "2 Kings",
+    "1 chr": "1 Chronicles", "2 chr": "2 Chronicles", "neh": "Nehemiah",
+    "esth": "Esther", "ps": "Psalms", "psalm": "Psalms", "prov": "Proverbs",
+    "eccl": "Ecclesiastes", "song of sol": "Song of Solomon", "sos": "Song of Solomon",
+    "isa": "Isaiah", "jer": "Jeremiah", "lam": "Lamentations", "ezek": "Ezekiel",
+    "dan": "Daniel", "hos": "Hosea", "obad": "Obadiah", "jon": "Jonah",
+    "mic": "Micah", "nah": "Nahum", "hab": "Habakkuk", "zeph": "Zephaniah",
+    "hag": "Haggai", "zech": "Zechariah", "mal": "Malachi",
+    "matt": "Matthew", "mt": "Matthew", "mk": "Mark", "lk": "Luke",
+    "rom": "Romans", "1 cor": "1 Corinthians", "2 cor": "2 Corinthians",
+    "gal": "Galatians", "eph": "Ephesians", "phil": "Philippians",
+    "col": "Colossians", "1 thess": "1 Thessalonians", "2 thess": "2 Thessalonians",
+    "1 tim": "1 Timothy", "2 tim": "2 Timothy", "philem": "Philemon",
+    "heb": "Hebrews", "jas": "James", "1 pet": "1 Peter", "2 pet": "2 Peter",
+    "1 jn": "1 John", "2 jn": "2 John", "3 jn": "3 John", "rev": "Revelation",
+}
+
+
+def _normalize_book_key(book: str) -> str:
+    """Collapses the punctuation/spacing variation a model might use
+    around an abbreviation ("D&C", "D & C", "D.&C.") down to one
+    consistent lookup key ("d&c") for _BOOK_ALIASES."""
+    key = book.replace(".", "")
+    key = key.replace("—", "-").replace("–", "-")  # em/en dash
+    key = re.sub(r"\s*&\s*", "&", key)
+    key = re.sub(r"-+", "-", key)
+    key = re.sub(r"\s+", " ", key).strip().lower()
+    return key
+
+
+def _canonical_book_name(book: str) -> str:
+    """Maps a recognized abbreviation to this database's own exact book
+    name; anything else is returned unchanged; get_verse_by_loose_reference/
+    get_chapter_by_loose_reference already match case-insensitively
+    against the real name, so an already-correct full name (however
+    cased) still resolves without needing an entry here."""
+    return _BOOK_ALIASES.get(_normalize_book_key(book), book)
 
 
 def _citations_for(references: list[str]) -> list[Citation]:

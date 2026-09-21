@@ -33,13 +33,22 @@ def _seed(conn: sqlite3.Connection) -> None:
     """A small, deliberately book-name-diverse slice of scripture: a
     numbered Book of Mormon book (to check "3 Nephi"-style parsing), a
     plain-named one in mixed case (to check case-insensitive matching),
-    and a chapter with several verses (to check whole-chapter and
-    verse-range resolution)."""
+    a chapter with several verses (to check whole-chapter and
+    verse-range resolution), and one book each from Doctrine and
+    Covenants and Pearl of Great Price whose real citation form is a
+    standard abbreviation ("D&C", "JS-H") rather than the book's actual
+    stored name - see _BOOK_ALIASES."""
     conn.execute("INSERT INTO volumes (id, name, slug, sort_order) VALUES (1, 'Book of Mormon', 'book-of-mormon', 1)")
+    conn.execute("INSERT INTO volumes (id, name, slug, sort_order) VALUES (2, 'Doctrine and Covenants', 'doctrine-and-covenants', 2)")
+    conn.execute("INSERT INTO volumes (id, name, slug, sort_order) VALUES (3, 'Pearl of Great Price', 'pearl-of-great-price', 3)")
     conn.execute("INSERT INTO books (id, volume_id, name, sort_order) VALUES (1, 1, '3 Nephi', 1)")
     conn.execute("INSERT INTO books (id, volume_id, name, sort_order) VALUES (2, 1, 'Alma', 2)")
+    conn.execute("INSERT INTO books (id, volume_id, name, sort_order) VALUES (3, 2, 'Doctrine and Covenants', 1)")
+    conn.execute("INSERT INTO books (id, volume_id, name, sort_order) VALUES (4, 3, 'Joseph Smith--History', 1)")
     conn.execute("INSERT INTO chapters (id, book_id, chapter_number) VALUES (1, 1, 11)")
     conn.execute("INSERT INTO chapters (id, book_id, chapter_number) VALUES (2, 2, 32)")
+    conn.execute("INSERT INTO chapters (id, book_id, chapter_number) VALUES (3, 3, 76)")
+    conn.execute("INSERT INTO chapters (id, book_id, chapter_number) VALUES (4, 4, 1)")
     verses = {
         1: "And it came to pass that Jesus spake unto them.",
         2: "And he called the twelve.",
@@ -55,6 +64,14 @@ def _seed(conn: sqlite3.Connection) -> None:
     conn.execute(
         "INSERT INTO verses (chapter_id, verse_number, text, reference) VALUES (2, 21, ?, ?)",
         ("Yea, they may begin to exercise a particle of faith.", "Alma 32:21"),
+    )
+    conn.execute(
+        "INSERT INTO verses (chapter_id, verse_number, text, reference) VALUES (3, 22, ?, ?)",
+        ("Behold, I say unto you, all these are kingdoms.", "Doctrine and Covenants 76:22"),
+    )
+    conn.execute(
+        "INSERT INTO verses (chapter_id, verse_number, text, reference) VALUES (4, 17, ?, ?)",
+        ("One of them spake unto me, calling me by name.", "Joseph Smith--History 1:17"),
     )
     conn.commit()
 
@@ -73,6 +90,34 @@ def test_parse_reference() -> None:
     assert _parse_reference("Doctrine and Covenants 76") == ("Doctrine and Covenants", 76, None, None)
     assert _parse_reference("not a reference at all") is None
     print("test_parse_reference: PASSED")
+
+
+def test_parse_reference_normalizes_abbreviations() -> None:
+    """The bug report: "D&C" (by far the most common way this volume is
+    actually cited) and other standard LDS abbreviations must resolve to
+    the same canonical book name a spelled-out reference would - see
+    _BOOK_ALIASES."""
+    assert _parse_reference("D&C 76:22") == ("Doctrine and Covenants", 76, 22, None)
+    assert _parse_reference("D & C 76:22") == ("Doctrine and Covenants", 76, 22, None)
+    assert _parse_reference("d&c 76:22") == ("Doctrine and Covenants", 76, 22, None)
+    assert _parse_reference("1 Ne. 3:7") == ("1 Nephi", 3, 7, None)
+    assert _parse_reference("Moro. 10:4") == ("Moroni", 10, 4, None)
+    assert _parse_reference("JS-H 1:17") == ("Joseph Smith--History", 1, 17, None)
+    print("test_parse_reference_normalizes_abbreviations: PASSED")
+
+
+def test_resolve_abbreviated_references() -> None:
+    """The actual end-to-end bug: an AI-suggested reference in standard
+    abbreviated form must resolve to real content, not be silently
+    dropped the way a hallucinated one would be."""
+    conn, tmp_root = _make_db()
+    try:
+        results = resolve_references(conn, ["D&C 76:22", "JS-H 1:17", "3 Nephi 11:1"])
+        refs = {r.reference for r in results}
+        assert refs == {"Doctrine and Covenants 76:22", "Joseph Smith--History 1:17", "3 Nephi 11:1"}
+        print("test_resolve_abbreviated_references: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
 
 
 def test_resolve_single_verse() -> None:
@@ -209,6 +254,8 @@ def test_resolve_attaches_real_citations() -> None:
 
 if __name__ == "__main__":
     test_parse_reference()
+    test_parse_reference_normalizes_abbreviations()
+    test_resolve_abbreviated_references()
     test_resolve_single_verse()
     test_resolve_verse_range()
     test_resolve_whole_chapter()
