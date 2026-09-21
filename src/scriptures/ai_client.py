@@ -34,14 +34,16 @@ class AiConfig:
 # Qt's own classification of "the server specifically rejected this for an
 # auth reason" (401/403-shaped errors), as opposed to a network-level
 # problem like a wrong port or a dead server - the two need very different
-# advice: "add/fix your API key" vs. "check the address".
-_AUTH_ERRORS = (
+# advice: "add/fix your API key" vs. "check the address". Exposed (no
+# leading underscore) since ask.py's own QuestionAsker checks against it
+# too, for the same distinction on the /chat/completions call.
+AUTH_ERRORS = (
     QNetworkReply.NetworkError.AuthenticationRequiredError,
     QNetworkReply.NetworkError.ContentAccessDenied,
 )
 
 
-def _request(config: AiConfig, path: str) -> QNetworkRequest:
+def build_request(config: AiConfig, path: str) -> QNetworkRequest:
     request = QNetworkRequest(QUrl(config.base_url.rstrip("/") + path))
     request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
     if config.api_key:
@@ -67,14 +69,14 @@ class ConnectionTester(QObject):
     def __init__(self, config: AiConfig, parent: QObject | None = None):
         super().__init__(parent)
         self._manager = QNetworkAccessManager(self)
-        self._reply = self._manager.get(_request(config, "/models"))
+        self._reply = self._manager.get(build_request(config, "/models"))
         self._reply.finished.connect(self._on_finished)
 
     def _on_finished(self) -> None:
         reply = self._reply
         error = reply.error()
         if error != QNetworkReply.NetworkError.NoError:
-            self.finished.emit(False, reply.errorString(), error in _AUTH_ERRORS)
+            self.finished.emit(False, reply.errorString(), error in AUTH_ERRORS)
         else:
             self.finished.emit(True, "Connected successfully.", False)
         reply.deleteLater()

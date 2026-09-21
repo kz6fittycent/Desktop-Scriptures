@@ -227,6 +227,43 @@ def get_verse_by_reference(
     return Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
 
 
+def get_verse_by_loose_reference(
+    conn: sqlite3.Connection, book_name: str, chapter_number: int, verse_number: int
+) -> Verse | None:
+    """Same lookup as get_verse_by_reference, but the book name is matched
+    case-insensitively - for resolving a reference parsed out of free-form
+    text (see ask.py) rather than one already known to be spelled exactly
+    as this database stores it (e.g. the Scripture of the Day pool)."""
+    r = conn.execute(
+        "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
+        "FROM verses v "
+        "JOIN chapters c ON c.id = v.chapter_id "
+        "JOIN books b ON b.id = c.book_id "
+        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ? AND v.verse_number = ?",
+        (book_name, chapter_number, verse_number),
+    ).fetchone()
+    if not r:
+        return None
+    return Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
+
+
+def get_chapter_by_loose_reference(
+    conn: sqlite3.Connection, book_name: str, chapter_number: int
+) -> Chapter | None:
+    """Look up a whole chapter by book name (matched case-insensitively,
+    same reasoning as get_verse_by_loose_reference) + chapter number, for
+    a reference that names a chapter with no specific verse."""
+    r = conn.execute(
+        "SELECT c.id, c.chapter_number, c.title, c.speaker, c.discourse_date "
+        "FROM chapters c JOIN books b ON b.id = c.book_id "
+        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ?",
+        (book_name, chapter_number),
+    ).fetchone()
+    if not r:
+        return None
+    return Chapter(r["id"], r["chapter_number"], r["title"], r["speaker"], r["discourse_date"])
+
+
 def get_chapter_location(
     conn: sqlite3.Connection, chapter_id: int
 ) -> tuple[Volume, Testament | None, Book, Chapter] | None:
