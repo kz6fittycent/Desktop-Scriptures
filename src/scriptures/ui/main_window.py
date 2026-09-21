@@ -176,12 +176,12 @@ class MainWindow(QMainWindow):
 
         self.search_bar = QLineEdit()
         self.search_bar.setObjectName("headerSearchBar")
-        self.search_bar.setPlaceholderText("Search verses, notes, tags...")
         self.search_bar.setFixedWidth(280)
         self.search_bar.setClearButtonEnabled(True)
         self.search_bar.textChanged.connect(lambda: self._search_debounce.start())
         self.search_bar.returnPressed.connect(self._run_search)
         header_row.addWidget(self.search_bar, 0)
+        self._update_search_placeholder()
 
         self._search_debounce = QTimer(self)
         self._search_debounce.setSingleShot(True)
@@ -658,6 +658,26 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, AI_BASE_URL_SETTING, dialog.base_url)
         set_setting(self.conn, AI_API_KEY_SETTING, dialog.api_key)
         set_setting(self.conn, AI_MODEL_SETTING, dialog.model)
+        self._update_search_placeholder()
+
+    def _update_search_placeholder(self) -> None:
+        """The search bar's placeholder/tooltip are the only hint that
+        AI-assisted search exists at all - without this, there's nothing
+        in the UI suggesting a full natural-language question works there
+        too, not just keywords/references. Refreshed here and right after
+        AI Settings closes, so turning it on/off takes effect immediately
+        rather than needing a restart to notice."""
+        if self._current_ai_config() is not None:
+            self.search_bar.setPlaceholderText("Ask a question, or search...")
+            self.search_bar.setToolTip(
+                "Search verses, notes, and tags, or ask a full question in "
+                "your own words - e.g. \"how did Christ organize the "
+                "Nephite church\" - and AI-assisted search will suggest "
+                "matching scripture."
+            )
+        else:
+            self.search_bar.setPlaceholderText("Search verses, notes, tags...")
+            self.search_bar.setToolTip("")
 
     def _on_side_tab_changed(self, index: int) -> None:
         self._side_tab_index = index
