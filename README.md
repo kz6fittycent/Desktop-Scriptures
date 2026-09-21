@@ -6,8 +6,13 @@ A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
 Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
 Joseph Smith Translation - fully offline, with personal notes, tags,
 verse highlighting, keyword search, a Topical Guide, General Conference
-citations, a Scripture of the Day banner, a reading streak, and a
-Resume Reading history of your last 5 chapters.
+citations, a Scripture of the Day banner, a reading streak, a Resume
+Reading history of your last 5 chapters, a choice of accent colors,
+cloud-folder sync across your own devices (via whatever cloud client -
+Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
+synced on your machine), and opt-in AI-assisted search: ask a question
+in your own words and get pointed at real, matching scripture, using
+your own AI endpoint.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -41,11 +46,12 @@ sudo snap install desktop-scriptures
 Features under consideration for future versions:
 
 - [x] Reading history (v1.3 - Resume Reading now shows your last 5 chapters, most recent first)
-- [ ] AI integration to help provide full context of chapter/verse/doctrine based on Conference talks, Discourses, etc.
+- [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server)
 - [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
-- [ ] Amount of time spent in scriptures (hours/minutes)
 - [ ] Apocrypha?
 - [ ] Wiki
 - [x] JST (v1.3)
 - [x] Topical Guide
-- [ ] P2P syncing capability
+- [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
+- [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
+- [ ] Listen to the scriptures - voice capability
