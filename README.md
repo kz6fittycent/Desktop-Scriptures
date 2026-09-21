@@ -11,8 +11,8 @@ Reading history of your last 5 chapters, a choice of accent colors,
 cloud-folder sync across your own devices (via whatever cloud client -
 Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
 synced on your machine), and opt-in AI-assisted search: ask a question
-in your own words and get pointed at real, matching scripture, using
-your own AI endpoint.
+in your own words - and refine it conversationally with follow-ups - to
+get pointed at real, matching scripture, using your own AI endpoint.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -46,7 +46,7 @@ sudo snap install desktop-scriptures
 Features under consideration for future versions:
 
 - [x] Reading history (v1.3 - Resume Reading now shows your last 5 chapters, most recent first)
-- [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server)
+- [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar, then refine it conversationally with follow-ups, and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server; see the AI Integration menu)
 - [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
 - [ ] Apocrypha?
 - [ ] Wiki
