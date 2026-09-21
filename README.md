@@ -33,6 +33,8 @@ separately-copyrighted Topical Guide.
 
 ![A chapter open with a highlight, chapter tags/note, and a verse note](docs/screenshots/chapter.png)
 
+![AI-assisted search answering a natural-language question, then narrowed with a follow-up](docs/screenshots/ai-search.png)
+
 ## Install
 
 Desktop Scriptures is published on the Snap Store:
