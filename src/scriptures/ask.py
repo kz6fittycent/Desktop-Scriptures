@@ -39,6 +39,22 @@ reference a model naturally reaches for would silently fail to resolve
 while Bible references - rarely abbreviated in general writing - kept
 working fine. That asymmetry ("the Bible always shows up, everything
 else is missing") is exactly the bug this fixes.
+
+On the initial question of a conversation (not a follow-up refinement -
+see AiConversationSection), coverage is also supplemented by a plain
+local keyword search: the question's own significant words (stopwords
+stripped - see _extract_keywords) are run through the same FTS5 index
+the ordinary keyword search already uses, across every volume, and any
+real matches not already suggested by the model are appended. This
+exists because a model's own citation recall is necessarily uneven -
+"Acts 11:26" (first called Christians) is near-universally known
+Christian trivia, while "Alma 46:16" (the Book of Mormon's own, much
+earlier use of the same word) is a far more obscure, LDS-specific
+cross-reference a general-purpose or smaller local model may simply
+never have learned to recall, no matter how the request is phrased.
+The local search doesn't depend on the model knowing anything - it
+only depends on the question sharing real words with the actual verse
+text, so it catches exactly this kind of gap.
 """
 
 from __future__ import annotations
@@ -306,6 +322,93 @@ def unresolved_candidates(conn: sqlite3.Connection, candidates: list[str]) -> li
     return [c for c in candidates if isinstance(c, str) and _resolve_one(conn, c) is None]
 
 
+# Common English words worth stripping before treating the rest of a
+# natural-language question as search keywords for the local supplement
+# below - deliberately short and unsurprising (not a linguistics-grade
+# stopword list), just enough to turn a full sentence into its handful
+# of actual content words - "when was the term christian first used"
+# reduces to just ["christian"], the exact word that matters.
+_STOPWORDS = frozenset(
+    """
+    a an the is was were are be been being when where who whom what
+    which why how did does do first term used use to of in on at by
+    for with about and or but that this these those it its i you he
+    she we they his her their our your my me him them
+    """.split()
+)
+
+
+def _extract_keywords(question: str, limit: int = 6) -> list[str]:
+    """A rough, stopword-stripped set of the question's own significant
+    words, order preserved and deduplicated - see the module docstring's
+    note on why this (not asking the model for keywords) backs the local
+    search supplement: it works the same regardless of which model is
+    configured, or how well it follows instructions."""
+    words = re.findall(r"[A-Za-z']+", question.lower())
+    seen: set[str] = set()
+    keywords: list[str] = []
+    for word in words:
+        if word in _STOPWORDS or len(word) <= 2 or word in seen:
+            continue
+        seen.add(word)
+        keywords.append(word)
+        if len(keywords) >= limit:
+            break
+    return keywords
+
+
+def _search_local_verses_by_keywords(
+    conn: sqlite3.Connection, keywords: list[str], limit: int
+) -> list[AskedReference]:
+    """Real verses (any volume) matching any of these keywords, ranked by
+    the same FTS5 bm25 relevance the app's own keyword search already
+    uses - entirely independent of anything the AI itself suggested, so
+    it surfaces real matches even when the configured model's own recall
+    of a specific cross-reference comes up short (see module docstring).
+    OR-combined (not AND, and not one quoted phrase the way the ordinary
+    search box's exact-phrase matching works) since these are independent
+    significant words, not a phrase to match verbatim. Each is also a
+    prefix match ("christian"* also matches "Christians") - FTS5 does
+    plain token matching with no stemming, and scripture text is
+    overwhelmingly archaic/inflected (-eth, -ed, plurals), so a bare exact
+    match on the word as typed would miss most of the very forms the
+    question is actually asking about."""
+    if not keywords:
+        return []
+    match_query = " OR ".join(f'"{kw}"*' for kw in keywords)
+    rows = conn.execute(
+        "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
+        "FROM verses_fts JOIN verses v ON v.id = verses_fts.rowid "
+        "WHERE verses_fts MATCH ? ORDER BY rank LIMIT ?",
+        (match_query, limit),
+    ).fetchall()
+    return [
+        AskedReference(
+            row["chapter_id"], row["id"], row["reference"], row["text"], _citations_for([row["reference"]])
+        )
+        for row in rows
+    ]
+
+
+def _merge_references(
+    primary: list[AskedReference], supplementary: list[AskedReference], cap: int
+) -> list[AskedReference]:
+    """`primary` (whatever the AI itself suggested and validated) always
+    leads; `supplementary` (the local keyword search) only fills in
+    references not already present, up to `cap` total."""
+    seen = {(r.chapter_id, r.verse_id) for r in primary}
+    merged = list(primary)
+    for ref in supplementary:
+        if len(merged) >= cap:
+            break
+        key = (ref.chapter_id, ref.verse_id)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(ref)
+    return merged
+
+
 def _extract_json_array(content: str) -> list[str]:
     """The model was asked for bare JSON, but is asked nicely, not
     forced - this tolerates a markdown code fence or stray prose around
@@ -386,7 +489,13 @@ class QuestionAsker(QObject):
     it's always the same bare JSON reference list already validated and
     shown to the user, re-fed back verbatim. The model never gets to
     accumulate its own commentary turn over turn - grounding holds across
-    the whole conversation, not just the first message."""
+    the whole conversation, not just the first message.
+
+    An empty `history` also means this is the conversation's initial
+    question (as opposed to a follow-up refinement of it), which is when
+    the local keyword-search supplement (see module docstring) applies -
+    a follow-up like "just the ones about baptism" is meant to narrow the
+    existing results, not broaden them with an unrelated keyword sweep."""
 
     succeeded = Signal(list, str, list)
     failed = Signal(str, bool)
@@ -401,6 +510,8 @@ class QuestionAsker(QObject):
     ):
         super().__init__(parent)
         self.conn = conn
+        self.question = question
+        self._is_initial_question = not history
         self._manager = QNetworkAccessManager(self)
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         for prior_question, prior_references in history:
@@ -434,4 +545,10 @@ class QuestionAsker(QObject):
         candidates = _extract_candidates(content)
         resolved = resolve_references(self.conn, candidates)
         misses = unresolved_candidates(self.conn, candidates)
+
+        if self._is_initial_question:
+            keywords = _extract_keywords(self.question)
+            local_matches = _search_local_verses_by_keywords(self.conn, keywords, MAX_REFERENCES)
+            resolved = _merge_references(resolved, local_matches, MAX_REFERENCES)
+
         self.succeeded.emit(resolved, content, misses)

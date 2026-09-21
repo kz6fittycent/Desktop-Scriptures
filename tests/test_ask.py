@@ -28,7 +28,10 @@ import scriptures.citations as citations_module  # noqa: E402
 from scriptures.ask import (  # noqa: E402
     _extract_candidates,
     _extract_json_array,
+    _extract_keywords,
+    _merge_references,
     _parse_reference,
+    _search_local_verses_by_keywords,
     resolve_references,
     unresolved_candidates,
 )
@@ -137,6 +140,50 @@ def test_unresolved_candidates_reports_partial_misses() -> None:
         misses = unresolved_candidates(conn, candidates)
         assert misses == ["Genesis 1:1", "not a reference"]
         print("test_unresolved_candidates_reports_partial_misses: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
+def test_extract_keywords() -> None:
+    """The exact bug report: a full question reduces to just its real
+    content word(s), stopwords stripped."""
+    assert _extract_keywords("when was the term christian first used") == ["christian"]
+    assert _extract_keywords("How did Christ organize the Nephite church?") == [
+        "christ",
+        "organize",
+        "nephite",
+        "church",
+    ]
+    assert _extract_keywords("the a of in on") == []
+    print("test_extract_keywords: PASSED")
+
+
+def test_search_local_verses_by_keywords_is_prefix_matched() -> None:
+    """FTS5 does plain token matching with no stemming, and scripture
+    text is overwhelmingly archaic/inflected - an exact match on "baptiz"
+    (nobody's real search word) would find nothing, but the actual verse
+    says "baptize"; the prefix match is what bridges that."""
+    conn, tmp_root = _make_db()
+    try:
+        matches = _search_local_verses_by_keywords(conn, ["baptiz"], limit=5)
+        assert any(m.reference == "3 Nephi 11:3" for m in matches)
+        assert _search_local_verses_by_keywords(conn, [], limit=5) == []
+        print("test_search_local_verses_by_keywords_is_prefix_matched: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
+def test_merge_references_supplements_without_duplicating() -> None:
+    conn, tmp_root = _make_db()
+    try:
+        primary = resolve_references(conn, ["3 Nephi 11:1"])
+        supplementary = resolve_references(conn, ["3 Nephi 11:1", "Alma 32:21"])
+        merged = _merge_references(primary, supplementary, cap=5)
+        assert [r.reference for r in merged] == ["3 Nephi 11:1", "Alma 32:21"]
+        # The cap applies to the combined total, not just the supplement.
+        capped = _merge_references(primary, supplementary, cap=1)
+        assert [r.reference for r in capped] == ["3 Nephi 11:1"]
+        print("test_merge_references_supplements_without_duplicating: PASSED")
     finally:
         shutil.rmtree(tmp_root, ignore_errors=True)
 
@@ -303,6 +350,9 @@ if __name__ == "__main__":
     test_parse_reference_normalizes_abbreviations()
     test_resolve_abbreviated_references()
     test_unresolved_candidates_reports_partial_misses()
+    test_extract_keywords()
+    test_search_local_verses_by_keywords_is_prefix_matched()
+    test_merge_references_supplements_without_duplicating()
     test_resolve_single_verse()
     test_resolve_verse_range()
     test_resolve_whole_chapter()
