@@ -383,28 +383,46 @@ class MainWindow(QMainWindow):
         highlight_group = QActionGroup(self)
         highlight_group.setExclusive(True)
 
-        off_action = QAction("Off", self, checkable=True)
-        off_action.setChecked(self._armed_highlight is None)
+        # Each item's own base label, kept separately from the QAction's
+        # displayed text - _update_highlight_menu_labels prefixes the
+        # active one with a checkmark and rebuilds every label from this
+        # dict, rather than relying on the checkable QAction's own native
+        # checkmark indicator. On this app's Snap (the gnome extension
+        # pulls in native GTK/Adwaita menu theming), that indicator can
+        # render too faint to notice - the same issue the General
+        # Conference reminder's checkbox had, fixed there by moving away
+        # from a native indicator entirely rather than trying to
+        # restyle one Qt style may just ignore.
+        self._highlight_labels: dict[str, str] = {"off": "Off"}
+        self._highlight_actions: dict[str, QAction] = {}
+
+        off_action = QAction(self._highlight_labels["off"], self, checkable=True)
         off_action.triggered.connect(lambda checked=False: self._set_highlight_mode(None))
         highlight_group.addAction(off_action)
         highlight_menu.addAction(off_action)
+        self._highlight_actions["off"] = off_action
 
         for color in ("yellow", "pink", "orange"):
-            action = QAction(color.capitalize(), self, checkable=True)
+            label = color.capitalize()
+            self._highlight_labels[color] = label
+            action = QAction(label, self, checkable=True)
             action.setIcon(self._swatch_icon(theming.HIGHLIGHT_COLORS[color].background))
-            action.setChecked(self._armed_highlight == color)
             action.triggered.connect(lambda checked=False, c=color: self._set_highlight_mode(c))
             highlight_group.addAction(action)
             highlight_menu.addAction(action)
+            self._highlight_actions[color] = action
 
         highlight_menu.addSeparator()
-        clear_highlight_action = QAction("Clear Highlight", self, checkable=True)
-        clear_highlight_action.setChecked(self._armed_highlight == "clear")
+        self._highlight_labels["clear"] = "Clear Highlight"
+        clear_highlight_action = QAction(self._highlight_labels["clear"], self, checkable=True)
         clear_highlight_action.triggered.connect(
             lambda checked=False: self._set_highlight_mode("clear")
         )
         highlight_group.addAction(clear_highlight_action)
         highlight_menu.addAction(clear_highlight_action)
+        self._highlight_actions["clear"] = clear_highlight_action
+
+        self._update_highlight_menu_labels()
 
         sync_menu = self.menuBar().addMenu("Sy&nc")
 
@@ -866,8 +884,16 @@ class MainWindow(QMainWindow):
     def _set_highlight_mode(self, mode: str | None) -> None:
         self._armed_highlight = mode
         set_setting(self.conn, HIGHLIGHT_MODE_SETTING, mode or "")
+        self._update_highlight_menu_labels()
         if self._current_reading_view is not None:
             self._current_reading_view.set_armed_highlight(mode)
+
+    def _update_highlight_menu_labels(self) -> None:
+        active_key = self._armed_highlight or "off"
+        for key, action in self._highlight_actions.items():
+            label = self._highlight_labels[key]
+            action.setChecked(key == active_key)
+            action.setText(f"✓ {label}" if key == active_key else label)
 
     def closeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         if self._current_reading_view is not None:
