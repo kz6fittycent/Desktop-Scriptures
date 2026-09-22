@@ -112,7 +112,17 @@ class _VerseTextEdit(QTextEdit):
         if self.toPlainText() != text:
             self.setPlainText(text)
 
+        # setCharFormat() replaces the *whole* char format, not just the
+        # properties given - any left unset (font family/size here) fall
+        # back through Qt's own resolution order rather than reliably
+        # inheriting the setFont() call above, and the whole-document
+        # pass below and each highlighted span's own pass can resolve
+        # that fallback differently, visibly changing the rendered font
+        # size between highlighted and plain text. Setting the font
+        # explicitly on every format applied here avoids depending on
+        # that fallback at all.
         normal_format = QTextCharFormat()
+        normal_format.setFont(font)
         normal_format.setForeground(QColor(normal_color))
         normal_format.clearBackground()
         whole_doc = QTextCursor(self.document())
@@ -122,6 +132,7 @@ class _VerseTextEdit(QTextEdit):
         for hl in highlights:
             colors = HIGHLIGHT_COLORS[hl.color]
             fmt = QTextCharFormat()
+            fmt.setFont(font)
             fmt.setForeground(QColor(colors.text))
             fmt.setBackground(QColor(colors.background))
             span = QTextCursor(self.document())
