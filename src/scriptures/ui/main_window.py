@@ -886,9 +886,10 @@ class MainWindow(QMainWindow):
         banner_grid.setColumnStretch(0, 3)
         banner_grid.setColumnStretch(1, 2)
 
-        # Come Follow Me sits alone in the top-left; the top-right cell
-        # is left empty for now.
-        banner_grid.addWidget(cfm_box, 0, 0)
+        # Come Follow Me sits above Church News, in the top-right; the
+        # top-left cell (above Scripture of the Day) is left empty for
+        # now.
+        banner_grid.addWidget(cfm_box, 0, 1)
 
         if sotd_label is not None:
             banner_grid.addWidget(sotd_label, 1, 0)
