@@ -530,6 +530,17 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary_hover};
             border: 1px solid {p.primary_hover};
         }}
+        QLabel#gcReminderMessage {{
+            font-size: 12px;
+        }}
+        QCheckBox#gcReminderCheckbox {{
+            font-size: 12px;
+            spacing: 8px;
+        }}
+        QCheckBox#gcReminderCheckbox::indicator {{
+            width: 20px;
+            height: 20px;
+        }}
         QFrame#card {{
             background-color: {p.card_bg};
             border-radius: {CARD_RADIUS}px;

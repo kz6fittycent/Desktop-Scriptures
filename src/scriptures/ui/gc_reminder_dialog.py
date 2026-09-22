@@ -23,13 +23,13 @@ from scriptures.general_conference import ConferenceDates, format_date_range
 # Sync Options). Wide enough that the checkbox's label fits on one line -
 # QCheckBox, unlike QLabel, doesn't word-wrap its own text.
 _DIALOG_WIDTH = 330
-_MESSAGE_FONT_POINT_SIZE = 10
-_CHECKBOX_FONT_POINT_SIZE = 10
-_CHECKBOX_INDICATOR_SIZE = 20
 
 # How far from the parent window's own bottom-left corner this opens -
 # out of the way of the landing page's boxes, closer to where a toast
-# notification would sit than a centered modal.
+# notification would sit than a centered modal. Note: some window
+# managers (Wayland compositors in particular, by protocol design) don't
+# let an app position its own top-level windows at all, and silently
+# ignore this - a platform limitation, not a bug here.
 _POSITION_MARGIN_X = 40
 _POSITION_MARGIN_Y = 60
 
@@ -51,24 +51,18 @@ class GeneralConferenceReminderDialog(QDialog):
         layout.setSpacing(10)
 
         message = QLabel(f"General Conference is coming up: {format_date_range(dates)}.")
+        message.setObjectName("gcReminderMessage")
         message.setWordWrap(True)
-        message_font = message.font()
-        message_font.setPointSize(_MESSAGE_FONT_POINT_SIZE)
-        message.setFont(message_font)
         layout.addWidget(message)
 
+        # Sized and styled via theme.py's "gcReminderCheckbox" rule, not
+        # a local setFont()/setStyleSheet() call here - this app applies
+        # one theme stylesheet to the whole QApplication (see
+        # theming.apply_app_theme), and every other font-size or sizing
+        # tweak elsewhere goes through that same mechanism rather than a
+        # one-off override on the widget itself.
         self._checkbox = QCheckBox("Don't remind me for this Conference")
-        checkbox_font = self._checkbox.font()
-        checkbox_font.setPointSize(_CHECKBOX_FONT_POINT_SIZE)
-        self._checkbox.setFont(checkbox_font)
-        # A plain QCheckBox's indicator box is easy to miss at this
-        # dialog's small size - sized up explicitly rather than relying
-        # on whatever a given Qt style's default happens to be.
-        self._checkbox.setStyleSheet(
-            f"QCheckBox::indicator {{ width: {_CHECKBOX_INDICATOR_SIZE}px; "
-            f"height: {_CHECKBOX_INDICATOR_SIZE}px; }}"
-            "QCheckBox { spacing: 8px; }"
-        )
+        self._checkbox.setObjectName("gcReminderCheckbox")
         layout.addWidget(self._checkbox)
 
         button_row = QHBoxLayout()
