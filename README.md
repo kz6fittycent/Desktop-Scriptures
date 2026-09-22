@@ -10,9 +10,10 @@ citations, a Scripture of the Day banner, a reading streak, a Resume
 Reading history of your last 5 chapters, a choice of accent colors,
 cloud-folder sync across your own devices (via whatever cloud client -
 Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
-synced on your machine), and opt-in AI-assisted search: ask a question
-in your own words - and refine it conversationally with follow-ups - to
-get pointed at real, matching scripture, using your own AI endpoint.
+synced on your machine), opt-in AI-assisted search: ask a question in
+your own words - and refine it conversationally with follow-ups - to
+get pointed at real, matching scripture, using your own AI endpoint, and
+an opt-in Church News headline on the landing page.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -57,3 +58,12 @@ Features under consideration for future versions:
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
 - [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
 - [ ] Listen to the scriptures - voice capability
+- [ ] CFM helper/reminder
+- [x] Church News button (v2.0.9 - an opt-in landing-page box showing the latest headline from Church News' own RSS feed, off by default like AI-assisted search)
+- [ ] Linguistics references
+- [ ] Archaeological references
+- [ ] Family history reminder
+- [ ] Journal/Diary feature
+- [ ] General Conference reminder
+- [ ] General Conference Talk auto updater
+- [ ] Embedded webui for talk references, etc. 

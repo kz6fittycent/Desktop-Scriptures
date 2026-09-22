@@ -64,6 +64,7 @@ from scriptures.sync import sync_now
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
+from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
@@ -107,6 +108,13 @@ AI_ENABLED_SETTING = "ai_enabled"
 AI_BASE_URL_SETTING = "ai_api_base_url"
 AI_API_KEY_SETTING = "ai_api_key"
 AI_MODEL_SETTING = "ai_model"
+
+# Local-only, same reasoning as the AI settings above: whether the
+# landing page's Church News box is allowed to fetch anything from
+# thechurchnews.com's RSS feed. Off by default - see church_news.py's
+# module docstring for why this is the one place that ever calls out
+# automatically rather than in direct response to a user action.
+CHURCH_NEWS_ENABLED_SETTING = "church_news_enabled"
 
 
 class MainWindow(QMainWindow):
@@ -284,6 +292,14 @@ class MainWindow(QMainWindow):
         zoom_reset = QAction("Reset Zoom", self, shortcut=QKeySequence("Ctrl+0"))
         zoom_reset.triggered.connect(self._zoom_reset)
         menu.addAction(zoom_reset)
+
+        menu.addSeparator()
+        self._church_news_action = QAction("Show Church News Headline", self, checkable=True)
+        self._church_news_action.setChecked(
+            get_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING) == "true"
+        )
+        self._church_news_action.triggered.connect(self._toggle_church_news)
+        menu.addAction(self._church_news_action)
 
         # Its own top-level menu, not a View submenu: it's a tool the user
         # reaches for mid-read to quickly switch colors, not a one-time
@@ -553,6 +569,11 @@ class MainWindow(QMainWindow):
     def _zoom_reset(self) -> None:
         self._set_font_size(theming.DEFAULT_FONT_SIZE)
 
+    def _toggle_church_news(self, checked: bool) -> None:
+        set_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING, "true" if checked else "false")
+        if not self._path:  # only the landing page shows the box - rebuild it if that's current
+            self.show_volumes()
+
     def _set_font_size(self, size: int) -> None:
         self._font_size = theming.clamp_font_size(size)
         set_setting(self.conn, "font_size", str(self._font_size))
@@ -813,17 +834,35 @@ class MainWindow(QMainWindow):
         self._update_breadcrumb()
         volumes = get_volumes(self.conn)
 
-        banner = None
+        sotd_label = None
         sotd = get_scripture_of_the_day(self.conn)
         if sotd is not None:
-            banner = QLabel(
+            sotd_label = QLabel(
                 "<b>Scripture of the Day:</b><br>"
                 f"{escape(sotd.text)} - {escape(sotd.reference)}"
             )
-            banner.setTextFormat(Qt.TextFormat.RichText)
-            banner.setObjectName("sotdBanner")
-            banner.setWordWrap(True)
-            banner.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            sotd_label.setTextFormat(Qt.TextFormat.RichText)
+            sotd_label.setObjectName("sotdBanner")
+            sotd_label.setWordWrap(True)
+            sotd_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        news_enabled = get_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING) == "true"
+        news_box = ChurchNewsBox(news_enabled)
+        news_box.enable_requested.connect(self._enable_church_news)
+
+        # A single composite widget (Scripture of the Day, wider, beside
+        # the narrower Church News box) fills CardGridWidget's existing
+        # optional `banner` slot - it only ever wanted one widget, and it
+        # was already generic enough to not care what's inside it.
+        if sotd_label is not None:
+            banner = QWidget()
+            banner_row = QHBoxLayout(banner)
+            banner_row.setContentsMargins(0, 0, 0, 0)
+            banner_row.setSpacing(8)
+            banner_row.addWidget(sotd_label, 3)
+            banner_row.addWidget(news_box, 2)
+        else:
+            banner = news_box
 
         grid = CardGridWidget(
             "Desktop Scriptures",
@@ -833,6 +872,11 @@ class MainWindow(QMainWindow):
         )
         grid.card_clicked.connect(self._on_volume_clicked)
         self._set_content(grid)
+
+    def _enable_church_news(self) -> None:
+        set_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING, "true")
+        self._church_news_action.setChecked(True)
+        self.show_volumes()
 
     def _resume_reading(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)
