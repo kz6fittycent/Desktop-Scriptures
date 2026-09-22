@@ -216,7 +216,18 @@ class MainWindow(QMainWindow):
 
         self.search_bar = QLineEdit()
         self.search_bar.setObjectName("headerSearchBar")
-        self.search_bar.setFixedWidth(280)
+        # 280 minus an empirically-measured 8px: on this app's Snap (the
+        # gnome extension pulls in native GTK/Adwaita theming), a
+        # QLineEdit's rounded-pill style paints a few extra pixels of
+        # chrome - almost certainly a focus-ring allowance GTK bakes
+        # into its own text-input theme - beyond the widget's own
+        # geometry. Qt's layout engine positions this widget identically
+        # to the landing page's boxes (confirmed directly against the
+        # widgets' own .geometry(), not a screenshot), but what actually
+        # gets painted runs 8px wider regardless, consistently, so the
+        # width is trimmed here to compensate for that paint-time-only
+        # overhang rather than the layout position itself.
+        self.search_bar.setFixedWidth(272)
         self.search_bar.setClearButtonEnabled(True)
         self.search_bar.textChanged.connect(lambda: self._search_debounce.start())
         self.search_bar.returnPressed.connect(self._run_search)
