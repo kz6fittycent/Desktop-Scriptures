@@ -531,7 +531,8 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             border: 1px solid {p.primary_hover};
         }}
         QLabel#gcReminderMessage {{
-            font-size: 12px;
+            font-size: 15px;
+            font-weight: bold;
         }}
         QFrame#gcReminderCheckboxRow {{
             background-color: {p.surface};
