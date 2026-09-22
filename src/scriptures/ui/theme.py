@@ -328,7 +328,7 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             color: {p.muted};
             margin: -4px 8px 8px 8px;
         }}
-        QLabel#sotdBanner, QLabel#newsBox, QLabel#cfmBox {{
+        QLabel#sotdBanner, QLabel#newsBox, QLabel#cfmBox, QLabel#inspirationBox {{
             font-size: 14px;
             padding: 12px 16px;
             margin: 0px 8px 8px 8px;

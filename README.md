@@ -13,8 +13,10 @@ Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
 synced on your machine), opt-in AI-assisted search: ask a question in
 your own words - and refine it conversationally with follow-ups - to
 get pointed at real, matching scripture, using your own AI endpoint, an
-opt-in Church News headline, and an opt-in Come Follow Me helper showing
-this week's lesson, both on the landing page.
+opt-in Church News headline, an opt-in Come Follow Me helper showing
+this week's lesson, and an opt-in Inspirational Message featuring
+whatever's currently on churchofjesuschrist.org's own homepage, all on
+the landing page.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community

@@ -68,6 +68,7 @@ from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidg
 from scriptures.ui.cfm_box import CfmBox
 from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
+from scriptures.ui.inspiration_box import InspirationBox
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
 from scriptures.ui.sync_dialog import SyncFolderDialog
@@ -121,6 +122,10 @@ CHURCH_NEWS_ENABLED_SETTING = "church_news_enabled"
 # Same reasoning and same off-by-default policy as CHURCH_NEWS_ENABLED_SETTING
 # above, for the landing page's Come Follow Me box - see cfm.py.
 CFM_ENABLED_SETTING = "cfm_enabled"
+
+# Same reasoning and same off-by-default policy as CHURCH_NEWS_ENABLED_SETTING
+# above, for the landing page's Inspirational Message box - see inspiration.py.
+INSPIRATION_ENABLED_SETTING = "inspiration_enabled"
 
 
 class MainWindow(QMainWindow):
@@ -315,6 +320,13 @@ class MainWindow(QMainWindow):
         self._cfm_action.setChecked(get_setting(self.conn, CFM_ENABLED_SETTING) == "true")
         self._cfm_action.triggered.connect(self._toggle_cfm)
         menu.addAction(self._cfm_action)
+
+        self._inspiration_action = QAction("Show Inspirational Message", self, checkable=True)
+        self._inspiration_action.setChecked(
+            get_setting(self.conn, INSPIRATION_ENABLED_SETTING) == "true"
+        )
+        self._inspiration_action.triggered.connect(self._toggle_inspiration)
+        menu.addAction(self._inspiration_action)
 
         # Its own top-level menu, not a View submenu: it's a tool the user
         # reaches for mid-read to quickly switch colors, not a one-time
@@ -591,6 +603,11 @@ class MainWindow(QMainWindow):
 
     def _toggle_cfm(self, checked: bool) -> None:
         set_setting(self.conn, CFM_ENABLED_SETTING, "true" if checked else "false")
+        if not self._path:  # only the landing page shows the box - rebuild it if that's current
+            self.show_volumes()
+
+    def _toggle_inspiration(self, checked: bool) -> None:
+        set_setting(self.conn, INSPIRATION_ENABLED_SETTING, "true" if checked else "false")
         if not self._path:  # only the landing page shows the box - rebuild it if that's current
             self.show_volumes()
 
@@ -874,14 +891,18 @@ class MainWindow(QMainWindow):
         cfm_box = CfmBox(cfm_enabled)
         cfm_box.enable_requested.connect(self._enable_cfm)
 
+        inspiration_enabled = get_setting(self.conn, INSPIRATION_ENABLED_SETTING) == "true"
+        inspiration_box = InspirationBox(inspiration_enabled)
+        inspiration_box.enable_requested.connect(self._enable_inspiration)
+
         # A single composite widget fills CardGridWidget's existing
         # optional `banner` slot - it only ever wanted one widget, and it
         # was already generic enough to not care what's inside it. A grid
-        # (not two independent HBoxLayout rows) guarantees Come Follow
-        # Me's column lines up exactly with Scripture of the Day's right
-        # below it - a grid's columns are always the same width in every
-        # row, where two separately-computed row layouts could drift out
-        # of alignment depending on each row's own content.
+        # (not independent HBoxLayout rows) guarantees each row's columns
+        # line up exactly with the row below it - a grid's columns are
+        # always the same width in every row, where separately-computed
+        # row layouts could drift out of alignment depending on each
+        # row's own content.
         banner = QWidget()
         banner_grid = QGridLayout(banner)
         banner_grid.setContentsMargins(0, 0, 0, 0)
@@ -890,9 +911,10 @@ class MainWindow(QMainWindow):
         banner_grid.setColumnStretch(0, 3)
         banner_grid.setColumnStretch(1, 2)
 
-        # Come Follow Me sits above Church News, in the top-right; the
-        # top-left cell (above Scripture of the Day) is left empty for
-        # now.
+        # Inspirational Message sits above Scripture of the Day, in the
+        # top-left; Come Follow Me sits above Church News, in the
+        # top-right.
+        banner_grid.addWidget(inspiration_box, 0, 0)
         banner_grid.addWidget(cfm_box, 0, 1)
 
         if sotd_label is not None:
@@ -919,6 +941,11 @@ class MainWindow(QMainWindow):
     def _enable_cfm(self) -> None:
         set_setting(self.conn, CFM_ENABLED_SETTING, "true")
         self._cfm_action.setChecked(True)
+        self.show_volumes()
+
+    def _enable_inspiration(self) -> None:
+        set_setting(self.conn, INSPIRATION_ENABLED_SETTING, "true")
+        self._inspiration_action.setChecked(True)
         self.show_volumes()
 
     def _resume_reading(self, chapter_id: int) -> None:
