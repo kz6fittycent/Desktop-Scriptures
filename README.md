@@ -12,8 +12,9 @@ cloud-folder sync across your own devices (via whatever cloud client -
 Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
 synced on your machine), opt-in AI-assisted search: ask a question in
 your own words - and refine it conversationally with follow-ups - to
-get pointed at real, matching scripture, using your own AI endpoint, and
-an opt-in Church News headline on the landing page.
+get pointed at real, matching scripture, using your own AI endpoint, an
+opt-in Church News headline, and an opt-in Come Follow Me helper showing
+this week's lesson, both on the landing page.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -58,7 +59,7 @@ Features under consideration for future versions:
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
 - [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
 - [ ] Listen to the scriptures - voice capability
-- [ ] CFM helper/reminder
+- [x] CFM helper/reminder (v2.1.1 - an opt-in landing-page box showing this week's Come Follow Me lesson, off by default like Church News; the reminder half of this item is still open, see General Conference reminder below)
 - [x] Church News button (v2.0.9 - an opt-in landing-page box showing the latest headline from Church News' own RSS feed, off by default like AI-assisted search)
 - [ ] Linguistics references
 - [ ] Archaeological references

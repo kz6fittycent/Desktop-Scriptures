@@ -64,6 +64,7 @@ from scriptures.sync import sync_now
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
+from scriptures.ui.cfm_box import CfmBox
 from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
 from scriptures.ui.reading_view import ReadingView
@@ -115,6 +116,10 @@ AI_MODEL_SETTING = "ai_model"
 # module docstring for why this is the one place that ever calls out
 # automatically rather than in direct response to a user action.
 CHURCH_NEWS_ENABLED_SETTING = "church_news_enabled"
+
+# Same reasoning and same off-by-default policy as CHURCH_NEWS_ENABLED_SETTING
+# above, for the landing page's Come Follow Me box - see cfm.py.
+CFM_ENABLED_SETTING = "cfm_enabled"
 
 
 class MainWindow(QMainWindow):
@@ -300,6 +305,11 @@ class MainWindow(QMainWindow):
         )
         self._church_news_action.triggered.connect(self._toggle_church_news)
         menu.addAction(self._church_news_action)
+
+        self._cfm_action = QAction("Show Come Follow Me Helper", self, checkable=True)
+        self._cfm_action.setChecked(get_setting(self.conn, CFM_ENABLED_SETTING) == "true")
+        self._cfm_action.triggered.connect(self._toggle_cfm)
+        menu.addAction(self._cfm_action)
 
         # Its own top-level menu, not a View submenu: it's a tool the user
         # reaches for mid-read to quickly switch colors, not a one-time
@@ -571,6 +581,11 @@ class MainWindow(QMainWindow):
 
     def _toggle_church_news(self, checked: bool) -> None:
         set_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING, "true" if checked else "false")
+        if not self._path:  # only the landing page shows the box - rebuild it if that's current
+            self.show_volumes()
+
+    def _toggle_cfm(self, checked: bool) -> None:
+        set_setting(self.conn, CFM_ENABLED_SETTING, "true" if checked else "false")
         if not self._path:  # only the landing page shows the box - rebuild it if that's current
             self.show_volumes()
 
@@ -850,19 +865,39 @@ class MainWindow(QMainWindow):
         news_box = ChurchNewsBox(news_enabled)
         news_box.enable_requested.connect(self._enable_church_news)
 
-        # A single composite widget (Scripture of the Day, wider, beside
-        # the narrower Church News box) fills CardGridWidget's existing
+        cfm_enabled = get_setting(self.conn, CFM_ENABLED_SETTING) == "true"
+        cfm_box = CfmBox(cfm_enabled)
+        cfm_box.enable_requested.connect(self._enable_cfm)
+
+        # A single composite widget fills CardGridWidget's existing
         # optional `banner` slot - it only ever wanted one widget, and it
-        # was already generic enough to not care what's inside it.
+        # was already generic enough to not care what's inside it. Come
+        # Follow Me sits in its own row above, sized to match Scripture
+        # of the Day's own column width (the same 3:2 split as the row
+        # below it) - the top-right quarter is left empty for now.
+        cfm_row = QWidget()
+        cfm_row_layout = QHBoxLayout(cfm_row)
+        cfm_row_layout.setContentsMargins(0, 0, 0, 0)
+        cfm_row_layout.setSpacing(8)
+        cfm_row_layout.addWidget(cfm_box, 3)
+        cfm_row_layout.addStretch(2)
+
+        banner = QWidget()
+        banner_layout = QVBoxLayout(banner)
+        banner_layout.setContentsMargins(0, 0, 0, 0)
+        banner_layout.setSpacing(8)
+        banner_layout.addWidget(cfm_row)
+
         if sotd_label is not None:
-            banner = QWidget()
-            banner_row = QHBoxLayout(banner)
-            banner_row.setContentsMargins(0, 0, 0, 0)
-            banner_row.setSpacing(8)
-            banner_row.addWidget(sotd_label, 3)
-            banner_row.addWidget(news_box, 2)
+            sotd_row = QWidget()
+            sotd_row_layout = QHBoxLayout(sotd_row)
+            sotd_row_layout.setContentsMargins(0, 0, 0, 0)
+            sotd_row_layout.setSpacing(8)
+            sotd_row_layout.addWidget(sotd_label, 3)
+            sotd_row_layout.addWidget(news_box, 2)
+            banner_layout.addWidget(sotd_row)
         else:
-            banner = news_box
+            banner_layout.addWidget(news_box)
 
         grid = CardGridWidget(
             "Desktop Scriptures",
@@ -877,6 +912,11 @@ class MainWindow(QMainWindow):
     def _enable_church_news(self) -> None:
         set_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING, "true")
         self._church_news_action.setChecked(True)
+        self.show_volumes()
+
+    def _enable_cfm(self) -> None:
+        set_setting(self.conn, CFM_ENABLED_SETTING, "true")
+        self._cfm_action.setChecked(True)
         self.show_volumes()
 
     def _resume_reading(self, chapter_id: int) -> None:
