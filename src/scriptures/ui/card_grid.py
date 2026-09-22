@@ -273,6 +273,13 @@ class CardGridWidget(QWidget):
         super().__init__(parent)
 
         outer = QVBoxLayout(self)
+        # Explicit rather than left at Qt's own (style-dependent) default,
+        # so this widget's left/right inset is a known quantity - the
+        # header row's own search bar margin is matched against this
+        # exact number (see main_window.py's header_row) rather than
+        # against whatever margin some particular Qt style happens to
+        # default to.
+        outer.setContentsMargins(GRID_MARGIN, GRID_MARGIN, GRID_MARGIN, GRID_MARGIN)
 
         # The landing page skips this - "Desktop Scriptures" is already
         # the window's own title bar text, so a second copy of it here
@@ -287,13 +294,12 @@ class CardGridWidget(QWidget):
 
         # Optional extra widget between the title and the card grid - e.g.
         # the landing page's Scripture of the Day / Church News boxes.
-        # Inset to match FlowLayout's own GRID_MARGIN below, so the
-        # banner's left/right edges land exactly where the card row's do
-        # rather than overhanging past them.
+        # outer's own margin above already provides the left/right inset,
+        # so this only needs the gap before the card grid below it.
         if banner is not None:
             banner_wrap = QWidget()
             banner_layout = QHBoxLayout(banner_wrap)
-            banner_layout.setContentsMargins(GRID_MARGIN, 0, GRID_MARGIN, 8)
+            banner_layout.setContentsMargins(0, 0, 0, 8)
             banner_layout.addWidget(banner)
             outer.addWidget(banner_wrap)
 

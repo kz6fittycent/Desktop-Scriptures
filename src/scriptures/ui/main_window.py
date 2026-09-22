@@ -64,7 +64,7 @@ from scriptures.sotd import get_scripture_of_the_day
 from scriptures.sync import sync_now
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
-from scriptures.ui.card_grid import LANDING_CARD_SIZE, CardGridWidget
+from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.cfm_box import CfmBox
 from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
@@ -181,7 +181,11 @@ class MainWindow(QMainWindow):
         layout.setSpacing(0)
 
         header_row = QHBoxLayout()
-        header_row.setContentsMargins(0, 6, 12, 6)
+        # Right margin matches CardGridWidget's own GRID_MARGIN, so the
+        # search bar's right edge lines up with the landing page's boxes
+        # and card grid below it instead of drifting from whatever this
+        # row's own margin happened to be picked separately.
+        header_row.setContentsMargins(0, 6, GRID_MARGIN, 6)
         header_row.setSpacing(0)
 
         self.breadcrumb = BreadcrumbBar()
