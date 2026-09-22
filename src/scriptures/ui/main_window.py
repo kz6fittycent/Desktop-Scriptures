@@ -869,6 +869,7 @@ class MainWindow(QMainWindow):
             [(v.id, v.name) for v in volumes] + [(TOPICAL_GUIDE_ID, "Topical Guide")],
             card_size=LANDING_CARD_SIZE,
             banner=banner,
+            show_title=False,
         )
         grid.card_clicked.connect(self._on_volume_clicked)
         self._set_content(grid)

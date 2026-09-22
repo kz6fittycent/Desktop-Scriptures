@@ -17,6 +17,7 @@ from PySide6.QtGui import QColor, QFontMetrics
 from PySide6.QtWidgets import (
     QFrame,
     QGraphicsDropShadowEffect,
+    QHBoxLayout,
     QLabel,
     QLayout,
     QScrollArea,
@@ -24,6 +25,13 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+# FlowLayout's own margin (below) inset the card grid an extra 12px past
+# whatever CardGridWidget's outer layout already gives every other direct
+# child (title, banner) - without matching that same inset, a banner
+# widget's edges land 12px outside where the row of cards beneath it
+# actually starts/ends.
+GRID_MARGIN = 12
 
 CARD_SIZE = 128
 
@@ -260,28 +268,40 @@ class CardGridWidget(QWidget):
         parent: QWidget | None = None,
         card_size: int = CARD_SIZE,
         banner: QWidget | None = None,
+        show_title: bool = True,
     ):
         super().__init__(parent)
 
         outer = QVBoxLayout(self)
 
-        title_label = QLabel(title)
-        title_label.setObjectName("sectionTitle")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        outer.addWidget(title_label)
+        # The landing page skips this - "Desktop Scriptures" is already
+        # the window's own title bar text, so a second copy of it here
+        # would just be repeated, space-wasting chrome. Every other level
+        # (a volume, a book) still needs it - it's the only place that
+        # name appears.
+        if show_title:
+            title_label = QLabel(title)
+            title_label.setObjectName("sectionTitle")
+            title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            outer.addWidget(title_label)
 
         # Optional extra widget between the title and the card grid - e.g.
-        # the landing page's Scripture of the Day banner. Not used by most
-        # callers, hence just a plain optional slot rather than a title
-        # feature of its own.
+        # the landing page's Scripture of the Day / Church News boxes.
+        # Inset to match FlowLayout's own GRID_MARGIN below, so the
+        # banner's left/right edges land exactly where the card row's do
+        # rather than overhanging past them.
         if banner is not None:
-            outer.addWidget(banner)
+            banner_wrap = QWidget()
+            banner_layout = QHBoxLayout(banner_wrap)
+            banner_layout.setContentsMargins(GRID_MARGIN, 0, GRID_MARGIN, 8)
+            banner_layout.addWidget(banner)
+            outer.addWidget(banner_wrap)
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
 
         grid_container = QWidget()
-        flow = FlowLayout(grid_container, margin=12, spacing=16)
+        flow = FlowLayout(grid_container, margin=GRID_MARGIN, spacing=16)
 
         for item_id, label in items:
             card = Card(item_id, label, size=card_size)
