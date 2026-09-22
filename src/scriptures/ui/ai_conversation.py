@@ -143,6 +143,7 @@ class AiConversationSection(QWidget):
         self._set_busy(True)
         self._pending_placeholder = QLabel("Asking AI...")
         self._pending_placeholder.setObjectName("resultSecondary")
+        self._pending_placeholder.setWordWrap(True)
         self._thread_layout.addWidget(self._pending_placeholder)
 
         self._asker = QuestionAsker(
@@ -173,6 +174,7 @@ class AiConversationSection(QWidget):
         if not references:
             note = QLabel("No matches for that.")
             note.setObjectName("resultSecondary")
+            note.setWordWrap(True)
             self._thread_layout.addWidget(note)
             # Diagnostic only, never presented as an answer - shows
             # exactly what the model actually replied with, so "why did
@@ -228,6 +230,7 @@ class AiConversationSection(QWidget):
         # quiet inline note, and the follow-up box stays usable to retry.
         note = QLabel(f"AI search failed: {message}")
         note.setObjectName("resultSecondary")
+        note.setWordWrap(True)
         self._thread_layout.addWidget(note)
 
     def _send_follow_up(self) -> None:

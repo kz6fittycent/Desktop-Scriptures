@@ -669,11 +669,17 @@ class MainWindow(QMainWindow):
         rather than needing a restart to notice."""
         if self._current_ai_config() is not None:
             self.search_bar.setPlaceholderText("Ask a question, or search...")
+            # A plain-text QToolTip doesn't wrap - Qt just renders it as
+            # one unbroken line, which for a sentence this long extended
+            # well past the window's own edge. Wrapping it in a width-
+            # capped <div> makes Qt treat it as rich text, which does wrap.
             self.search_bar.setToolTip(
+                '<div style="max-width: 320px;">'
                 "Search verses, notes, and tags, or ask a full question in "
                 "your own words - e.g. \"how did Christ organize the "
                 "Nephite church\" - and AI-assisted search will suggest "
                 "matching scripture."
+                "</div>"
             )
         else:
             self.search_bar.setPlaceholderText("Search verses, notes, tags...")
