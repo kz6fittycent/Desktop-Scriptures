@@ -60,6 +60,11 @@ from scriptures.data_access import (
     record_reading,
     set_setting,
 )
+from scriptures.general_conference import (
+    GeneralConferenceFetcher,
+    should_attempt_fetch,
+    should_show_reminder,
+)
 from scriptures.sotd import get_scripture_of_the_day
 from scriptures.sync import sync_now
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
@@ -68,6 +73,7 @@ from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidg
 from scriptures.ui.cfm_box import CfmBox
 from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
+from scriptures.ui.gc_reminder_dialog import GeneralConferenceReminderDialog
 from scriptures.ui.inspiration_box import InspirationBox
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
@@ -127,6 +133,16 @@ CFM_ENABLED_SETTING = "cfm_enabled"
 # above, for the landing page's Inspirational Message box - see inspiration.py.
 INSPIRATION_ENABLED_SETTING = "inspiration_enabled"
 
+# Same off-by-default opt-in policy as the settings above, for the
+# General Conference reminder popup - see general_conference.py. Not a
+# landing-page box like the other three, so it also tracks the last
+# calendar day it was shown (once-a-day-at-most) and which specific
+# Conference's reminder the user last dismissed (so "don't remind me
+# again" only lasts for that one Conference, not forever).
+GC_REMINDER_ENABLED_SETTING = "gc_reminder_enabled"
+GC_REMINDER_LAST_SHOWN_SETTING = "gc_reminder_last_shown"  # ISO date of the last day shown
+GC_REMINDER_DISMISSED_START_SETTING = "gc_reminder_dismissed_start"  # ISO start date dismissed
+
 
 class MainWindow(QMainWindow):
     def __init__(self, conn: sqlite3.Connection):
@@ -134,6 +150,7 @@ class MainWindow(QMainWindow):
         self.conn = conn
         self._path: list[dict] = []  # breadcrumb segments below the root
         self._current_reading_view: ReadingView | None = None
+        self._gc_fetcher: GeneralConferenceFetcher | None = None
         # Highlighter tool state - which color (or "clear") is armed, if
         # any. Deliberately not persisted like the theme/font settings
         # below: it's a transient tool selection, not a standing
@@ -219,6 +236,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self._content_container)
 
         self.show_volumes()
+        self._maybe_check_gc_reminder()
 
     # ------------------------------------------------------------------
     # Theming: menu, persistence, live apply
@@ -327,6 +345,15 @@ class MainWindow(QMainWindow):
         )
         self._inspiration_action.triggered.connect(self._toggle_inspiration)
         menu.addAction(self._inspiration_action)
+
+        self._gc_reminder_action = QAction(
+            "Show General Conference Reminder", self, checkable=True
+        )
+        self._gc_reminder_action.setChecked(
+            get_setting(self.conn, GC_REMINDER_ENABLED_SETTING) == "true"
+        )
+        self._gc_reminder_action.triggered.connect(self._toggle_gc_reminder)
+        menu.addAction(self._gc_reminder_action)
 
         # Its own top-level menu, not a View submenu: it's a tool the user
         # reaches for mid-read to quickly switch colors, not a one-time
@@ -610,6 +637,15 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, INSPIRATION_ENABLED_SETTING, "true" if checked else "false")
         if not self._path:  # only the landing page shows the box - rebuild it if that's current
             self.show_volumes()
+
+    def _toggle_gc_reminder(self, checked: bool) -> None:
+        set_setting(self.conn, GC_REMINDER_ENABLED_SETTING, "true" if checked else "false")
+        if checked:
+            # Same "turn it on and see it work right away" feel as
+            # clicking a disabled landing-page box - otherwise turning
+            # this on gives no feedback until the next time the app
+            # happens to be launched.
+            self._maybe_check_gc_reminder()
 
     def _set_font_size(self, size: int) -> None:
         self._font_size = theming.clamp_font_size(size)
@@ -947,6 +983,37 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, INSPIRATION_ENABLED_SETTING, "true")
         self._inspiration_action.setChecked(True)
         self.show_volumes()
+
+    def _maybe_check_gc_reminder(self) -> None:
+        if get_setting(self.conn, GC_REMINDER_ENABLED_SETTING) != "true":
+            return
+        today = date.today()
+        if get_setting(self.conn, GC_REMINDER_LAST_SHOWN_SETTING) == today.isoformat():
+            return  # already shown today
+        if not should_attempt_fetch(today):
+            return  # nowhere near Conference time - skip the fetch entirely
+        self._gc_fetcher = GeneralConferenceFetcher(parent=self)
+        self._gc_fetcher.succeeded.connect(self._on_gc_dates_fetched)
+        self._gc_fetcher.failed.connect(self._on_gc_fetch_failed)
+
+    def _on_gc_fetch_failed(self, message: str) -> None:  # noqa: ARG002 (kept for parity/debuggability)
+        # Quiet failure, same as every other opt-in fetch in this app -
+        # a startup popup is exactly the wrong place to interrupt with
+        # an error dialog over an ordinary network hiccup.
+        self._gc_fetcher = None
+
+    def _on_gc_dates_fetched(self, dates) -> None:
+        self._gc_fetcher = None
+        today = date.today()
+        if not should_show_reminder(dates, today):
+            return
+        if get_setting(self.conn, GC_REMINDER_DISMISSED_START_SETTING) == dates.start.isoformat():
+            return  # the user already dismissed this specific Conference's reminder
+        dialog = GeneralConferenceReminderDialog(dates, parent=self)
+        dialog.exec()
+        set_setting(self.conn, GC_REMINDER_LAST_SHOWN_SETTING, today.isoformat())
+        if dialog.dont_remind_again:
+            set_setting(self.conn, GC_REMINDER_DISMISSED_START_SETTING, dates.start.isoformat())
 
     def _resume_reading(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)
