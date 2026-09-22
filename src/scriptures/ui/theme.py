@@ -533,13 +533,30 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
         QLabel#gcReminderMessage {{
             font-size: 12px;
         }}
-        QCheckBox#gcReminderCheckbox {{
-            font-size: 12px;
-            spacing: 8px;
+        QFrame#gcReminderCheckboxRow {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
         }}
-        QCheckBox#gcReminderCheckbox::indicator {{
-            width: 20px;
-            height: 20px;
+        QFrame#gcReminderCheckboxRow:hover {{
+            background-color: {p.card_bg};
+            border: 1px solid {p.primary};
+        }}
+        QLabel#gcReminderCheckboxLabel {{
+            font-size: 12px;
+            background: transparent;
+        }}
+        QPushButton#gcReminderToggle {{
+            background-color: {p.window_bg};
+            border: 2px solid {p.border};
+            border-radius: 4px;
+            color: #FFFFFF;
+            font-weight: bold;
+            padding: 0px;
+        }}
+        QPushButton#gcReminderToggle:checked {{
+            background-color: {p.primary};
+            border: 2px solid {p.primary};
         }}
         QFrame#card {{
             background-color: {p.card_bg};

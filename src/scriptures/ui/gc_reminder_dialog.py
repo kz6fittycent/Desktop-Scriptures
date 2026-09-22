@@ -6,9 +6,10 @@ before Conference starts).
 
 from __future__ import annotations
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QCheckBox,
     QDialog,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -20,8 +21,7 @@ from scriptures.general_conference import ConferenceDates, format_date_range
 
 # Small and unobtrusive on purpose - this is a heads-up, not something
 # that needs to compete for attention like a real dialog (AI Settings,
-# Sync Options). Wide enough that the checkbox's label fits on one line -
-# QCheckBox, unlike QLabel, doesn't word-wrap its own text.
+# Sync Options). Wide enough that the checkbox's label fits on one line.
 _DIALOG_WIDTH = 330
 
 # How far from the parent window's own bottom-left corner this opens -
@@ -32,6 +32,46 @@ _DIALOG_WIDTH = 330
 # ignore this - a platform limitation, not a bug here.
 _POSITION_MARGIN_X = 40
 _POSITION_MARGIN_Y = 60
+
+
+class _CheckboxRow(QFrame):
+    """A bordered, clickable row - clicking anywhere in it toggles the
+    dismissal, not just a small indicator glyph. Built from a checkable
+    QPushButton rather than a real QCheckBox: some native/GTK-integrated
+    Qt styles (this app's Snap uses the gnome extension) draw a
+    QCheckBox's indicator through their own theme engine and ignore this
+    app's own size hint for it entirely, rendering it too small to
+    notice. A QPushButton's whole box is styled as one ordinary
+    rectangle, with none of that sub-control delegation, so plain QSS
+    sizing always applies regardless of platform style."""
+
+    def __init__(self, text: str, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setObjectName("gcReminderCheckboxRow")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setSpacing(8)
+
+        self._toggle = QPushButton()
+        self._toggle.setObjectName("gcReminderToggle")
+        self._toggle.setCheckable(True)
+        self._toggle.setFixedSize(20, 20)
+        self._toggle.toggled.connect(lambda checked: self._toggle.setText("✓" if checked else ""))
+        layout.addWidget(self._toggle)
+
+        label = QLabel(text)
+        label.setObjectName("gcReminderCheckboxLabel")
+        layout.addWidget(label, 1)
+
+    def isChecked(self) -> bool:
+        return self._toggle.isChecked()
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._toggle.setChecked(not self._toggle.isChecked())
+        super().mousePressEvent(event)
 
 
 class GeneralConferenceReminderDialog(QDialog):
@@ -55,15 +95,8 @@ class GeneralConferenceReminderDialog(QDialog):
         message.setWordWrap(True)
         layout.addWidget(message)
 
-        # Sized and styled via theme.py's "gcReminderCheckbox" rule, not
-        # a local setFont()/setStyleSheet() call here - this app applies
-        # one theme stylesheet to the whole QApplication (see
-        # theming.apply_app_theme), and every other font-size or sizing
-        # tweak elsewhere goes through that same mechanism rather than a
-        # one-off override on the widget itself.
-        self._checkbox = QCheckBox("Don't remind me for this Conference")
-        self._checkbox.setObjectName("gcReminderCheckbox")
-        layout.addWidget(self._checkbox)
+        self._checkbox_row = _CheckboxRow("Don't remind me for this Conference")
+        layout.addWidget(self._checkbox_row)
 
         button_row = QHBoxLayout()
         button_row.addStretch(1)
@@ -84,5 +117,5 @@ class GeneralConferenceReminderDialog(QDialog):
         self.move(max(x, 0), max(y, 0))
 
     def accept(self) -> None:
-        self.dont_remind_again = self._checkbox.isChecked()
+        self.dont_remind_again = self._checkbox_row.isChecked()
         super().accept()
