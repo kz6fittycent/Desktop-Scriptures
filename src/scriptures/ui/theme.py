@@ -543,12 +543,12 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             border: 1px solid {p.primary};
         }}
         QLabel#gcReminderCheckboxLabel {{
-            font-size: 12px;
+            font-size: 11px;
             background: transparent;
         }}
         QPushButton#gcReminderToggle {{
-            background-color: {p.window_bg};
-            border: 2px solid {p.border};
+            background-color: {p.surface};
+            border: 2px solid {p.text};
             border-radius: 4px;
             color: #FFFFFF;
             font-weight: bold;

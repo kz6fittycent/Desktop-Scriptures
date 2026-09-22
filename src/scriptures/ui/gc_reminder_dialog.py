@@ -21,17 +21,9 @@ from scriptures.general_conference import ConferenceDates, format_date_range
 
 # Small and unobtrusive on purpose - this is a heads-up, not something
 # that needs to compete for attention like a real dialog (AI Settings,
-# Sync Options). Wide enough that the checkbox's label fits on one line.
-_DIALOG_WIDTH = 330
-
-# How far from the parent window's own bottom-left corner this opens -
-# out of the way of the landing page's boxes, closer to where a toast
-# notification would sit than a centered modal. Note: some window
-# managers (Wayland compositors in particular, by protocol design) don't
-# let an app position its own top-level windows at all, and silently
-# ignore this - a platform limitation, not a bug here.
-_POSITION_MARGIN_X = 40
-_POSITION_MARGIN_Y = 60
+# Sync Options). Wide enough that the checkbox's label fits beside the
+# Okay button on the same row without crowding.
+_DIALOG_WIDTH = 340
 
 
 class _CheckboxRow(QFrame):
@@ -51,19 +43,19 @@ class _CheckboxRow(QFrame):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(10, 8, 10, 8)
-        layout.setSpacing(8)
+        layout.setContentsMargins(8, 6, 8, 6)
+        layout.setSpacing(6)
 
         self._toggle = QPushButton()
         self._toggle.setObjectName("gcReminderToggle")
         self._toggle.setCheckable(True)
-        self._toggle.setFixedSize(20, 20)
+        self._toggle.setFixedSize(18, 18)
         self._toggle.toggled.connect(lambda checked: self._toggle.setText("✓" if checked else ""))
         layout.addWidget(self._toggle)
 
         label = QLabel(text)
         label.setObjectName("gcReminderCheckboxLabel")
-        layout.addWidget(label, 1)
+        layout.addWidget(label)
 
     def isChecked(self) -> bool:
         return self._toggle.isChecked()
@@ -95,26 +87,18 @@ class GeneralConferenceReminderDialog(QDialog):
         message.setWordWrap(True)
         layout.addWidget(message)
 
-        self._checkbox_row = _CheckboxRow("Don't remind me for this Conference")
-        layout.addWidget(self._checkbox_row)
-
-        button_row = QHBoxLayout()
-        button_row.addStretch(1)
+        # One bottom row - the dismissal checkbox at its left edge, the
+        # Okay button at its right, nothing else competing for space in
+        # between.
+        bottom_row = QHBoxLayout()
+        self._checkbox_row = _CheckboxRow("Don't remind me again")
+        bottom_row.addWidget(self._checkbox_row)
+        bottom_row.addStretch(1)
         ok_button = QPushButton("Okay")
         ok_button.setDefault(True)
         ok_button.clicked.connect(self.accept)
-        button_row.addWidget(ok_button)
-        layout.addLayout(button_row)
-
-        if parent is not None:
-            self._position_near_parent(parent)
-
-    def _position_near_parent(self, parent: QWidget) -> None:
-        self.adjustSize()
-        parent_geo = parent.frameGeometry()
-        x = parent_geo.x() + _POSITION_MARGIN_X
-        y = parent_geo.y() + parent_geo.height() - self.height() - _POSITION_MARGIN_Y
-        self.move(max(x, 0), max(y, 0))
+        bottom_row.addWidget(ok_button)
+        layout.addLayout(bottom_row)
 
     def accept(self) -> None:
         self.dont_remind_again = self._checkbox_row.isChecked()
