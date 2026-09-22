@@ -19,6 +19,7 @@ from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QP
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -871,33 +872,29 @@ class MainWindow(QMainWindow):
 
         # A single composite widget fills CardGridWidget's existing
         # optional `banner` slot - it only ever wanted one widget, and it
-        # was already generic enough to not care what's inside it. Come
-        # Follow Me sits in its own row above, sized to match Scripture
-        # of the Day's own column width (the same 3:2 split as the row
-        # below it) - the top-right quarter is left empty for now.
-        cfm_row = QWidget()
-        cfm_row_layout = QHBoxLayout(cfm_row)
-        cfm_row_layout.setContentsMargins(0, 0, 0, 0)
-        cfm_row_layout.setSpacing(8)
-        cfm_row_layout.addWidget(cfm_box, 3)
-        cfm_row_layout.addStretch(2)
-
+        # was already generic enough to not care what's inside it. A grid
+        # (not two independent HBoxLayout rows) guarantees Come Follow
+        # Me's column lines up exactly with Scripture of the Day's right
+        # below it - a grid's columns are always the same width in every
+        # row, where two separately-computed row layouts could drift out
+        # of alignment depending on each row's own content.
         banner = QWidget()
-        banner_layout = QVBoxLayout(banner)
-        banner_layout.setContentsMargins(0, 0, 0, 0)
-        banner_layout.setSpacing(8)
-        banner_layout.addWidget(cfm_row)
+        banner_grid = QGridLayout(banner)
+        banner_grid.setContentsMargins(0, 0, 0, 0)
+        banner_grid.setHorizontalSpacing(8)
+        banner_grid.setVerticalSpacing(8)
+        banner_grid.setColumnStretch(0, 3)
+        banner_grid.setColumnStretch(1, 2)
+
+        # Come Follow Me sits alone in the top-left; the top-right cell
+        # is left empty for now.
+        banner_grid.addWidget(cfm_box, 0, 0)
 
         if sotd_label is not None:
-            sotd_row = QWidget()
-            sotd_row_layout = QHBoxLayout(sotd_row)
-            sotd_row_layout.setContentsMargins(0, 0, 0, 0)
-            sotd_row_layout.setSpacing(8)
-            sotd_row_layout.addWidget(sotd_label, 3)
-            sotd_row_layout.addWidget(news_box, 2)
-            banner_layout.addWidget(sotd_row)
+            banner_grid.addWidget(sotd_label, 1, 0)
+            banner_grid.addWidget(news_box, 1, 1)
         else:
-            banner_layout.addWidget(news_box)
+            banner_grid.addWidget(news_box, 1, 0, 1, 2)
 
         grid = CardGridWidget(
             "Desktop Scriptures",

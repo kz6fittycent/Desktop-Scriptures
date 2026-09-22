@@ -57,9 +57,11 @@ class CfmBox(QLabel):
         self._url = lesson.link
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip("Open this week's lesson at churchofjesuschrist.org")
+        # Same two-line shape as the Scripture of the Day box right
+        # below it: a plain bold title line, then the actual content.
         self.setText(
-            f"<b>Come Follow Me: {escape(lesson.date_label)}</b><br>"
-            f"{escape(lesson.scripture_block)}"
+            "<b>Come Follow Me:</b><br>"
+            f"{escape(lesson.date_label)} - {escape(lesson.scripture_block)}"
         )
 
     def _on_failed(self, message: str) -> None:  # noqa: ARG002 (kept for parity/debuggability)
