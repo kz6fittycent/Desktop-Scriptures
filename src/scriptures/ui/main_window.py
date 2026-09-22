@@ -143,6 +143,12 @@ GC_REMINDER_ENABLED_SETTING = "gc_reminder_enabled"
 GC_REMINDER_LAST_SHOWN_SETTING = "gc_reminder_last_shown"  # ISO date of the last day shown
 GC_REMINDER_DISMISSED_START_SETTING = "gc_reminder_dismissed_start"  # ISO start date dismissed
 
+# The highlighter's armed color (or "clear"), so it stays selected across
+# launches instead of resetting to Off every time - a standing tool
+# preference like the theme/font settings above, not a one-off toggle.
+# Stored as one of "yellow", "pink", "orange", "clear", or "" for Off.
+HIGHLIGHT_MODE_SETTING = "highlight_mode"
+
 
 class MainWindow(QMainWindow):
     def __init__(self, conn: sqlite3.Connection):
@@ -152,10 +158,13 @@ class MainWindow(QMainWindow):
         self._current_reading_view: ReadingView | None = None
         self._gc_fetcher: GeneralConferenceFetcher | None = None
         # Highlighter tool state - which color (or "clear") is armed, if
-        # any. Deliberately not persisted like the theme/font settings
-        # below: it's a transient tool selection, not a standing
-        # preference, so it always starts back at "Off" on launch.
-        self._armed_highlight: str | None = None
+        # any. Restored from settings like the theme/font preferences
+        # below, so it stays on (and on the same color) across launches
+        # instead of needing to be turned back on every time.
+        stored_highlight_mode = get_setting(conn, HIGHLIGHT_MODE_SETTING, "")
+        self._armed_highlight = (
+            stored_highlight_mode if stored_highlight_mode in ("yellow", "pink", "orange", "clear") else None
+        )
         # Which tab (Study/Citations) of the reading view's side panel is
         # selected. Each chapter navigation rebuilds ReadingView (and its
         # QTabWidget) from scratch, so without this the tab would silently
@@ -375,7 +384,7 @@ class MainWindow(QMainWindow):
         highlight_group.setExclusive(True)
 
         off_action = QAction("Off", self, checkable=True)
-        off_action.setChecked(True)
+        off_action.setChecked(self._armed_highlight is None)
         off_action.triggered.connect(lambda checked=False: self._set_highlight_mode(None))
         highlight_group.addAction(off_action)
         highlight_menu.addAction(off_action)
@@ -383,12 +392,14 @@ class MainWindow(QMainWindow):
         for color in ("yellow", "pink", "orange"):
             action = QAction(color.capitalize(), self, checkable=True)
             action.setIcon(self._swatch_icon(theming.HIGHLIGHT_COLORS[color].background))
+            action.setChecked(self._armed_highlight == color)
             action.triggered.connect(lambda checked=False, c=color: self._set_highlight_mode(c))
             highlight_group.addAction(action)
             highlight_menu.addAction(action)
 
         highlight_menu.addSeparator()
         clear_highlight_action = QAction("Clear Highlight", self, checkable=True)
+        clear_highlight_action.setChecked(self._armed_highlight == "clear")
         clear_highlight_action.triggered.connect(
             lambda checked=False: self._set_highlight_mode("clear")
         )
@@ -854,6 +865,7 @@ class MainWindow(QMainWindow):
 
     def _set_highlight_mode(self, mode: str | None) -> None:
         self._armed_highlight = mode
+        set_setting(self.conn, HIGHLIGHT_MODE_SETTING, mode or "")
         if self._current_reading_view is not None:
             self._current_reading_view.set_armed_highlight(mode)
 
