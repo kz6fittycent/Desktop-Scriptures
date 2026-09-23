@@ -10,7 +10,12 @@ from pathlib import Path
 
 from PySide6.QtWidgets import QMessageBox, QWidget
 
-from scriptures.data_access import get_all_notes, search_verse_references, search_verses
+from scriptures.data_access import (
+    get_all_journal_entries,
+    get_all_notes,
+    search_verse_references,
+    search_verses,
+)
 
 
 def _documents_dir() -> Path:
@@ -25,8 +30,11 @@ def _write_export(path: Path, lines: list[str]) -> None:
 
 def export_notes(conn: sqlite3.Connection, parent: QWidget | None) -> None:
     notes = get_all_notes(conn)
-    if not notes:
-        QMessageBox.information(parent, "Export Notes", "You don't have any notes yet.")
+    journal_entries = get_all_journal_entries(conn)
+    if not notes and not journal_entries:
+        QMessageBox.information(
+            parent, "Export Notes", "You don't have any notes or journal entries yet."
+        )
         return
 
     timestamp = datetime.now()
@@ -35,16 +43,34 @@ def export_notes(conn: sqlite3.Connection, parent: QWidget | None) -> None:
         f"Exported {timestamp:%Y-%m-%d %H:%M:%S}",
         "",
     ]
-    for note in notes:
-        lines.append(note.reference)
-        lines.append(note.text)
+    if notes:
+        lines.append("--- Notes ---")
         lines.append("")
+        for note in notes:
+            lines.append(note.reference)
+            lines.append(note.text)
+            lines.append("")
+
+    if journal_entries:
+        lines.append("--- Journal ---")
+        lines.append("")
+        for entry in journal_entries:
+            header = f"{entry.entry_date} ({entry.reference})" if entry.reference else entry.entry_date
+            lines.append(header)
+            lines.append(entry.text)
+            lines.append("")
 
     path = _documents_dir() / f"desktop-scriptures-notes-{timestamp:%Y%m%d-%H%M%S}.txt"
     _write_export(path, lines)
 
+    parts = []
+    if notes:
+        parts.append(f"{len(notes)} note(s)")
+    if journal_entries:
+        noun = "entry" if len(journal_entries) == 1 else "entries"
+        parts.append(f"{len(journal_entries)} journal {noun}")
     QMessageBox.information(
-        parent, "Export Notes", f"Saved {len(notes)} note(s) to:\n{path}"
+        parent, "Export Notes", f"Saved {' and '.join(parts)} to:\n{path}"
     )
 
 

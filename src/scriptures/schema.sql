@@ -184,6 +184,27 @@ CREATE TRIGGER IF NOT EXISTS notes_au AFTER UPDATE ON notes BEGIN
     INSERT INTO notes_fts(rowid, text) VALUES (new.id, new.text);
 END;
 
+-- Journal: one free-text entry per calendar day (entry_date is UNIQUE),
+-- optionally reflecting on a specific verse or chapter - unlike notes'
+-- own target, both may be NULL here (most entries won't reference any
+-- particular passage). save_journal_entry() always updates an existing
+-- row for a given date in place (reusing even a soft-deleted one) rather
+-- than inserting a second row for it, so the UNIQUE constraint is never
+-- actually at odds with the tombstone convention - see its own
+-- docstring. `deleted_at` is a tombstone for the same sync reason as
+-- notes' own.
+CREATE TABLE IF NOT EXISTS journal_entries (
+    id          INTEGER PRIMARY KEY,
+    entry_date  TEXT NOT NULL UNIQUE,  -- ISO date, e.g. "2026-09-23"
+    text        TEXT NOT NULL,
+    verse_id    INTEGER REFERENCES verses(id),
+    chapter_id  INTEGER REFERENCES chapters(id),
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at  TEXT,
+    CHECK ((verse_id IS NOT NULL) + (chapter_id IS NOT NULL) <= 1)
+);
+
 -- Tags are user-defined labels. A tag can be applied to a verse or a chapter,
 -- acting as a lightweight, user-built cross-reference system.
 CREATE TABLE IF NOT EXISTS tags (

@@ -160,6 +160,61 @@ def test_two_device_sync_merges_and_propagates_deletion() -> None:
         shutil.rmtree(tmp_root, ignore_errors=True)
 
 
+def test_journal_entry_sync_merges_edits_and_deletion() -> None:
+    tmp_root = Path(tempfile.mkdtemp(prefix="scriptures-sync-test-"))
+    sync_folder = tmp_root / "sync"
+    sync_folder.mkdir()
+
+    try:
+        conn_a, verses_a = _make_device(tmp_root, "device_a")
+        conn_b, verses_b = _make_device(tmp_root, "device_b")
+
+        # Device A writes today's entry, with an optional reference to
+        # verse 1 - device B has its own, independent verse_id for that
+        # same verse, so this also confirms the reference resolves by
+        # natural key rather than by raw id.
+        da.save_journal_entry(
+            conn_a, "2026-09-20", "A's entry", verse_id=verses_a[1]
+        )
+        entry_a = da.get_journal_entry(conn_a, "2026-09-20")
+        _set_updated_at(conn_a, "journal_entries", entry_a.id, "2026-01-01 00:00:00")
+
+        export_device_state(conn_a, sync_folder)
+        import_and_merge(conn_b, sync_folder)
+
+        entry_on_b = da.get_journal_entry(conn_b, "2026-09-20")
+        assert entry_on_b is not None
+        assert entry_on_b.text == "A's entry"
+        assert entry_on_b.verse_id == verses_b[1], (
+            "reference should resolve to B's own local verse_id for the same verse"
+        )
+
+        # Device B edits that same day's entry, later - should win on next sync.
+        da.save_journal_entry(conn_b, "2026-09-20", "B's edit")
+        edited_on_b = da.get_journal_entry(conn_b, "2026-09-20")
+        _set_updated_at(conn_b, "journal_entries", edited_on_b.id, "2026-01-02 00:00:00")
+
+        export_device_state(conn_b, sync_folder)
+        import_and_merge(conn_a, sync_folder)
+        assert da.get_journal_entry(conn_a, "2026-09-20").text == "B's edit"
+
+        # Device B deletes it - should propagate to A too.
+        da.delete_journal_entry(conn_b, "2026-09-20")
+        deleted_row = conn_b.execute(
+            "SELECT id FROM journal_entries WHERE entry_date = ? AND deleted_at IS NOT NULL",
+            ("2026-09-20",),
+        ).fetchone()
+        _set_updated_at(conn_b, "journal_entries", deleted_row["id"], "2026-01-03 00:00:00")
+
+        export_device_state(conn_b, sync_folder)
+        import_and_merge(conn_a, sync_folder)
+        assert da.get_journal_entry(conn_a, "2026-09-20") is None
+
+        print("test_journal_entry_sync_merges_edits_and_deletion: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 def test_export_file_contents() -> None:
     tmp_root = Path(tempfile.mkdtemp(prefix="scriptures-sync-test-"))
     sync_folder = tmp_root / "sync"
@@ -224,5 +279,6 @@ def test_missing_sync_folder_raises() -> None:
 if __name__ == "__main__":
     test_export_file_contents()
     test_two_device_sync_merges_and_propagates_deletion()
+    test_journal_entry_sync_merges_edits_and_deletion()
     test_missing_sync_folder_raises()
     print("All sync tests passed.")

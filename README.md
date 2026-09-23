@@ -8,10 +8,12 @@ Joseph Smith Translation. The core reading and study experience works
 fully offline - personal notes, tags, verse highlighting, keyword
 search, a Topical Guide, General Conference citations, a Scripture of
 the Day banner, a reading streak, a Resume Reading history of your last
-5 chapters, a choice of accent colors, and cloud-folder sync across your
-own devices (via whatever cloud client - Nextcloud, OneDrive, Google
-Drive, or similar - already keeps a folder synced on your machine, so
-the app itself never talks to the network for this).
+5 chapters, a Journal with one entry per day (optionally linked to a
+verse or chapter you're reflecting on), a choice of accent colors, and
+cloud-folder sync across your own devices (via whatever cloud client -
+Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
+synced on your machine, so the app itself never talks to the network
+for this).
 
 A handful of landing-page extras are opt-in and off by default, only
 reaching the network once you turn them on: AI-assisted search (ask a
@@ -62,7 +64,7 @@ Features under consideration for future versions:
 - [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar, then refine it conversationally with follow-ups, and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server; see the AI Integration menu - v2.0.1 also surfaces any General Conference talks already known to cite a suggested verse)
 - [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
 - [ ] Apocrypha?
-- [ ] Wiki
+- [x] Wiki
 - [x] JST (v1.3)
 - [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics)
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
@@ -73,7 +75,7 @@ Features under consideration for future versions:
 - [ ] Linguistics references
 - [ ] Archaeological references
 - [ ] Family history reminder
-- [ ] Journal/Diary feature
+- [x] Journal/Diary feature (v2.1.7 - a "Journal" menu with one free-text entry per day, page through past dates with Previous/Next, and an optional link to a specific verse or chapter you're reflecting on; syncs across devices and is included in Export Notes, like your other personal data)
 - [x] General Conference reminder (v2.1.6 - an opt-in startup popup shown once a day in the ~2 weeks before Conference, using the real announced dates; off by default, with a per-Conference "don't remind me again" that resets for the next one)
 - [ ] General Conference Talk auto updater
 - [ ] Embedded webui for talk references, etc. 

@@ -10,8 +10,8 @@ any) is in use.
 Two independent operations:
 
 - `export_device_state` writes this device's entire current state (every
-  note/tag assignment/highlight/reading-log row it has, including
-  soft-deleted ones - see schema.sql's `deleted_at` columns) to
+  note/journal entry/tag assignment/highlight/reading-log row it has,
+  including soft-deleted ones - see schema.sql's `deleted_at` columns) to
   <folder>/device-<this device's id>.json.
 - `import_and_merge` reads every device-*.json file present in the folder
   (including this device's own last export), merges them by natural key
@@ -143,6 +143,26 @@ def _target_key(target: dict[str, Any]) -> tuple:
 # ---------------------------------------------------------------------
 
 
+def _export_journal_entries(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    out = []
+    for r in conn.execute("SELECT * FROM journal_entries"):
+        # Unlike notes' own target below, a journal entry's reference is
+        # optional - None here just means "no reference," not "skip this
+        # record" (_verse_or_chapter_target(conn, None, None) itself
+        # already returns None safely, since a NULL id matches no row).
+        target = _verse_or_chapter_target(conn, r["verse_id"], r["chapter_id"])
+        out.append(
+            {
+                "entry_date": r["entry_date"],
+                "text": r["text"],
+                "target": target,
+                "updated_at": r["updated_at"],
+                "deleted_at": r["deleted_at"],
+            }
+        )
+    return out
+
+
 def _export_notes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     out = []
     for r in conn.execute("SELECT * FROM notes"):
@@ -229,6 +249,7 @@ def export_device_state(conn: sqlite3.Connection, sync_folder: Path) -> Path:
     payload = {
         "device_id": device_id,
         "notes": _export_notes(conn),
+        "journal_entries": _export_journal_entries(conn),
         "tag_assignments": _export_tag_assignments(conn),
         "highlights": _export_highlights(conn),
         "reading_log": _export_reading_log(conn),
@@ -269,6 +290,52 @@ def _read_device_files(sync_folder: Path) -> list[dict[str, Any]]:
         except (OSError, json.JSONDecodeError):
             continue
     return payloads
+
+
+def _apply_journal_entry(conn: sqlite3.Connection, record: dict[str, Any]) -> None:
+    """Matched by entry_date directly (a device-independent natural key
+    on its own, unlike notes' verse/chapter target) - the optional
+    reference is resolved separately and just left NULL if this device
+    doesn't have that content synced yet, rather than dropping the whole
+    entry the way an unresolvable note target does."""
+    verse_id = chapter_id = None
+    if record.get("target") is not None:
+        resolved = _resolve_target(conn, record["target"])
+        if resolved is not None:
+            verse_id, chapter_id = resolved
+    existing = conn.execute(
+        "SELECT id, updated_at FROM journal_entries WHERE entry_date = ?",
+        (record["entry_date"],),
+    ).fetchone()
+    if existing and existing["updated_at"] >= record["updated_at"]:
+        return
+    if existing:
+        conn.execute(
+            "UPDATE journal_entries SET text = ?, verse_id = ?, chapter_id = ?, "
+            "updated_at = ?, deleted_at = ? WHERE id = ?",
+            (
+                record["text"],
+                verse_id,
+                chapter_id,
+                record["updated_at"],
+                record["deleted_at"],
+                existing["id"],
+            ),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO journal_entries "
+            "(entry_date, text, verse_id, chapter_id, updated_at, deleted_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                record["entry_date"],
+                record["text"],
+                verse_id,
+                chapter_id,
+                record["updated_at"],
+                record["deleted_at"],
+            ),
+        )
 
 
 def _apply_note(conn: sqlite3.Connection, record: dict[str, Any]) -> None:
@@ -396,6 +463,7 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
         raise FileNotFoundError(f"Sync folder does not exist: {sync_folder}")
 
     notes: dict[tuple, dict[str, Any]] = {}
+    journal_entries: dict[str, dict[str, Any]] = {}
     tags: dict[tuple, dict[str, Any]] = {}
     highlights: dict[tuple, dict[str, Any]] = {}
     reading_log: dict[tuple, dict[str, Any]] = {}
@@ -403,6 +471,8 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
     for payload in _read_device_files(sync_folder):
         for rec in payload.get("notes", []):
             _keep_latest(notes, _target_key(rec["target"]), rec)
+        for rec in payload.get("journal_entries", []):
+            _keep_latest(journal_entries, rec["entry_date"], rec)
         for rec in payload.get("tag_assignments", []):
             _keep_latest(tags, (rec["tag_name"].lower(), _target_key(rec["target"])), rec)
         for rec in payload.get("highlights", []):
@@ -413,6 +483,8 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
 
     for rec in notes.values():
         _apply_note(conn, rec)
+    for rec in journal_entries.values():
+        _apply_journal_entry(conn, rec)
     for rec in tags.values():
         _apply_tag_assignment(conn, rec)
     for rec in highlights.values():

@@ -76,6 +76,7 @@ from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
 from scriptures.ui.gc_reminder_dialog import GeneralConferenceReminderDialog
 from scriptures.ui.inspiration_box import InspirationBox
+from scriptures.ui.journal_view import JournalView
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
 from scriptures.ui.sync_dialog import SyncFolderDialog
@@ -476,6 +477,13 @@ class MainWindow(QMainWindow):
         self._highlight_actions["clear"] = clear_highlight_action
 
         self._update_highlight_menu_labels()
+
+        # A plain top-level action, not addMenu() - there's only ever one
+        # thing to do here (open the Journal), so a dropdown with a
+        # single item would just be an extra click for nothing.
+        journal_action = QAction("&Journal", self)
+        journal_action.triggered.connect(self._show_journal)
+        self.menuBar().addAction(journal_action)
 
         sync_menu = self.menuBar().addMenu("Sy&nc")
 
@@ -1137,6 +1145,17 @@ class MainWindow(QMainWindow):
             return
         volume, testament, book, _chapter = location
         self._on_chapter_clicked(volume, testament, book, chapter_id)
+
+    # ------------------------------------------------------------------
+    # Journal
+    # ------------------------------------------------------------------
+
+    def _show_journal(self) -> None:
+        self._path = [{"label": "Journal", "action": self._show_journal}]
+        self._update_breadcrumb()
+        journal = JournalView(self.conn)
+        journal.reference_selected.connect(self._resume_reading)
+        self._set_content(journal)
 
     # ------------------------------------------------------------------
     # Topical Guide

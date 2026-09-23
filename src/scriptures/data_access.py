@@ -60,6 +60,28 @@ class Note:
 
 
 @dataclass(frozen=True)
+class JournalEntry:
+    id: int
+    entry_date: str  # ISO date, e.g. "2026-09-23"
+    text: str
+    verse_id: int | None
+    chapter_id: int | None
+    updated_at: str
+
+
+@dataclass(frozen=True)
+class JournalEntryResult:
+    """A journal entry as listed for export - `reference` is the
+    optional linked verse/chapter's own reference label, or "" if the
+    entry has none."""
+
+    id: int
+    entry_date: str
+    text: str
+    reference: str
+
+
+@dataclass(frozen=True)
 class Tag:
     id: int
     name: str
@@ -429,6 +451,98 @@ def delete_note(conn: sqlite3.Connection, note_id: int) -> None:
         (note_id,),
     )
     conn.commit()
+
+
+def get_journal_entry(conn: sqlite3.Connection, entry_date: str) -> JournalEntry | None:
+    """The active (non-deleted) journal entry for `entry_date` (an ISO
+    date string), or None if nothing's been written for that day yet."""
+    r = conn.execute(
+        "SELECT id, entry_date, text, verse_id, chapter_id, updated_at FROM journal_entries "
+        "WHERE entry_date = ? AND deleted_at IS NULL",
+        (entry_date,),
+    ).fetchone()
+    return (
+        JournalEntry(r["id"], r["entry_date"], r["text"], r["verse_id"], r["chapter_id"], r["updated_at"])
+        if r
+        else None
+    )
+
+
+def save_journal_entry(
+    conn: sqlite3.Connection,
+    entry_date: str,
+    text: str,
+    *,
+    verse_id: int | None = None,
+    chapter_id: int | None = None,
+) -> None:
+    """Create or update the entry for `entry_date`. Looks up any existing
+    row for that date directly (not via get_journal_entry, which filters
+    out soft-deleted rows), so re-saving after a delete reuses that same
+    row - entry_date is UNIQUE, so a second INSERT for a date that
+    already has a (tombstoned) row would otherwise fail instead of just
+    reactivating it."""
+    existing = conn.execute(
+        "SELECT id FROM journal_entries WHERE entry_date = ?", (entry_date,)
+    ).fetchone()
+    if existing:
+        conn.execute(
+            "UPDATE journal_entries SET text = ?, verse_id = ?, chapter_id = ?, "
+            "updated_at = datetime('now'), deleted_at = NULL WHERE id = ?",
+            (text, verse_id, chapter_id, existing["id"]),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO journal_entries (entry_date, text, verse_id, chapter_id) "
+            "VALUES (?, ?, ?, ?)",
+            (entry_date, text, verse_id, chapter_id),
+        )
+    conn.commit()
+
+
+def delete_journal_entry(conn: sqlite3.Connection, entry_date: str) -> None:
+    """Soft delete (tombstone), not a real DELETE - see sync.py."""
+    conn.execute(
+        "UPDATE journal_entries SET deleted_at = datetime('now'), updated_at = datetime('now') "
+        "WHERE entry_date = ? AND deleted_at IS NULL",
+        (entry_date,),
+    )
+    conn.commit()
+
+
+def get_all_journal_entries(conn: sqlite3.Connection) -> list[JournalEntryResult]:
+    """Every journal entry, oldest first, for exporting the whole set at
+    once."""
+    rows = conn.execute(
+        "SELECT je.id, je.entry_date, je.text, "
+        "COALESCE(v.reference, b.name || ' ' || c.chapter_number, '') AS reference "
+        "FROM journal_entries je "
+        "LEFT JOIN verses v ON v.id = je.verse_id "
+        "LEFT JOIN chapters c ON c.id = COALESCE(v.chapter_id, je.chapter_id) "
+        "LEFT JOIN books b ON b.id = c.book_id "
+        "WHERE je.deleted_at IS NULL "
+        "ORDER BY je.entry_date"
+    ).fetchall()
+    return [JournalEntryResult(r["id"], r["entry_date"], r["text"], r["reference"]) for r in rows]
+
+
+def get_reference_label(
+    conn: sqlite3.Connection, *, verse_id: int | None, chapter_id: int | None
+) -> str | None:
+    """A human-readable label ("Alma 32:21" or "Genesis 1") for an
+    optional verse_id/chapter_id target, e.g. a journal entry's linked
+    passage - None if neither is set."""
+    if verse_id is None and chapter_id is None:
+        return None
+    r = conn.execute(
+        "SELECT COALESCE(v.reference, b.name || ' ' || c.chapter_number) AS label "
+        "FROM (SELECT ? AS verse_id, ? AS chapter_id) input "
+        "LEFT JOIN verses v ON v.id = input.verse_id "
+        "LEFT JOIN chapters c ON c.id = COALESCE(v.chapter_id, input.chapter_id) "
+        "LEFT JOIN books b ON b.id = c.book_id",
+        (verse_id, chapter_id),
+    ).fetchone()
+    return r["label"] if r else None
 
 
 def get_tags(
