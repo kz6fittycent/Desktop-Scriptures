@@ -604,10 +604,20 @@ class MainWindow(QMainWindow):
         self.resume_button.setObjectName("resumeButton")
         self.resume_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.resume_button.clicked.connect(self._show_resume_menu)
+        # A floor, not a fixed width - on this app's Snap (the gnome
+        # extension pulls in native GTK/Adwaita theming), the actual
+        # painted text can run wider than Qt's own sizeHint() calculates
+        # for it (the same style-vs-layout mismatch behind this session's
+        # search bar and highlighter-checkbox fixes), clipping the label
+        # inside a button sized to that too-small hint. A generous
+        # minimum leaves comfortable room without capping growth for
+        # something like a longer streak count below.
+        self.resume_button.setMinimumWidth(185)
         corner_layout.addWidget(self.resume_button)
 
         self.streak_label = QLabel()
         self.streak_label.setObjectName("streakBadge")
+        self.streak_label.setMinimumWidth(165)  # same reasoning as resume_button above
         corner_layout.addWidget(self.streak_label)
 
         self.menuBar().setCornerWidget(self._menu_corner, Qt.Corner.TopRightCorner)
