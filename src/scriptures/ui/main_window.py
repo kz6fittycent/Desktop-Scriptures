@@ -482,7 +482,12 @@ class MainWindow(QMainWindow):
         # thing to do here (open the Journal), so a dropdown with a
         # single item would just be an extra click for nothing.
         journal_action = QAction("&Journal", self)
-        journal_action.triggered.connect(self._show_journal)
+        # Not a direct connection to self._show_journal: QAction.triggered
+        # emits a bool (its checked state), which would otherwise land in
+        # _show_journal's own optional entry_date parameter - the same
+        # checked=False lambda guard used throughout this file wherever a
+        # triggered signal connects to a slot that takes an argument.
+        journal_action.triggered.connect(lambda checked=False: self._show_journal())
         self.menuBar().addAction(journal_action)
 
         sync_menu = self.menuBar().addMenu("Sy&nc")
