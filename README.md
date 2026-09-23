@@ -8,12 +8,12 @@ Joseph Smith Translation. The core reading and study experience works
 fully offline - personal notes, tags, verse highlighting, keyword
 search, a Topical Guide, General Conference citations, a Scripture of
 the Day banner, a reading streak, a Resume Reading history of your last
-5 chapters, a Journal with one entry per day (optionally linked to a
-verse or chapter you're reflecting on), a choice of accent colors, and
-cloud-folder sync across your own devices (via whatever cloud client -
-Nextcloud, OneDrive, Google Drive, or similar - already keeps a folder
-synced on your machine, so the app itself never talks to the network
-for this).
+5 chapters, a searchable Journal with one entry per day (optionally
+linked to a verse or chapter you're reflecting on), a choice of accent
+colors, and cloud-folder sync across your own devices (via whatever
+cloud client - Nextcloud, OneDrive, Google Drive, or similar - already
+keeps a folder synced on your machine, so the app itself never talks to
+the network for this).
 
 A handful of landing-page extras are opt-in and off by default, only
 reaching the network once you turn them on: AI-assisted search (ask a
@@ -47,6 +47,8 @@ separately-copyrighted Topical Guide.
 ![A chapter open with a highlight, chapter tags/note, and a verse note](docs/screenshots/chapter.png)
 
 ![AI-assisted search answering a natural-language question, then narrowed with a follow-up](docs/screenshots/ai-search.png)
+
+![A Journal entry linked to Alma 32:21, with Previous/Next Day navigation](docs/screenshots/journal.png)
 
 ## Install
 

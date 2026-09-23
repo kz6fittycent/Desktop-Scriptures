@@ -8,10 +8,12 @@ description: |
   fully offline - personal notes, tags, verse highlighting, keyword
   search, a Topical Guide, General Conference citations, a Scripture of
   the Day banner, a reading streak, a Resume Reading history of your last
-  5 chapters, a choice of accent colors, and cloud-folder sync across your
-  own devices (via whatever cloud client - Nextcloud, OneDrive, Google
-  Drive, or similar - already keeps a folder synced on your machine, so
-  the app itself never talks to the network for this).
+  5 chapters, a Journal with one searchable entry per day (optionally
+  linked to a verse or chapter you're reflecting on), a choice of accent
+  colors, and cloud-folder sync across your own devices (via whatever
+  cloud client - Nextcloud, OneDrive, Google Drive, or similar - already
+  keeps a folder synced on your machine, so the app itself never talks to
+  the network for this).
 
   A handful of landing-page extras are opt-in and off by default, only
   reaching the network once you turn them on: AI-assisted search (ask a
@@ -19,7 +21,10 @@ description: |
   follow-ups - to get pointed at real, matching scripture, using your own
   AI endpoint), a Church News headline, a Come Follow Me helper showing
   this week's lesson, and an Inspirational Message featuring whatever's
-  currently on churchofjesuschrist.org's own homepage.
+  currently on churchofjesuschrist.org's own homepage. A General
+  Conference reminder (also opt-in, also off by default) shows once a day
+  in the roughly two weeks before Conference starts, using the real
+  announced dates.
 
   This is an unofficial application, not produced by or affiliated with
   The Church of Jesus Christ of Latter-day Saints, or with Community of
@@ -64,10 +69,11 @@ apps:
       # For this app's several opt-in, off-by-default network features -
       # AI-assisted search (see ai_client.py, talks only to whatever
       # endpoint the user configures under AI Integration -> AI
-      # Settings...), and the landing page's Church News, Come Follow
-      # Me, and Inspirational Message boxes (see church_news.py, cfm.py,
-      # and inspiration.py - each fetches from a single fixed Church
-      # source only once turned on in the View menu). Never anywhere on
+      # Settings...), the landing page's Church News, Come Follow Me,
+      # and Inspirational Message boxes (see church_news.py, cfm.py, and
+      # inspiration.py), and the General Conference reminder popup (see
+      # general_conference.py) - each fetches from a single fixed Church
+      # source only once turned on in the View menu. Never anywhere on
       # its own otherwise.
       - network
     environment:
