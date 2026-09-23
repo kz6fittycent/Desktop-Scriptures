@@ -14,11 +14,12 @@ from datetime import date
 from html import escape
 from pathlib import Path
 
-from PySide6.QtCore import QPoint, QSize, QTimer, Qt
+from PySide6.QtCore import QPoint, QSize, QTimer, Qt, Signal
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
+    QFrame,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -148,6 +149,55 @@ GC_REMINDER_DISMISSED_START_SETTING = "gc_reminder_dismissed_start"  # ISO start
 # preference like the theme/font settings above, not a one-off toggle.
 # Stored as one of "yellow", "pink", "orange", "clear", or "" for Off.
 HIGHLIGHT_MODE_SETTING = "highlight_mode"
+
+
+class _HighlightColorRow(QFrame):
+    """One color's row in the Highlighter menu - a real widget, not a
+    QAction's icon, so its own checkmark is fully under this app's
+    control. A plain QAction icon was tried first, but QMenu scales an
+    icon down to its style's own fixed menu-icon size regardless of the
+    pixmap's actual dimensions (there's no QMenu.setIconSize to override
+    that, unlike QToolBar/QListView), which kept the checkmark too small
+    to read no matter how large or bold it was drawn - the same kind of
+    native-style limitation the General Conference reminder's checkbox
+    ran into, worked around there the same way: a real widget instead of
+    fighting a native indicator's own rendering."""
+
+    clicked = Signal()
+
+    def __init__(self, label: str, swatch_hex: str, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(8, 4, 10, 4)
+        layout.setSpacing(6)
+
+        self._check_label = QLabel("")
+        self._check_label.setFixedWidth(16)
+        check_font = self._check_label.font()
+        check_font.setBold(True)
+        check_font.setPointSize(check_font.pointSize() + 2)
+        self._check_label.setFont(check_font)
+        layout.addWidget(self._check_label)
+
+        swatch = QLabel()
+        swatch.setFixedSize(14, 14)
+        swatch.setStyleSheet(
+            f"background-color: {swatch_hex}; border: 1px solid rgba(0, 0, 0, 60); border-radius: 2px;"
+        )
+        layout.addWidget(swatch)
+
+        layout.addWidget(QLabel(label))
+        layout.addStretch(1)
+
+    def set_checked(self, checked: bool) -> None:
+        self._check_label.setText("✓" if checked else "")
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        super().mousePressEvent(event)
 
 
 class MainWindow(QMainWindow):
@@ -392,9 +442,11 @@ class MainWindow(QMainWindow):
         # render too faint to notice - the same issue the General
         # Conference reminder's checkbox had, fixed there by moving away
         # from a native indicator entirely rather than trying to
-        # restyle one Qt style may just ignore.
+        # restyle one Qt style may just ignore. The three color rows
+        # below go a step further, as plain QAction (icon-based)
+        # checkmarks - see _HighlightColorRow's own docstring for why.
         self._highlight_labels: dict[str, str] = {"off": "Off"}
-        self._highlight_actions: dict[str, QAction] = {}
+        self._highlight_actions: dict[str, QAction | _HighlightColorRow] = {}
 
         off_action = QAction(self._highlight_labels["off"], self, checkable=True)
         off_action.triggered.connect(lambda checked=False: self._set_highlight_mode(None))
@@ -405,12 +457,13 @@ class MainWindow(QMainWindow):
         for color in ("yellow", "pink", "orange"):
             label = color.capitalize()
             self._highlight_labels[color] = label
-            action = QAction(label, self, checkable=True)
-            action.setIcon(self._swatch_icon(theming.HIGHLIGHT_COLORS[color].background))
-            action.triggered.connect(lambda checked=False, c=color: self._set_highlight_mode(c))
-            highlight_group.addAction(action)
-            highlight_menu.addAction(action)
-            self._highlight_actions[color] = action
+            row = _HighlightColorRow(label, theming.HIGHLIGHT_COLORS[color].background)
+            row.clicked.connect(lambda c=color: self._set_highlight_mode(c))
+            row.clicked.connect(highlight_menu.close)
+            row_action = QWidgetAction(self)
+            row_action.setDefaultWidget(row)
+            highlight_menu.addAction(row_action)
+            self._highlight_actions[color] = row
 
         highlight_menu.addSeparator()
         self._highlight_labels["clear"] = "Clear Highlight"
@@ -891,9 +944,13 @@ class MainWindow(QMainWindow):
     def _update_highlight_menu_labels(self) -> None:
         active_key = self._armed_highlight or "off"
         for key, action in self._highlight_actions.items():
-            label = self._highlight_labels[key]
-            action.setChecked(key == active_key)
-            action.setText(f"✓ {label}" if key == active_key else label)
+            is_active = key == active_key
+            if key in theming.HIGHLIGHT_COLORS:
+                action.set_checked(is_active)
+            else:
+                label = self._highlight_labels[key]
+                action.setChecked(is_active)
+                action.setText(f"✓ {label}" if is_active else label)
 
     def closeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         if self._current_reading_view is not None:
