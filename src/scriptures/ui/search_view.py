@@ -8,18 +8,25 @@ whatever query MainWindow hands it via `set_query()`. There's no separate
 "how did Christ organize the Nephite church", by product decision - one
 place to search, not two.
 
-Four independent LOCAL lookups run on every query and are shown as
-labeled sections, each only appearing when it has results. Tags and notes
-are your own annotations, so they're shown first, ahead of the scripture
-matches themselves:
+Five independent LOCAL lookups run on every query and are shown as
+labeled sections, each only appearing when it has results. Tags, notes,
+and the journal are your own annotations, so they're shown first, ahead
+of the scripture matches themselves:
 - Tags: tag-name matches, with every verse/chapter that tag is attached
   to listed directly underneath - no separate drill-down click needed
 - Notes: a keyword (FTS5) match over note text
+- Journal: a keyword (FTS5) match over journal entry text - same "your
+  own words, not what it's linked to" behavior as Notes: an entry linked
+  to a verse doesn't surface just because the query matches that verse's
+  own scripture text, only if the query also matches what was actually
+  written. Clicking a result opens the Journal at that entry's date
+  (journal_entry_selected, a plain ISO date - not result_selected below,
+  since an entry doesn't necessarily have a chapter to navigate to).
 - Chapters: book/chapter name matches (e.g. "Genesis 1", "Alma")
 - Verses: a direct reference match (e.g. "John 3:16") first, then a
   keyword (FTS5) match over scripture text, deduplicated by verse
 
-If an AiConfig is supplied, a fifth, asynchronous lookup also runs: the
+If an AiConfig is supplied, a sixth, asynchronous lookup also runs: the
 query is sent to ask.py as a natural-language question, and an
 AiConversationSection (see ui/ai_conversation.py) renders whatever comes
 back - already validated against this same local database - as a
@@ -33,15 +40,19 @@ below it.
 Clicking any result emits `result_selected(chapter_id)`; MainWindow
 resolves that chapter's full volume/testament/book path and navigates
 exactly as if the chapter had been reached by clicking through the
-normal card-grid levels.
+normal card-grid levels. A Journal result is the one exception - it
+emits `journal_entry_selected(entry_date)` instead, opening the Journal
+at that date rather than a chapter.
 """
 
 from __future__ import annotations
 
 import sqlite3
+from datetime import date
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QFrame,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -52,8 +63,10 @@ from PySide6.QtWidgets import (
 
 from scriptures.ai_client import AiConfig
 from scriptures.data_access import (
+    JournalEntryResult,
     get_tag_targets,
     search_chapters,
+    search_journal_entries,
     search_notes,
     search_tags_by_name,
     search_verse_references,
@@ -64,8 +77,54 @@ from scriptures.ui.export import export_search_results
 from scriptures.ui.result_row import ResultRow, truncate_text as _truncate
 
 
+def _format_journal_result_heading(entry: JournalEntryResult) -> str:
+    label = date.fromisoformat(entry.entry_date).strftime("%B %-d, %Y")
+    if entry.reference:
+        return f"Journal — {label} ({entry.reference})"
+    return f"Journal — {label}"
+
+
+class _JournalResultRow(QFrame):
+    """A journal-entry search hit - a separate small copy of ResultRow's
+    own shape rather than reusing it directly, since clicking one needs
+    to open the Journal at that entry's date (a plain ISO date string),
+    not navigate to a chapter_id the way every other result row does;
+    a journal entry doesn't necessarily have one at all."""
+
+    clicked = Signal(str)
+
+    def __init__(
+        self, entry_date: str, primary_text: str, secondary_text: str = "", parent: QWidget | None = None
+    ):
+        super().__init__(parent)
+        self.entry_date = entry_date
+        self.setObjectName("resultRow")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 8, 12, 8)
+        layout.setSpacing(2)
+
+        primary = QLabel(primary_text)
+        primary.setObjectName("resultPrimary")
+        primary.setWordWrap(True)
+        layout.addWidget(primary)
+
+        if secondary_text:
+            secondary = QLabel(secondary_text)
+            secondary.setObjectName("resultSecondary")
+            secondary.setWordWrap(True)
+            layout.addWidget(secondary)
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit(self.entry_date)
+        super().mousePressEvent(event)
+
+
 class SearchView(QWidget):
     result_selected = Signal(int)
+    journal_entry_selected = Signal(str)
 
     def __init__(
         self,
@@ -134,6 +193,16 @@ class SearchView(QWidget):
             row.clicked.connect(self.result_selected)
             self._results_layout.addWidget(row)
 
+    def _add_journal_section(self, rows: list[_JournalResultRow]) -> None:
+        if not rows:
+            return
+        header = QLabel("Journal")
+        header.setObjectName("searchSectionHeader")
+        self._results_layout.addWidget(header)
+        for row in rows:
+            row.clicked.connect(self.journal_entry_selected)
+            self._results_layout.addWidget(row)
+
     def _export_results(self) -> None:
         export_search_results(self.conn, self._query, self)
 
@@ -163,6 +232,14 @@ class SearchView(QWidget):
             ResultRow(n.chapter_id, n.reference, _truncate(n.text))
             for n in search_notes(self.conn, query)
         ]
+        journal_rows = [
+            _JournalResultRow(
+                e.entry_date,
+                _format_journal_result_heading(e),
+                _truncate(e.text),
+            )
+            for e in search_journal_entries(self.conn, query)
+        ]
         chapter_rows = [
             ResultRow(m.chapter_id, m.label) for m in search_chapters(self.conn, query)
         ]
@@ -185,13 +262,14 @@ class SearchView(QWidget):
                 row.clicked.connect(self.result_selected)
                 self._results_layout.addWidget(row)
         self._add_section("Notes", note_rows)
+        self._add_journal_section(journal_rows)
         self._add_section("Chapters", chapter_rows)
         self._add_section("Verses", verse_rows)
 
         # Not _show_message() - that clears the whole layout, which would
         # also wipe the AI placeholder/section above if one is pending or
         # already showing. A plain inline note alongside it instead.
-        if not (chapter_rows or verse_rows or note_rows or matched_tags):
+        if not (chapter_rows or verse_rows or note_rows or journal_rows or matched_tags):
             no_keyword_results = QLabel(
                 f'No keyword results for "{query}".'
                 if self.ai_config is not None

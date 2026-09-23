@@ -1150,11 +1150,13 @@ class MainWindow(QMainWindow):
     # Journal
     # ------------------------------------------------------------------
 
-    def _show_journal(self) -> None:
+    def _show_journal(self, entry_date: date | None = None) -> None:
         self._path = [{"label": "Journal", "action": self._show_journal}]
         self._update_breadcrumb()
         journal = JournalView(self.conn)
         journal.reference_selected.connect(self._resume_reading)
+        if entry_date is not None:
+            journal.load_date(entry_date)
         self._set_content(journal)
 
     # ------------------------------------------------------------------
@@ -1201,8 +1203,12 @@ class MainWindow(QMainWindow):
         self._update_breadcrumb()
         view = SearchView(self.conn, ai_config=self._current_ai_config())
         view.result_selected.connect(self._on_search_result_selected)
+        view.journal_entry_selected.connect(self._on_journal_result_selected)
         view.set_query(query)
         self._set_content(view)
+
+    def _on_journal_result_selected(self, entry_date_iso: str) -> None:
+        self._show_journal(date.fromisoformat(entry_date_iso))
 
     def _current_ai_config(self) -> AiConfig | None:
         """None means "don't even try" - AI-assisted search is off, or on

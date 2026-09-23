@@ -140,9 +140,12 @@ class JournalView(QWidget):
         self._timer.timeout.connect(self.save_now)
         self._text_edit.textChanged.connect(self._timer.start)
 
-        self._load_date(self._current_date)
+        self.load_date(self._current_date)
 
-    def _load_date(self, target_date: date) -> None:
+    def load_date(self, target_date: date) -> None:
+        """Public, not just internal Previous/Next Day plumbing - also
+        called by MainWindow right after construction to jump straight
+        to a specific date, e.g. from a Journal search result."""
         self.flush_pending_save()
         self._current_date = target_date
         self._date_label.setText(target_date.strftime("%A, %B %-d, %Y"))
@@ -160,11 +163,11 @@ class JournalView(QWidget):
         self._refresh_reference_chip()
 
     def _go_previous_day(self) -> None:
-        self._load_date(self._current_date - timedelta(days=1))
+        self.load_date(self._current_date - timedelta(days=1))
 
     def _go_next_day(self) -> None:
         if self._current_date < date.today():
-            self._load_date(self._current_date + timedelta(days=1))
+            self.load_date(self._current_date + timedelta(days=1))
 
     def _resolve_reference(self) -> None:
         text = self._reference_edit.text().strip()

@@ -205,6 +205,25 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     CHECK ((verse_id IS NOT NULL) + (chapter_id IS NOT NULL) <= 1)
 );
 
+CREATE VIRTUAL TABLE IF NOT EXISTS journal_entries_fts USING fts5(
+    text,
+    content='journal_entries',
+    content_rowid='id'
+);
+
+CREATE TRIGGER IF NOT EXISTS journal_entries_ai AFTER INSERT ON journal_entries BEGIN
+    INSERT INTO journal_entries_fts(rowid, text) VALUES (new.id, new.text);
+END;
+
+CREATE TRIGGER IF NOT EXISTS journal_entries_ad AFTER DELETE ON journal_entries BEGIN
+    INSERT INTO journal_entries_fts(journal_entries_fts, rowid, text) VALUES ('delete', old.id, old.text);
+END;
+
+CREATE TRIGGER IF NOT EXISTS journal_entries_au AFTER UPDATE ON journal_entries BEGIN
+    INSERT INTO journal_entries_fts(journal_entries_fts, rowid, text) VALUES ('delete', old.id, old.text);
+    INSERT INTO journal_entries_fts(rowid, text) VALUES (new.id, new.text);
+END;
+
 -- Tags are user-defined labels. A tag can be applied to a verse or a chapter,
 -- acting as a lightweight, user-built cross-reference system.
 CREATE TABLE IF NOT EXISTS tags (

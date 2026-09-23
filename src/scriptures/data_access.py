@@ -526,6 +526,32 @@ def get_all_journal_entries(conn: sqlite3.Connection) -> list[JournalEntryResult
     return [JournalEntryResult(r["id"], r["entry_date"], r["text"], r["reference"]) for r in rows]
 
 
+def search_journal_entries(
+    conn: sqlite3.Connection, query: str, limit: int = 40
+) -> list[JournalEntryResult]:
+    """Keyword search over journal entry text (FTS5) - mirrors
+    search_notes exactly. A query matching only the linked verse/chapter's
+    own scripture text, with no match in the entry's own wording, won't
+    surface it - same "your own words, not what you linked to" behavior
+    notes already have."""
+    query = query.strip()
+    if not query:
+        return []
+    rows = conn.execute(
+        "SELECT je.id, je.entry_date, je.text, "
+        "COALESCE(v.reference, b.name || ' ' || c.chapter_number, '') AS reference "
+        "FROM journal_entries_fts "
+        "JOIN journal_entries je ON je.id = journal_entries_fts.rowid "
+        "LEFT JOIN verses v ON v.id = je.verse_id "
+        "LEFT JOIN chapters c ON c.id = COALESCE(v.chapter_id, je.chapter_id) "
+        "LEFT JOIN books b ON b.id = c.book_id "
+        "WHERE journal_entries_fts MATCH ? AND je.deleted_at IS NULL "
+        "ORDER BY rank LIMIT ?",
+        (_fts_phrase(query), limit),
+    ).fetchall()
+    return [JournalEntryResult(r["id"], r["entry_date"], r["text"], r["reference"]) for r in rows]
+
+
 def get_reference_label(
     conn: sqlite3.Connection, *, verse_id: int | None, chapter_id: int | None
 ) -> str | None:

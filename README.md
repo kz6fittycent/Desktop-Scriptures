@@ -75,7 +75,7 @@ Features under consideration for future versions:
 - [ ] Linguistics references
 - [ ] Archaeological references
 - [ ] Family history reminder
-- [x] Journal/Diary feature (v2.1.7 - a "Journal" menu with one free-text entry per day, page through past dates with Previous/Next, and an optional link to a specific verse or chapter you're reflecting on; syncs across devices and is included in Export Notes, like your other personal data)
+- [x] Journal/Diary feature (v2.1.7 - a "Journal" menu with one free-text entry per day, page through past dates with Previous/Next, and an optional link to a specific verse or chapter you're reflecting on; syncs across devices and is included in Export Notes, like your other personal data; v2.1.8 makes entries keyword-searchable, matching what you actually wrote, not just what they're linked to)
 - [x] General Conference reminder (v2.1.6 - an opt-in startup popup shown once a day in the ~2 weeks before Conference, using the real announced dates; off by default, with a per-Conference "don't remind me again" that resets for the next one)
 - [ ] General Conference Talk auto updater
 - [ ] Embedded webui for talk references, etc. 

@@ -34,6 +34,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
     _backfill_reading_history(conn)
+    _backfill_journal_entries_fts(conn)
     _ensure_device_id(conn)
     conn.commit()
 
@@ -88,6 +89,32 @@ def _backfill_reading_history(conn: sqlite3.Connection) -> None:
         "INSERT INTO reading_history (chapter_id, read_at) "
         "SELECT chapter_id, read_date || 'T00:00:00' FROM reading_log "
         "WHERE chapter_id IS NOT NULL"
+    )
+
+
+def _backfill_journal_entries_fts(conn: sqlite3.Connection) -> None:
+    """journal_entries_fts is new - any journal entries already written
+    before this index existed (the journal feature itself shipped one
+    version before search over it did) predate the triggers that keep it
+    updated, so they'd otherwise never show up in search until next
+    edited. Uses FTS5's own 'rebuild' command to re-derive the whole
+    index from journal_entries' current content, rather than a `WHERE id
+    NOT IN (SELECT rowid FROM journal_entries_fts)`-style check the way
+    other one-off backfills in this file work: for an external-content
+    FTS5 table (content='journal_entries'), a plain `SELECT rowid` like
+    that doesn't reliably reflect what's actually term-indexed - it can
+    still enumerate a rowid whose postings were already removed, making
+    that check unable to tell "never indexed" apart from "indexed, then
+    deleted." Gated by a settings flag so the rebuild only ever runs
+    once, not on every launch."""
+    already_done = conn.execute(
+        "SELECT 1 FROM settings WHERE key = 'journal_entries_fts_backfilled'"
+    ).fetchone()
+    if already_done:
+        return
+    conn.execute("INSERT INTO journal_entries_fts(journal_entries_fts) VALUES ('rebuild')")
+    conn.execute(
+        "INSERT INTO settings (key, value) VALUES ('journal_entries_fts_backfilled', 'true')"
     )
 
 
