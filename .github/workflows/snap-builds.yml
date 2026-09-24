@@ -21,7 +21,12 @@ jobs:
         uses: snapcore/action-build@v1
         id: build
         with:
-          args: pack
+          # Not "args" - the action renamed this input at some point;
+          # "args" is silently ignored now (just an unrecognized-input
+          # warning, not a hard failure), which meant this was actually
+          # running bare `snapcraft` instead of `snapcraft pack` the
+          # whole time.
+          snapcraft-args: pack
 
       - name: Snapcraft Review
         uses: diddlesnaps/snapcraft-review-action@v1

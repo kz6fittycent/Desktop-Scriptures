@@ -43,7 +43,8 @@ jobs:
         uses: snapcore/action-build@v1
         id: build
         with:
-          args: pack
+          # Not "args" - see the matching comment in snap-builds.yml.
+          snapcraft-args: pack
 
       - name: Upload to the candidate channel
         id: upload
