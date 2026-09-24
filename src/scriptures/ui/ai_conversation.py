@@ -63,11 +63,14 @@ class _TalkRow(QFrame):
         title.setWordWrap(True)
         layout.addWidget(title)
 
-        # "General Conference talk" spelled out, unlike the Citations tab's
-        # own _TalkRow - there, section context alone already makes it
-        # obvious; here, a talk row sits directly beneath a verse row with
-        # no section header between them, so it needs its own cue.
-        subtitle = QLabel(f"General Conference talk · {citation.speaker} · {citation.date}")
+        # citation.source_label spelled out, unlike the Citations tab's
+        # own _TalkRow - there, section context alone already makes the
+        # source obvious; here, a talk row sits directly beneath a verse
+        # row with no section header between them, so it needs its own
+        # cue (and since get_citations() merges General Conference talks
+        # and Liahona articles together, a hardcoded "General Conference
+        # talk" label here would be wrong for the latter).
+        subtitle = QLabel(f"{citation.source_label} · {citation.speaker} · {citation.date}")
         subtitle.setObjectName("resultSecondary")
         subtitle.setWordWrap(True)
         layout.addWidget(subtitle)

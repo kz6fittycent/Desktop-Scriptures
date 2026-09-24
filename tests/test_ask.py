@@ -338,9 +338,10 @@ def test_resolve_attaches_real_citations() -> None:
     real data/verse_citations.json, so this is exact and repo-data-
     independent."""
     conn, tmp_root = _make_db()
-    original_cache = citations_module._citations_cache
+    original_gc_cache = citations_module._gc_cache
+    original_liahona_cache = citations_module._liahona_cache
     try:
-        citations_module._citations_cache = {
+        citations_module._gc_cache = {
             "3 Nephi 11:1": [
                 {
                     "talk_title": "A Sample Talk",
@@ -350,6 +351,7 @@ def test_resolve_attaches_real_citations() -> None:
                 }
             ]
         }
+        citations_module._liahona_cache = {}
         results = resolve_references(conn, ["3 Nephi 11:1", "3 Nephi 11:2"])
         by_ref = {r.reference: r for r in results}
         assert len(by_ref["3 Nephi 11:1"].citations) == 1
@@ -359,7 +361,8 @@ def test_resolve_attaches_real_citations() -> None:
         assert by_ref["3 Nephi 11:2"].citations == []
         print("test_resolve_attaches_real_citations: PASSED")
     finally:
-        citations_module._citations_cache = original_cache
+        citations_module._gc_cache = original_gc_cache
+        citations_module._liahona_cache = original_liahona_cache
         shutil.rmtree(tmp_root, ignore_errors=True)
 
 

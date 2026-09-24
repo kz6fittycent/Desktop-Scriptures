@@ -16,3 +16,7 @@ data/tts_voices/
 
 # Local snapcraft build output
 *.snap
+
+# Overnight/background run logs (e.g. scripts/harvest_liahona_citations.py
+# left running unattended via nohup) - just console output, not data.
+*.log

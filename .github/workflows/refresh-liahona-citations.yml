@@ -1,0 +1,61 @@
+name: 📖 Refresh Liahona Citations
+
+# Automates *when* scripts/harvest_liahona_citations.py runs, not what it
+# does - same developer-scoped, rate-limited, metadata-only harvest
+# (never article text) it's always been, just on a schedule. Monthly to
+# match how often a new Ensign/Liahona issue actually appears.
+#
+# Unlike refresh-gc-citations.yml, a *first-ever* run of this harvester
+# would be genuinely slow (the full 1971-present archive, on the order
+# of ten thousand articles, many hours) - but data/liahona_citations.json
+# already carries that one-time backfill (run manually, not through this
+# workflow - see the harvester's own module docstring), so every run
+# through here only ever needs to fetch whatever's new in the latest
+# issue, since already-harvested article URLs are skipped (see
+# harvest_liahona_citations.py's own `seen_urls`).
+on:
+  schedule:
+    - cron: "0 7 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Re-harvest citation metadata
+        run: python3 scripts/harvest_liahona_citations.py
+
+      # Opens a PR only if the harvest actually produced a different
+      # data/liahona_citations.json (create-pull-request no-ops
+      # otherwise) - a human still reviews and merges it, same as any
+      # other change; this just removes the need to remember to run the
+      # harvester by hand every month.
+      - name: Open a PR if the citation data changed
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "Refresh Liahona citation metadata"
+          title: "Refresh Liahona citation metadata"
+          body: |
+            Automated re-harvest of `data/liahona_citations.json` from
+            churchofjesuschrist.org's Ensign/Liahona archive (see
+            `scripts/harvest_liahona_citations.py`) - metadata only
+            (article title, author, date, URL), never article text.
+            Citations are detected via each article's own hyperlinks to
+            `/study/scriptures/...`, never by reading article prose.
+
+            Review the diff, then merge to ship the update in the next release.
+          branch: automated/refresh-liahona-citations
+          delete-branch: true

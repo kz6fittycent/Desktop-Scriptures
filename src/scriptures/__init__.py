@@ -1,3 +1,3 @@
 """Scriptures - a desktop reader for the LDS standard works."""
 
-__version__ = "2.2.2"
+__version__ = "2.2.3"

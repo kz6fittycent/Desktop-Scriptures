@@ -6,7 +6,7 @@ description: |
   Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
   Joseph Smith Translation. The core reading and study experience works
   fully offline - personal notes, tags, verse highlighting, keyword
-  search, a Topical Guide, General Conference citations, a Scripture of
+  search, a Topical Guide, General Conference and Ensign/Liahona citations, a Scripture of
   the Day banner, a reading streak, a Resume Reading history of your last
   5 chapters, a Journal with one searchable entry per day (optionally
   linked to a verse or chapter you're reflecting on), a choice of accent
@@ -39,7 +39,10 @@ description: |
   Journal of Discourses and Joseph Smith Translation (published as the
   "Inspired Version") text courtesy of their public-domain scans on
   archive.org; General Conference citation data courtesy of BYU's
-  Scripture Citation Index. The Topical Guide is Desktop Scriptures' own
+  Scripture Citation Index; Ensign/Liahona citation data (English issues,
+  1971-present) detected directly from each article's own scripture
+  hyperlinks on churchofjesuschrist.org, since no outside citation index
+  for it exists. The Topical Guide is Desktop Scriptures' own
   correlation of its local scripture text and that same citation index -
   not a copy of the Church's own, separately-copyrighted Topical Guide.
 

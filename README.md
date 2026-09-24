@@ -6,7 +6,7 @@ A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
 Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
 Joseph Smith Translation. The core reading and study experience works
 fully offline - personal notes, tags, verse highlighting, keyword
-search, a Topical Guide, General Conference citations, a Scripture of
+search, a Topical Guide, General Conference and Ensign/Liahona citations, a Scripture of
 the Day banner, a reading streak, a Resume Reading history of your last
 5 chapters, a searchable Journal with one entry per day (optionally
 linked to a verse or chapter you're reflecting on), a choice of accent
@@ -44,7 +44,14 @@ project; Journal of Discourses and Joseph Smith Translation (published
 as the "Inspired Version") text courtesy of their public-domain scans on
 [archive.org](https://archive.org) (Journal of Discourses discourse
 metadata cross-referenced from FAIR's index); General Conference
-citation data courtesy of [BYU's Scripture Citation Index](https://scriptures.byu.edu).
+citation data courtesy of [BYU's Scripture Citation Index](https://scriptures.byu.edu);
+Ensign/Liahona citation data (English issues, 1971-present) detected directly
+from each article's own scripture hyperlinks on
+[churchofjesuschrist.org](https://www.churchofjesuschrist.org), since no
+outside citation index for it exists. Both are metadata only - talk/
+article title, speaker/author, date, and URL - never the underlying
+talk or article text, which this app never stores or displays; it links
+out to the original source instead.
 The Topical Guide is Desktop Scriptures' own correlation of its local
 scripture text and that same citation index (see
 `scripts/build_topical_guide.py`) - not a copy of the Church's own,
@@ -92,5 +99,6 @@ Features under consideration for future versions:
 - [x] Journal/Diary feature (v2.1.7 - a "Journal" menu with one free-text entry per day, page through past dates with Previous/Next, and an optional link to a specific verse or chapter you're reflecting on; syncs across devices and is included in Export Notes, like your other personal data; v2.1.8 makes entries keyword-searchable, matching what you actually wrote, not just what they're linked to)
 - [x] General Conference reminder (v2.1.6 - an opt-in startup popup shown once a day in the ~2 weeks before Conference, using the real announced dates; off by default, with a per-Conference "don't remind me again" that resets for the next one)
 - [x] General Conference Talk auto updater (a monthly CI job re-runs the existing citation harvester and opens a PR if scriptures.byu.edu's index turned up anything new - see `.github/workflows/refresh-gc-citations.yml`; a dev/process change, not a new in-app feature, so it ships whenever its PRs are next merged rather than bumping the app version itself)
+- [x] Ensign/Liahona citations (v2.2.3 - BYU's Citation Index has no corpus at all for the Ensign or Liahona, so this detects citations directly from each article's own scripture hyperlinks on churchofjesuschrist.org instead, covering every English issue from 1971 to present; see `scripts/harvest_liahona_citations.py`. Shows up alongside General Conference talks in the Citations tab and AI-assisted search's citing-works list, each clearly labeled by source - "Ensign" or "Liahona" depending on the issue's date, since the magazine was renamed for English readers in January 2021)
 - [ ] Embedded webui for talk references, etc. 
 - [x] Temple recommend renewal reminder (v2.1.9 - an opt-in, entirely offline reminder shown once a day starting ~4 weeks before the expiration date you enter, and every day past it until you renew and update the date; see View → "Temple Recommend Reminder...")

@@ -1,6 +1,7 @@
 """Citations tab: which verses in the current chapter are cited in
-General Conference talks (pilot-scoped to the Scripture of the Day pool -
-see scripts/harvest_citations.py and scriptures/citations.py; most
+General Conference talks or Ensign/Liahona articles (pilot-scoped to the
+Scripture of the Day pool - see scripts/harvest_citations.py,
+scripts/harvest_liahona_citations.py, and scriptures/citations.py; most
 chapters have no data at all, which is the normal case, not an error).
 
 Each cited verse is a header row ("Verse 15 - cited 3 times") that
@@ -48,7 +49,7 @@ class _TalkRow(QFrame):
         title.setWordWrap(True)
         layout.addWidget(title)
 
-        subtitle = QLabel(f"{citation.speaker} · {citation.date}")
+        subtitle = QLabel(f"{citation.speaker} · {citation.date} · {citation.source_label}")
         subtitle.setObjectName("resultSecondary")
         subtitle.setWordWrap(True)
         layout.addWidget(subtitle)
@@ -131,7 +132,9 @@ class CitationsPanel(QWidget):
         self.cited_verse_count = cited_count
 
         if cited_count == 0:
-            empty = QLabel("No verses in this chapter are cited in Conference talks.")
+            empty = QLabel(
+                "No verses in this chapter are cited in Conference talks or Ensign/Liahona articles."
+            )
             empty.setObjectName("resultSecondary")
             empty.setWordWrap(True)
             content_layout.addWidget(empty)
