@@ -559,6 +559,35 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary};
             border: 2px solid {p.primary};
         }}
+        QLabel#templeRecommendMessage {{
+            font-size: 15px;
+            font-weight: bold;
+        }}
+        QFrame#templeRecommendCheckboxRow {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+        }}
+        QFrame#templeRecommendCheckboxRow:hover {{
+            background-color: {p.card_bg};
+            border: 1px solid {p.primary};
+        }}
+        QLabel#templeRecommendCheckboxLabel {{
+            font-size: 11px;
+            background: transparent;
+        }}
+        QPushButton#templeRecommendToggle {{
+            background-color: {p.surface};
+            border: 2px solid {p.text};
+            border-radius: 4px;
+            color: #FFFFFF;
+            font-weight: bold;
+            padding: 0px;
+        }}
+        QPushButton#templeRecommendToggle:checked {{
+            background-color: {p.primary};
+            border: 2px solid {p.primary};
+        }}
         QFrame#card {{
             background-color: {p.card_bg};
             border-radius: {CARD_RADIUS}px;

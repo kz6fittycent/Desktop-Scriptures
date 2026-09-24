@@ -10,10 +10,12 @@ description: |
   the Day banner, a reading streak, a Resume Reading history of your last
   5 chapters, a Journal with one searchable entry per day (optionally
   linked to a verse or chapter you're reflecting on), a choice of accent
-  colors, and cloud-folder sync across your own devices (via whatever
-  cloud client - Nextcloud, OneDrive, Google Drive, or similar - already
-  keeps a folder synced on your machine, so the app itself never talks to
-  the network for this).
+  colors, cloud-folder sync across your own devices (via whatever cloud
+  client - Nextcloud, OneDrive, Google Drive, or similar - already keeps
+  a folder synced on your machine, so the app itself never talks to the
+  network for this), and an opt-in Temple Recommend renewal reminder
+  (also fully offline - it just checks the expiration date you enter
+  against today's date).
 
   A handful of landing-page extras are opt-in and off by default, only
   reaching the network once you turn them on: AI-assisted search (ask a

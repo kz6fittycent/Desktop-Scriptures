@@ -68,6 +68,7 @@ from scriptures.general_conference import (
 )
 from scriptures.sotd import get_scripture_of_the_day
 from scriptures.sync import sync_now
+from scriptures.temple_recommend import should_show_reminder as should_show_temple_reminder
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
@@ -80,6 +81,10 @@ from scriptures.ui.journal_view import JournalView
 from scriptures.ui.reading_view import ReadingView
 from scriptures.ui.search_view import SearchView
 from scriptures.ui.sync_dialog import SyncFolderDialog
+from scriptures.ui.temple_recommend_dialog import (
+    TempleRecommendOptionsDialog,
+    TempleRecommendReminderDialog,
+)
 from scriptures.ui.topical_guide_view import TopicDetailView
 from scriptures.ui import theme as theming
 
@@ -144,6 +149,16 @@ INSPIRATION_ENABLED_SETTING = "inspiration_enabled"
 GC_REMINDER_ENABLED_SETTING = "gc_reminder_enabled"
 GC_REMINDER_LAST_SHOWN_SETTING = "gc_reminder_last_shown"  # ISO date of the last day shown
 GC_REMINDER_DISMISSED_START_SETTING = "gc_reminder_dismissed_start"  # ISO start date dismissed
+
+# Same off-by-default opt-in policy as GC_REMINDER_ENABLED_SETTING above,
+# for the Temple Recommend renewal reminder - see temple_recommend.py.
+# There's no fetch involved (the user enters their own expiration date),
+# so it's keyed by that date rather than a Conference start date - still
+# reset naturally the same way, once the user renews and enters a new one.
+TEMPLE_RECOMMEND_ENABLED_SETTING = "temple_recommend_reminder_enabled"
+TEMPLE_RECOMMEND_EXPIRATION_SETTING = "temple_recommend_expiration"  # ISO date, user-entered
+TEMPLE_RECOMMEND_LAST_SHOWN_SETTING = "temple_recommend_last_shown"  # ISO date of last day shown
+TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING = "temple_recommend_dismissed_expiration"
 
 # The highlighter's armed color (or "clear"), so it stays selected across
 # launches instead of resetting to Off every time - a standing tool
@@ -308,6 +323,7 @@ class MainWindow(QMainWindow):
 
         self.show_volumes()
         self._maybe_check_gc_reminder()
+        self._maybe_check_temple_recommend_reminder()
 
     # ------------------------------------------------------------------
     # Theming: menu, persistence, live apply
@@ -425,6 +441,13 @@ class MainWindow(QMainWindow):
         )
         self._gc_reminder_action.triggered.connect(self._toggle_gc_reminder)
         menu.addAction(self._gc_reminder_action)
+
+        # Not checkable like the toggles above - it needs the user's own
+        # expiration date, not just an on/off switch, so this opens a
+        # small setup dialog instead (same reasoning as "Sync Options...").
+        temple_recommend_action = QAction("Temple Recommend Reminder...", self)
+        temple_recommend_action.triggered.connect(self._show_temple_recommend_options)
+        menu.addAction(temple_recommend_action)
 
         # Its own top-level menu, not a View submenu: it's a tool the user
         # reaches for mid-read to quickly switch colors, not a one-time
@@ -762,6 +785,30 @@ class MainWindow(QMainWindow):
             # this on gives no feedback until the next time the app
             # happens to be launched.
             self._maybe_check_gc_reminder()
+
+    def _show_temple_recommend_options(self) -> None:
+        enabled = get_setting(self.conn, TEMPLE_RECOMMEND_ENABLED_SETTING) == "true"
+        previous_raw = get_setting(self.conn, TEMPLE_RECOMMEND_EXPIRATION_SETTING)
+        previous = date.fromisoformat(previous_raw) if previous_raw else None
+        dialog = TempleRecommendOptionsDialog(enabled, previous, self)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        set_setting(
+            self.conn, TEMPLE_RECOMMEND_ENABLED_SETTING, "true" if dialog.enabled else "false"
+        )
+        if dialog.expiration is not None:
+            new_raw = dialog.expiration.isoformat()
+            if new_raw != previous_raw:
+                # A changed date means either a fresh setup or a renewal -
+                # either way, any earlier dismissal/last-shown tracking no
+                # longer applies to it.
+                set_setting(self.conn, TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING, "")
+                set_setting(self.conn, TEMPLE_RECOMMEND_LAST_SHOWN_SETTING, "")
+            set_setting(self.conn, TEMPLE_RECOMMEND_EXPIRATION_SETTING, new_raw)
+        if dialog.enabled:
+            # Same "see it work right away" feel as the GC reminder toggle
+            # above.
+            self._maybe_check_temple_recommend_reminder()
 
     def _set_font_size(self, size: int) -> None:
         self._font_size = theming.clamp_font_size(size)
@@ -1143,6 +1190,26 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, GC_REMINDER_LAST_SHOWN_SETTING, today.isoformat())
         if dialog.dont_remind_again:
             set_setting(self.conn, GC_REMINDER_DISMISSED_START_SETTING, dates.start.isoformat())
+
+    def _maybe_check_temple_recommend_reminder(self) -> None:
+        if get_setting(self.conn, TEMPLE_RECOMMEND_ENABLED_SETTING) != "true":
+            return
+        expiration_raw = get_setting(self.conn, TEMPLE_RECOMMEND_EXPIRATION_SETTING)
+        if not expiration_raw:
+            return
+        today = date.today()
+        if get_setting(self.conn, TEMPLE_RECOMMEND_LAST_SHOWN_SETTING) == today.isoformat():
+            return  # already shown today
+        expiration = date.fromisoformat(expiration_raw)
+        if not should_show_temple_reminder(expiration, today):
+            return
+        if get_setting(self.conn, TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING) == expiration_raw:
+            return  # the user already dismissed this specific expiration's reminder
+        dialog = TempleRecommendReminderDialog(expiration, today, parent=self)
+        dialog.exec()
+        set_setting(self.conn, TEMPLE_RECOMMEND_LAST_SHOWN_SETTING, today.isoformat())
+        if dialog.dont_remind_again:
+            set_setting(self.conn, TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING, expiration_raw)
 
     def _resume_reading(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)

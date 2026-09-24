@@ -25,7 +25,11 @@ currently on churchofjesuschrist.org's own homepage. A General
 Conference reminder (also opt-in, also off by default) shows once a day
 in the roughly two weeks before Conference starts, using the real
 announced dates - dismissible for that Conference specifically, so it
-comes back fresh for the next one.
+comes back fresh for the next one. A Temple Recommend renewal reminder
+works the same way, but entirely offline: enter your recommend's
+expiration date once, and it shows once a day starting about two months
+out (and every day past it, if it lapses) until you renew and update the
+date.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -81,4 +85,4 @@ Features under consideration for future versions:
 - [x] General Conference reminder (v2.1.6 - an opt-in startup popup shown once a day in the ~2 weeks before Conference, using the real announced dates; off by default, with a per-Conference "don't remind me again" that resets for the next one)
 - [ ] General Conference Talk auto updater
 - [ ] Embedded webui for talk references, etc. 
-- [ ] Temple recommend renewal reminder
+- [x] Temple recommend renewal reminder (v2.1.9 - an opt-in, entirely offline reminder shown once a day starting ~2 months before the expiration date you enter, and every day past it until you renew and update the date; see View → "Temple Recommend Reminder...")
