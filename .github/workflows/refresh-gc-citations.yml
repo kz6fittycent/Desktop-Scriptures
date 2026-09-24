@@ -1,0 +1,53 @@
+name: 📖 Refresh GC Citations
+
+# Automates *when* scripts/harvest_citations.py runs, not what it does -
+# it's still the same developer-scoped, rate-limited, metadata-only
+# harvest (never talk text) against the same 100-verse Scripture of the
+# Day pool it's always covered, just on a schedule instead of by hand.
+# Monthly rather than twice a year to match Conference itself: cheap
+# either way (~144 requests, a few minutes total), and this way there's
+# no need to guess exactly when scriptures.byu.edu's own index has
+# caught up with a Conference that just happened.
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Re-harvest citation metadata
+        run: python3 scripts/harvest_citations.py
+
+      # Opens a PR only if the harvest actually produced a different
+      # data/verse_citations.json (create-pull-request no-ops otherwise)
+      # - a human still reviews and merges it, same as any other change;
+      # this just removes the need to remember to run the harvester by
+      # hand every few months.
+      - name: Open a PR if the citation data changed
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "Refresh General Conference citation metadata"
+          title: "Refresh General Conference citation metadata"
+          body: |
+            Automated re-harvest of `data/verse_citations.json` from
+            scriptures.byu.edu's Citation Index (see
+            `scripts/harvest_citations.py`) - metadata only (talk title,
+            speaker, date, churchofjesuschrist.org URL), never talk text.
+
+            Review the diff, then merge to ship the update in the next release.
+          branch: automated/refresh-gc-citations
+          delete-branch: true
