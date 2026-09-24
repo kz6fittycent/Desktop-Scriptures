@@ -44,9 +44,10 @@ class TempleRecommendOptionsDialog(QDialog):
         layout = QVBoxLayout(self)
 
         intro = QLabel(
-            "Get a heads-up in the weeks before your temple recommend "
-            "expires. Entirely offline - this just checks the date below "
-            "against today's date, nothing is sent anywhere."
+            "Get a heads-up starting about 4 weeks out from your temple "
+            "recommend's expiration date. Entirely offline - this just "
+            "checks the date below against today's date, nothing is sent "
+            "anywhere."
         )
         intro.setWordWrap(True)
         layout.addWidget(intro)

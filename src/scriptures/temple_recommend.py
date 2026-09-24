@@ -12,12 +12,12 @@ from __future__ import annotations
 
 from datetime import date
 
-# The reminder starts firing this many days before expiration - long
-# enough to schedule a bishopric/stake presidency interview without
-# rushing. There's no upper bound on the overdue side (see
+# The reminder starts firing this many days before expiration - four
+# weeks, long enough to schedule a bishopric/stake presidency interview
+# without rushing. There's no upper bound on the overdue side (see
 # should_show_reminder): a lapsed recommend keeps being worth a reminder
 # every day until the user renews and enters a new date.
-REMINDER_WINDOW_DAYS = 60
+REMINDER_WINDOW_DAYS = 28
 
 
 def should_show_reminder(expiration: date, today: date) -> bool:
