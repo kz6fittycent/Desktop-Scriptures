@@ -80,7 +80,7 @@ Features under consideration for future versions:
 - [ ] Apocrypha?
 - [x] Wiki
 - [x] JST (v1.3)
-- [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics)
+- [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics; v2.2.2 - expanded further to 61 topics and put in alphabetical order)
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
 - [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
 - [x] Listen to the scriptures - voice capability (v2.2.1 - a "Listen" button in the reading view reads the current chapter aloud verse by verse, highlighting each as it goes, using a fully offline neural TTS engine (Piper); pick from 4 bundled voices - American or British English, male or female - under Menu → Voice)
