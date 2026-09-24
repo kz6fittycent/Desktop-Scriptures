@@ -29,7 +29,10 @@ comes back fresh for the next one. A Temple Recommend renewal reminder
 works the same way, but entirely offline: enter your recommend's
 expiration date once, and it shows once a day starting about four weeks
 out (and every day past it, if it lapses) until you renew and update the
-date.
+date. A Family History reminder is opt-in too, but not on any fixed
+schedule at all - once turned on, it nudges you at random intervals (at
+least 4 days apart) so it stays noticeable instead of becoming background
+noise, with a link straight to FamilySearch.
 
 This is an **unofficial** application, not produced by or affiliated
 with The Church of Jesus Christ of Latter-day Saints, or with Community
@@ -80,7 +83,7 @@ Features under consideration for future versions:
 - [x] Church News button (v2.0.9 - an opt-in landing-page box showing the latest headline from Church News' own RSS feed, off by default like AI-assisted search)
 - [ ] Linguistics references
 - [ ] Archaeological references
-- [ ] Family history reminder
+- [x] Family history reminder (v2.2.0 - an opt-in nudge shown at random intervals of at least 4 days apart, rather than a fixed schedule, so it stays noticeable instead of getting tuned out; links straight to FamilySearch; see View → "Family History Reminder")
 - [x] Journal/Diary feature (v2.1.7 - a "Journal" menu with one free-text entry per day, page through past dates with Previous/Next, and an optional link to a specific verse or chapter you're reflecting on; syncs across devices and is included in Export Notes, like your other personal data; v2.1.8 makes entries keyword-searchable, matching what you actually wrote, not just what they're linked to)
 - [x] General Conference reminder (v2.1.6 - an opt-in startup popup shown once a day in the ~2 weeks before Conference, using the real announced dates; off by default, with a per-Conference "don't remind me again" that resets for the next one)
 - [ ] General Conference Talk auto updater

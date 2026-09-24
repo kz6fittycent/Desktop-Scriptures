@@ -588,6 +588,10 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary};
             border: 2px solid {p.primary};
         }}
+        QLabel#familyHistoryMessage {{
+            font-size: 15px;
+            font-weight: bold;
+        }}
         QFrame#card {{
             background-color: {p.card_bg};
             border-radius: {CARD_RADIUS}px;

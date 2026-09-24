@@ -61,6 +61,8 @@ from scriptures.data_access import (
     record_reading,
     set_setting,
 )
+from scriptures.family_history import pick_next_reminder_date
+from scriptures.family_history import should_show_reminder as should_show_family_history_reminder
 from scriptures.general_conference import (
     GeneralConferenceFetcher,
     should_attempt_fetch,
@@ -75,6 +77,7 @@ from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidg
 from scriptures.ui.cfm_box import CfmBox
 from scriptures.ui.church_news_box import ChurchNewsBox
 from scriptures.ui.export import export_notes
+from scriptures.ui.family_history_dialog import FamilyHistoryReminderDialog
 from scriptures.ui.gc_reminder_dialog import GeneralConferenceReminderDialog
 from scriptures.ui.inspiration_box import InspirationBox
 from scriptures.ui.journal_view import JournalView
@@ -159,6 +162,16 @@ TEMPLE_RECOMMEND_ENABLED_SETTING = "temple_recommend_reminder_enabled"
 TEMPLE_RECOMMEND_EXPIRATION_SETTING = "temple_recommend_expiration"  # ISO date, user-entered
 TEMPLE_RECOMMEND_LAST_SHOWN_SETTING = "temple_recommend_last_shown"  # ISO date of last day shown
 TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING = "temple_recommend_dismissed_expiration"
+
+# Same off-by-default opt-in policy as the settings above, for the
+# Family History reminder - see family_history.py. Not tied to any
+# particular date, so there's no "dismissed" setting like the others -
+# just when the next randomly-scheduled reminder is due, and the last
+# calendar day one was actually shown (once-a-day safety cap, same
+# reasoning as GC_REMINDER_LAST_SHOWN_SETTING).
+FAMILY_HISTORY_ENABLED_SETTING = "family_history_reminder_enabled"
+FAMILY_HISTORY_NEXT_DUE_SETTING = "family_history_next_due"  # ISO date
+FAMILY_HISTORY_LAST_SHOWN_SETTING = "family_history_last_shown"  # ISO date of last day shown
 
 # The highlighter's armed color (or "clear"), so it stays selected across
 # launches instead of resetting to Off every time - a standing tool
@@ -324,6 +337,7 @@ class MainWindow(QMainWindow):
         self.show_volumes()
         self._maybe_check_gc_reminder()
         self._maybe_check_temple_recommend_reminder()
+        self._maybe_check_family_history_reminder()
 
     # ------------------------------------------------------------------
     # Theming: menu, persistence, live apply
@@ -448,6 +462,17 @@ class MainWindow(QMainWindow):
         temple_recommend_action = QAction("Temple Recommend Reminder...", self)
         temple_recommend_action.triggered.connect(self._show_temple_recommend_options)
         menu.addAction(temple_recommend_action)
+
+        # Checkable like the toggles above, not a "..." setup dialog like
+        # Temple Recommend's - there's nothing to configure, just on/off
+        # (see family_history.py for why this fires at random intervals
+        # rather than a fixed schedule).
+        self._family_history_action = QAction("Family History Reminder", self, checkable=True)
+        self._family_history_action.setChecked(
+            get_setting(self.conn, FAMILY_HISTORY_ENABLED_SETTING) == "true"
+        )
+        self._family_history_action.triggered.connect(self._toggle_family_history_reminder)
+        menu.addAction(self._family_history_action)
 
         # Its own top-level menu, not a View submenu: it's a tool the user
         # reaches for mid-read to quickly switch colors, not a one-time
@@ -809,6 +834,21 @@ class MainWindow(QMainWindow):
             # Same "see it work right away" feel as the GC reminder toggle
             # above.
             self._maybe_check_temple_recommend_reminder()
+
+    def _toggle_family_history_reminder(self, checked: bool) -> None:
+        set_setting(self.conn, FAMILY_HISTORY_ENABLED_SETTING, "true" if checked else "false")
+        if checked:
+            # Deliberately does NOT check right away like the other
+            # toggles - the whole point of this reminder is irregularity,
+            # not "see it work immediately". Reseeds the schedule fresh
+            # every time it's turned on (rather than only when missing),
+            # in case a stale date is left over from a previous stint
+            # with it enabled.
+            set_setting(
+                self.conn,
+                FAMILY_HISTORY_NEXT_DUE_SETTING,
+                pick_next_reminder_date(date.today()).isoformat(),
+            )
 
     def _set_font_size(self, size: int) -> None:
         self._font_size = theming.clamp_font_size(size)
@@ -1210,6 +1250,30 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, TEMPLE_RECOMMEND_LAST_SHOWN_SETTING, today.isoformat())
         if dialog.dont_remind_again:
             set_setting(self.conn, TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING, expiration_raw)
+
+    def _maybe_check_family_history_reminder(self) -> None:
+        if get_setting(self.conn, FAMILY_HISTORY_ENABLED_SETTING) != "true":
+            return
+        today = date.today()
+        if get_setting(self.conn, FAMILY_HISTORY_LAST_SHOWN_SETTING) == today.isoformat():
+            return  # already shown today
+        next_due_raw = get_setting(self.conn, FAMILY_HISTORY_NEXT_DUE_SETTING)
+        if not next_due_raw:
+            # Shouldn't normally happen (the toggle above seeds this),
+            # but guard against a missing schedule rather than crashing.
+            set_setting(
+                self.conn, FAMILY_HISTORY_NEXT_DUE_SETTING, pick_next_reminder_date(today).isoformat()
+            )
+            return
+        next_due = date.fromisoformat(next_due_raw)
+        if not should_show_family_history_reminder(next_due, today):
+            return
+        dialog = FamilyHistoryReminderDialog(parent=self)
+        dialog.exec()
+        set_setting(self.conn, FAMILY_HISTORY_LAST_SHOWN_SETTING, today.isoformat())
+        set_setting(
+            self.conn, FAMILY_HISTORY_NEXT_DUE_SETTING, pick_next_reminder_date(today).isoformat()
+        )
 
     def _resume_reading(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)

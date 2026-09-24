@@ -13,9 +13,11 @@ description: |
   colors, cloud-folder sync across your own devices (via whatever cloud
   client - Nextcloud, OneDrive, Google Drive, or similar - already keeps
   a folder synced on your machine, so the app itself never talks to the
-  network for this), and an opt-in Temple Recommend renewal reminder
-  (also fully offline - it just checks the expiration date you enter
-  against today's date).
+  network for this), an opt-in Temple Recommend renewal reminder (also
+  fully offline - it just checks the expiration date you enter against
+  today's date), and an opt-in Family History reminder that nudges you
+  at random intervals rather than a fixed schedule, so it stays
+  noticeable instead of becoming background noise.
 
   A handful of landing-page extras are opt-in and off by default, only
   reaching the network once you turn them on: AI-assisted search (ask a
