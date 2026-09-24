@@ -316,8 +316,8 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
         QLabel#sectionTitle {{
             font-size: 19px;
             font-weight: bold;
-            padding: 14px;
-            margin: 8px;
+            padding: 8px;
+            margin: 4px;
             background-color: {p.surface};
             border: 1px solid {p.border};
             border-radius: {PANEL_RADIUS}px;
@@ -393,6 +393,28 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
         QPushButton#zoomButton[annotated="true"] {{
             border: 1px solid {p.primary};
             color: {p.primary};
+        }}
+        QPushButton#listenButton {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+            padding: 3px 12px;
+            font-weight: bold;
+        }}
+        QPushButton#listenButton:hover {{
+            background-color: {p.card_bg};
+            color: {p.card_text};
+        }}
+        QPushButton#stopListenButton {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }}
+        QPushButton#stopListenButton:hover {{
+            background-color: {p.card_bg};
+            color: {p.card_text};
         }}
         QPushButton#navButton {{
             background-color: {p.surface};
@@ -506,10 +528,25 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
         so untouched by that rule) stays flush at the top, misaligning
         the two vertically. Colors are still applied per-character in
         reading_view.py via QTextCharFormat, not here. */
+        /* A transparent border reserved unconditionally, not just when
+        nowReading is true below - so toggling it never changes this
+        widget's box model (and therefore its computed height/wrapping in
+        _adjust_height), which a border/padding added only in the
+        [nowReading="true"] rule would otherwise do, visibly shifting
+        every row below it each time playback advances a verse. */
         QTextEdit#verseBody {{
             background: transparent;
-            border: none;
+            border: 2px solid transparent;
+            border-radius: {BUTTON_RADIUS}px;
             padding: 0px;
+        }}
+        /* The verse currently being read aloud (see reading_view.py's
+        set_now_reading) - deliberately separate from the user's own
+        highlight colors, which are per-character QTextCharFormat spans
+        inside this same widget and would otherwise visually compete
+        with a background-based indicator here. */
+        QTextEdit#verseBody[nowReading="true"] {{
+            border: 2px solid {p.primary};
         }}
         QDialog QPushButton {{
             background-color: {p.surface};

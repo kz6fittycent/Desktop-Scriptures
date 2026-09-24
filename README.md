@@ -10,10 +10,13 @@ search, a Topical Guide, General Conference citations, a Scripture of
 the Day banner, a reading streak, a Resume Reading history of your last
 5 chapters, a searchable Journal with one entry per day (optionally
 linked to a verse or chapter you're reflecting on), a choice of accent
-colors, and cloud-folder sync across your own devices (via whatever
-cloud client - Nextcloud, OneDrive, Google Drive, or similar - already
-keeps a folder synced on your machine, so the app itself never talks to
-the network for this).
+colors, cloud-folder sync across your own devices (via whatever cloud
+client - Nextcloud, OneDrive, Google Drive, or similar - already keeps
+a folder synced on your machine, so the app itself never talks to the
+network for this), and Listen controls to have any chapter read aloud -
+verse by verse, with the current verse highlighted as it goes - in a
+choice of four bundled offline voices (American or British English,
+male or female).
 
 A handful of landing-page extras are opt-in and off by default, only
 reaching the network once you turn them on: AI-assisted search (ask a
@@ -57,6 +60,8 @@ separately-copyrighted Topical Guide.
 
 ![A Journal entry linked to Alma 32:21, with Previous/Next Day navigation](docs/screenshots/journal.png)
 
+![2 Nephi 3 being read aloud, with the current verse highlighted and Pause/Stop controls](docs/screenshots/listen.png)
+
 ## Install
 
 Desktop Scriptures is published on the Snap Store:
@@ -78,7 +83,7 @@ Features under consideration for future versions:
 - [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics)
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
 - [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
-- [ ] Listen to the scriptures - voice capability
+- [x] Listen to the scriptures - voice capability (v2.2.1 - a "Listen" button in the reading view reads the current chapter aloud verse by verse, highlighting each as it goes, using a fully offline neural TTS engine (Piper); pick from 4 bundled voices - American or British English, male or female - under Menu → Voice)
 - [x] CFM helper/reminder (v2.1.1 - an opt-in landing-page box showing this week's Come Follow Me lesson, off by default like Church News; the reminder half of this item is covered by the General Conference reminder below)
 - [x] Church News button (v2.0.9 - an opt-in landing-page box showing the latest headline from Church News' own RSS feed, off by default like AI-assisted search)
 - [ ] Linguistics references

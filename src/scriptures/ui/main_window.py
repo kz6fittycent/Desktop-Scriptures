@@ -70,6 +70,7 @@ from scriptures.general_conference import (
 )
 from scriptures.sotd import get_scripture_of_the_day
 from scriptures.sync import sync_now
+from scriptures import tts
 from scriptures.temple_recommend import should_show_reminder as should_show_temple_reminder
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
@@ -172,6 +173,10 @@ TEMPLE_RECOMMEND_DISMISSED_EXPIRATION_SETTING = "temple_recommend_dismissed_expi
 FAMILY_HISTORY_ENABLED_SETTING = "family_history_reminder_enabled"
 FAMILY_HISTORY_NEXT_DUE_SETTING = "family_history_next_due"  # ISO date
 FAMILY_HISTORY_LAST_SHOWN_SETTING = "family_history_last_shown"  # ISO date of last day shown
+
+# Which of tts.VOICES the Listen controls use - a standing tool
+# preference like HIGHLIGHT_MODE_SETTING below, not a one-off toggle.
+TTS_VOICE_SETTING = "tts_voice"
 
 # The highlighter's armed color (or "clear"), so it stays selected across
 # launches instead of resetting to Off every time - a standing tool
@@ -277,9 +282,21 @@ class MainWindow(QMainWindow):
             )
         except ValueError:
             self._font_size = theming.DEFAULT_FONT_SIZE
+        self._tts_voice = get_setting(conn, TTS_VOICE_SETTING, tts.DEFAULT_VOICE_KEY)
+        if tts.get_voice(self._tts_voice) is None:
+            self._tts_voice = tts.DEFAULT_VOICE_KEY
 
         self.setWindowTitle("Desktop Scriptures")
-        self.resize(1000, 700)
+        # The menu bar's corner widget (Resume Reading + the streak badge
+        # - see _build_menu) doesn't wrap or shrink gracefully like a
+        # normal layout would once the window gets too narrow for the
+        # full menu bar's natural width (~934px with every menu item and
+        # both corner widgets present); it just overlaps instead. A hard
+        # floor here, comfortably above that, means the window can never
+        # be resized narrow enough to trigger it, on top of a wider
+        # default so it doesn't start right at the edge either.
+        self.setMinimumWidth(1050)
+        self.resize(1100, 700)
 
         self._build_menu()
         theming.apply_app_theme(QApplication.instance(), self._app_theme, self._app_accent)
@@ -363,6 +380,23 @@ class MainWindow(QMainWindow):
         share_bom_action = QAction("Share the Book of Mormon", self)
         share_bom_action.triggered.connect(self._share_book_of_mormon)
         file_menu.addAction(share_bom_action)
+
+        file_menu.addSeparator()
+
+        # Which of tts.VOICES the reading view's Listen controls use -
+        # see reading_view.py. Voices not actually installed (see
+        # tts.is_voice_installed) still show up here so the menu doesn't
+        # look different across builds - _on_listen_clicked is what
+        # actually catches and reports a missing one.
+        voice_menu = file_menu.addMenu("Voice")
+        voice_group = QActionGroup(self)
+        voice_group.setExclusive(True)
+        for voice in tts.VOICES:
+            action = QAction(voice.label, self, checkable=True)
+            action.setChecked(voice.key == self._tts_voice)
+            action.triggered.connect(lambda checked=False, k=voice.key: self._set_tts_voice(k))
+            voice_group.addAction(action)
+            voice_menu.addAction(action)
 
         menu = self.menuBar().addMenu("&View")
 
@@ -689,13 +723,32 @@ class MainWindow(QMainWindow):
         streak = get_reading_streak(self.conn)
         if streak <= 0:
             self.streak_label.setVisible(False)
+            self._refresh_menu_corner_geometry()
             return
         day_word = "day" if streak == 1 else "days"
         self.streak_label.setText(f"\U0001f525 {streak} {day_word} streak")
         self.streak_label.setVisible(True)
+        self._refresh_menu_corner_geometry()
+
+    def _refresh_menu_corner_geometry(self) -> None:
+        """The menu bar's corner widget (see _build_menu) doesn't always
+        re-poll its own sizeHint() when a child inside it - the streak
+        badge or the Resume Reading button - flips between hidden and
+        visible well after setCornerWidget() first ran, most noticeably
+        the very first time either one appears (e.g. exactly
+        READING_STREAK_DWELL_MS into a fresh db with no reading history
+        yet, when both go from hidden to visible in the same instant) -
+        an explicit nudge forces it to actually reserve the right amount
+        of space instead of visually overlapping the regular menu
+        actions to its left."""
+        self._menu_corner.adjustSize()
+        self._menu_corner.updateGeometry()
+        self.menuBar().adjustSize()
+        self.menuBar().updateGeometry()
 
     def _update_resume_button(self) -> None:
         self.resume_button.setVisible(bool(get_reading_history(self.conn, limit=1)))
+        self._refresh_menu_corner_geometry()
 
     def _show_resume_menu(self) -> None:
         entries = get_reading_history(self.conn, limit=5)
@@ -777,6 +830,12 @@ class MainWindow(QMainWindow):
         self._font_family = name
         set_setting(self.conn, "font_family", name)
         self._apply_reading_theme()
+
+    def _set_tts_voice(self, key: str) -> None:
+        self._tts_voice = key
+        set_setting(self.conn, TTS_VOICE_SETTING, key)
+        if self._current_reading_view is not None:
+            self._current_reading_view.set_tts_voice(key)
 
     def _zoom_in(self) -> None:
         self._set_font_size(self._font_size + theming.ZOOM_STEP)
@@ -1065,6 +1124,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         if self._current_reading_view is not None:
             self._current_reading_view.flush_pending_save()
+            self._current_reading_view.shutdown_tts()
         super().closeEvent(event)
 
     # ------------------------------------------------------------------
@@ -1512,6 +1572,7 @@ class MainWindow(QMainWindow):
         # already on.
         if self._current_reading_view is not None:
             self._current_reading_view.flush_pending_save()
+            self._current_reading_view.shutdown_tts()
 
         chapter = get_chapter(self.conn, chapter_id)
 
@@ -1558,6 +1619,7 @@ class MainWindow(QMainWindow):
             armed_highlight=self._armed_highlight,
             selected_side_tab=self._side_tab_index,
             subtitle=self._chapter_subtitle(chapter),
+            tts_voice=self._tts_voice,
         )
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)

@@ -15,9 +15,12 @@ description: |
   a folder synced on your machine, so the app itself never talks to the
   network for this), an opt-in Temple Recommend renewal reminder (also
   fully offline - it just checks the expiration date you enter against
-  today's date), and an opt-in Family History reminder that nudges you
-  at random intervals rather than a fixed schedule, so it stays
-  noticeable instead of becoming background noise.
+  today's date), an opt-in Family History reminder that nudges you at
+  random intervals rather than a fixed schedule, so it stays noticeable
+  instead of becoming background noise, and Listen controls to have any
+  chapter read aloud - verse by verse, with the current verse
+  highlighted - in a choice of four bundled offline voices (American or
+  British English, male or female).
 
   A handful of landing-page extras are opt-in and off by default, only
   reaching the network once you turn them on: AI-assisted search (ask a
@@ -80,6 +83,12 @@ apps:
       # source only once turned on in the View menu. Never anywhere on
       # its own otherwise.
       - network
+      # For the Listen (text-to-speech) controls in the reading view -
+      # see tts_playback.py. Synthesis itself is fully offline (bundled
+      # Piper voices, see the tts-voices part below); this plug is only
+      # for actually routing the resulting audio to the system's sound
+      # device.
+      - audio-playback
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONPATH: $SNAP/lib/python3.12/site-packages:$SNAP/src
@@ -109,3 +118,28 @@ parts:
       cp "$CRAFT_PART_SRC/data/verse_citations.json" "$CRAFT_PART_INSTALL/data/verse_citations.json"
 
       craftctl set version="$(grep -oP '__version__ = "\K[^"]+' "$CRAFT_PART_SRC/src/scriptures/__init__.py")"
+
+  # The 4 bundled Piper TTS voice models (see tts.py's module docstring) -
+  # never committed to the repo (each is ~60MB); fetched fresh here from
+  # the same upstream Hugging Face repository
+  # scripts/download_tts_voices.py uses for local development. Keep
+  # MODEL_SOURCES there and this list in sync if a voice choice changes.
+  tts-voices:
+    plugin: nil
+    build-packages:
+      - curl
+    override-build: |
+      set -e
+      base="https://huggingface.co/rhasspy/piper-voices/resolve/main/en"
+      dest="$CRAFT_PART_INSTALL/data/tts_voices"
+      mkdir -p "$dest"
+      for entry in \
+        "en_US/lessac/medium/en_US-lessac-medium" \
+        "en_US/hfc_female/medium/en_US-hfc_female-medium" \
+        "en_GB/alan/medium/en_GB-alan-medium" \
+        "en_GB/cori/medium/en_GB-cori-medium" \
+      ; do
+        name="$(basename "$entry")"
+        curl -fL -o "$dest/${name}.onnx" "${base}/${entry}.onnx"
+        curl -fL -o "$dest/${name}.onnx.json" "${base}/${entry}.onnx.json"
+      done

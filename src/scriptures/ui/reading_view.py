@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QTabWidget,
@@ -44,6 +45,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from scriptures import tts
 from scriptures.data_access import (
     Highlight,
     Verse,
@@ -57,6 +59,7 @@ from scriptures.data_access import (
 from scriptures.ui.chapter_panel import PANEL_WIDTH, ChapterPanel
 from scriptures.ui.citations_panel import CitationsPanel
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
+from scriptures.ui.tts_playback import ReadableVerse, TtsController
 
 VERSE_NUMBER_WIDTH = 32
 
@@ -147,6 +150,17 @@ class _VerseTextEdit(QTextEdit):
         cursor.clearSelection()
         self.setTextCursor(cursor)
 
+    def set_now_reading(self, active: bool) -> None:
+        """Toggles the "currently being read aloud" border - a dynamic
+        property + QSS rule (see theme.py's #verseBody[nowReading="true"]),
+        same re-polish pattern as ReadingView._refresh_verse_indicator's
+        annotate button. Deliberately separate from the user's own
+        highlight colors (applied as char-format spans in render_text,
+        not a widget-level style) so the two never conflict."""
+        self.setProperty("nowReading", active)
+        self.style().unpolish(self)
+        self.style().polish(self)
+
     def mouseReleaseEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         super().mouseReleaseEvent(event)
         if event.button() != Qt.MouseButton.LeftButton:
@@ -180,6 +194,7 @@ class ReadingView(QWidget):
         armed_highlight: str | None = None,
         selected_side_tab: int = 0,
         subtitle: str | None = None,
+        tts_voice: str = tts.DEFAULT_VOICE_KEY,
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
@@ -189,6 +204,9 @@ class ReadingView(QWidget):
         self._verses = verses
         self._verse_highlights = get_highlights(conn, chapter_id)
         self._armed_highlight = armed_highlight
+        self._tts_voice = tts_voice
+        self._tts: TtsController | None = None  # created lazily - see _ensure_tts()
+        self._now_reading_verse_id: int | None = None
 
         outer = QHBoxLayout(self)
 
@@ -199,6 +217,19 @@ class ReadingView(QWidget):
         title_label.setObjectName("sectionTitle")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header.addWidget(title_label, stretch=1)
+
+        self._listen_btn = QPushButton("▶ Listen")
+        self._listen_btn.setObjectName("listenButton")
+        self._listen_btn.setToolTip("Read this chapter aloud")
+        self._listen_btn.clicked.connect(self._on_listen_clicked)
+        header.addWidget(self._listen_btn)
+
+        self._stop_listen_btn = QPushButton("⏹")
+        self._stop_listen_btn.setObjectName("stopListenButton")
+        self._stop_listen_btn.setToolTip("Stop reading aloud")
+        self._stop_listen_btn.setVisible(False)
+        self._stop_listen_btn.clicked.connect(self._on_stop_listen_clicked)
+        header.addWidget(self._stop_listen_btn)
 
         zoom_out_btn = QPushButton("A-")
         zoom_out_btn.setObjectName("zoomButton")
@@ -395,6 +426,12 @@ class ReadingView(QWidget):
         needing to be reopened."""
         self._armed_highlight = color
 
+    def set_tts_voice(self, key: str) -> None:
+        """Called by MainWindow when the View -> Voice selection changes,
+        same reasoning as set_armed_highlight - only affects the *next*
+        time Listen is clicked, not anything already playing."""
+        self._tts_voice = key
+
     def _refresh_verse_indicator(self, verse_id: int) -> None:
         btn = self._annotate_buttons.get(verse_id)
         if btn is None:
@@ -409,3 +446,84 @@ class ReadingView(QWidget):
     def flush_pending_save(self) -> None:
         """Forwarded to the chapter panel - see ChapterPanel.flush_pending_save."""
         self._panel.flush_pending_save()
+
+    # ------------------------------------------------------------------
+    # Listen (text-to-speech) - see tts.py and ui/tts_playback.py for the
+    # synthesis/playback machinery this drives.
+    # ------------------------------------------------------------------
+
+    def _ensure_tts(self) -> TtsController:
+        if self._tts is None:
+            self._tts = TtsController(self)
+            self._tts.verse_started.connect(self._on_tts_verse_started)
+            self._tts.playback_stopped.connect(self._on_tts_playback_stopped)
+            self._tts.synthesis_failed.connect(self._on_tts_synthesis_failed)
+        return self._tts
+
+    def _on_listen_clicked(self) -> None:
+        if self._tts is not None and self._tts.is_active():
+            if self._tts.is_paused():
+                self._tts.resume()
+                self._listen_btn.setText("⏸ Pause")
+            else:
+                self._tts.pause()
+                self._listen_btn.setText("▶ Resume")
+            return
+
+        if not tts.is_voice_installed(self._tts_voice):
+            QMessageBox.warning(
+                self,
+                "Listen",
+                "This voice isn't installed. Pick a different one under "
+                "View → Voice, or reinstall the app.",
+            )
+            return
+
+        controller = self._ensure_tts()
+        readable = [ReadableVerse(v.id, v.text) for v in self._verses]
+        controller.start(self._tts_voice, readable)
+        self._listen_btn.setText("⏸ Pause")
+        self._stop_listen_btn.setVisible(True)
+
+    def _on_stop_listen_clicked(self) -> None:
+        if self._tts is not None:
+            self._tts.stop()
+        self._reset_listen_controls()
+
+    def _on_tts_verse_started(self, verse_id: int) -> None:
+        if self._now_reading_verse_id is not None:
+            old = self._body_widgets.get(self._now_reading_verse_id)
+            if old is not None:
+                old.set_now_reading(False)
+        self._now_reading_verse_id = verse_id
+        body = self._body_widgets.get(verse_id)
+        if body is not None:
+            body.set_now_reading(True)
+            self._scroll.ensureWidgetVisible(body)
+
+    def _on_tts_playback_stopped(self) -> None:
+        self._reset_listen_controls()
+
+    def _on_tts_synthesis_failed(self, message: str) -> None:  # noqa: ARG002
+        # Quiet failure with a reset back to idle, same policy as every
+        # other opt-in fetch/feature in this app - message kept for
+        # debugging via a future log, not surfaced as an error dialog for
+        # what's most likely a one-off synthesis hiccup.
+        self._reset_listen_controls()
+
+    def _reset_listen_controls(self) -> None:
+        self._listen_btn.setText("▶ Listen")
+        self._stop_listen_btn.setVisible(False)
+        if self._now_reading_verse_id is not None:
+            old = self._body_widgets.get(self._now_reading_verse_id)
+            if old is not None:
+                old.set_now_reading(False)
+            self._now_reading_verse_id = None
+
+    def shutdown_tts(self) -> None:
+        """Called by MainWindow right before this view is discarded (see
+        its flush_pending_save() call site) - stops playback and shuts
+        down the background synthesis thread for good, not just the
+        current playback (see TtsController.shutdown)."""
+        if self._tts is not None:
+            self._tts.shutdown()

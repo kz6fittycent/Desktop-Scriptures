@@ -9,5 +9,10 @@ __pycache__/
 # data/scriptures.db it gets imported into.
 data/raw/lds-scriptures.txt
 
+# Local-only download via scripts/download_tts_voices.py - each voice
+# model is ~60MB, too large to commit; snapcraft.yaml's "tts-voices"
+# part fetches the same files fresh at build time instead.
+data/tts_voices/
+
 # Local snapcraft build output
 *.snap
