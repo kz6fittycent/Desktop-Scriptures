@@ -490,6 +490,26 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
         QTabBar::tab:hover:!selected {{
             background-color: {p.hover_bg};
         }}
+        /* The Study/Citations/Cross-references tab bar is narrower than
+        its three tab labels at most zoom levels, so Qt adds its own
+        left/right scroll arrows to page through them - default-styled,
+        these render as an unthemed, flat-bevel pair that looks out of
+        place next to every other themed control here. */
+        QTabBar QToolButton {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+        }}
+        QTabBar QToolButton:hover {{
+            background-color: {p.hover_bg};
+        }}
+        QTabBar QToolButton:pressed {{
+            background-color: {p.card_bg};
+        }}
+        QTabBar QToolButton:disabled {{
+            background-color: {p.window_bg};
+            border: 1px solid {p.border};
+        }}
         /* Accordion header for one cited verse in the Citations tab - a
         left-aligned toggle button rather than a small icon button, since
         its whole row (including the "cited N times" count) is the click
