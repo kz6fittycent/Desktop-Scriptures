@@ -25,6 +25,17 @@ summaries, e.g. 2 Nephi 12's "Compare Isaiah 2"), not machine-detected
 text similarity - accuracy matters more than exhaustiveness here, so a
 plausible-but-unverified parallel is left out rather than guessed at.
 
+This is an intentionally ongoing, incremental list, not a finished one -
+the goal is eventually covering notable parallels across the whole
+standard works (the New Testament's own many quotations of the Old
+Testament very much included), added a well-verified batch at a time
+rather than all at once. A public-domain dataset exists for the
+Bible-internal side (the Treasury of Scripture Knowledge, ~500,000
+cross-references) but is deliberately NOT bulk-imported here - it isn't
+doctrine-tagged, and at that scale would bury a chapter in loosely-related
+verses rather than surfacing the handful that actually matter, the
+opposite of this feature's own accuracy-first design.
+
 DOCTRINE: each entry names the doctrine it's actually about via
 TOPIC_SLUGS - a comma-separated string of slugs from the Topical Guide's
 own topic list (see build_topical_guide.py's TOPICS), reused rather than
@@ -372,6 +383,175 @@ ENTRIES = [
         "the Church - Moroni's list parallels Paul's, though it "
         "continues further, adding gifts like beholding angels that "
         "Paul doesn't list.",
+    ),
+    # --- New Testament quotes Old Testament: the clearest, most explicit
+    # cases first - passages the New Testament itself flags as fulfilled
+    # prophecy ("that it might be fulfilled," "as it is written," a
+    # direct quotation from Christ or an apostle) rather than a looser
+    # thematic echo. Both sides live in the same "Holy Bible" volume here.
+    (
+        "Matthew", "Holy Bible", 1, 22, 23,
+        "Isaiah", "Holy Bible", 7, 14, 14,
+        "quotation", "jesus-christ",
+        "The sign of Immanuel - \"a virgin shall conceive, and bear a "
+        "son\" - Matthew explicitly quotes Isaiah as fulfilled prophecy "
+        "of Christ's birth (\"that it might be fulfilled which was "
+        "spoken of the Lord by the prophet\").",
+    ),
+    (
+        "Matthew", "Holy Bible", 2, 5, 6,
+        "Micah", "Holy Bible", 5, 2, 2,
+        "quotation", "jesus-christ",
+        "Bethlehem named centuries in advance as the Messiah's "
+        "birthplace - the chief priests and scribes quote this very "
+        "verse to Herod when asked where Christ should be born.",
+    ),
+    (
+        "Matthew", "Holy Bible", 2, 14, 15,
+        "Hosea", "Holy Bible", 11, 1, 1,
+        "quotation", "jesus-christ",
+        "\"Out of Egypt have I called my son\" - originally about "
+        "Israel's own exodus, applied by Matthew to the child Jesus "
+        "fleeing to and returning from Egypt, explicitly marked as "
+        "fulfillment.",
+    ),
+    (
+        "Matthew", "Holy Bible", 3, 3, 3,
+        "Isaiah", "Holy Bible", 40, 3, 3,
+        "quotation", "prophets",
+        "\"The voice of him that crieth in the wilderness, prepare ye "
+        "the way of the Lord\" - Matthew identifies this prophecy with "
+        "John the Baptist's own ministry preparing the way for Christ.",
+    ),
+    (
+        "Matthew", "Holy Bible", 4, 4, 4,
+        "Deuteronomy", "Holy Bible", 8, 3, 3,
+        "quotation", "temptation",
+        "\"Man shall not live by bread alone, but by every word that "
+        "proceedeth out of the mouth of God\" - Christ quotes Moses' own "
+        "teaching on Israel's wilderness wandering while resisting "
+        "Satan's first temptation.",
+    ),
+    (
+        "Luke", "Holy Bible", 4, 18, 19,
+        "Isaiah", "Holy Bible", 61, 1, 2,
+        "quotation", "jesus-christ",
+        "\"The Spirit of the Lord is upon me... to preach the gospel to "
+        "the poor\" - Christ reads this passage aloud in the Nazareth "
+        "synagogue and declares, \"this day is this scripture fulfilled "
+        "in your ears,\" one of His clearest public claims to be the "
+        "promised Messiah.",
+    ),
+    (
+        "Matthew", "Holy Bible", 21, 42, 42,
+        "Psalms", "Holy Bible", 118, 22, 22,
+        "quotation", "jesus-christ",
+        "\"The stone which the builders rejected, the same is become "
+        "the head of the corner\" - Christ applies this directly to "
+        "Himself, asking the chief priests and elders, \"Did ye never "
+        "read in the scriptures...\"",
+    ),
+    (
+        "Matthew", "Holy Bible", 21, 4, 5,
+        "Zechariah", "Holy Bible", 9, 9, 9,
+        "quotation", "jesus-christ",
+        "\"Thy King cometh unto thee... riding upon an ass\" - Christ's "
+        "triumphal entry into Jerusalem, explicitly identified by "
+        "Matthew as fulfilling this prophecy.",
+    ),
+    (
+        "Matthew", "Holy Bible", 27, 46, 46,
+        "Psalms", "Holy Bible", 22, 1, 1,
+        "quotation", "atonement",
+        "\"My God, my God, why hast thou forsaken me?\" - Christ quotes "
+        "this psalm of suffering word for word from the cross, at the "
+        "depth of His atoning suffering.",
+    ),
+    (
+        "John", "Holy Bible", 19, 24, 24,
+        "Psalms", "Holy Bible", 22, 18, 18,
+        "quotation", "atonement",
+        "\"They part my garments among them, and cast lots upon my "
+        "vesture\" - John notes explicitly that this was fulfilled when "
+        "the soldiers cast lots for Christ's clothing at the "
+        "crucifixion - the same psalm quoted in Matthew 27:46 above.",
+    ),
+    (
+        "Matthew", "Holy Bible", 8, 17, 17,
+        "Isaiah", "Holy Bible", 53, 4, 4,
+        "quotation", "atonement",
+        "\"Himself took our infirmities, and bare our sicknesses\" - "
+        "Matthew explicitly quotes the suffering servant prophecy to "
+        "explain Christ's healing miracles, the same chapter Mosiah 14 "
+        "quotes in full over the Atonement itself (see above).",
+    ),
+    (
+        "Acts", "Holy Bible", 2, 16, 21,
+        "Joel", "Holy Bible", 2, 28, 32,
+        "quotation", "holy-ghost",
+        "\"I will pour out my spirit upon all flesh\" - Peter explicitly "
+        "quotes Joel's prophecy to explain the miraculous outpouring of "
+        "the Holy Ghost at Pentecost.",
+    ),
+    (
+        "Romans", "Holy Bible", 4, 3, 3,
+        "Genesis", "Holy Bible", 15, 6, 6,
+        "quotation", "faith",
+        "\"Abraham believed God, and it was counted unto him for "
+        "righteousness\" - Paul quotes this directly to teach that "
+        "righteousness comes through faith, not merely obedience to "
+        "the law.",
+    ),
+    (
+        "Romans", "Holy Bible", 1, 17, 17,
+        "Habakkuk", "Holy Bible", 2, 4, 4,
+        "quotation", "faith",
+        "\"The just shall live by faith\" - quoted by Paul as the "
+        "foundation of his entire argument that the gospel's "
+        "righteousness is received through faith.",
+    ),
+    (
+        "Matthew", "Holy Bible", 19, 5, 5,
+        "Genesis", "Holy Bible", 2, 24, 24,
+        "quotation", "marriage",
+        "\"A man shall leave his father and mother, and shall cleave "
+        "unto his wife\" - Christ quotes marriage's original institution "
+        "in Eden while teaching on its permanence, the same doctrine "
+        "Moses 3 restates in its own revision of this chapter (see "
+        "above).",
+    ),
+    (
+        "Matthew", "Holy Bible", 22, 37, 37,
+        "Deuteronomy", "Holy Bible", 6, 5, 5,
+        "quotation", "love",
+        "\"Thou shalt love the Lord thy God with all thine heart\" - "
+        "quoted by Christ as the first and great commandment.",
+    ),
+    (
+        "Matthew", "Holy Bible", 22, 39, 39,
+        "Leviticus", "Holy Bible", 19, 18, 18,
+        "quotation", "love",
+        "\"Thou shalt love thy neighbour as thyself\" - quoted by Christ "
+        "as the second great commandment, \"like unto\" the first (see "
+        "Deuteronomy 6:5 above).",
+    ),
+    (
+        "Matthew", "Holy Bible", 22, 44, 44,
+        "Psalms", "Holy Bible", 110, 1, 1,
+        "quotation", "jesus-christ",
+        "\"The LORD said unto my Lord, sit thou on my right hand\" - "
+        "Christ quotes this psalm to testify of His own divine Sonship, "
+        "asking the Pharisees how David's own \"Lord\" could also be "
+        "David's descendant.",
+    ),
+    (
+        "Matthew", "Holy Bible", 11, 4, 5,
+        "Isaiah", "Holy Bible", 35, 5, 6,
+        "quotation", "jesus-christ",
+        "\"The eyes of the blind shall be opened... the lame man shall "
+        "leap as an hart\" - Christ points to His own healing miracles "
+        "as proof, to John the Baptist's disciples, that He is the "
+        "promised Messiah these signs describe.",
     ),
 ]
 
