@@ -1015,6 +1015,143 @@ ENTRIES = [
         "world - fulfilled exactly as prophesied at the moment of the "
         "crucifixion.",
     ),
+    # --- D&C 113: another explicit, verse-by-verse interpretation, this
+    # time of Isaiah 11 and 52 - same vein as D&C 77's Revelation
+    # exposition above.
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 113, 1, 4,
+        "Isaiah", "Holy Bible", 11, 1, 1,
+        "paraphrase", "jesus-christ",
+        "Identifies the \"Stem of Jesse\" as Christ Himself, and the "
+        "\"rod\" that comes of that stem as a latter-day servant holding "
+        "priesthood power - not competing figures, but Christ and His "
+        "authorized servant together.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 113, 5, 6,
+        "Isaiah", "Holy Bible", 11, 10, 10,
+        "paraphrase", "house-of-israel",
+        "The \"root of Jesse\" is identified as a latter-day descendant "
+        "of Jesse and Joseph holding \"the priesthood, and the keys of "
+        "the kingdom,\" raised as an ensign for gathering scattered "
+        "Israel.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 113, 7, 8,
+        "Isaiah", "Holy Bible", 52, 1, 1,
+        "paraphrase", "priesthood",
+        "\"Put on thy strength, O Zion\" is explained as the last-day "
+        "call to those who \"hold the power of priesthood to bring "
+        "again Zion.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 113, 9, 10,
+        "Isaiah", "Holy Bible", 52, 2, 2,
+        "paraphrase", "house-of-israel",
+        "Zion \"loosing herself from the bands of her neck\" is "
+        "explained as scattered Israel's own call to return to the "
+        "Lord.",
+    ),
+    # --- More typology and direct Psalm/Hebrews Christological quotations ---
+    (
+        "John", "Holy Bible", 1, 51, 51,
+        "Genesis", "Holy Bible", 28, 10, 12,
+        "typology", "jesus-christ",
+        "Christ explicitly applies Jacob's ladder to Himself: \"ye "
+        "shall see heaven open, and the angels of God ascending and "
+        "descending upon the Son of man\" - He is the very connection "
+        "between heaven and earth Jacob's dream showed.",
+    ),
+    (
+        "Romans", "Holy Bible", 16, 20, 20,
+        "Genesis", "Holy Bible", 3, 14, 15,
+        "typology", "jesus-christ",
+        "\"The God of peace shall bruise Satan under your feet shortly\" "
+        "- Paul's own echo of the Lord's first curse on the serpent, "
+        "\"it shall bruise thy head,\" the earliest Messianic promise in "
+        "scripture.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 1, 5, 5,
+        "Psalms", "Holy Bible", 2, 7, 7,
+        "quotation", "jesus-christ",
+        "\"Thou art my Son, this day have I begotten thee\" - quoted "
+        "directly as testimony of Christ's divine Sonship, a title "
+        "never given to any angel.",
+    ),
+    (
+        "Acts", "Holy Bible", 13, 33, 33,
+        "Psalms", "Holy Bible", 2, 7, 7,
+        "quotation", "jesus-christ",
+        "Paul quotes the same psalm as Hebrews 1:5 above, applying "
+        "\"this day have I begotten thee\" directly to Christ's own "
+        "resurrection.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 1, 8, 9,
+        "Psalms", "Holy Bible", 45, 6, 7,
+        "quotation", "jesus-christ",
+        "\"Thy throne, O God, is for ever and ever\" - quoted directly, "
+        "applying language addressed to God alone to Christ's own "
+        "eternal kingdom.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 1, 10, 12,
+        "Psalms", "Holy Bible", 102, 25, 27,
+        "quotation", "jesus-christ",
+        "\"Thou, Lord, in the beginning hast laid the foundation of the "
+        "earth\" - quoted directly, identifying Christ as the "
+        "unchanging Creator this psalm addresses.",
+    ),
+    (
+        "Luke", "Holy Bible", 2, 32, 32,
+        "Isaiah", "Holy Bible", 49, 6, 6,
+        "quotation", "jesus-christ",
+        "\"A light to lighten the Gentiles\" - Simeon's own words over "
+        "the infant Christ, echoing Isaiah's prophecy of a servant who "
+        "would be a light not only to Israel but to all nations.",
+    ),
+    (
+        "Acts", "Holy Bible", 13, 47, 47,
+        "Isaiah", "Holy Bible", 49, 6, 6,
+        "quotation", "missionary-work",
+        "Paul and Barnabas quote the same prophecy as Luke 2:32 above "
+        "directly, to justify preaching the gospel to the Gentiles, not "
+        "the Jews alone.",
+    ),
+    (
+        "Colossians", "Holy Bible", 2, 11, 12,
+        "Genesis", "Holy Bible", 17, 10, 11,
+        "typology", "baptism",
+        "Paul explicitly calls baptism \"the circumcision of Christ\" - "
+        "the new covenant token replacing the old, both marking entry "
+        "into God's covenant people.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 4, 9, 10,
+        "Genesis", "Holy Bible", 2, 2, 3,
+        "typology", "sabbath-day",
+        "\"There remaineth therefore a rest to the people of God\" - "
+        "the Sabbath's own pattern of God's rest after His work becomes "
+        "a type of the greater spiritual rest offered through Christ.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 2, 2,
+        "Genesis", "Holy Bible", 2, 9, 9,
+        "typology", "plan-of-salvation",
+        "The tree of life, first seen in Eden and lost through the "
+        "Fall, reappears in the final restored paradise - access to it "
+        "regained through Christ rather than barred by the flaming "
+        "sword of Genesis 3:24.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 14, 14,
+        "Genesis", "Holy Bible", 3, 22, 24,
+        "typology", "plan-of-salvation",
+        "\"That they may have right to the tree of life\" reverses "
+        "Eden's own curse - mankind was driven out and barred from the "
+        "tree in Genesis; the redeemed are welcomed back to it here.",
+    ),
 ]
 
 
