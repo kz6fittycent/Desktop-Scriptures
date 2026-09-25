@@ -450,6 +450,22 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             color: {p.primary};
             border: 1px solid {p.primary};
         }}
+        /* Doctrine chip in the Cross-references tab - same rounded-pill
+        look as tagChip, but a real clickable QPushButton (jumps to that
+        topic's Topical Guide detail view) rather than a static label. */
+        QPushButton#crossReferenceTopicChip {{
+            background-color: {p.card_bg};
+            color: {p.card_text};
+            border: none;
+            border-radius: 10px;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }}
+        QPushButton#crossReferenceTopicChip:hover {{
+            background-color: {p.primary};
+            color: {p.card_bg};
+        }}
         QTabWidget::pane {{
             border: 1px solid {p.border};
             border-radius: {PANEL_RADIUS}px;

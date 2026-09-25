@@ -119,18 +119,30 @@ class TopicTalk:
 
 
 @dataclass(frozen=True)
+class CrossReferenceTopic:
+    id: int
+    name: str
+
+
+@dataclass(frozen=True)
 class CrossReference:
     """One related passage for a chapter currently being read: the local
     verse range this entry covers (both None = the whole chapter),
     `related_reference` as a display string (e.g. "Isaiah 52:7-10"), and
     `related_chapter_id` to jump straight to that chapter - see
-    get_cross_references for how "local" vs. "related" is decided."""
+    get_cross_references for how "local" vs. "related" is decided.
+
+    `topics` names the doctrine this pairing is actually about (e.g.
+    Atonement, Faith), reusing the same Topical Guide topics shown
+    elsewhere in the app - each clickable through to that topic's own
+    detail view, same interaction as a chapter link."""
 
     verse_start: int | None
     verse_end: int | None
     related_reference: str
     related_chapter_id: int
     relationship: str
+    topics: list[CrossReferenceTopic]
     note: str
 
 
@@ -983,7 +995,23 @@ def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[Cros
                 ),
                 related_chapter_id=other_chapter["id"],
                 relationship=row["relationship"],
+                topics=_resolve_topic_slugs(conn, row["topic_slugs"]),
                 note=row["note"],
             )
         )
     return results
+
+
+def _resolve_topic_slugs(conn: sqlite3.Connection, topic_slugs: str) -> list[CrossReferenceTopic]:
+    """A slug with no matching topic (e.g. an older writable database that
+    hasn't synced in a newer topic yet) is simply left out, the same
+    tolerance get_topic_verses already has for a stale reference."""
+    slugs = [s.strip() for s in topic_slugs.split(",") if s.strip()]
+    if not slugs:
+        return []
+    topics = []
+    for slug in slugs:
+        row = conn.execute("SELECT id, name FROM topics WHERE slug = ?", (slug,)).fetchone()
+        if row is not None:
+            topics.append(CrossReferenceTopic(row["id"], row["name"]))
+    return topics

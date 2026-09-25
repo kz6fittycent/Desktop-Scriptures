@@ -59,6 +59,10 @@ def _seed(conn) -> None:
             "INSERT INTO verses (chapter_id, verse_number, text, reference) VALUES (?, ?, 'x', 'Isaiah 2:5')",
             (chapter_id, verse_number),
         )
+    conn.execute(
+        "INSERT INTO topics (id, name, slug, description, sort_order) "
+        "VALUES (1, 'Zion', 'zion', 'test description', 1)"
+    )
     conn.commit()
 
 
@@ -70,9 +74,9 @@ def test_cross_reference_resolves_both_directions() -> None:
             "INSERT INTO cross_references "
             "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
             "related_volume_slug, related_book_name, related_chapter_number, "
-            "related_verse_start, related_verse_end, relationship, note, sort_order) "
+            "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
             "VALUES ('book-of-mormon', '2 Nephi', 12, NULL, NULL, "
-            "'holy-bible', 'Isaiah', 2, NULL, NULL, 'quotation', 'test note', 1)"
+            "'holy-bible', 'Isaiah', 2, NULL, NULL, 'quotation', 'zion', 'test note', 1)"
         )
         conn.commit()
 
@@ -81,11 +85,13 @@ def test_cross_reference_resolves_both_directions() -> None:
         assert forward[0].related_reference == "Isaiah 2"
         assert forward[0].related_chapter_id == 1
         assert forward[0].verse_start is None
+        assert [t.name for t in forward[0].topics] == ["Zion"]
 
         reverse = get_cross_references(conn, 1)  # Holy Bible Isaiah 2
         assert len(reverse) == 1
         assert reverse[0].related_reference == "2 Nephi 12"
         assert reverse[0].related_chapter_id == 2
+        assert [t.name for t in reverse[0].topics] == ["Zion"]
 
         print("test_cross_reference_resolves_both_directions: PASSED")
     finally:
@@ -106,9 +112,9 @@ def test_reference_string_collision_does_not_leak_across_volumes() -> None:
             "INSERT INTO cross_references "
             "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
             "related_volume_slug, related_book_name, related_chapter_number, "
-            "related_verse_start, related_verse_end, relationship, note, sort_order) "
+            "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
             "VALUES ('book-of-mormon', '2 Nephi', 12, NULL, NULL, "
-            "'holy-bible', 'Isaiah', 2, NULL, NULL, 'quotation', 'test note', 1)"
+            "'holy-bible', 'Isaiah', 2, NULL, NULL, 'quotation', 'zion', 'test note', 1)"
         )
         conn.commit()
 
@@ -138,7 +144,7 @@ def test_verify_entry_catches_bad_chapter() -> None:
         bad_chapter = (
             "2 Nephi", "The Book of Mormon", 999, None, None,
             "Isaiah", "Holy Bible", 2, None, None,
-            "quotation", "note",
+            "quotation", "zion", "note",
         )
         try:
             bcr.verify_entry(conn, bad_chapter)
@@ -149,7 +155,7 @@ def test_verify_entry_catches_bad_chapter() -> None:
         bad_verse = (
             "2 Nephi", "The Book of Mormon", 12, 1, 999,
             "Isaiah", "Holy Bible", 2, None, None,
-            "quotation", "note",
+            "quotation", "zion", "note",
         )
         try:
             bcr.verify_entry(conn, bad_verse)
@@ -162,9 +168,69 @@ def test_verify_entry_catches_bad_chapter() -> None:
         shutil.rmtree(tmp_root, ignore_errors=True)
 
 
+def test_verify_entry_catches_unknown_topic_slug() -> None:
+    conn, tmp_root = _make_db()
+    try:
+        _seed(conn)
+        bad_topic = (
+            "2 Nephi", "The Book of Mormon", 12, None, None,
+            "Isaiah", "Holy Bible", 2, None, None,
+            "quotation", "not-a-real-topic", "note",
+        )
+        try:
+            bcr.verify_entry(conn, bad_topic)
+            raise AssertionError("expected verify_entry to reject an unknown topic slug")
+        except ValueError:
+            pass
+
+        # A real slug already seeded above must pass.
+        bcr.verify_entry(
+            conn,
+            (
+                "2 Nephi", "The Book of Mormon", 12, None, None,
+                "Isaiah", "Holy Bible", 2, None, None,
+                "quotation", "zion", "note",
+            ),
+        )
+
+        print("test_verify_entry_catches_unknown_topic_slug: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
+def test_unresolvable_topic_slug_is_skipped_not_erroring() -> None:
+    """A topic_slugs value naming a topic that isn't (yet) in this writable
+    database's topics table - e.g. an older copy that hasn't synced in a
+    newer topic - is simply left out of the resolved list, the same
+    tolerance get_topic_verses already has for a stale reference, rather
+    than raising or blocking the rest of the entry from showing."""
+    conn, tmp_root = _make_db()
+    try:
+        _seed(conn)
+        conn.execute(
+            "INSERT INTO cross_references "
+            "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
+            "related_volume_slug, related_book_name, related_chapter_number, "
+            "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
+            "VALUES ('book-of-mormon', '2 Nephi', 12, NULL, NULL, "
+            "'holy-bible', 'Isaiah', 2, NULL, NULL, 'quotation', 'zion,not-synced-yet', 'test note', 1)"
+        )
+        conn.commit()
+
+        results = get_cross_references(conn, 2)
+        assert len(results) == 1
+        assert [t.name for t in results[0].topics] == ["Zion"]
+
+        print("test_unresolvable_topic_slug_is_skipped_not_erroring: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     test_cross_reference_resolves_both_directions()
     test_reference_string_collision_does_not_leak_across_volumes()
     test_no_cross_references_is_empty_list()
     test_verify_entry_catches_bad_chapter()
+    test_verify_entry_catches_unknown_topic_slug()
+    test_unresolvable_topic_slug_is_skipped_not_erroring()
     print("All cross-reference tests passed.")

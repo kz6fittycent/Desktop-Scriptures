@@ -185,6 +185,7 @@ class ReadingView(QWidget):
     next_requested = Signal()
     side_tab_changed = Signal(int)
     chapter_link_activated = Signal(int)
+    topic_link_activated = Signal(int)
 
     def __init__(
         self,
@@ -347,6 +348,7 @@ class ReadingView(QWidget):
         cross_references = get_cross_references(conn, chapter_id)
         cross_references_panel = CrossReferencesPanel(cross_references)
         cross_references_panel.chapter_selected.connect(self.chapter_link_activated)
+        cross_references_panel.topic_selected.connect(self.topic_link_activated)
         self._side_tabs.addTab(
             cross_references_panel, self._cross_references_tab_label(cross_references_panel)
         )

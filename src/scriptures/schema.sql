@@ -162,6 +162,16 @@ CREATE TABLE IF NOT EXISTS cross_references (
     -- translation = a JST-style revision of the very same underlying
     -- narrative, not an independent quotation of it.
     relationship            TEXT NOT NULL CHECK (relationship IN ('quotation', 'paraphrase', 'translation')),
+    -- Comma-separated Topical Guide topic slugs (see topics.slug) naming
+    -- the doctrine this pairing is actually about - e.g. "atonement", or
+    -- "second-coming,plan-of-salvation" for a passage that touches both.
+    -- Reuses the same topic taxonomy topics/topic_verses already curate
+    -- rather than inventing a second one; a slug with no matching topic
+    -- (e.g. an older writable database that hasn't synced in a newer
+    -- topic yet) is simply left out when resolving this list, the same
+    -- tolerance get_topic_verses already has. May be empty if no existing
+    -- topic is a good fit.
+    topic_slugs             TEXT NOT NULL DEFAULT '',
     note                    TEXT NOT NULL,
     sort_order              INTEGER NOT NULL
 );

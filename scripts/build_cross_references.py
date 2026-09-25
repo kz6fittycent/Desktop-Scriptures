@@ -25,6 +25,15 @@ summaries, e.g. 2 Nephi 12's "Compare Isaiah 2"), not machine-detected
 text similarity - accuracy matters more than exhaustiveness here, so a
 plausible-but-unverified parallel is left out rather than guessed at.
 
+DOCTRINE: each entry names the doctrine it's actually about via
+TOPIC_SLUGS - a comma-separated string of slugs from the Topical Guide's
+own topic list (see build_topical_guide.py's TOPICS), reused rather than
+inventing a second taxonomy. Left empty only when no existing topic is a
+close enough fit; the note still names the doctrine in prose either way.
+Every note leads with what doctrine the passage is teaching and how both
+sides agree on it, then (where relevant) how the wording or scope
+differs - "how the doctrine aligns," not just "what changed."
+
 Three relationship kinds (see also schema.sql's own comment):
 - "quotation": wording matches (allowing for translation-era spelling).
 - "paraphrase": same content/point, but wording diverges meaningfully, or
@@ -43,207 +52,328 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from scriptures.db import connect  # noqa: E402
 
-# Consecutive whole chapters, quoted 1:1 - every chapter in the range has
-# the exact same verse count as its counterpart (verified directly against
-# the database before being added here). Expanded below into one
-# chapter-level ENTRIES row per chapter pair.
-CHAPTER_BLOCKS = [
-    # (book, volume, chapter_start, chapter_end,
-    #  related_book, related_volume, related_chapter_start,
-    #  relationship, note)
-    (
-        "2 Nephi", "The Book of Mormon", 12, 24,
-        "Isaiah", "Holy Bible", 2,
-        "quotation",
-        "Nephi quotes Isaiah 2-14 nearly word for word, though not without "
-        "change - for example expanding Isaiah 2:5's brief admonition into "
-        "\"yea, come, for ye have all gone astray, every one to his wicked "
-        "ways\" in 2 Nephi 12:5.",
-    ),
-    (
-        "3 Nephi", "The Book of Mormon", 12, 13,
-        "Matthew", "Holy Bible", 5,
-        "quotation",
-        "The risen Christ's \"Sermon at the Temple\" to the Nephites, "
-        "closely following the Sermon on the Mount - see 3 Nephi 14 for "
-        "where it begins to diverge.",
-    ),
-    (
-        "3 Nephi", "The Book of Mormon", 24, 25,
-        "Malachi", "Holy Bible", 3,
-        "quotation",
-        "Christ quotes Malachi 3-4 to the Nephites almost word for word, "
-        "identifying it by name in 3 Nephi 24:1.",
-    ),
-]
-
-# Everything else: a single chapter, or a specific verse range on one or
-# both sides. verse_start/verse_end are None together for a whole-chapter
-# entry (see schema.sql).
+# (book, volume, chapter, verse_start, verse_end,
+#  related_book, related_volume, related_chapter, related_verse_start, related_verse_end,
+#  relationship, topic_slugs, note)
+#
+# verse_start/verse_end are None together for a whole-chapter entry (see
+# schema.sql). topic_slugs is a comma-separated string, "" if nothing
+# existing fits well.
 ENTRIES = [
-    # (book, volume, chapter, verse_start, verse_end,
-    #  related_book, related_volume, related_chapter, related_verse_start, related_verse_end,
-    #  relationship, note)
+    # --- 2 Nephi 12-24 <-> Isaiah 2-14: quoted nearly word for word, but
+    # each chapter is its own doctrine, not one undifferentiated block.
     (
-        "Mosiah", "The Book of Mormon", 12, 21, 24,
-        "Isaiah", "Holy Bible", 52, 7, 10,
-        "quotation",
-        "Abinadi quotes Isaiah directly while testifying before King "
-        "Noah's priests.",
+        "2 Nephi", "The Book of Mormon", 12, None, None,
+        "Isaiah", "Holy Bible", 2, None, None,
+        "quotation", "zion",
+        "Both describe the latter-day gathering to \"the mountain of the "
+        "Lord's house\" - Zion established before the Second Coming. "
+        "Nephi expands Isaiah 2:5's brief admonition into \"yea, come, "
+        "for ye have all gone astray, every one to his wicked ways,\" an "
+        "invitation Isaiah's own text only implies.",
     ),
     (
-        "Mosiah", "The Book of Mormon", 14, None, None,
-        "Isaiah", "Holy Bible", 53, None, None,
-        "quotation",
-        "Abinadi quotes the entire \"suffering servant\" chapter, applying "
-        "it to Christ.",
+        "2 Nephi", "The Book of Mormon", 13, None, None,
+        "Isaiah", "Holy Bible", 3, None, None,
+        "quotation", "judgment,humility",
+        "Both pronounce judgment on Judah for pride and oppression of "
+        "the poor, particularly \"the daughters of Zion\" - worldly "
+        "pride, in both texts, is what invites divine judgment.",
     ),
     (
-        "3 Nephi", "The Book of Mormon", 16, 18, 20,
-        "Isaiah", "Holy Bible", 52, 8, 10,
-        "quotation",
-        "The risen Christ quotes Isaiah to the Nephites while foretelling "
-        "the Gentiles' role in the latter days.",
+        "2 Nephi", "The Book of Mormon", 14, None, None,
+        "Isaiah", "Holy Bible", 4, None, None,
+        "quotation", "zion",
+        "Both promise that a purified remnant of Zion will be protected "
+        "- a cloud by day, a flaming fire by night - once its \"filth\" "
+        "is washed away, the same covenant-protection doctrine of Zion "
+        "as the previous chapter.",
     ),
     (
-        "3 Nephi", "The Book of Mormon", 20, 32, 45,
-        "Isaiah", "Holy Bible", 52, 1, 15,
-        "paraphrase",
-        "Christ weaves together verses from Isaiah 52 (and, from verse 43 "
-        "on, the opening of Isaiah 53) rather than quoting a single "
-        "continuous passage.",
+        "2 Nephi", "The Book of Mormon", 15, None, None,
+        "Isaiah", "Holy Bible", 5, None, None,
+        "quotation", "house-of-israel",
+        "The Song of the Vineyard: Israel as a vineyard the Lord planted "
+        "and tended, yet which brought forth wild grapes - God's "
+        "covenant care for Israel, and Israel's own responsibility to "
+        "bear fruit.",
     ),
     (
-        "3 Nephi", "The Book of Mormon", 22, None, None,
-        "Isaiah", "Holy Bible", 54, None, None,
-        "quotation",
-        "Christ quotes the entirety of Isaiah 54 - \"O thou afflicted, "
-        "tossed with tempest\" - to the Nephites.",
+        "2 Nephi", "The Book of Mormon", 16, None, None,
+        "Isaiah", "Holy Bible", 6, None, None,
+        "quotation", "prophets",
+        "Isaiah's temple vision and call to prophetic ministry - \"Here "
+        "am I; send me\" - the doctrine that prophets are cleansed and "
+        "called by God before being sent.",
     ),
     (
-        "2 Nephi", "The Book of Mormon", 27, None, None,
-        "Isaiah", "Holy Bible", 29, None, None,
-        "paraphrase",
-        "Nephi paraphrases and greatly expands Isaiah's \"sealed book\" "
-        "prophecy (29 verses become 35), interweaving his own commentary "
-        "rather than quoting it verbatim.",
+        "2 Nephi", "The Book of Mormon", 17, None, None,
+        "Isaiah", "Holy Bible", 7, None, None,
+        "quotation", "jesus-christ",
+        "The sign of Immanuel - \"a virgin shall conceive, and bear a "
+        "son\" - read in both texts as a Messianic prophecy of Christ's "
+        "birth.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 18, None, None,
+        "Isaiah", "Holy Bible", 8, None, None,
+        "quotation", "testimony",
+        "\"Bind up the testimony, seal the law among my disciples\" - "
+        "preserving true testimony intact for a future generation, "
+        "alongside a second reference to Immanuel.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 19, None, None,
+        "Isaiah", "Holy Bible", 9, None, None,
+        "quotation", "jesus-christ",
+        "\"For unto us a child is born... Wonderful, Counsellor, The "
+        "mighty God\" - Christ's divine titles and eternal government, a "
+        "core Messianic prophecy in both texts.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 20, None, None,
+        "Isaiah", "Holy Bible", 10, None, None,
+        "quotation", "judgment",
+        "Assyria as \"the rod of mine anger\" - God using a wicked "
+        "nation as an instrument of judgment on Israel, then judging "
+        "that nation in turn for its own pride.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 21, None, None,
+        "Isaiah", "Holy Bible", 11, None, None,
+        "quotation", "second-coming,plan-of-salvation",
+        "\"A rod out of the stem of Jesse\" ushering in the peaceable, "
+        "Millennial kingdom - Christ's Second Coming and the plan of "
+        "salvation's culminating rest from conflict, agreed on by both "
+        "texts down to the imagery.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 22, None, None,
+        "Isaiah", "Holy Bible", 12, None, None,
+        "quotation", "gratitude,salvation",
+        "A psalm of thanksgiving for deliverance - \"with joy shall ye "
+        "draw water out of the wells of salvation\" - gratitude as the "
+        "natural response to God's saving power.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 23, None, None,
+        "Isaiah", "Holy Bible", 13, None, None,
+        "quotation", "judgment",
+        "The \"burden of Babylon\" - judgment on a proud, idolatrous "
+        "nation, continuing the same judgment doctrine as chapter 10's "
+        "Assyria.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 24, None, None,
+        "Isaiah", "Holy Bible", 14, None, None,
+        "quotation", "premortal-life",
+        "\"How art thou fallen from heaven, O Lucifer\" - read "
+        "doctrinally as Satan's fall following his rebellion in the "
+        "premortal council, alongside continued judgment on Babylon.",
+    ),
+    # --- 3 Nephi's Sermon at the Temple <-> the Sermon on the Mount ---
+    (
+        "3 Nephi", "The Book of Mormon", 12, None, None,
+        "Matthew", "Holy Bible", 5, None, None,
+        "quotation", "discipleship",
+        "The Beatitudes and \"ye are the salt of the earth\" - the "
+        "character and higher law expected of Christ's true disciples, "
+        "surpassing the law of Moses in both accounts alike.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 13, None, None,
+        "Matthew", "Holy Bible", 6, None, None,
+        "quotation", "prayer",
+        "The Lord's Prayer, given here as the pattern for personal "
+        "prayer, alongside teaching on fasting in secret and seeking "
+        "\"first the kingdom of God.\"",
     ),
     (
         "3 Nephi", "The Book of Mormon", 14, None, None,
         "Matthew", "Holy Bible", 7, None, None,
-        "paraphrase",
-        "Continues the Sermon at the Temple, but omits the Lord's Prayer "
-        "(already taught in 3 Nephi 13) and edits other material, so its "
-        "27 verses don't line up one-to-one with Matthew's 29.",
+        "paraphrase", "obedience",
+        "\"Judge not, that ye be not judged,\" then the wise man who "
+        "built upon the rock - true discipleship is doing, not merely "
+        "hearing, what the Lord commands. 3 Nephi omits the Lord's "
+        "Prayer already taught in the previous chapter, so its 27 verses "
+        "don't line up one-to-one with Matthew's 29.",
     ),
+    # --- 3 Nephi's Malachi block ---
+    (
+        "3 Nephi", "The Book of Mormon", 24, None, None,
+        "Malachi", "Holy Bible", 3, None, None,
+        "quotation", "tithing",
+        "\"Will a man rob God?... bring ye all the tithes into the "
+        "storehouse\" - the doctrine and promised blessing of tithing, "
+        "quoted to the Nephites almost word for word.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 25, None, None,
+        "Malachi", "Holy Bible", 4, None, None,
+        "quotation", "second-coming",
+        "The day that \"shall burn as an oven\" at Christ's coming, and "
+        "Elijah's promise to \"turn the heart of the fathers to the "
+        "children\" - the Second Coming and the sealing power that binds "
+        "families (see D&C 128:17 below for how that promise was later "
+        "applied to temple work).",
+    ),
+    # --- Isaiah quoted elsewhere in the Book of Mormon ---
+    (
+        "Mosiah", "The Book of Mormon", 12, 21, 24,
+        "Isaiah", "Holy Bible", 52, 7, 10,
+        "quotation", "missionary-work",
+        "\"How beautiful upon the mountains are the feet of him that "
+        "bringeth good tidings\" - those who publish the gospel's peace "
+        "are honored before God. Abinadi quotes it word for word while "
+        "testifying before King Noah's priests.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 14, None, None,
+        "Isaiah", "Holy Bible", 53, None, None,
+        "quotation", "atonement",
+        "The \"suffering servant\" chapter - \"he was wounded for our "
+        "transgressions, he was bruised for our iniquities\" - the "
+        "clearest Old Testament prophecy of Christ's atoning sacrifice, "
+        "which Abinadi quotes in full and applies directly to Christ.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 16, 18, 20,
+        "Isaiah", "Holy Bible", 52, 8, 10,
+        "quotation", "house-of-israel",
+        "\"The Lord hath made bare his holy arm in the eyes of all the "
+        "nations\" - God's latter-day work of gathering scattered "
+        "Israel, quoted by the risen Christ while explaining the "
+        "Gentiles' role in that gathering.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 20, 32, 45,
+        "Isaiah", "Holy Bible", 52, 1, 15,
+        "paraphrase", "zion",
+        "\"Awake, awake... put on thy strength, O Zion\" - Zion's "
+        "latter-day redemption, woven together here with the watchmen "
+        "passage above and the opening of Isaiah 53, rather than quoted "
+        "as one single continuous passage.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 22, None, None,
+        "Isaiah", "Holy Bible", 54, None, None,
+        "quotation", "covenants",
+        "\"My covenant of peace shall not be removed\" - God's "
+        "everlasting covenant with a gathered, afflicted-but-redeemed "
+        "Zion, quoted here in its entirety.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 27, None, None,
+        "Isaiah", "Holy Bible", 29, None, None,
+        "paraphrase", "restoration",
+        "The \"sealed book\" prophecy - \"a marvelous work and a "
+        "wonder\" - understood as foretelling the Book of Mormon's own "
+        "coming forth, a foundational Restoration prophecy. Nephi "
+        "paraphrases and greatly expands it (29 verses become 35) rather "
+        "than quoting it verbatim.",
+    ),
+    # --- Joseph Smith Translation / Moses: revisions, not quotations ---
     (
         "Joseph Smith--Matthew", "Pearl of Great Price", 1, None, None,
         "Matthew", "Holy Bible", 24, None, None,
-        "translation",
-        "Joseph Smith's inspired revision of the Olivet Discourse - the "
-        "same conversation as Matthew 24, offset by one verse throughout "
-        "(JS-Matthew adds an opening verse Matthew doesn't have) and "
-        "expanded further toward the end.",
+        "translation", "second-coming",
+        "The Olivet Discourse - signs of the times preceding the Second "
+        "Coming, the same doctrine in both. Joseph Smith's inspired "
+        "revision of the same conversation, offset by one verse "
+        "throughout and expanded further toward the end.",
     ),
     (
         "Moses", "Pearl of Great Price", 2, None, None,
         "Genesis", "Holy Bible", 1, None, None,
-        "translation",
-        "Joseph Smith's revision of the creation account.",
+        "translation", "creation",
+        "The creation of the heavens and the earth, in Joseph Smith's "
+        "revision of Genesis' opening account.",
     ),
     (
         "Moses", "Pearl of Great Price", 3, None, None,
         "Genesis", "Holy Bible", 2, None, None,
-        "translation",
-        "Continues the creation account and the Garden of Eden - Moses "
+        "translation", "marriage",
+        "\"Therefore shall a man leave his father and mother, and shall "
+        "cleave unto his wife\" - marriage instituted in Eden. Moses "
         "3:1 restates Genesis 2:1 almost verbatim (\"Thus the heaven and "
         "the earth were finished...\").",
     ),
     (
         "Moses", "Pearl of Great Price", 4, None, None,
         "Genesis", "Holy Bible", 3, None, None,
-        "translation",
-        "The Fall - Moses adds several verses on Satan's motive before "
-        "rejoining Genesis' account of the serpent and the forbidden "
-        "fruit.",
+        "translation", "agency",
+        "The Fall, prefaced in Moses by Satan's own account of seeking "
+        "\"to destroy the agency of man\" - agency as the very thing his "
+        "rebellion opposed, before rejoining Genesis' account of the "
+        "forbidden fruit.",
     ),
     (
         "Moses", "Pearl of Great Price", 5, None, None,
         "Genesis", "Holy Bible", 4, None, None,
-        "translation",
-        "Cain and Abel, and Adam's posterity - Moses adds substantial "
-        "teaching about sacrifice and the gospel being preached to "
-        "Adam's family.",
+        "translation", "sacrifice",
+        "Cain and Abel's offerings - Moses adds that sacrifice was "
+        "commanded \"in similitude of the only Begotten,\" giving the "
+        "doctrine behind an ordinance Genesis simply narrates.",
     ),
     (
         "Moses", "Pearl of Great Price", 6, None, None,
         "Genesis", "Holy Bible", 5, None, None,
-        "translation",
-        "Adam's genealogy, expanded with an account of a \"book of "
-        "remembrance\" and Enoch's ministry beginning.",
+        "translation", "baptism",
+        "Adam's genealogy, expanded with the gospel being taught to "
+        "Adam - \"by the water... ye keep the commandment... by the "
+        "Spirit ye are justified\" - one of scripture's clearest "
+        "statements of baptism's doctrine, absent from Genesis' brief "
+        "record.",
     ),
     (
         "Moses", "Pearl of Great Price", 8, None, None,
         "Genesis", "Holy Bible", 6, None, None,
-        "translation",
-        "Corruption before the Flood and God's call to Noah - Moses 7's "
+        "translation", "repentance",
+        "God's call to repent before the Flood - \"I am angry with this "
+        "people, and my fierce anger is kindled against them\" - "
+        "repentance as the offer that precedes judgment. Moses 7's "
         "entire account of Enoch's vision has no Genesis counterpart at "
         "all and sits between these two chapters.",
     ),
+    # --- D&C / Bible ---
     (
         "Doctrine and Covenants", "Doctrine and Covenants", 128, 17, 17,
         "Malachi", "Holy Bible", 4, 5, 6,
-        "quotation",
-        "Joseph Smith quotes Malachi's Elijah prophecy directly within "
-        "this verse (\"for Malachi says, last chapter, verses 5th and "
-        "6th\"), applying it to temple work for the dead.",
+        "quotation", "temple",
+        "Elijah's promise, applied here to baptism for the dead - the "
+        "sealing power that makes temple ordinance work for deceased "
+        "ancestors possible. Joseph Smith quotes it directly (\"for "
+        "Malachi says, last chapter, verses 5th and 6th\") before "
+        "explaining its meaning.",
     ),
+    # --- Book of Mormon / New Testament paraphrases ---
     (
         "Ether", "The Book of Mormon", 12, 6, 22,
         "Hebrews", "Holy Bible", 11, None, None,
-        "paraphrase",
+        "paraphrase", "faith",
+        "Faith defined as \"things which are hoped for and not seen\" - "
         "Moroni explicitly draws on \"Paul\" (Ether 12:6 echoes Hebrews "
-        "11:1's own definition of faith) for his own \"faith chapter,\" "
-        "then continues with Book of Mormon examples rather than the Old "
-        "Testament ones Paul lists.",
+        "11:1) for his own \"faith chapter,\" then illustrates it with "
+        "Book of Mormon examples rather than Paul's Old Testament ones.",
     ),
     (
         "Moroni", "The Book of Mormon", 7, 45, 48,
         "1 Corinthians", "Holy Bible", 13, 4, 8,
-        "paraphrase",
-        "Mormon's discourse on faith, hope, and charity closely parallels "
-        "- in places word for word - Paul's \"love\" chapter.",
+        "paraphrase", "charity",
+        "\"Charity never faileth\" - charity as the pure love of Christ, "
+        "described here in places word for word the same as Paul's "
+        "\"love\" chapter.",
     ),
     (
         "Moroni", "The Book of Mormon", 10, 9, 16,
         "1 Corinthians", "Holy Bible", 12, 8, 11,
-        "paraphrase",
-        "Moroni's list of spiritual gifts parallels Paul's list to the "
-        "Corinthians, though Moroni's is longer - it continues with gifts, "
-        "like beholding angels, that Paul doesn't list.",
+        "paraphrase", "holy-ghost",
+        "Spiritual gifts given \"by the Spirit\" for the edification of "
+        "the Church - Moroni's list parallels Paul's, though it "
+        "continues further, adding gifts like beholding angels that "
+        "Paul doesn't list.",
     ),
 ]
-
-
-def expand_chapter_blocks(blocks: list[tuple]) -> list[tuple]:
-    """One whole-chapter ENTRIES-shaped tuple per chapter in each block,
-    the related side's chapter number advancing in lockstep."""
-    expanded = []
-    for (
-        book, volume, chapter_start, chapter_end,
-        related_book, related_volume, related_chapter_start,
-        relationship, note,
-    ) in blocks:
-        span = chapter_end - chapter_start
-        for offset in range(span + 1):
-            expanded.append(
-                (
-                    book, volume, chapter_start + offset, None, None,
-                    related_book, related_volume, related_chapter_start + offset, None, None,
-                    relationship, note,
-                )
-            )
-    return expanded
 
 
 def resolve_volume_slug(conn, volume_name: str) -> str:
@@ -255,13 +385,14 @@ def resolve_volume_slug(conn, volume_name: str) -> str:
 
 def verify_entry(conn, entry: tuple) -> None:
     """Sanity-check one entry against the actual imported text before it's
-    written: both chapters must exist, and any verse range given must fall
-    within that chapter's real verse count - catches a typo'd chapter or
-    verse number rather than silently writing a broken cross-reference."""
+    written: both chapters must exist, any verse range given must fall
+    within that chapter's real verse count, and every topic slug named
+    must be a real Topical Guide topic - catches a typo'd chapter, verse
+    number, or topic slug rather than silently writing a broken entry."""
     (
         book, volume, chapter, verse_start, verse_end,
         related_book, related_volume, related_chapter, related_verse_start, related_verse_end,
-        _relationship, _note,
+        _relationship, topic_slugs, _note,
     ) = entry
     for b, v, c, vs, ve in (
         (book, volume, chapter, verse_start, verse_end),
@@ -283,38 +414,42 @@ def verify_entry(conn, entry: tuple) -> None:
         if ve is not None and ve > verse_count:
             raise ValueError(f"{b} {c}:{ve} ({v}) is out of range - chapter only has {verse_count} verses")
 
+    for slug in (s.strip() for s in topic_slugs.split(",") if s.strip()):
+        exists = conn.execute("SELECT 1 FROM topics WHERE slug = ?", (slug,)).fetchone()
+        if exists is None:
+            raise ValueError(f"{book} {chapter}: no such topic slug {slug!r} - typo, or topics table not built yet?")
+
 
 def rebuild(conn) -> None:
     conn.execute("DELETE FROM cross_references")
 
-    all_entries = expand_chapter_blocks(CHAPTER_BLOCKS) + ENTRIES
-    print(f"Verifying {len(all_entries)} cross-reference entries against imported text...")
-    for entry in all_entries:
+    print(f"Verifying {len(ENTRIES)} cross-reference entries against imported text...")
+    for entry in ENTRIES:
         verify_entry(conn, entry)
     print("  All entries verified.")
 
     print("Writing cross_references...")
-    for sort_order, entry in enumerate(all_entries, start=1):
+    for sort_order, entry in enumerate(ENTRIES, start=1):
         (
             book, volume, chapter, verse_start, verse_end,
             related_book, related_volume, related_chapter, related_verse_start, related_verse_end,
-            relationship, note,
+            relationship, topic_slugs, note,
         ) = entry
         conn.execute(
             "INSERT INTO cross_references "
             "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
             "related_volume_slug, related_book_name, related_chapter_number, "
-            "related_verse_start, related_verse_end, relationship, note, sort_order) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 resolve_volume_slug(conn, volume), book, chapter, verse_start, verse_end,
                 resolve_volume_slug(conn, related_volume), related_book, related_chapter,
                 related_verse_start, related_verse_end,
-                relationship, note, sort_order,
+                relationship, topic_slugs, note, sort_order,
             ),
         )
     conn.commit()
-    print(f"  {len(all_entries)} entries written.")
+    print(f"  {len(ENTRIES)} entries written.")
 
 
 def main() -> None:

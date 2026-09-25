@@ -30,6 +30,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     _migrate_whole_verse_highlights(conn)
     _migrate_add_chapter_metadata_columns(conn)
     _migrate_add_sync_columns(conn)
+    _migrate_add_cross_reference_topic_slugs(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
@@ -171,6 +172,14 @@ def _migrate_add_sync_columns(conn: sqlite3.Connection) -> None:
             "UPDATE reading_log SET updated_at = read_date || 'T00:00:00' "
             "WHERE updated_at IS NULL"
         )
+
+
+def _migrate_add_cross_reference_topic_slugs(conn: sqlite3.Connection) -> None:
+    """topic_slugs was added to cross_references after that table already
+    existed for anyone who picked up an earlier v2.2.4 build - default to
+    '' (no topics tagged yet), same as schema.sql's own DEFAULT for a
+    fresh database."""
+    _add_column_if_missing(conn, "cross_references", "topic_slugs", "TEXT NOT NULL DEFAULT ''")
 
 
 def _add_column_if_missing(
@@ -425,20 +434,21 @@ def _sync_bundled_cross_references(conn: sqlite3.Connection) -> None:
                 "INSERT INTO cross_references "
                 "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
                 "related_volume_slug, related_book_name, related_chapter_number, "
-                "related_verse_start, related_verse_end, relationship, note, sort_order) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     b_cr["volume_slug"], b_cr["book_name"], b_cr["chapter_number"],
                     b_cr["verse_start"], b_cr["verse_end"],
                     b_cr["related_volume_slug"], b_cr["related_book_name"], b_cr["related_chapter_number"],
                     b_cr["related_verse_start"], b_cr["related_verse_end"],
-                    b_cr["relationship"], b_cr["note"], b_cr["sort_order"],
+                    b_cr["relationship"], b_cr["topic_slugs"], b_cr["note"], b_cr["sort_order"],
                 ),
             )
         else:
             conn.execute(
-                "UPDATE cross_references SET relationship = ?, note = ?, sort_order = ? WHERE id = ?",
-                (b_cr["relationship"], b_cr["note"], b_cr["sort_order"], row["id"]),
+                "UPDATE cross_references SET relationship = ?, topic_slugs = ?, note = ?, sort_order = ? "
+                "WHERE id = ?",
+                (b_cr["relationship"], b_cr["topic_slugs"], b_cr["note"], b_cr["sort_order"], row["id"]),
             )
 
 

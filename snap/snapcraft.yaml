@@ -50,7 +50,8 @@ description: |
   Cross-references are hand-curated the same way: a short, accuracy-first
   list of well-documented parallel passages, each verified directly
   against this app's own imported text rather than copied from any
-  outside source.
+  outside source, and each tagged with the Topical Guide topic it's
+  actually teaching.
 
 adopt-info: desktop-scriptures
 license: MIT
