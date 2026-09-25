@@ -125,6 +125,52 @@ CREATE TABLE IF NOT EXISTS topic_talks (
 
 CREATE INDEX IF NOT EXISTS idx_topic_talks_topic ON topic_talks(topic_id);
 
+-- Cross-references: passages that quote, closely paraphrase, or are a JST/
+-- Moses-style translation-revision of another passage elsewhere in the
+-- corpus - developer-curated like the Topical Guide above, and synced
+-- forward the same way. Built/refreshed by scripts/build_cross_references.py,
+-- never edited by hand or by the app itself.
+--
+-- Each row is one pair, named "primary"/"related" only for column-naming
+-- purposes - a lookup matches either side (see get_cross_references), so
+-- which passage a reader is currently viewing decides which side is
+-- "this chapter" and which is "the other one" at query time.
+--
+-- Identified by (volume slug, book name, chapter number) rather than a
+-- verse_id or even a single `reference` string, for the same reason as
+-- topic_verses above: the Joseph Smith Translation reuses the King James
+-- Bible's own chapter/verse numbering, so a bare reference like
+-- "Isaiah 2:5" exists once in Holy Bible and again, with unrelated
+-- wording, in Joseph Smith Translation. verse_start/verse_end are NULL
+-- together for a whole-chapter match (e.g. 2 Nephi 12 <-> Isaiah 2);
+-- verse_end NULL with verse_start set means a single verse.
+CREATE TABLE IF NOT EXISTS cross_references (
+    id                      INTEGER PRIMARY KEY,
+    volume_slug             TEXT NOT NULL,
+    book_name               TEXT NOT NULL,
+    chapter_number          INTEGER NOT NULL,
+    verse_start             INTEGER,
+    verse_end               INTEGER,
+    related_volume_slug     TEXT NOT NULL,
+    related_book_name       TEXT NOT NULL,
+    related_chapter_number  INTEGER NOT NULL,
+    related_verse_start     INTEGER,
+    related_verse_end       INTEGER,
+    -- quotation = wording matches (allowing for translation-era spelling);
+    -- paraphrase = same content/point, wording diverges meaningfully, or
+    -- only part of the passage is quoted amid original commentary;
+    -- translation = a JST-style revision of the very same underlying
+    -- narrative, not an independent quotation of it.
+    relationship            TEXT NOT NULL CHECK (relationship IN ('quotation', 'paraphrase', 'translation')),
+    note                    TEXT NOT NULL,
+    sort_order              INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_cross_references_primary
+    ON cross_references(volume_slug, book_name, chapter_number);
+CREATE INDEX IF NOT EXISTS idx_cross_references_related
+    ON cross_references(related_volume_slug, related_book_name, related_chapter_number);
+
 -- Full-text search over verse text. External-content table keeps the index
 -- in sync with `verses` via triggers below, without duplicating storage.
 CREATE VIRTUAL TABLE IF NOT EXISTS verses_fts USING fts5(

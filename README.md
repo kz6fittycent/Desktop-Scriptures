@@ -6,8 +6,10 @@ A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
 Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
 Joseph Smith Translation. The core reading and study experience works
 fully offline - personal notes, tags, verse highlighting, keyword
-search, a Topical Guide, General Conference and Ensign/Liahona citations, a Scripture of
-the Day banner, a reading streak, a Resume Reading history of your last
+search, a Topical Guide, General Conference and Ensign/Liahona citations,
+a Cross-references tab pointing out known parallel passages elsewhere in
+the corpus (an Isaiah chapter also quoted in the Book of Mormon, say),
+a Scripture of the Day banner, a reading streak, a Resume Reading history of your last
 5 chapters, a searchable Journal with one entry per day (optionally
 linked to a verse or chapter you're reflecting on), a choice of accent
 colors, cloud-folder sync across your own devices (via whatever cloud
@@ -55,7 +57,12 @@ out to the original source instead.
 The Topical Guide is Desktop Scriptures' own correlation of its local
 scripture text and that same citation index (see
 `scripts/build_topical_guide.py`) - not a copy of the Church's own,
-separately-copyrighted Topical Guide.
+separately-copyrighted Topical Guide. Cross-references are hand-curated
+the same way (see `scripts/build_cross_references.py`) - a short,
+accuracy-first list of well-documented parallel passages (quotations,
+paraphrases, and Joseph Smith Translation/Moses-style revisions), each
+verified directly against this app's own imported text rather than
+copied from any outside source.
 
 ## Screenshots
 
@@ -101,3 +108,4 @@ Features under consideration for future versions:
 - [x] General Conference Talk auto updater (a monthly CI job re-runs the existing citation harvester and opens a PR if scriptures.byu.edu's index turned up anything new - see `.github/workflows/refresh-gc-citations.yml`; a dev/process change, not a new in-app feature, so it ships whenever its PRs are next merged rather than bumping the app version itself)
 - [x] Ensign/Liahona citations (v2.2.3 - BYU's Citation Index has no corpus at all for the Ensign or Liahona, so this detects citations directly from each article's own scripture hyperlinks on churchofjesuschrist.org instead, covering every English issue from 1971 to present; see `scripts/harvest_liahona_citations.py`. Shows up alongside General Conference talks in the Citations tab and AI-assisted search's citing-works list, each clearly labeled by source - "Ensign" or "Liahona" depending on the issue's date, since the magazine was renamed for English readers in January 2021)
 - [x] Temple recommend renewal reminder (v2.1.9 - an opt-in, entirely offline reminder shown once a day starting ~4 weeks before the expiration date you enter, and every day past it until you renew and update the date; see View → "Temple Recommend Reminder...")
+- [x] Cross-references (v2.2.4 - a "Cross-references" tab alongside Study and Citations surfaces known parallel passages elsewhere in the corpus - quotations, paraphrases, and Joseph Smith Translation/Moses-style revisions - each clickable straight through to that other chapter; see `scripts/build_cross_references.py`. Deliberately a short, hand-curated, accuracy-first list rather than an attempt at exhaustive or automatic detection - every entry was checked directly against this app's own imported text before being added)

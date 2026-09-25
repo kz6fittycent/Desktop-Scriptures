@@ -330,6 +330,7 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                                 ),
                             )
         _sync_bundled_topics(conn)
+        _sync_bundled_cross_references(conn)
         conn.commit()
     finally:
         conn.execute("DETACH DATABASE bundled")
@@ -396,6 +397,49 @@ def _sync_bundled_topics(conn: sqlite3.Connection) -> None:
                         b_talk["sort_order"],
                     ),
                 )
+
+
+def _sync_bundled_cross_references(conn: sqlite3.Connection) -> None:
+    """Cross-references are developer-authored, like topics above - synced
+    the same way, matched by the full (volume/book/chapter/verse-range)
+    pair on both sides rather than a single natural-key column, since no
+    one column identifies a row. relationship/note/sort_order are kept in
+    sync with the bundled copy on a re-run, same as a topic's own
+    description/sort_order."""
+    for b_cr in conn.execute("SELECT * FROM bundled.cross_references ORDER BY sort_order"):
+        row = conn.execute(
+            "SELECT id FROM cross_references WHERE "
+            "volume_slug = ? AND book_name = ? AND chapter_number = ? "
+            "AND verse_start IS ? AND verse_end IS ? "
+            "AND related_volume_slug = ? AND related_book_name = ? AND related_chapter_number = ? "
+            "AND related_verse_start IS ? AND related_verse_end IS ?",
+            (
+                b_cr["volume_slug"], b_cr["book_name"], b_cr["chapter_number"],
+                b_cr["verse_start"], b_cr["verse_end"],
+                b_cr["related_volume_slug"], b_cr["related_book_name"], b_cr["related_chapter_number"],
+                b_cr["related_verse_start"], b_cr["related_verse_end"],
+            ),
+        ).fetchone()
+        if row is None:
+            conn.execute(
+                "INSERT INTO cross_references "
+                "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
+                "related_volume_slug, related_book_name, related_chapter_number, "
+                "related_verse_start, related_verse_end, relationship, note, sort_order) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    b_cr["volume_slug"], b_cr["book_name"], b_cr["chapter_number"],
+                    b_cr["verse_start"], b_cr["verse_end"],
+                    b_cr["related_volume_slug"], b_cr["related_book_name"], b_cr["related_chapter_number"],
+                    b_cr["related_verse_start"], b_cr["related_verse_end"],
+                    b_cr["relationship"], b_cr["note"], b_cr["sort_order"],
+                ),
+            )
+        else:
+            conn.execute(
+                "UPDATE cross_references SET relationship = ?, note = ?, sort_order = ? WHERE id = ?",
+                (b_cr["relationship"], b_cr["note"], b_cr["sort_order"], row["id"]),
+            )
 
 
 def fts5_available(conn: sqlite3.Connection) -> bool:

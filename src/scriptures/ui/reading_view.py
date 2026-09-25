@@ -9,12 +9,16 @@ Each verse has a small pencil button; clicking it reveals (creating if
 needed) that verse's note/tags entry in the "Study" tab of the tabbed
 panel docked to the right, and focuses it there - that tab (ChapterPanel)
 is the single editing surface for every note and tag in this chapter,
-verse-level and chapter-level alike. The other tab, "Citations", shows
-which of this chapter's verses are cited in General Conference talks
-(pilot-scoped - see scriptures/citations.py) - selecting which tab is
-current is tracked by MainWindow and threaded back in via
-selected_side_tab, so it survives Previous/Next chapter navigation even
-though each navigation rebuilds this whole view from scratch.
+verse-level and chapter-level alike. "Citations" shows which of this
+chapter's verses are cited in General Conference talks or Ensign/Liahona
+articles (see scriptures/citations.py). "Cross-references" shows known
+parallel passages elsewhere in the corpus - quotations, paraphrases, or
+JST/Moses-style translation-revisions (see
+scripts/build_cross_references.py) - each clickable straight through to
+that other chapter. Selecting which tab is current is tracked by
+MainWindow and threaded back in via selected_side_tab, so it survives
+Previous/Next chapter navigation even though each navigation rebuilds
+this whole view from scratch.
 
 Highlighting is armed from the Highlighter menu (see main_window.py) rather
 than anything on this screen. Each verse's body is a read-only QTextEdit
@@ -52,12 +56,14 @@ from scriptures.data_access import (
     add_highlight,
     clear_highlight_range,
     get_annotated_verse_ids,
+    get_cross_references,
     get_highlights,
     get_note,
     get_tags,
 )
 from scriptures.ui.chapter_panel import PANEL_WIDTH, ChapterPanel
 from scriptures.ui.citations_panel import CitationsPanel
+from scriptures.ui.cross_references_panel import CrossReferencesPanel
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
 from scriptures.ui.tts_playback import ReadableVerse, TtsController
 
@@ -178,6 +184,7 @@ class ReadingView(QWidget):
     prev_requested = Signal()
     next_requested = Signal()
     side_tab_changed = Signal(int)
+    chapter_link_activated = Signal(int)
 
     def __init__(
         self,
@@ -337,6 +344,13 @@ class ReadingView(QWidget):
         citations_panel = CitationsPanel(verses)
         self._side_tabs.addTab(citations_panel, self._citations_tab_label(citations_panel))
 
+        cross_references = get_cross_references(conn, chapter_id)
+        cross_references_panel = CrossReferencesPanel(cross_references)
+        cross_references_panel.chapter_selected.connect(self.chapter_link_activated)
+        self._side_tabs.addTab(
+            cross_references_panel, self._cross_references_tab_label(cross_references_panel)
+        )
+
         self._side_tabs.setCurrentIndex(selected_side_tab)
         self._side_tabs.currentChanged.connect(self.side_tab_changed)
         outer.addWidget(self._side_tabs)
@@ -404,6 +418,11 @@ class ReadingView(QWidget):
     def _citations_tab_label(citations_panel: CitationsPanel) -> str:
         count = citations_panel.cited_verse_count
         return f"Citations ({count})" if count else "Citations"
+
+    @staticmethod
+    def _cross_references_tab_label(cross_references_panel: CrossReferencesPanel) -> str:
+        count = cross_references_panel.reference_count
+        return f"Cross-references ({count})" if count else "Cross-references"
 
     def _on_range_selected(self, verse: Verse, start: int, end: int) -> None:
         # Selection is otherwise left alone here - with no highlighter

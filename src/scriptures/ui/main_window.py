@@ -1624,6 +1624,7 @@ class MainWindow(QMainWindow):
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)
         view.side_tab_changed.connect(self._on_side_tab_changed)
+        view.chapter_link_activated.connect(self._on_search_result_selected)
         if prev_target is not None:
             pt, pb, pc = prev_target
             view.prev_requested.connect(lambda: self._on_chapter_clicked(volume, pt, pb, pc.id))

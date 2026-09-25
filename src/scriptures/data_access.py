@@ -119,6 +119,22 @@ class TopicTalk:
 
 
 @dataclass(frozen=True)
+class CrossReference:
+    """One related passage for a chapter currently being read: the local
+    verse range this entry covers (both None = the whole chapter),
+    `related_reference` as a display string (e.g. "Isaiah 52:7-10"), and
+    `related_chapter_id` to jump straight to that chapter - see
+    get_cross_references for how "local" vs. "related" is decided."""
+
+    verse_start: int | None
+    verse_end: int | None
+    related_reference: str
+    related_chapter_id: int
+    relationship: str
+    note: str
+
+
+@dataclass(frozen=True)
 class NoteResult:
     """A note-search hit: `reference` is the verse's reference, or a
     "Book chapter_number" label for a chapter-level note."""
@@ -893,3 +909,81 @@ def get_topic_talks(conn: sqlite3.Connection, topic_id: int) -> list[TopicTalk]:
         (topic_id,),
     ).fetchall()
     return [TopicTalk(r["talk_title"], r["speaker"], r["date"], r["url"]) for r in rows]
+
+
+def _format_reference(book_name: str, chapter_number: int, verse_start: int | None, verse_end: int | None) -> str:
+    if verse_start is None:
+        return f"{book_name} {chapter_number}"
+    if verse_end is None or verse_end == verse_start:
+        return f"{book_name} {chapter_number}:{verse_start}"
+    return f"{book_name} {chapter_number}:{verse_start}-{verse_end}"
+
+
+def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[CrossReference]:
+    """Every known parallel passage touching this chapter - a row matches
+    if EITHER side names this chapter (see cross_references' schema
+    comment on why volume/book/chapter, not chapter_id, identifies a
+    side), with the other side returned regardless of which one matched,
+    resolved to that other chapter's own chapter_id for navigation. A row
+    whose other side isn't present in this database yet (e.g. an older
+    writable copy that hasn't synced in that book) is simply left out,
+    the same tolerance get_topic_verses already has."""
+    location = get_chapter_location(conn, chapter_id)
+    if location is None:
+        return []
+    volume, _testament, book, chapter = location
+
+    rows = conn.execute(
+        "SELECT * FROM cross_references "
+        "WHERE (volume_slug = ? AND book_name = ? AND chapter_number = ?) "
+        "   OR (related_volume_slug = ? AND related_book_name = ? AND related_chapter_number = ?) "
+        "ORDER BY sort_order",
+        (
+            volume.slug, book.name, chapter.chapter_number,
+            volume.slug, book.name, chapter.chapter_number,
+        ),
+    ).fetchall()
+
+    results = []
+    for row in rows:
+        is_primary_side = (
+            row["volume_slug"] == volume.slug
+            and row["book_name"] == book.name
+            and row["chapter_number"] == chapter.chapter_number
+        )
+        if is_primary_side:
+            local_start, local_end = row["verse_start"], row["verse_end"]
+            other_volume_slug = row["related_volume_slug"]
+            other_book_name = row["related_book_name"]
+            other_chapter_number = row["related_chapter_number"]
+            other_start, other_end = row["related_verse_start"], row["related_verse_end"]
+        else:
+            local_start, local_end = row["related_verse_start"], row["related_verse_end"]
+            other_volume_slug = row["volume_slug"]
+            other_book_name = row["book_name"]
+            other_chapter_number = row["chapter_number"]
+            other_start, other_end = row["verse_start"], row["verse_end"]
+
+        other_chapter = conn.execute(
+            "SELECT c.id FROM chapters c "
+            "JOIN books b ON b.id = c.book_id "
+            "JOIN volumes vol ON vol.id = b.volume_id "
+            "WHERE vol.slug = ? AND b.name = ? AND c.chapter_number = ?",
+            (other_volume_slug, other_book_name, other_chapter_number),
+        ).fetchone()
+        if other_chapter is None:
+            continue
+
+        results.append(
+            CrossReference(
+                verse_start=local_start,
+                verse_end=local_end,
+                related_reference=_format_reference(
+                    other_book_name, other_chapter_number, other_start, other_end
+                ),
+                related_chapter_id=other_chapter["id"],
+                relationship=row["relationship"],
+                note=row["note"],
+            )
+        )
+    return results
