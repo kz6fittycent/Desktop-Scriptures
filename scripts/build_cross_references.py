@@ -2758,6 +2758,405 @@ ENTRIES = [
         "\"suffer the little children to come unto me, and forbid them "
         "not: for of such is the kingdom of God.\"",
     ),
+    # --- Fork: New Testament ---
+    (
+        "Mark", "Holy Bible", 10, 14, 15,
+        "3 Nephi", "The Book of Mormon", 11, 37, 38,
+        "paraphrase", "baptism",
+        "\"Suffer the little children to come unto me... for of such is "
+        "the kingdom of God\" and \"ye must repent, and become as a "
+        "little child, and be baptized\" both make childlike humility "
+        "the condition of entering God's kingdom.",
+    ),
+    (
+        "Luke", "Holy Bible", 15, 4, 7,
+        "Doctrine and Covenants", "Doctrine and Covenants", 18, 15, 15,
+        "paraphrase", "missionary-work",
+        "The shepherd who leaves ninety and nine to seek the one lost "
+        "sheep is the same joy this modern revelation promises: \"if it "
+        "so be... ye bring, save it be one soul unto me, how great shall "
+        "be your joy.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 24, 32, 32,
+        "Doctrine and Covenants", "Doctrine and Covenants", 9, 8, 9,
+        "paraphrase", "revelation",
+        "\"Did not our heart burn within us, while he talked with us by "
+        "the way\" describes in narrative the very confirmation this "
+        "revelation later teaches as a pattern: \"I will cause that your "
+        "bosom shall burn within you.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 24, 36, 39,
+        "Doctrine and Covenants", "Doctrine and Covenants", 130, 22, 22,
+        "quotation", "godhead",
+        "The risen Christ invites the apostles to \"handle me, and see; "
+        "for a spirit hath not flesh and bones, as ye see me have\" - "
+        "the same doctrine this modern revelation states plainly: \"The "
+        "Father has a body of flesh and bones as tangible as man's; the "
+        "Son also.\"",
+    ),
+    (
+        "John", "Holy Bible", 5, 39, 39,
+        "Jacob", "The Book of Mormon", 7, 11, 11,
+        "paraphrase", "testimony",
+        "\"Search the scriptures... they are they which testify of me\" "
+        "and \"none of the prophets have written, nor prophesied, save "
+        "they have spoken concerning this Christ\" both teach that "
+        "scripture's whole purpose is to testify of Him.",
+    ),
+    (
+        "John", "Holy Bible", 20, 29, 29,
+        "Alma", "The Book of Mormon", 32, 21, 21,
+        "paraphrase", "faith",
+        "\"Blessed are they that have not seen, and yet have believed\" "
+        "and \"faith is not to have a perfect knowledge of things... ye "
+        "hope for things which are not seen, which are true\" both "
+        "describe faith as trust that outruns physical proof.",
+    ),
+    (
+        "Acts", "Holy Bible", 9, 3, 6,
+        "Alma", "The Book of Mormon", 36, 6, 11,
+        "paraphrase", "testimony",
+        "Saul struck down by light on the road to Damascus and Alma "
+        "struck down by an angel's voice \"as it were of thunder\" are "
+        "each a sudden, overwhelming conversion that redirects a "
+        "persecutor into a witness of Christ.",
+    ),
+    (
+        "Romans", "Holy Bible", 8, 38, 39,
+        "2 Nephi", "The Book of Mormon", 1, 15, 15,
+        "paraphrase", "love",
+        "\"Nothing... shall be able to separate us from the love of "
+        "God\" and \"I am encircled about eternally in the arms of his "
+        "love\" both describe God's love as something nothing in "
+        "mortality can take away.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 11, 23, 25,
+        "3 Nephi", "The Book of Mormon", 18, 7, 7,
+        "quotation", "ordinances",
+        "\"This do in remembrance of me\" - Paul's account of the "
+        "sacrament's institution at the Last Supper and Christ's own "
+        "words instituting it again among the Nephites use nearly "
+        "identical language for the same ordinance.",
+    ),
+    (
+        "2 Corinthians", "Holy Bible", 5, 17, 17,
+        "Mosiah", "The Book of Mormon", 27, 25, 26,
+        "paraphrase", "repentance",
+        "\"If any man be in Christ, he is a new creature: old things are "
+        "passed away\" and \"all mankind... must be born again... "
+        "changed from their carnal and fallen state\" both describe "
+        "conversion as a genuine change of nature, not a fresh start in "
+        "name only.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 4, 11, 14,
+        "Articles of Faith", "Pearl of Great Price", 1, 6, 6,
+        "paraphrase", "church-of-jesus-christ",
+        "\"He gave some, apostles; and some, prophets... pastors and "
+        "teachers\" is the same church organization the Articles of "
+        "Faith name as restored: \"the same organization that existed "
+        "in the Primitive Church.\"",
+    ),
+    (
+        "Philippians", "Holy Bible", 4, 13, 13,
+        "Alma", "The Book of Mormon", 26, 12, 12,
+        "quotation", "faith",
+        "\"I can do all things through Christ which strengtheneth me\" "
+        "and Ammon's own \"in his strength I can do all things\" name "
+        "the identical source of power - not personal ability, but "
+        "Christ's own strength lent to the believer.",
+    ),
+    (
+        "Colossians", "Holy Bible", 1, 15, 17,
+        "Doctrine and Covenants", "Doctrine and Covenants", 93, 21, 21,
+        "paraphrase", "jesus-christ",
+        "\"The image of the invisible God, the firstborn of every "
+        "creature... by him were all things created\" and \"I was in "
+        "the beginning with the Father, and am the Firstborn\" both "
+        "name Christ's premortal role as Creator and Firstborn.",
+    ),
+    (
+        "1 Timothy", "Holy Bible", 2, 5, 5,
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 40, 42,
+        "paraphrase", "atonement",
+        "\"One mediator between God and men, the man Christ Jesus\" and "
+        "\"he came into the world... to be crucified for the world, and "
+        "to bear the sins of the world\" both describe Christ's unique "
+        "mediating role between God and mankind.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 13, 8, 8,
+        "Mormon", "The Book of Mormon", 9, 9, 9,
+        "quotation", "godhead",
+        "\"Jesus Christ the same yesterday, and to day, and for ever\" "
+        "is echoed even more closely by Mormon's own three-part "
+        "phrasing, \"God is the same yesterday, today, and forever, and "
+        "in him there is no variableness\" - the same doctrine of God's "
+        "changeless nature (see also James 1:17 above).",
+    ),
+    (
+        "James", "Holy Bible", 5, 14, 15,
+        "Doctrine and Covenants", "Doctrine and Covenants", 42, 43, 44,
+        "paraphrase", "ordinances",
+        "\"Let him call for the elders of the church; and let them pray "
+        "over him, anointing him with oil\" is the same ordinance of "
+        "administering to the sick this modern revelation directs the "
+        "elders to perform.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 2, 9, 9,
+        "Exodus", "Holy Bible", 19, 5, 6,
+        "quotation", "covenants",
+        "\"A royal priesthood, an holy nation, a peculiar people\" - "
+        "Peter quotes the Lord's own covenant language to Israel at "
+        "Sinai, \"a peculiar treasure... a kingdom of priests, and an "
+        "holy nation,\" applying it to the covenant people of Christ's "
+        "own day.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 1, 18, 19,
+        "Exodus", "Holy Bible", 12, 5, 5,
+        "typology", "atonement",
+        "\"Redeemed... with the precious blood of Christ, as of a lamb "
+        "without blemish\" - Peter explicitly applies the Passover "
+        "lamb's own qualification, unblemished and without spot, to "
+        "Christ's atoning sacrifice.",
+    ),
+    (
+        "2 Peter", "Holy Bible", 1, 4, 4,
+        "Doctrine and Covenants", "Doctrine and Covenants", 132, 20, 20,
+        "paraphrase", "exaltation",
+        "\"Partakers of the divine nature\" and \"then shall they be "
+        "gods, because they have no end\" both teach that the faithful "
+        "can become like God in nature, not merely admitted to His "
+        "presence.",
+    ),
+    (
+        "1 John", "Holy Bible", 3, 2, 2,
+        "Doctrine and Covenants", "Doctrine and Covenants", 130, 1, 1,
+        "quotation", "second-coming",
+        "\"We shall be like him; for we shall see him as he is\" is "
+        "quoted almost word for word in this revelation's own promise: "
+        "\"when the Savior shall appear we shall see him as he is.\"",
+    ),
+    (
+        "1 John", "Holy Bible", 1, 9, 9,
+        "Mosiah", "The Book of Mormon", 26, 29, 30,
+        "paraphrase", "repentance",
+        "\"If we confess our sins, he is faithful and just to forgive us "
+        "our sins\" and \"as often as my people repent will I forgive "
+        "them their trespasses\" both promise that sincere confession "
+        "and repentance bring real, repeated forgiveness.",
+    ),
+    (
+        "Revelation", "Holy Bible", 1, 8, 8,
+        "Doctrine and Covenants", "Doctrine and Covenants", 19, 1, 1,
+        "quotation", "jesus-christ",
+        "\"I am Alpha and Omega... which is, and which was, and which is "
+        "to come\" is quoted almost exactly in Christ's own "
+        "self-introduction to this modern revelation: \"I am Alpha and "
+        "Omega, Christ the Lord... the beginning and the end.\"",
+    ),
+    (
+        "Revelation", "Holy Bible", 1, 18, 18,
+        "Doctrine and Covenants", "Doctrine and Covenants", 110, 4, 4,
+        "quotation", "jesus-christ",
+        "\"I am he that liveth, and was dead; and, behold, I am alive "
+        "for evermore\" is echoed in Christ's own words to Joseph Smith "
+        "and Oliver Cowdery in the Kirtland Temple: \"I am he who "
+        "liveth, I am he who was slain.\"",
+    ),
+    (
+        "Revelation", "Holy Bible", 12, 7, 9,
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 25, 27,
+        "paraphrase", "premortal-life",
+        "\"There was war in heaven: Michael and his angels fought "
+        "against the dragon\" and this revelation's own account of an "
+        "angel \"who rebelled against the Only Begotten Son\" both "
+        "describe Lucifer's premortal rebellion.",
+    ),
+    (
+        "Revelation", "Holy Bible", 20, 12, 13,
+        "Doctrine and Covenants", "Doctrine and Covenants", 128, 6, 7,
+        "quotation", "judgment",
+        "Joseph Smith explicitly cites this very verse by chapter and "
+        "number - \"as you will find recorded in Revelation 20:12\" - "
+        "while teaching about the books of record kept for the final "
+        "judgment.",
+    ),
+    (
+        "Galatians", "Holy Bible", 4, 4, 5,
+        "Doctrine and Covenants", "Doctrine and Covenants", 20, 26, 26,
+        "paraphrase", "jesus-christ",
+        "\"When the fulness of the time was come, God sent forth his "
+        "Son\" and this revelation's own \"meridian of time, in the "
+        "flesh\" both mark Christ's mortal birth as the appointed "
+        "center-point of history.",
+    ),
+    (
+        "Matthew", "Holy Bible", 16, 18, 18,
+        "Doctrine and Covenants", "Doctrine and Covenants", 10, 69, 69,
+        "quotation", "church-of-jesus-christ",
+        "\"Upon this rock I will build my church; and the gates of hell "
+        "shall not prevail against it\" is echoed almost word for word "
+        "in this revelation's own promise to those who endure in "
+        "Christ's church to the end.",
+    ),
+    (
+        "Matthew", "Holy Bible", 16, 19, 19,
+        "Doctrine and Covenants", "Doctrine and Covenants", 128, 8, 9,
+        "paraphrase", "priesthood",
+        "\"Whatsoever thou shalt bind on earth shall be bound in "
+        "heaven\" is the same sealing power this revelation explains at "
+        "length as an ordinance \"granted\" through priesthood "
+        "authority, not Peter's alone to hold.",
+    ),
+    (
+        "Matthew", "Holy Bible", 24, 36, 36,
+        "Doctrine and Covenants", "Doctrine and Covenants", 49, 7, 7,
+        "paraphrase", "second-coming",
+        "\"Of that day and hour knoweth no man... but my Father only\" "
+        "and \"the hour and the day no man knoweth, neither the angels "
+        "in heaven\" both withhold the exact timing of the Second "
+        "Coming from everyone but God.",
+    ),
+    (
+        "John", "Holy Bible", 3, 3, 5,
+        "Moses", "Pearl of Great Price", 6, 59, 60,
+        "quotation", "baptism",
+        "\"Except a man be born of water and of the Spirit, he cannot "
+        "enter into the kingdom of God\" is taught to Adam himself in "
+        "nearly the same words: \"born into the world by water, and "
+        "blood, and the spirit... even so ye must be born again.\"",
+    ),
+    (
+        "John", "Holy Bible", 6, 38, 38,
+        "Moses", "Pearl of Great Price", 4, 1, 2,
+        "paraphrase", "premortal-life",
+        "\"I came down from heaven, not to do mine own will, but the "
+        "will of him that sent me\" is the mortal fulfillment of "
+        "Christ's own premortal answer to the Father's plan: \"Father, "
+        "thy will be done, and the glory be thine forever.\"",
+    ),
+    (
+        "Revelation", "Holy Bible", 3, 5, 5,
+        "Alma", "The Book of Mormon", 5, 57, 58,
+        "paraphrase", "judgment",
+        "\"I will not blot out his name out of the book of life\" and "
+        "Alma's warning that the wicked's \"names shall be blotted "
+        "out\" both use the same image of a heavenly record kept - or "
+        "erased - according to faithfulness.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 18, 19,
+        "1 Nephi", "The Book of Mormon", 13, 26, 29,
+        "paraphrase", "restoration",
+        "John's warning against adding to or taking away from scripture "
+        "and Nephi's vision of \"many plain and precious things\" being "
+        "taken away from the Bible by \"that great and abominable "
+        "church\" both anticipate scripture itself being corrupted.",
+    ),
+    (
+        "Luke", "Holy Bible", 1, 37, 37,
+        "1 Nephi", "The Book of Mormon", 7, 12, 12,
+        "paraphrase", "faith",
+        "\"For with God nothing shall be impossible\" and \"the Lord is "
+        "able to do all things according to his will, for the children "
+        "of men, if it so be that they exercise faith in him\" both "
+        "root faith in God's own limitless power.",
+    ),
+    (
+        "Acts", "Holy Bible", 4, 12, 12,
+        "Mosiah", "The Book of Mormon", 3, 17, 17,
+        "quotation", "salvation",
+        "\"Neither is there salvation in any other: for there is none "
+        "other name under heaven given among men, whereby we must be "
+        "saved\" is repeated almost word for word: \"there shall be no "
+        "other name given... whereby salvation can come... only in and "
+        "through the name of Christ.\"",
+    ),
+    (
+        "John", "Holy Bible", 11, 25, 26,
+        "Mosiah", "The Book of Mormon", 16, 8, 9,
+        "paraphrase", "resurrection",
+        "\"I am the resurrection, and the life: he that believeth in "
+        "me, though he were dead, yet shall he live\" and \"there is a "
+        "resurrection, therefore the grave hath no victory, and the "
+        "sting of death is swallowed up in Christ\" both anchor victory "
+        "over death in Christ personally, not merely in an abstract "
+        "future event.",
+    ),
+    (
+        "Romans", "Holy Bible", 12, 1, 1,
+        "Omni", "The Book of Mormon", 1, 26, 26,
+        "paraphrase", "consecration",
+        "\"Present your bodies a living sacrifice, holy, acceptable "
+        "unto God\" and \"come unto him, and offer your whole souls as "
+        "an offering unto him\" both call for a complete, personal "
+        "consecration, not merely outward observance.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 2, 9, 9,
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 10, 10,
+        "quotation", "revelation",
+        "\"Eye hath not seen, nor ear heard... the things which God hath "
+        "prepared for them that love him\" is quoted directly in this "
+        "revelation's own account of the vision of the degrees of "
+        "glory, describing \"those things which eye has not seen, nor "
+        "ear heard.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 17, 10, 10,
+        "Mosiah", "The Book of Mormon", 2, 21, 21,
+        "quotation", "humility",
+        "\"When ye shall have done all those things which are commanded "
+        "you, say, We are unprofitable servants\" and King Benjamin's "
+        "own \"if ye should serve him with all your whole souls yet ye "
+        "would be unprofitable servants\" both teach that even perfect "
+        "obedience earns no claim on God.",
+    ),
+    (
+        "Matthew", "Holy Bible", 7, 7, 7,
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 63, 63,
+        "quotation", "prayer",
+        "\"Ask, and it shall be given you; seek, and ye shall find; "
+        "knock, and it shall be opened unto you\" is quoted almost word "
+        "for word in this modern revelation's own invitation to draw "
+        "near to God.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 6, 11, 17,
+        "Doctrine and Covenants", "Doctrine and Covenants", 27, 15, 18,
+        "quotation", "temptation",
+        "\"Put on the whole armour of God, that ye may be able to stand "
+        "against the wiles of the devil\" is quoted at length in this "
+        "modern revelation's own charge to \"take upon you my whole "
+        "armor, that ye may be able to withstand the evil day.\"",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 3, 16, 17,
+        "Doctrine and Covenants", "Doctrine and Covenants", 93, 35, 35,
+        "paraphrase", "temple",
+        "\"Ye are the temple of God... if any man defile the temple of "
+        "God, him shall God destroy\" is restated in this modern "
+        "revelation as \"man is the tabernacle of God, even temples; "
+        "and whatsoever temple is defiled, God shall destroy that "
+        "temple.\"",
+    ),
+    (
+        "Acts", "Holy Bible", 2, 38, 38,
+        "Articles of Faith", "Pearl of Great Price", 1, 4, 4,
+        "paraphrase", "ordinances",
+        "\"Repent, and be baptized every one of you... for the "
+        "remission of sins, and ye shall receive the gift of the Holy "
+        "Ghost\" gives, in narrative order, the very sequence of first "
+        "principles and ordinances the Articles of Faith later name "
+        "formally: faith, repentance, baptism, and the gift of the Holy "
+        "Ghost.",
+    ),
 ]
 
 
