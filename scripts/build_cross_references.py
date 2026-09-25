@@ -1434,6 +1434,123 @@ ENTRIES = [
         "name peace as Christ's own gift to the righteous, not "
         "something the world can offer.",
     ),
+    # --- A second, wider pass of the same citation-mining technique
+    # (cross-book this time, not only cross-volume, which is what
+    # surfaced these Old Testament <-> New Testament pairs).
+    (
+        "John", "Holy Bible", 14, 27, 27,
+        "Philippians", "Holy Bible", 4, 7, 7,
+        "paraphrase", "peace",
+        "\"My peace I give unto you\" and \"the peace of God, which "
+        "passeth all understanding\" both describe a peace only Christ, "
+        "not the world, can give.",
+    ),
+    (
+        "John", "Holy Bible", 14, 27, 27,
+        "Matthew", "Holy Bible", 5, 9, 9,
+        "paraphrase", "peace",
+        "Christ's gift of peace and His blessing on \"the peacemakers... "
+        "they shall be called the children of God\" tie receiving "
+        "Christ's peace to becoming a peacemaker oneself.",
+    ),
+    (
+        "John", "Holy Bible", 14, 27, 27,
+        "Matthew", "Holy Bible", 11, 28, 28,
+        "paraphrase", "peace",
+        "\"Come unto me... I will give you rest\" is the same gift of "
+        "peace Christ promises in John 14:27, offered to \"all ye that "
+        "labour and are heavy laden.\"",
+    ),
+    (
+        "Ephesians", "Holy Bible", 1, 10, 10,
+        "Acts", "Holy Bible", 3, 19, 21,
+        "paraphrase", "restoration",
+        "\"The times of restitution of all things\" and \"the "
+        "dispensation of the fulness of times\" name the same latter-day "
+        "restoration - both Peter and Paul point to a future gathering "
+        "together of all things in Christ.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 41, 10, 10,
+        "2 Nephi", "The Book of Mormon", 2, 27, 27,
+        "paraphrase", "agency",
+        "\"Free to choose liberty and eternal life... or to choose "
+        "captivity and death\" and \"wickedness never was happiness\" "
+        "both teach that agency's consequences are built into the "
+        "choice itself, not arbitrarily assigned afterward.",
+    ),
+    (
+        "Abraham", "Pearl of Great Price", 3, 25, 25,
+        "2 Nephi", "The Book of Mormon", 2, 27, 27,
+        "paraphrase", "agency",
+        "Agency's purpose - being \"free to choose\" - is what makes "
+        "Abraham 3:25's premortal test possible at all: \"we will prove "
+        "them herewith, to see if they will do all things whatsoever "
+        "the Lord... shall command.\"",
+    ),
+    (
+        "Articles of Faith", "Pearl of Great Price", 1, 1, 1,
+        "Joseph Smith--History", "Pearl of Great Price", 1, 17, 17,
+        "paraphrase", "godhead",
+        "\"We believe in God, the Eternal Father, and in His Son, Jesus "
+        "Christ\" as two separate beings is exactly what Joseph Smith "
+        "saw firsthand in the First Vision - the article of faith "
+        "states as doctrine what he witnessed directly.",
+    ),
+    (
+        "Matthew", "Holy Bible", 25, 40, 40,
+        "James", "Holy Bible", 1, 27, 27,
+        "paraphrase", "service",
+        "\"Pure religion... is this, To visit the fatherless and "
+        "widows in their affliction\" and \"inasmuch as ye have done it "
+        "unto one of the least of these... ye have done it unto me\" "
+        "both define true religion by service to the vulnerable.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 119, 4, 4,
+        "Malachi", "Holy Bible", 3, 10, 10,
+        "quotation", "tithing",
+        "\"Bring ye all the tithes into the storehouse... prove me now "
+        "herewith\" is the same law and the same promised blessing the "
+        "Lord restores as \"a standing law unto them forever\" in this "
+        "modern revelation.",
+    ),
+    (
+        "James", "Holy Bible", 1, 5, 5,
+        "Moroni", "The Book of Mormon", 10, 4, 5,
+        "paraphrase", "testimony",
+        "\"If any of you lack wisdom, let him ask of God\" and "
+        "Moroni's promise to \"ask God, the Eternal Father, in the name "
+        "of Christ, if these things are not true\" teach the same "
+        "pattern of receiving personal revelation - Joseph Smith's own "
+        "use of James 1:5 (see Joseph Smith-History above) makes the "
+        "connection more than coincidence.",
+    ),
+    (
+        "Isaiah", "Holy Bible", 9, 6, 6,
+        "John", "Holy Bible", 14, 27, 27,
+        "paraphrase", "jesus-christ",
+        "Isaiah names Him \"The Prince of Peace\" centuries in advance; "
+        "Christ Himself then gives what that title promises: \"my peace "
+        "I give unto you.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 7, 11, 13,
+        "Matthew", "Holy Bible", 11, 28, 28,
+        "paraphrase", "atonement",
+        "\"That his bowels may be filled with mercy... that he may "
+        "know... how to succor his people\" is the same gift of rest "
+        "and relief Christ offers directly in \"come unto me, all ye "
+        "that labour and are heavy laden, and I will give you rest.\"",
+    ),
+    (
+        "Joseph Smith--History", "Pearl of Great Price", 1, 17, 17,
+        "Moses", "Pearl of Great Price", 1, 39, 39,
+        "paraphrase", "restoration",
+        "The First Vision, opening the \"dispensation of the fulness of "
+        "times,\" is the beginning of God bringing to pass in the "
+        "latter days the very work and glory Moses 1:39 describes.",
+    ),
 ]
 
 
