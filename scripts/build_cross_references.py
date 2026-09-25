@@ -949,6 +949,72 @@ ENTRIES = [
         "teach that trials are evidence of God's fatherly love, not His "
         "abandonment.",
     ),
+    # --- Book of Mormon prophecy/fulfillment and shared distinctive
+    # language with the Bible - not verbatim quotation, but wording
+    # and imagery close enough to be more than coincidence.
+    (
+        "Romans", "Holy Bible", 11, 17, 24,
+        "Jacob", "The Book of Mormon", 5, None, None,
+        "paraphrase", "house-of-israel",
+        "Paul uses the same olive-tree grafting imagery - wild branches "
+        "grafted in among the natural, some broken off for unbelief - "
+        "that Zenos' allegory (quoted in full by Jacob) develops at far "
+        "greater length: God's care for scattered Israel and grafted-in "
+        "Gentiles alike.",
+    ),
+    (
+        "Luke", "Holy Bible", 22, 44, 44,
+        "Mosiah", "The Book of Mormon", 3, 7, 7,
+        "paraphrase", "atonement",
+        "\"Blood cometh from every pore\" - Benjamin prophesies the "
+        "Atonement's suffering in strikingly specific, physical terms "
+        "nearly a century before Luke records Christ's own sweat "
+        "becoming \"as it were great drops of blood\" in Gethsemane.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 19, 18, 18,
+        "Mosiah", "The Book of Mormon", 3, 7, 7,
+        "paraphrase", "atonement",
+        "Christ's own later description of His suffering - \"to bleed "
+        "at every pore\" - matches Benjamin's prophecy almost word for "
+        "word, given independently by revelation centuries apart.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 2, 17, 18,
+        "Alma", "The Book of Mormon", 7, 11, 13,
+        "paraphrase", "atonement",
+        "Both texts use the same striking word: Alma says Christ "
+        "suffers \"that he may know... how to succor his people,\" "
+        "Hebrews that He is \"able to succour them that are tempted\" - "
+        "Christ's own suffering as the very thing that qualifies Him to "
+        "help others through theirs.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 4, 15, 15,
+        "Alma", "The Book of Mormon", 7, 11, 13,
+        "paraphrase", "atonement",
+        "\"Touched with the feeling of our infirmities... tempted like "
+        "as we are\" - the same doctrine Alma teaches above: Christ's "
+        "own experience of mortal suffering lets Him fully understand "
+        "and help His people.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 1, 15, 21,
+        "Helaman", "The Book of Mormon", 14, 2, 6,
+        "paraphrase", "prophets",
+        "Samuel the Lamanite prophesies a night and a day and a night "
+        "without darkness as the sign of Christ's birth - fulfilled "
+        "precisely as foretold, five years later.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 8, 5, 23,
+        "Helaman", "The Book of Mormon", 14, 20, 27,
+        "paraphrase", "atonement",
+        "Samuel foretells three days of darkness, storms, and great "
+        "destruction marking Christ's death on the other side of the "
+        "world - fulfilled exactly as prophesied at the moment of the "
+        "crucifixion.",
+    ),
 ]
 
 
