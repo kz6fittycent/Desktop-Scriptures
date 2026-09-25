@@ -2907,16 +2907,6 @@ ENTRIES = [
         "elders to perform.",
     ),
     (
-        "1 Peter", "Holy Bible", 2, 9, 9,
-        "Exodus", "Holy Bible", 19, 5, 6,
-        "quotation", "covenants",
-        "\"A royal priesthood, an holy nation, a peculiar people\" - "
-        "Peter quotes the Lord's own covenant language to Israel at "
-        "Sinai, \"a peculiar treasure... a kingdom of priests, and an "
-        "holy nation,\" applying it to the covenant people of Christ's "
-        "own day.",
-    ),
-    (
         "1 Peter", "Holy Bible", 1, 18, 19,
         "Exodus", "Holy Bible", 12, 5, 5,
         "typology", "atonement",
@@ -3799,6 +3789,601 @@ ENTRIES = [
         "warning against forgetting God after being blessed: \"beware "
         "that thou forget not the Lord thy God... lest... thine heart "
         "be lifted up.\"",
+    ),
+    # --- Fork: OT prophetic books (Isaiah, Jeremiah, Lamentations,
+    # Ezekiel, Daniel, Hosea through Malachi) ---
+    (
+        'Acts', 'Holy Bible', 8, 32, 35,
+        'Isaiah', 'Holy Bible', 53, 7, 7,
+        'quotation', 'jesus-christ',
+        "\"He was led as a sheep to the slaughter\" - Philip explicitly reads "
+        "this passage with the Ethiopian eunuch and \"began at the same "
+        "scripture, and preached unto him Jesus,\" one of the clearest moments "
+        "in the New Testament of Isaiah 53 being read as prophecy of Christ.",
+    ),
+    (
+        '1 Peter', 'Holy Bible', 2, 24, 24,
+        'Isaiah', 'Holy Bible', 53, 5, 5,
+        'quotation', 'atonement',
+        "\"He was wounded for our transgressions... with his stripes we are "
+        "healed\" is quoted almost verbatim: \"who his own self bare our sins "
+        "in his own body on the tree... by whose stripes ye were healed.\"",
+    ),
+    (
+        'Luke', 'Holy Bible', 22, 37, 37,
+        'Isaiah', 'Holy Bible', 53, 12, 12,
+        'quotation', 'atonement',
+        "\"He was numbered with the transgressors\" - Christ explicitly quotes "
+        "this the night of His arrest: \"this that is written must yet be "
+        "accomplished in me... he was reckoned among the transgressors.\"",
+    ),
+    (
+        'Matthew', 'Holy Bible', 27, 57, 60,
+        'Isaiah', 'Holy Bible', 53, 9, 9,
+        'paraphrase', 'atonement',
+        "\"He made his grave with the wicked, and with the rich in his death\" "
+        "- fulfilled when a rich man, Joseph of Arimathaea, laid Christ's "
+        "body in his own tomb.",
+    ),
+    (
+        'Matthew', 'Holy Bible', 15, 8, 9,
+        'Isaiah', 'Holy Bible', 29, 13, 13,
+        'quotation', 'truth',
+        "\"This people draweth nigh unto me with their mouth... but their "
+        "heart is far from me\" - Christ quotes Isaiah directly to condemn "
+        "worship that is outwardly correct but inwardly empty.",
+    ),
+    (
+        'Revelation', 'Holy Bible', 1, 17, 17,
+        'Isaiah', 'Holy Bible', 44, 6, 6,
+        'paraphrase', 'jesus-christ',
+        "\"I am the first, and I am the last; and beside me there is no God\" "
+        "is the very title Christ takes for Himself in John's vision: \"Fear "
+        "not; I am the first and the last.\"",
+    ),
+    (
+        'Revelation', 'Holy Bible', 21, 1, 1,
+        'Isaiah', 'Holy Bible', 65, 17, 17,
+        'paraphrase', 'second-coming',
+        "\"I create new heavens and a new earth\" and \"I saw a new heaven and a "
+        "new earth: for the first heaven and the first earth were passed "
+        "away\" describe the same final renewal, Isaiah's promise and John's "
+        "vision of its fulfillment.",
+    ),
+    (
+        'Revelation', 'Holy Bible', 21, 23, 23,
+        'Isaiah', 'Holy Bible', 60, 19, 20,
+        'paraphrase', 'second-coming',
+        "\"The Lord shall be unto thee an everlasting light\" and \"the city had "
+        "no need of the sun... for the glory of God did lighten it, and the "
+        "Lamb is the light thereof\" describe the same Millennial city, lit by "
+        "God's own presence rather than the sun.",
+    ),
+    (
+        'Revelation', 'Holy Bible', 3, 7, 7,
+        'Isaiah', 'Holy Bible', 22, 22, 22,
+        'quotation', 'jesus-christ',
+        "\"The key of the house of David... he shall open, and none shall "
+        "shut\" is quoted directly by the risen Christ: \"he that hath the key "
+        "of David, he that openeth, and no man shutteth.\"",
+    ),
+    (
+        'Matthew', 'Holy Bible', 2, 17, 18,
+        'Jeremiah', 'Holy Bible', 31, 15, 15,
+        'quotation', 'jesus-christ',
+        "\"Rahel weeping for her children\" is quoted directly as fulfilled at "
+        "the slaughter of the innocents in Bethlehem: \"in Rama was there a "
+        "voice heard, lamentation, and weeping... Rachel weeping for her "
+        "children.\"",
+    ),
+    (
+        '2 Nephi', 'The Book of Mormon', 3, 12, 12,
+        'Ezekiel', 'Holy Bible', 37, 15, 19,
+        'paraphrase', 'house-of-israel',
+        "Ezekiel's two sticks - one for Judah, one for Joseph - joined into "
+        "one in the Lord's hand is the same promise Lehi gives Joseph: \"the "
+        "fruit of thy loins shall write; and the fruit of the loins of Judah "
+        "shall write... and they shall grow together.\"",
+    ),
+    (
+        'Articles of Faith', 'Pearl of Great Price', 1, 2, 2,
+        'Ezekiel', 'Holy Bible', 18, 20, 20,
+        'paraphrase', 'judgment',
+        "\"The soul that sinneth, it shall die. The son shall not bear the "
+        "iniquity of the father\" is the same doctrine of individual "
+        "accountability the Articles of Faith state plainly: \"men will be "
+        "punished for their own sins, and not for Adam's transgression.\"",
+    ),
+    (
+        'Jacob', 'The Book of Mormon', 1, 19, 19,
+        'Ezekiel', 'Holy Bible', 3, 17, 19,
+        'paraphrase', 'prophets',
+        "Ezekiel is made \"a watchman unto the house of Israel,\" warned that a "
+        "sinner's blood is required at his hand if he fails to warn them - "
+        "the same responsibility Jacob describes: \"answering the sins of the "
+        "people upon our own heads if we did not teach them the word of God.\"",
+    ),
+    (
+        'Matthew', 'Holy Bible', 26, 64, 64,
+        'Daniel', 'Holy Bible', 7, 13, 14,
+        'quotation', 'jesus-christ',
+        "\"One like the Son of man came with the clouds of heaven\" is the very "
+        "title and image Christ applies to Himself before the high priest: "
+        "\"hereafter shall ye see the Son of man... coming in the clouds of "
+        "heaven.\"",
+    ),
+    (
+        'John', 'Holy Bible', 5, 28, 29,
+        'Daniel', 'Holy Bible', 12, 2, 2,
+        'paraphrase', 'resurrection',
+        "\"Many of them that sleep in the dust of the earth shall awake, some "
+        "to everlasting life, and some to shame\" is echoed almost exactly by "
+        "Christ Himself: \"they that have done good, unto the resurrection of "
+        "life; and they that have done evil, unto the resurrection of "
+        "damnation.\"",
+    ),
+    (
+        '1 Corinthians', 'Holy Bible', 15, 4, 4,
+        'Hosea', 'Holy Bible', 6, 2, 2,
+        'paraphrase', 'resurrection',
+        "\"In the third day he will raise us up\" is widely read as one of the "
+        "prophetic scriptures Paul has in mind when he writes that Christ "
+        "\"rose again the third day according to the scriptures.\"",
+    ),
+    (
+        '1 Nephi', 'The Book of Mormon', 13, 29, 29,
+        'Amos', 'Holy Bible', 8, 11, 11,
+        'paraphrase', 'restoration',
+        "\"A famine... of hearing the words of the Lord\" is the same loss "
+        "Nephi's vision describes - \"many plain and precious things taken "
+        "away\" from the Gentiles' record of the gospel - both naming a real "
+        "spiritual famine, not merely a literal one.",
+    ),
+    (
+        'Isaiah', 'Holy Bible', 2, 2, 3,
+        'Micah', 'Holy Bible', 4, 1, 2,
+        'quotation', 'zion',
+        "Micah records the very same prophecy, in nearly the same words, as "
+        "Isaiah: \"the mountain of the house of the Lord shall be established "
+        "in the top of the mountains... and all nations shall flow unto it\" - "
+        "two prophets bearing identical witness.",
+    ),
+    (
+        'Jude', 'Holy Bible', 1, 9, 9,
+        'Zechariah', 'Holy Bible', 3, 1, 2,
+        'quotation', 'agency',
+        "\"The Lord rebuke thee, O Satan\" is quoted directly by Jude, "
+        "describing Michael's own dispute with the devil - the same rebuke "
+        "first recorded in Zechariah's vision of Joshua the high priest.",
+    ),
+    (
+        'Acts', 'Holy Bible', 1, 11, 12,
+        'Zechariah', 'Holy Bible', 14, 4, 4,
+        'paraphrase', 'second-coming',
+        "\"His feet shall stand in that day upon the mount of Olives\" - the "
+        "same mountain Christ ascended from at His departure, where angels "
+        "promise \"this same Jesus... shall so come in like manner as ye have "
+        "seen him go into heaven.\"",
+    ),
+    (
+        'Mormon', 'The Book of Mormon', 9, 9, 9,
+        'Malachi', 'Holy Bible', 3, 6, 6,
+        'paraphrase', 'godhead',
+        "\"I am the Lord, I change not\" is the same doctrine Mormon later "
+        "teaches: \"God is the same yesterday, today, and forever, and in him "
+        "there is no variableness neither shadow of changing.\"",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 4, 6, 6,
+        'Lamentations', 'Holy Bible', 3, 22, 23,
+        'paraphrase', 'gratitude',
+        "\"It is of the Lord's mercies that we are not consumed... they are "
+        "new every morning\" and \"if ye have come to a knowledge of the "
+        "goodness of God, and his matchless power, and his wisdom, and his "
+        "patience\" both anchor gratitude in God's own unfailing, daily mercy.",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 3, 5, 5,
+        'Isaiah', 'Holy Bible', 9, 6, 6,
+        'paraphrase', 'jesus-christ',
+        "\"Unto us a child is born... his name shall be called... The mighty "
+        "God\" is echoed in King Benjamin's own prophecy: \"the Lord Omnipotent "
+        "who reigneth, who was, and is from all eternity to all eternity, "
+        "shall come down.\"",
+    ),
+    (
+        '3 Nephi', 'The Book of Mormon', 11, 10, 10,
+        'Isaiah', 'Holy Bible', 9, 6, 6,
+        'paraphrase', 'jesus-christ',
+        "Isaiah's child \"whose name shall be called Wonderful\" identifies "
+        "Himself directly to the Nephites: \"Behold, I am Jesus Christ, whom "
+        "the prophets testified shall come into the world.\"",
+    ),
+    (
+        '1 Nephi', 'The Book of Mormon', 14, 14, 14,
+        'Isaiah', 'Holy Bible', 29, 14, 14,
+        'paraphrase', 'restoration',
+        "\"A marvellous work and a wonder\" - the very phrase Nephi's own "
+        "vision uses for the latter-day work: \"the power of the Lamb of "
+        "God... descended upon the saints of the church of the Lamb.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 110, 3, 4,
+        'Isaiah', 'Holy Bible', 40, 5, 5,
+        'paraphrase', 'second-coming',
+        "\"The glory of the Lord shall be revealed, and all flesh shall see it "
+        "together\" - a foretaste of that glory appears already in the "
+        "Kirtland Temple: \"his eyes were as a flame of fire... his voice as "
+        "the sound of the rushing of great waters.\"",
+    ),
+    (
+        'Matthew', 'Holy Bible', 18, 2, 4,
+        'Isaiah', 'Holy Bible', 11, 6, 9,
+        'paraphrase', 'humility',
+        "The peaceable kingdom where \"a little child shall lead them\" matches "
+        "Christ's own teaching that only those who \"become as little "
+        "children\" can enter His kingdom - childlike humility as the "
+        "condition of peace in both texts.",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 4, 26, 26,
+        'Isaiah', 'Holy Bible', 58, 6, 7,
+        'paraphrase', 'service',
+        "\"Is not this the fast that I have chosen... to let the oppressed go "
+        "free\" and \"impart of your substance to the poor... administer to "
+        "their relief\" both teach that true worship is measured by concrete "
+        "care for the needy, not ritual alone.",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 93, 40, 40,
+        'Isaiah', 'Holy Bible', 54, 13, 13,
+        'paraphrase', 'children',
+        "\"All thy children shall be taught of the Lord\" is the same promise "
+        "behind the commandment \"to bring up your children in light and "
+        "truth\" above.",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 90, 24, 24,
+        'Isaiah', 'Holy Bible', 55, 9, 9,
+        'paraphrase', 'truth',
+        "\"As the heavens are higher than the earth, so are my ways higher "
+        "than your ways\" is the same trust behind the promise \"all things "
+        "shall work together for your good, if ye walk uprightly.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 138, 55, 56,
+        'Jeremiah', 'Holy Bible', 1, 5, 5,
+        'paraphrase', 'premortal-life',
+        "Jeremiah's own foreordination as a prophet \"before thou camest forth "
+        "out of the womb\" is the same doctrine this vision describes more "
+        "broadly: spirits \"chosen... to be rulers in the Church of God\" even "
+        "\"before they were born.\"",
+    ),
+    (
+        'Alma', 'The Book of Mormon', 13, 3, 3,
+        'Jeremiah', 'Holy Bible', 1, 5, 5,
+        'paraphrase', 'premortal-life',
+        "Alma teaches the identical doctrine Jeremiah's own call illustrates "
+        "- priests \"called and prepared from the foundation of the world "
+        "according to the foreknowledge of God.\"",
+    ),
+    (
+        'Alma', 'The Book of Mormon', 7, 11, 12,
+        'Isaiah', 'Holy Bible', 53, 4, 4,
+        'paraphrase', 'atonement',
+        "\"Surely he hath borne our griefs, and carried our sorrows\" is the "
+        "same prophecy Alma quotes directly in teaching the Atonement: \"this "
+        "that the word might be fulfilled which saith he will take upon "
+        "him... the pains and the sicknesses of his people.\"",
+    ),
+    (
+        'Malachi', 'Holy Bible', 3, 10, 10,
+        'Genesis', 'Holy Bible', 14, 20, 20,
+        'paraphrase', 'tithing',
+        "Abram's tithe to Melchizedek - \"he gave him tithes of all\" - is "
+        "scripture's first recorded example of the very law Malachi later "
+        "commands and promises to bless.",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 1, 30, 30,
+        'Daniel', 'Holy Bible', 2, 44, 45,
+        'paraphrase', 'restoration',
+        "Daniel's kingdom \"which shall never be destroyed\" is identified in "
+        "modern revelation as \"the only true and living church upon the face "
+        "of the whole earth,\" brought forth \"out of obscurity and out of "
+        "darkness.\"",
+    ),
+    (
+        '2 Nephi', 'The Book of Mormon', 9, 14, 14,
+        'Isaiah', 'Holy Bible', 61, 10, 10,
+        'paraphrase', 'salvation',
+        "\"He hath clothed me with the garments of salvation, he hath covered "
+        "me with the robe of righteousness\" is the same image Jacob uses for "
+        "the righteous at the judgment: a \"perfect knowledge of their "
+        "enjoyment\" and \"purity.\"",
+    ),
+    (
+        'Jeremiah', 'Holy Bible', 18, 6, 6,
+        'Isaiah', 'Holy Bible', 64, 8, 8,
+        'paraphrase', 'humility',
+        "\"We are the clay, and thou our potter\" and \"as the clay is in the "
+        "potter's hand, so are ye in mine hand\" both use the same image, from "
+        "two different prophets, to teach submission to God's shaping hand.",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 1, 12, 13,
+        'Zephaniah', 'Holy Bible', 1, 14, 15,
+        'paraphrase', 'second-coming',
+        "\"The great day of the Lord is near, it is near, and hasteth greatly\" "
+        "is echoed in modern revelation's own warning: \"prepare ye, prepare "
+        "ye for that which is to come, for the Lord is nigh.\"",
+    ),
+    (
+        'Revelation', 'Holy Bible', 11, 15, 15,
+        'Obadiah', 'Holy Bible', 1, 21, 21,
+        'paraphrase', 'second-coming',
+        "\"The kingdom shall be the Lord's\" is the same final sovereignty "
+        "John's vision announces: \"the kingdoms of this world are become the "
+        "kingdoms of our Lord, and of his Christ.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 84, 98, 98,
+        'Habakkuk', 'Holy Bible', 2, 14, 14,
+        'quotation', 'missionary-work',
+        "\"The earth shall be filled with the knowledge of the glory of the "
+        "Lord, as the waters cover the sea\" is quoted almost word for word in "
+        "this modern revelation's own promise that all shall \"be filled with "
+        "the knowledge of the Lord.\"",
+    ),
+    (
+        '1 Peter', 'Holy Bible', 2, 25, 25,
+        'Isaiah', 'Holy Bible', 53, 6, 6,
+        'paraphrase', 'atonement',
+        "\"All we like sheep have gone astray... the Lord hath laid on him the "
+        "iniquity of us all\" is echoed directly: \"ye were as sheep going "
+        "astray; but are now returned unto the Shepherd and Bishop of your "
+        "souls.\"",
+    ),
+    (
+        'Alma', 'The Book of Mormon', 5, 37, 39,
+        'Ezekiel', 'Holy Bible', 34, 2, 4,
+        'paraphrase', 'jesus-christ',
+        "Ezekiel condemns shepherds who fail to feed the flock and let it be "
+        "scattered; Alma asks his own people the identical question - whether "
+        "they are \"a shepherd\" who watches over the flock \"or a hireling\" who "
+        "lets it be led away.",
+    ),
+    (
+        'Abraham', 'Pearl of Great Price', 3, 27, 27,
+        'Isaiah', 'Holy Bible', 6, 8, 8,
+        'quotation', 'premortal-life',
+        "\"Whom shall I send, and who will go for us?... Here am I; send me\" - "
+        "the very words Isaiah records in his own call vision are given "
+        "again, in the same form, in the premortal council Abraham is shown.",
+    ),
+    (
+        'Articles of Faith', 'Pearl of Great Price', 1, 9, 9,
+        'Amos', 'Holy Bible', 3, 7, 7,
+        'paraphrase', 'revelation',
+        "\"Surely the Lord God will do nothing, but he revealeth his secret "
+        "unto his servants the prophets\" is the same principle of continuing "
+        "revelation the Articles of Faith affirm: God \"will yet reveal many "
+        "great and important things.\"",
+    ),
+    (
+        'Luke', 'Holy Bible', 2, 32, 32,
+        'Isaiah', 'Holy Bible', 42, 6, 6,
+        'paraphrase', 'jesus-christ',
+        "\"A covenant of the people, for a light of the Gentiles\" is the same "
+        "title Simeon gives the infant Christ: \"a light to lighten the "
+        "Gentiles, and the glory of thy people Israel.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 59, 8, 8,
+        'Micah', 'Holy Bible', 6, 6, 8,
+        'paraphrase', 'sacrifice',
+        "\"What doth the Lord require of thee, but to do justly, and to love "
+        "mercy\" - not burnt offerings - is the same shift in modern "
+        "revelation's own sacrifice: \"a broken heart and a contrite spirit,\" "
+        "not an animal offering.",
+    ),
+    (
+        'Romans', 'Holy Bible', 10, 13, 13,
+        'Joel', 'Holy Bible', 2, 32, 32,
+        'quotation', 'salvation',
+        "\"Whosoever shall call on the name of the Lord shall be delivered\" is "
+        "quoted directly by Paul: \"whosoever shall call upon the name of the "
+        "Lord shall be saved.\"",
+    ),
+    (
+        'James', 'Holy Bible', 1, 27, 27,
+        'Isaiah', 'Holy Bible', 1, 17, 17,
+        'paraphrase', 'service',
+        "\"Relieve the oppressed, judge the fatherless, plead for the widow\" "
+        "and \"pure religion... is this, To visit the fatherless and widows in "
+        "their affliction\" both define true devotion to God by care for the "
+        "vulnerable.",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 1, 19, 19,
+        'Zechariah', 'Holy Bible', 4, 6, 6,
+        'paraphrase', 'humility',
+        "\"Not by might, nor by power, but by my spirit\" is the same principle "
+        "behind modern revelation's own promise that \"the weak things of the "
+        "world shall come forth and break down the mighty and strong ones.\"",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 26, 30, 30,
+        'Isaiah', 'Holy Bible', 43, 25, 25,
+        'paraphrase', 'forgiveness',
+        "\"I, even I, am he that blotteth out thy transgressions... and will "
+        "not remember thy sins\" is the same promise the Lord gives Alma: \"as "
+        "often as my people repent will I forgive them their trespasses.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 49, 24, 25,
+        'Isaiah', 'Holy Bible', 35, 1, 1,
+        'paraphrase', 'restoration',
+        "\"The desert shall rejoice, and blossom as the rose\" is quoted in "
+        "nearly the same words in modern revelation's own promise of the "
+        "latter-day gathering: \"the Lamanites shall blossom as the rose.\"",
+    ),
+    (
+        'Acts', 'Holy Bible', 7, 49, 49,
+        'Isaiah', 'Holy Bible', 66, 1, 1,
+        'quotation', 'reverence',
+        "\"Heaven is my throne, and the earth is my footstool: where is the "
+        "house that ye build unto me?\" is quoted directly by Stephen to teach "
+        "that God cannot be confined to any temple built by human hands.",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 88, 63, 63,
+        'Jeremiah', 'Holy Bible', 29, 13, 13,
+        'paraphrase', 'prayer',
+        "\"Ye shall seek me, and find me, when ye shall search for me with all "
+        "your heart\" is echoed almost exactly: \"draw near unto me and I will "
+        "draw near unto you; seek me diligently and ye shall find me.\"",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 17, 9, 10,
+        'Daniel', 'Holy Bible', 3, 17, 18,
+        'paraphrase', 'faith',
+        "Shadrach, Meshach, and Abednego's faith regardless of outcome - \"if "
+        "not... we will not serve thy gods\" - is the same steadfastness "
+        "Abinadi shows facing death: \"I will not recall the words which I "
+        "have spoken... for they are true.\"",
+    ),
+    (
+        'Moroni', 'The Book of Mormon', 7, 14, 17,
+        'Isaiah', 'Holy Bible', 5, 20, 20,
+        'paraphrase', 'truth',
+        "\"Woe unto them that call evil good, and good evil\" is the same "
+        "warning Moroni gives about discerning good from evil: \"take heed... "
+        "that ye do not judge that which is evil to be of God, or that which "
+        "is good and of God to be of the devil.\"",
+    ),
+    (
+        'Revelation', 'Holy Bible', 2, 17, 17,
+        'Isaiah', 'Holy Bible', 62, 2, 2,
+        'paraphrase', 'covenants',
+        "\"Thou shalt be called by a new name, which the mouth of the Lord "
+        "shall name\" is echoed in John's own vision of Christ's promise: \"to "
+        "him that overcometh will I give... a new name written, which no man "
+        "knoweth.\"",
+    ),
+    (
+        'Alma', 'The Book of Mormon', 40, 3, 4,
+        'Isaiah', 'Holy Bible', 26, 19, 19,
+        'paraphrase', 'resurrection',
+        "\"Thy dead men shall live, together with my dead body shall they "
+        "arise\" anticipates the same resurrection Alma teaches his son - "
+        "though, as Alma cautions, \"the resurrection is not yet\" in full for "
+        "all.",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 5, 2, 2,
+        'Ezekiel', 'Holy Bible', 36, 26, 26,
+        'paraphrase', 'repentance',
+        "\"A new heart also will I give you... I will take away the stony "
+        "heart\" is the same change King Benjamin's people describe "
+        "experiencing: \"we have no more disposition to do evil, but to do "
+        "good continually.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 89, 20, 20,
+        'Isaiah', 'Holy Bible', 40, 31, 31,
+        'quotation', 'word-of-wisdom',
+        "\"They shall run, and not be weary; and they shall walk, and not "
+        "faint\" is repeated almost word for word as the Word of Wisdom's own "
+        "promise: \"shall run and not be weary, and shall walk and not faint.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 68, 6, 6,
+        'Isaiah', 'Holy Bible', 41, 10, 10,
+        'paraphrase', 'faith',
+        "\"Fear thou not; for I am with thee... I will strengthen thee\" is the "
+        "same promise of divine companionship given to those the Lord sends: "
+        "\"be of good cheer, and do not fear, for I the Lord am with you, and "
+        "will stand by you.\"",
+    ),
+    (
+        '1 Peter', 'Holy Bible', 5, 2, 4,
+        'Isaiah', 'Holy Bible', 40, 11, 11,
+        'paraphrase', 'service',
+        "\"He shall feed his flock like a shepherd... and gently lead those "
+        "that are with young\" is the same pastoral care Peter asks of every "
+        "under-shepherd: \"feed the flock of God which is among you, taking "
+        "the oversight thereof... willingly.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 113, 5, 6,
+        'Ezekiel', 'Holy Bible', 37, 11, 14,
+        'paraphrase', 'house-of-israel',
+        "Ezekiel's dry bones - \"these bones are the whole house of Israel\" - "
+        "restored and brought \"into the land of Israel,\" is the same latter- "
+        "day gathering this revelation identifies as the work of a descendant "
+        "of Jesse and Joseph holding \"the keys of the kingdom.\"",
+    ),
+    (
+        '1 Peter', 'Holy Bible', 1, 7, 7,
+        'Isaiah', 'Holy Bible', 48, 10, 10,
+        'paraphrase', 'trials-and-adversity',
+        "\"I have refined thee... in the furnace of affliction\" is the same "
+        "purpose behind trials Peter describes: \"the trial of your faith, "
+        "being much more precious than of gold that perisheth, though it be "
+        "tried with fire.\"",
+    ),
+    (
+        'Matthew', 'Holy Bible', 4, 16, 16,
+        'Isaiah', 'Holy Bible', 9, 2, 2,
+        'quotation', 'jesus-christ',
+        "\"The people that walked in darkness have seen a great light\" is "
+        "quoted directly of Christ beginning His Galilean ministry: \"the "
+        "people which sat in darkness saw great light.\"",
+    ),
+    (
+        'Mosiah', 'The Book of Mormon', 15, 10, 10,
+        'Isaiah', 'Holy Bible', 53, 10, 10,
+        'quotation', 'atonement',
+        "\"When thou shalt make his soul an offering for sin, he shall see his "
+        "seed\" is quoted directly by Abinadi in his own exposition of "
+        "Isaiah's suffering-servant prophecy: \"when his soul has been made an "
+        "offering for sin he shall see his seed.\"",
+    ),
+    (
+        'Enos', 'The Book of Mormon', 1, 6, 6,
+        'Micah', 'Holy Bible', 7, 18, 19,
+        'paraphrase', 'forgiveness',
+        "\"He retaineth not his anger for ever... he will cast all their sins "
+        "into the depths of the sea\" is the same complete forgiveness Enos "
+        "experiences directly: \"I, Enos, knew that God could not lie; "
+        "wherefore, my guilt was swept away.\"",
+    ),
+    (
+        '1 Thessalonians', 'Holy Bible', 1, 9, 9,
+        'Jeremiah', 'Holy Bible', 10, 10, 10,
+        'paraphrase', 'godhead',
+        "\"The Lord is the true God, he is the living God\" is echoed in the "
+        "same distinctive phrase Paul uses to describe conversion: turning "
+        "\"from idols to serve the living and true God.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 97, 15, 16,
+        'Habakkuk', 'Holy Bible', 2, 20, 20,
+        'paraphrase', 'temple',
+        "\"The Lord is in his holy temple: let all the earth keep silence "
+        "before him\" is the same reverence modern revelation asks of a temple "
+        "built to the Lord, that His \"glory shall rest upon it\" and \"presence "
+        "shall be there.\"",
+    ),
+    (
+        'Doctrine and Covenants', 'Doctrine and Covenants', 19, 16, 19,
+        'Zechariah', 'Holy Bible', 13, 1, 1,
+        'paraphrase', 'atonement',
+        "\"A fountain opened to the house of David... for sin and for "
+        "uncleanness\" is the same cleansing Christ Himself explains He "
+        "purchased through suffering: \"I, God, have suffered these things for "
+        "all, that they might not suffer if they would repent.\"",
     ),
 ]
 
