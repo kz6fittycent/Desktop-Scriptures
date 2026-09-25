@@ -1971,6 +1971,793 @@ ENTRIES = [
         "term for Christ's resurrection: \"Christ the firstfruits; "
         "afterward they that are Christ's at his coming.\"",
     ),
+    # --- Fork: OT historical/wisdom books (Genesis-Deuteronomy narrative,
+    # Joshua-Esther, Job-Song of Solomon) ---
+    (
+        "Hebrews", "Holy Bible", 11, 5, 5,
+        "Genesis", "Holy Bible", 5, 24, 24,
+        "paraphrase", "faith",
+        "Enoch \"walked with God: and he was not; for God took him\" - "
+        "Paul explains this as being \"translated that he should not "
+        "see death... because he pleased God,\" faith itself the "
+        "cause.",
+    ),
+    (
+        "John", "Holy Bible", 8, 58, 58,
+        "Exodus", "Holy Bible", 3, 14, 14,
+        "quotation", "jesus-christ",
+        "\"I AM THAT I AM\" is the very name Christ claims for Himself: "
+        "\"before Abraham was, I am\" - the same divine self-existence, "
+        "the same name.",
+    ),
+    (
+        "2 Corinthians", "Holy Bible", 3, 7, 13,
+        "Exodus", "Holy Bible", 34, 29, 35,
+        "paraphrase", "revelation",
+        "Moses' face shone so brightly after speaking with God that he "
+        "wore a veil - Paul explains this glory as \"done away,\" a "
+        "lesser glory compared to the greater one Christ's gospel now "
+        "reveals without a veil.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 16, 16,
+        "Numbers", "Holy Bible", 24, 17, 17,
+        "paraphrase", "jesus-christ",
+        "\"There shall come a Star out of Jacob\" is Balaam's own "
+        "Messianic prophecy; Christ later claims the title directly: "
+        "\"I am... the bright and morning star.\"",
+    ),
+    (
+        "Joshua", "Holy Bible", 24, 15, 15,
+        "Deuteronomy", "Holy Bible", 30, 19, 19,
+        "paraphrase", "agency",
+        "\"Choose you this day whom ye will serve\" and \"I have set "
+        "before you life and death... therefore choose life\" both make "
+        "agency, not fate, the deciding factor in a person's standing "
+        "before God.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 1, 19, 20,
+        "Judges", "Holy Bible", 7, 2, 2,
+        "paraphrase", "humility",
+        "Gideon's army is deliberately shrunk \"lest Israel vaunt "
+        "themselves... mine own hand hath saved me\" - the same reason "
+        "\"the weak things of the world\" are chosen in this modern "
+        "revelation, so no one can claim the credit that belongs to "
+        "God.",
+    ),
+    (
+        "Matthew", "Holy Bible", 1, 5, 5,
+        "Ruth", "Holy Bible", 4, 13, 17,
+        "quotation", "house-of-israel",
+        "Ruth, a Moabite woman, is named outright in Christ's own "
+        "genealogy - \"Booz begat Obed of Ruth\" - the same marriage "
+        "and birth Ruth's own book records in full.",
+    ),
+    (
+        "Luke", "Holy Bible", 1, 32, 33,
+        "2 Samuel", "Holy Bible", 7, 12, 16,
+        "quotation", "jesus-christ",
+        "\"The Lord God shall give unto him the throne of his father "
+        "David... he shall reign... for ever\" - Gabriel's own "
+        "announcement to Mary quotes the Davidic covenant almost "
+        "verbatim, applying it directly to Christ.",
+    ),
+    (
+        "Luke", "Holy Bible", 4, 25, 26,
+        "1 Kings", "Holy Bible", 17, 8, 16,
+        "quotation", "faith",
+        "Christ Himself cites this exact story by name to the people "
+        "of Nazareth - Elijah sent to the widow of Zarephath rather "
+        "than any widow in Israel - to teach that God's power isn't "
+        "limited by birthright or expectation.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 2, 34, 34,
+        "1 Chronicles", "Holy Bible", 29, 11, 14,
+        "paraphrase", "gratitude",
+        "\"All that is in the heaven and in the earth is thine\" and "
+        "\"ye are eternally indebted to your heavenly Father\" both "
+        "teach that everything a person has, and gives back, "
+        "ultimately belongs to God first.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 24, 15, 15,
+        "Job", "Holy Bible", 1, 21, 21,
+        "paraphrase", "trials-and-adversity",
+        "Job's submission - \"the Lord gave, and the Lord hath taken "
+        "away; blessed be the name of the Lord\" - is the same patient "
+        "acceptance Alma's people show when the Lord \"did strengthen "
+        "them that they could bear up their burdens with ease.\"",
+    ),
+    (
+        "John", "Holy Bible", 10, 11, 11,
+        "Psalms", "Holy Bible", 23, 1, 1,
+        "paraphrase", "jesus-christ",
+        "\"The Lord is my shepherd; I shall not want\" is realized "
+        "directly in Christ's own words: \"I am the good shepherd: the "
+        "good shepherd giveth his life for the sheep.\"",
+    ),
+    (
+        "John", "Holy Bible", 19, 36, 36,
+        "Psalms", "Holy Bible", 34, 20, 20,
+        "quotation", "atonement",
+        "\"He keepeth all his bones: not one of them is broken\" is "
+        "fulfilled, alongside the Passover lamb's own unbroken bones, "
+        "when Christ's legs are left unbroken on the cross.",
+    ),
+    (
+        "Luke", "Holy Bible", 23, 46, 46,
+        "Psalms", "Holy Bible", 31, 5, 5,
+        "quotation", "atonement",
+        "\"Into thine hand I commit my spirit\" - Christ quotes this "
+        "psalm directly as His very last words on the cross.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 10, 5, 7,
+        "Psalms", "Holy Bible", 40, 6, 8,
+        "quotation", "jesus-christ",
+        "\"Sacrifice and offering thou wouldest not, but a body hast "
+        "thou prepared me\" - Hebrews quotes this psalm as Christ's own "
+        "words spoken \"when he cometh into the world,\" accepting a "
+        "mortal body to do God's will.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 4, 8, 8,
+        "Psalms", "Holy Bible", 68, 18, 18,
+        "quotation", "atonement",
+        "\"When he ascended up on high, he led captivity captive, and "
+        "gave gifts unto men\" - Paul quotes this psalm directly of "
+        "Christ's ascension, freeing the captive dead and bestowing "
+        "spiritual gifts.",
+    ),
+    (
+        "Matthew", "Holy Bible", 4, 6, 6,
+        "Psalms", "Holy Bible", 91, 11, 12,
+        "quotation", "temptation",
+        "\"He shall give his angels charge over thee\" is the very "
+        "psalm Satan quotes - accurately, but out of context - while "
+        "tempting Christ to test God by casting Himself down.",
+    ),
+    (
+        "Matthew", "Holy Bible", 21, 9, 9,
+        "Psalms", "Holy Bible", 118, 26, 26,
+        "quotation", "jesus-christ",
+        "\"Blessed is he that cometh in the name of the Lord\" - the "
+        "crowd's own shout at Christ's triumphal entry quotes this "
+        "psalm directly.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 2, 6, 8,
+        "Psalms", "Holy Bible", 8, 4, 6,
+        "quotation", "jesus-christ",
+        "\"Thou madest him a little lower than the angels... and "
+        "didst set him over the works of thy hands\" - Hebrews quotes "
+        "this psalm to teach Christ's own condescension and "
+        "exaltation.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 37, 37, 37,
+        "Proverbs", "Holy Bible", 3, 5, 6,
+        "paraphrase", "prayer",
+        "\"Trust in the Lord with all thine heart... and he shall "
+        "direct thy paths\" and \"counsel with the Lord in all thy "
+        "doings, and he will direct thee for good\" teach the identical "
+        "pattern of seeking God's guidance in daily life.",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 6, 63, 63,
+        "Psalms", "Holy Bible", 19, 1, 1,
+        "paraphrase", "creation",
+        "\"The heavens declare the glory of God\" and \"all things... "
+        "are created and made to bear record of me\" both teach that "
+        "creation itself testifies of God, not just scripture or "
+        "prophets.",
+    ),
+    (
+        "Matthew", "Holy Bible", 5, 5, 5,
+        "Psalms", "Holy Bible", 37, 11, 11,
+        "quotation", "humility",
+        "\"The meek shall inherit the earth\" - one of the Beatitudes, "
+        "quoted directly from this psalm.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 68, 25, 28,
+        "Psalms", "Holy Bible", 127, 3, 3,
+        "paraphrase", "children",
+        "\"Children are an heritage of the Lord\" is the same premise "
+        "behind the commandment that parents \"teach them to "
+        "understand the doctrine\" - children are a trust from God, "
+        "not merely a family matter.",
+    ),
+    (
+        "Micah", "Holy Bible", 7, 19, 19,
+        "Psalms", "Holy Bible", 103, 12, 12,
+        "paraphrase", "forgiveness",
+        "\"As far as the east is from the west, so far hath he removed "
+        "our transgressions\" and \"cast all their sins into the depths "
+        "of the sea\" both picture complete, irretrievable forgiveness.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 9, 15, 15,
+        "Genesis", "Holy Bible", 1, 1, 1,
+        "quotation", "jesus-christ",
+        "\"I created the heavens and the earth, and all things that in "
+        "them are\" - the resurrected Christ explicitly claims to be "
+        "the Creator of Genesis' opening account.",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 6, 60, 60,
+        "Leviticus", "Holy Bible", 17, 11, 11,
+        "paraphrase", "atonement",
+        "\"It is the blood that maketh an atonement for your souls\" "
+        "and \"by the blood ye are sanctified\" both root atonement and "
+        "sanctification in blood - anticipating Christ's own atoning "
+        "blood.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 1, 16, 16,
+        "Leviticus", "Holy Bible", 19, 2, 2,
+        "quotation", "reverence",
+        "\"Be ye holy; for I am holy\" - Peter quotes this commandment "
+        "directly, unchanged across covenants old and new.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 122, 7, 7,
+        "Job", "Holy Bible", 13, 15, 15,
+        "paraphrase", "trials-and-adversity",
+        "\"Though he slay me, yet will I trust in him\" is the same "
+        "resolve behind the promise that the deepest afflictions, even "
+        "to \"the gates of hell,\" \"shall be but a small moment\" if "
+        "endured well.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 2, 24, 24,
+        "Genesis", "Holy Bible", 50, 20, 20,
+        "paraphrase", "plan-of-salvation",
+        "\"Ye thought evil against me; but God meant it unto good\" and "
+        "\"all things have been done in the wisdom of him who knoweth "
+        "all things\" both teach that God can turn even others' evil "
+        "intentions toward His own good purposes.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 18, 19,
+        "Deuteronomy", "Holy Bible", 4, 2, 2,
+        "paraphrase", "word-of-god",
+        "\"Ye shall not add unto the word... neither shall ye "
+        "diminish ought from it\" and Revelation's own closing warning "
+        "against adding to or taking from \"this book\" bookend the "
+        "entire Bible with the same command.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 32, 3, 3,
+        "Joshua", "Holy Bible", 1, 8, 8,
+        "paraphrase", "word-of-god",
+        "\"Thou shalt meditate therein day and night\" and \"feast "
+        "upon the words of Christ\" both call for constant, not "
+        "occasional, engagement with scripture.",
+    ),
+    (
+        "Helaman", "The Book of Mormon", 5, 12, 12,
+        "1 Samuel", "Holy Bible", 2, 2, 2,
+        "paraphrase", "jesus-christ",
+        "\"There is none holy as the Lord... neither is there any rock "
+        "like our God\" and \"the rock of our Redeemer, who is Christ\" "
+        "both use the same title - the Rock - for God.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 44, 4, 4,
+        "2 Chronicles", "Holy Bible", 20, 15, 15,
+        "paraphrase", "faith",
+        "\"Be not afraid nor dismayed... for the battle is not yours, "
+        "but God's\" and \"God will support, and keep, and preserve "
+        "us, so long as we are faithful\" both teach that victory in a "
+        "righteous cause depends on God, not numbers or strength.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 17, 9, 10,
+        "Esther", "Holy Bible", 4, 16, 16,
+        "paraphrase", "testimony",
+        "\"If I perish, I perish\" and Abinadi's own willingness that "
+        "\"it matters not... if it so be I am saved\" both show a "
+        "readiness to risk life itself rather than abandon a righteous "
+        "cause.",
+    ),
+    (
+        "1 Nephi", "The Book of Mormon", 15, 25, 25,
+        "Ecclesiastes", "Holy Bible", 12, 13, 13,
+        "paraphrase", "word-of-god",
+        "\"Fear God, and keep his commandments: for this is the whole "
+        "duty of man\" and Nephi's own exhortation to \"give heed unto "
+        "the word of the Lord\" both call obedience to God's word the "
+        "defining duty of life.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 84, 99, 100,
+        "Exodus", "Holy Bible", 15, 1, 2,
+        "paraphrase", "salvation",
+        "Both are songs of triumphant redemption - Moses and Israel "
+        "singing after the Red Sea, this modern revelation's own song "
+        "of Zion redeemed \"according to the election of grace.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 97, 15, 16,
+        "Exodus", "Holy Bible", 25, 8, 8,
+        "paraphrase", "temple",
+        "\"Let them make me a sanctuary; that I may dwell among them\" "
+        "and \"my glory shall rest upon\" a temple built unto the Lord "
+        "both state the same purpose for a temple - God's own presence "
+        "among His people.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 4, 15, 16,
+        "Genesis", "Holy Bible", 4, 9, 9,
+        "paraphrase", "service",
+        "\"Am I my brother's keeper?\" is the question Cain refuses to "
+        "answer rightly; Benjamin teaches the correct answer - to "
+        "\"succor those that stand in need of your succor\" and "
+        "\"administer to their relief.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 42, 18, 19,
+        "Genesis", "Holy Bible", 9, 6, 6,
+        "paraphrase", "judgment",
+        "\"Whoso sheddeth man's blood, by man shall his blood be "
+        "shed\" and \"he that kills shall not have forgiveness in this "
+        "world, nor in the world to come\" both treat murder as the "
+        "gravest of sins.",
+    ),
+    (
+        "Luke", "Holy Bible", 1, 37, 37,
+        "Genesis", "Holy Bible", 18, 14, 14,
+        "paraphrase", "faith",
+        "\"Is any thing too hard for the Lord?\" asked of Sarah's own "
+        "impossible pregnancy, is echoed by the angel Gabriel about "
+        "Mary's: \"with God nothing shall be impossible.\"",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 7, 18, 18,
+        "Psalms", "Holy Bible", 133, 1, 1,
+        "paraphrase", "zion",
+        "\"How good and how pleasant it is for brethren to dwell "
+        "together in unity\" and Enoch's Zion, \"of one heart and one "
+        "mind,\" both describe the same ideal of a unified, righteous "
+        "community.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 24, 14, 14,
+        "Psalms", "Holy Bible", 55, 22, 22,
+        "paraphrase", "trials-and-adversity",
+        "\"Cast thy burden upon the Lord, and he shall sustain thee\" "
+        "and the Lord's own promise to \"ease the burdens which are "
+        "put upon your shoulders, that even you cannot feel them\" both "
+        "describe divine relief carrying what a person cannot bear "
+        "alone.",
+    ),
+    (
+        "Abraham", "Pearl of Great Price", 2, 3, 3,
+        "Genesis", "Holy Bible", 12, 1, 1,
+        "translation", "faith",
+        "Abraham's own record repeats the Lord's call to him nearly "
+        "word for word - \"get thee out of thy country, and from thy "
+        "kindred, and from thy father's house\" - the same call Genesis "
+        "records, retold in Abraham's own voice.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 2, 9, 9,
+        "Exodus", "Holy Bible", 19, 5, 6,
+        "quotation", "church-of-jesus-christ",
+        "\"A kingdom of priests, and an holy nation\" is echoed almost "
+        "word for word: \"a royal priesthood, an holy nation, a "
+        "peculiar people\" - the same covenant identity given to "
+        "Israel at Sinai, and to the Church through Peter.",
+    ),
+    # --- Fork: Book of Mormon ---
+    (
+        "1 Nephi", "The Book of Mormon", 10, 7, 10,
+        "Matthew", "Holy Bible", 3, 11, 11,
+        "quotation", "jesus-christ",
+        "Lehi prophesies of \"a prophet who should come before the "
+        "Messiah, to prepare the way of the Lord\" who \"should baptize "
+        "in Bethabara, beyond Jordan\" - the same prophet Matthew "
+        "records as John the Baptist, who says of Christ, \"he that "
+        "cometh after me is mightier than I.\"",
+    ),
+    (
+        "1 Nephi", "The Book of Mormon", 11, 18, 21,
+        "Luke", "Holy Bible", 1, 30, 35,
+        "paraphrase", "jesus-christ",
+        "Nephi's vision shows him \"the virgin\" who is \"the mother of "
+        "the Son of God, after the manner of the flesh\" - the same "
+        "annunciation Luke records, when the angel tells Mary she will "
+        "\"bring forth a son\" and \"call his name Jesus.\"",
+    ),
+    (
+        "1 Nephi", "The Book of Mormon", 14, 14, 14,
+        "Ephesians", "Holy Bible", 1, 10, 10,
+        "paraphrase", "restoration",
+        "Nephi's vision of the saints \"armed with righteousness and "
+        "with the power of God in great glory\" in the last days "
+        "matches Paul's own \"dispensation of the fulness of times,\" "
+        "when God gathers His covenant people together in Christ.",
+    ),
+    (
+        "1 Nephi", "The Book of Mormon", 17, 41, 41,
+        "Numbers", "Holy Bible", 21, 8, 9,
+        "typology", "jesus-christ",
+        "Nephi recounts the same brazen-serpent story as Numbers - "
+        "\"the labor which they had to perform was to look\" - a "
+        "fourth witness (alongside John 3:14-15, Alma 33:19-22, and "
+        "Helaman 8:14-15 above) that simple faith, not effort, was "
+        "what healed them.",
+    ),
+    (
+        "1 Nephi", "The Book of Mormon", 22, 20, 21,
+        "Deuteronomy", "Holy Bible", 18, 15, 19,
+        "quotation", "prophets",
+        "Nephi quotes the same prophecy of Moses that Peter later "
+        "quotes in Acts 3:22 - \"A prophet shall the Lord your God "
+        "raise up unto you, like unto me\" - applying it to Christ "
+        "centuries before Peter does.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 2, 27, 27,
+        "Joshua", "Holy Bible", 24, 15, 15,
+        "paraphrase", "agency",
+        "\"Free to choose liberty and eternal life... or to choose "
+        "captivity and death\" and Joshua's own charge, \"choose you "
+        "this day whom ye will serve,\" both frame agency as a real, "
+        "consequential choice between serving God or not.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 4, 17, 19,
+        "Romans", "Holy Bible", 7, 24, 24,
+        "quotation", "repentance",
+        "\"O wretched man that I am!\" - Nephi's own psalm of "
+        "self-reproach uses nearly the same cry as Paul's, both "
+        "immediately followed by turning back to God rather than "
+        "despair.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 7, None, None,
+        "Isaiah", "Holy Bible", 50, None, None,
+        "quotation", "jesus-christ",
+        "Nephi quotes Isaiah 50 in its entirety, word for word - the "
+        "Lord's servant giving \"my back to the smiters,\" confident "
+        "that \"he is near that justifieth me.\"",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 8, None, None,
+        "Isaiah", "Holy Bible", 51, None, None,
+        "quotation", "zion",
+        "\"Look unto the rock from whence ye are hewn... look unto "
+        "Abraham your father\" - Nephi quotes Isaiah's own comfort to "
+        "Zion, promising joy and gladness to a people presently "
+        "afflicted.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 11, 4, 4,
+        "Colossians", "Holy Bible", 2, 17, 17,
+        "paraphrase", "jesus-christ",
+        "\"All things which have been given of God from the beginning "
+        "of the world, unto man, are the typifying of him\" is Nephi's "
+        "own statement of the very principle behind this whole "
+        "feature - matching Paul's own \"which are a shadow of things "
+        "to come; but the body is of Christ.\"",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 26, 24, 24,
+        "John", "Holy Bible", 3, 16, 17,
+        "paraphrase", "jesus-christ",
+        "\"He loveth the world, even that he layeth down his own life "
+        "that he may draw all men unto him\" restates John's own "
+        "\"God so loved the world, that he gave his only begotten "
+        "Son.\"",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 31, 5, 9,
+        "Matthew", "Holy Bible", 3, 13, 15,
+        "paraphrase", "baptism",
+        "\"If the Lamb of God, he being holy, should have need to be "
+        "baptized by water, to fulfil all righteousness\" - Nephi "
+        "reasons from the very account Matthew records, where Christ "
+        "tells John, \"thus it becometh us to fulfil all "
+        "righteousness.\"",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 31, 20, 20,
+        "Doctrine and Covenants", "Doctrine and Covenants", 14, 7, 7,
+        "paraphrase", "exaltation",
+        "\"If ye shall press forward... and endure to the end... ye "
+        "shall have eternal life\" matches the same promise named "
+        "\"the greatest of all the gifts of God\" in this modern "
+        "revelation.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 31, 20, 20,
+        "Hebrews", "Holy Bible", 11, 1, 1,
+        "paraphrase", "hope",
+        "\"A perfect brightness of hope\" is Nephi's own phrase for the "
+        "same confidence Paul defines as faith: \"the substance of "
+        "things hoped for, the evidence of things not seen.\"",
+    ),
+    (
+        "Jacob", "The Book of Mormon", 4, 4, 5,
+        "Hebrews", "Holy Bible", 11, 13, 13,
+        "paraphrase", "faith",
+        "\"We knew of Christ, and we had a hope of his glory many "
+        "hundred years before his coming\" is the same faith Hebrews "
+        "describes in the patriarchs, who \"having seen them afar off\" "
+        "still \"were persuaded of them, and embraced them.\"",
+    ),
+    (
+        "Jarom", "The Book of Mormon", 1, 11, 11,
+        "Acts", "Holy Bible", 10, 43, 43,
+        "paraphrase", "prophets",
+        "Jarom's prophets, priests, and teachers spent their lives "
+        "\"persuading them to look forward unto the Messiah, and "
+        "believe in him to come as though he already was\" - the same "
+        "witness Peter later describes running the other direction: "
+        "\"to him give all the prophets witness.\"",
+    ),
+    (
+        "Omni", "The Book of Mormon", 1, 26, 26,
+        "Doctrine and Covenants", "Doctrine and Covenants", 14, 7, 7,
+        "paraphrase", "exaltation",
+        "\"Come unto Christ... and endure to the end; and as the Lord "
+        "liveth ye will be saved\" is Amaleki's own version of the same "
+        "eternal-life promise named explicitly in D&C 14:7 above.",
+    ),
+    (
+        "Words of Mormon", "The Book of Mormon", 1, 7, 8,
+        "Isaiah", "Holy Bible", 55, 8, 9,
+        "paraphrase", "truth",
+        "Mormon trusts a purpose he cannot fully see - \"I do not know "
+        "all things; but the Lord knoweth all things which are to "
+        "come\" - the same humility Isaiah teaches: \"my thoughts are "
+        "not your thoughts, neither are your ways my ways.\"",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 2, 17, 17,
+        "Matthew", "Holy Bible", 25, 40, 40,
+        "paraphrase", "service",
+        "\"When ye are in the service of your fellow beings ye are "
+        "only in the service of your God\" is King Benjamin's own "
+        "version of Christ's \"inasmuch as ye have done it unto one of "
+        "the least of these my brethren, ye have done it unto me.\"",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 13, 12, 24,
+        "Exodus", "Holy Bible", 20, 3, 17,
+        "quotation", "obedience",
+        "Abinadi recites the Ten Commandments to King Noah's priests "
+        "word for word from the law of Moses, before teaching that "
+        "salvation does not come by this law alone.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 15, 1, 3,
+        "John", "Holy Bible", 1, 1, 14,
+        "paraphrase", "godhead",
+        "\"God himself shall come down among the children of men, and "
+        "shall redeem his people\" is Abinadi's own statement of the "
+        "same mystery John opens his gospel with: \"the Word was God... "
+        "and the Word was made flesh, and dwelt among us.\"",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 16, 6, 8,
+        "1 Corinthians", "Holy Bible", 15, 54, 55,
+        "paraphrase", "resurrection",
+        "Abinadi's \"O death, where is thy sting? O grave, where is thy "
+        "victory?\" is quoted so closely from Paul's own words that the "
+        "two passages read almost as one, though centuries and an "
+        "ocean apart.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 27, 8, 24,
+        "Acts", "Holy Bible", 9, 1, 9,
+        "paraphrase", "repentance",
+        "Alma the younger, actively working \"to destroy the church of "
+        "God,\" is struck down and left unable to speak by an angel's "
+        "appearance - the same pattern as Saul's own conversion on the "
+        "road to Damascus, struck blind by a light and voice from "
+        "heaven.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 5, 38, 38,
+        "John", "Holy Bible", 10, 11, 11,
+        "paraphrase", "jesus-christ",
+        "\"The good shepherd doth call you... in his own name, which "
+        "is the name of Christ\" - Alma uses the very title Christ "
+        "later claims for Himself: \"I am the good shepherd: the good "
+        "shepherd giveth his life for the sheep.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 26, 12, 12,
+        "Genesis", "Holy Bible", 18, 27, 27,
+        "paraphrase", "humility",
+        "\"I know that I am nothing; as to my strength I am weak... I "
+        "will boast of my God\" is Ammon's own version of Abraham's "
+        "humility before the Lord, taking no credit for what only God "
+        "could accomplish.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 30, 44, 44,
+        "Romans", "Holy Bible", 1, 20, 20,
+        "paraphrase", "truth",
+        "Alma's argument to Korihor - \"all things denote there is a "
+        "God; yea, even the earth, and all things that are upon the "
+        "face of it\" - matches Paul's own claim that God's \"eternal "
+        "power and Godhead\" are \"clearly seen, being understood by "
+        "the things that are made.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 32, 21, 21,
+        "Hebrews", "Holy Bible", 11, 1, 1,
+        "paraphrase", "faith",
+        "\"Faith is not to have a perfect knowledge of things; "
+        "therefore if ye have faith ye hope for things which are not "
+        "seen\" is nearly Paul's own definition: \"faith is the "
+        "substance of things hoped for, the evidence of things not "
+        "seen.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 34, 32, 34,
+        "2 Corinthians", "Holy Bible", 6, 2, 2,
+        "paraphrase", "repentance",
+        "\"This life is the time for men to prepare to meet God\" is "
+        "Amulek's own version of Paul's \"now is the accepted time; "
+        "behold, now is the day of salvation\" - urgency about "
+        "repenting without delay.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 36, 6, 10,
+        "Acts", "Holy Bible", 9, 1, 9,
+        "paraphrase", "repentance",
+        "Alma's own account to his son of being confronted by an angel "
+        "\"as it were with a voice of thunder\" while \"seeking to "
+        "destroy the church of God\" is his first-person retelling of "
+        "the same conversion pattern Paul experienced on the road to "
+        "Damascus.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 42, 8, 8,
+        "Doctrine and Covenants", "Doctrine and Covenants", 14, 7, 7,
+        "paraphrase", "plan-of-salvation",
+        "Alma teaches that reclaiming man from temporal death without "
+        "a plan \"would destroy the great plan of happiness\" - the "
+        "same plan whose reward, eternal life, D&C 14:7 calls "
+        "\"the greatest of all the gifts of God.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 42, 15, 15,
+        "Romans", "Holy Bible", 3, 26, 26,
+        "paraphrase", "atonement",
+        "\"God himself atoneth for the sins of the world, to bring "
+        "about the plan of mercy, to appease the demands of justice\" "
+        "matches Paul's own teaching that God is both \"just, and the "
+        "justifier of him which believeth in Jesus.\"",
+    ),
+    (
+        "Helaman", "The Book of Mormon", 3, 29, 29,
+        "Hebrews", "Holy Bible", 4, 12, 12,
+        "paraphrase", "word-of-god",
+        "\"The word of God... is quick and powerful, which shall "
+        "divide asunder all the cunning and the snares and the wiles "
+        "of the devil\" nearly repeats Hebrews' own description: "
+        "\"the word of God is quick, and powerful, and sharper than "
+        "any twoedged sword.\"",
+    ),
+    (
+        "Helaman", "The Book of Mormon", 12, 7, 8,
+        "Isaiah", "Holy Bible", 40, 15, 17,
+        "paraphrase", "humility",
+        "\"How great is the nothingness of the children of men\" and "
+        "Isaiah's own \"the nations are as a drop of a bucket... "
+        "counted as the small dust of the balance\" both teach the "
+        "same lesson of humility before God's greatness.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 9, 18, 18,
+        "John", "Holy Bible", 8, 12, 12,
+        "paraphrase", "jesus-christ",
+        "\"I am the light and the life of the world\" - Christ repeats "
+        "to the Nephites, in the darkness following His crucifixion, "
+        "the same title He claimed in Jerusalem: \"I am the light of "
+        "the world.\"",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 17, 21, 24,
+        "Mark", "Holy Bible", 10, 13, 16,
+        "paraphrase", "children",
+        "Christ blesses the Nephite children \"one by one\" with angels "
+        "encircling them in fire - the same tenderness as when He "
+        "\"took them up in his arms, put his hands upon them, and "
+        "blessed them\" in Judea.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 18, 1, 7,
+        "Luke", "Holy Bible", 22, 19, 20,
+        "paraphrase", "ordinances",
+        "Christ institutes the sacrament of bread and wine among the "
+        "Nephites in almost the same words as the Last Supper - "
+        "\"this do in remembrance of me\" - the same ordinance given "
+        "on two continents.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 19, 23, 23,
+        "John", "Holy Bible", 17, 21, 23,
+        "paraphrase", "church-of-jesus-christ",
+        "Christ prays for the Nephites \"that they may believe in me, "
+        "that I may be in them as thou, Father, art in me\" - nearly "
+        "the same words as His own intercessory prayer in Gethsemane's "
+        "own upper room, \"that they all may be one.\"",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 27, 27, 27,
+        "Matthew", "Holy Bible", 16, 24, 24,
+        "paraphrase", "discipleship",
+        "\"What manner of men ought ye to be?... even as I am\" and "
+        "Christ's own charge to \"deny himself, and take up his cross, "
+        "and follow me\" both describe the same total, transforming "
+        "discipleship.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 28, 6, 9,
+        "John", "Holy Bible", 21, 22, 23,
+        "quotation", "testimony",
+        "Christ explicitly names \"John, my beloved, who was with me "
+        "in my ministry\" as the very disciple this desire was granted "
+        "to, confirming the same tarrying John's own gospel only hints "
+        "at: \"if I will that he tarry till I come, what is that to "
+        "thee?\"",
+    ),
+    (
+        "Mormon", "The Book of Mormon", 7, 5, 7,
+        "Acts", "Holy Bible", 4, 12, 12,
+        "paraphrase", "salvation",
+        "Mormon's dying charge to \"believe in Jesus Christ, that he is "
+        "the Son of God\" rests on the same exclusive claim Peter "
+        "makes: \"none other name under heaven given among men, "
+        "whereby we must be saved.\"",
+    ),
+    (
+        "Ether", "The Book of Mormon", 3, 6, 16,
+        "1 Timothy", "Holy Bible", 6, 16, 16,
+        "paraphrase", "faith",
+        "The brother of Jared sees the Lord's finger, then His whole "
+        "spirit body, told \"never has man come before me with such "
+        "exceeding faith\" - remarkable precisely because, as Paul "
+        "says, God ordinarily dwells \"in the light which no man can "
+        "approach unto.\"",
+    ),
+    (
+        "Ether", "The Book of Mormon", 6, 2, 12,
+        "Genesis", "Holy Bible", 7, 17, 18,
+        "paraphrase", "faith",
+        "The Jaredite barges, buried in the sea yet brought safely "
+        "across by the Lord, echo Noah's own ark - both accounts of a "
+        "vessel and a people preserved through water by following "
+        "exact divine instruction.",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 6, 4, 4,
+        "Acts", "Holy Bible", 2, 42, 42,
+        "paraphrase", "church-of-jesus-christ",
+        "The newly baptized Nephites were \"numbered among the people "
+        "of the church of Christ\" and nourished \"by the good word of "
+        "God\" - the same pattern of fellowship Acts describes: "
+        "\"they continued steadfastly in the apostles' doctrine and "
+        "fellowship.\"",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 8, 8, 12,
+        "Mark", "Holy Bible", 10, 14, 14,
+        "paraphrase", "baptism",
+        "\"Little children are alive in Christ\" and need no baptism, "
+        "Mormon teaches - the same truth behind Christ's own words, "
+        "\"suffer the little children to come unto me, and forbid them "
+        "not: for of such is the kingdom of God.\"",
+    ),
 ]
 
 
