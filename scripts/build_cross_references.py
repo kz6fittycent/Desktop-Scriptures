@@ -1551,6 +1551,97 @@ ENTRIES = [
         "times,\" is the beginning of God bringing to pass in the "
         "latter days the very work and glory Moses 1:39 describes.",
     ),
+    # --- A third mining pass, further down the ranked list, filtered to
+    # pairs not already touching a chapter already in this table.
+    (
+        "John", "Holy Bible", 16, 33, 33,
+        "Matthew", "Holy Bible", 11, 28, 28,
+        "paraphrase", "peace",
+        "\"That in me ye might have peace... be of good cheer; I have "
+        "overcome the world\" is the same peace-in-Christ theme as "
+        "\"come unto me... I will give you rest\" above.",
+    ),
+    (
+        "John", "Holy Bible", 16, 33, 33,
+        "Philippians", "Holy Bible", 4, 7, 7,
+        "paraphrase", "peace",
+        "Christ's promise that His followers may \"have peace\" even "
+        "amid the world's tribulation matches Paul's \"peace of God, "
+        "which passeth all understanding\" above.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 5, 14, 14,
+        "Mosiah", "The Book of Mormon", 5, 2, 2,
+        "paraphrase", "repentance",
+        "Both use the same distinctive phrase for true conversion: Alma "
+        "asks \"have ye experienced this mighty change in your "
+        "hearts?\"; King Benjamin's people already had, having \"no more "
+        "disposition to do evil, but to do good continually.\"",
+    ),
+    (
+        "John", "Holy Bible", 8, 12, 12,
+        "Matthew", "Holy Bible", 5, 16, 16,
+        "paraphrase", "jesus-christ",
+        "\"I am the light of the world\" is Christ's own declaration; "
+        "\"let your light so shine before men\" is what He then asks of "
+        "everyone who follows Him - reflecting the very light He is.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 110, 14, 16,
+        "Malachi", "Holy Bible", 4, 5, 6,
+        "quotation", "temple",
+        "\"The time has fully come, which was spoken of by the mouth of "
+        "Malachi\" - Elijah's own appearance in the Kirtland Temple, "
+        "explicitly identified as the literal fulfillment of Malachi's "
+        "prophecy, restoring the sealing power for temple work (see "
+        "D&C 128:17 above for how that power is then applied).",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 24, 24,
+        "Acts", "Holy Bible", 17, 28, 29,
+        "paraphrase", "godhead",
+        "\"We are also his offspring\" and \"begotten sons and "
+        "daughters unto God\" both teach the same doctrine of literal "
+        "divine parentage - not a figure of speech, but a real "
+        "relationship.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 59, 9, 9,
+        "Exodus", "Holy Bible", 20, 8, 8,
+        "paraphrase", "sabbath-day",
+        "\"Remember the sabbath day, to keep it holy\" is restated in "
+        "modern revelation as going \"to the house of prayer\" and "
+        "offering \"thy sacraments upon my holy day\" - the same "
+        "commandment, adapted to Christ's own restored Church.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 38, 27, 27,
+        "John", "Holy Bible", 17, 21, 21,
+        "paraphrase", "church-of-jesus-christ",
+        "\"Be one; and if ye are not one ye are not mine\" matches "
+        "Christ's own intercessory prayer \"that they all may be "
+        "one... that the world may believe that thou hast sent me\" - "
+        "unity among believers as evidence of true discipleship.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 122, 8, 8,
+        "Alma", "The Book of Mormon", 7, 11, 13,
+        "paraphrase", "atonement",
+        "\"The Son of Man hath descended below them all. Art thou "
+        "greater than he?\" is the same doctrine as Alma 7's teaching "
+        "above - Christ's suffering exceeds and therefore qualifies Him "
+        "to succor every other person's own trials.",
+    ),
+    (
+        "Ether", "The Book of Mormon", 12, 27, 27,
+        "Mosiah", "The Book of Mormon", 4, 27, 27,
+        "paraphrase", "grace",
+        "\"My grace is sufficient for all men that humble themselves\" "
+        "and \"it is not requisite that a man should run faster than he "
+        "has strength\" both teach that the Lord's expectations are "
+        "matched to what His grace actually enables, not to unaided "
+        "human effort alone.",
+    ),
 ]
 
 
