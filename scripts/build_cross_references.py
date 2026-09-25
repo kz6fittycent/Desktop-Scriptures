@@ -1962,6 +1962,15 @@ ENTRIES = [
         "Lord am with you, and will stand by you\" both promise the "
         "same divine companionship to those the Lord sends out.",
     ),
+    (
+        "1 Corinthians", "Holy Bible", 15, 22, 23,
+        "Leviticus", "Holy Bible", 23, 10, 11,
+        "typology", "resurrection",
+        "The wave-sheaf of firstfruits, waved before the Lord the day "
+        "after the Sabbath during the Passover week, gives Paul his own "
+        "term for Christ's resurrection: \"Christ the firstfruits; "
+        "afterward they that are Christ's at his coming.\"",
+    ),
 ]
 
 
