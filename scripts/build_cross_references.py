@@ -738,6 +738,217 @@ ENTRIES = [
         "this directly, teaching that Christ bore the law's own curse on "
         "the cross so that others could be redeemed from it.",
     ),
+    # --- D&C 77: an explicit, verse-by-verse interpretation of Revelation
+    # 4-11, each answer naming its own source chapter/verse outright -
+    # about as clean a "how these relate" case as scripture offers.
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 1, 4,
+        "Revelation", "Holy Bible", 4, 6, 6,
+        "paraphrase", "second-coming",
+        "Explains John's vision plainly: the \"sea of glass\" is the "
+        "earth itself in its future sanctified, immortal, and eternal "
+        "state - the four beasts figures of the classes of created "
+        "beings in that same glorified condition.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 5, 5,
+        "Revelation", "Holy Bible", 4, 4, 4,
+        "paraphrase", "resurrection",
+        "The twenty-four elders are identified as real, specific people "
+        "- ministers from John's own era who had already died and were "
+        "then in paradise - not symbolic figures.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 6, 7,
+        "Revelation", "Holy Bible", 5, 1, 1,
+        "paraphrase", "revelation",
+        "The sealed book contains \"the revealed will, mysteries, and "
+        "works of God\" for the earth's full seven-thousand-year "
+        "temporal existence, one seal's worth of history unsealed at a "
+        "time.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 8, 9,
+        "Revelation", "Holy Bible", 7, 1, 2,
+        "paraphrase", "second-coming",
+        "The four angels holding back the four winds are literal angels "
+        "given power to restrain until the gathering and sealing work "
+        "described in the following verses is complete.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 11, 11,
+        "Revelation", "Holy Bible", 7, 4, 8,
+        "paraphrase", "priesthood",
+        "The 144,000 sealed are explicitly identified as \"high priests, "
+        "ordained unto the holy order of God,\" sent to gather Israel "
+        "from every nation - not a symbolic number alone, but a "
+        "description of priesthood service.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 14, 14,
+        "Revelation", "Holy Bible", 10, 1, 2,
+        "paraphrase", "prophets",
+        "The little book John ate was \"a mission, and an ordinance\" - "
+        "identified here as Elias, the one who \"must come and restore "
+        "all things\" before the gathering of Israel.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 77, 15, 15,
+        "Revelation", "Holy Bible", 11, 3, 4,
+        "paraphrase", "prophets",
+        "The two witnesses are named plainly as two literal prophets, "
+        "raised up to prophesy to the Jews in Jerusalem in the last "
+        "days.",
+    ),
+    # --- More explicit New Testament quotations of the Old Testament ---
+    (
+        "Matthew", "Holy Bible", 12, 18, 21,
+        "Isaiah", "Holy Bible", 42, 1, 4,
+        "quotation", "jesus-christ",
+        "\"Behold my servant... he shall bring forth judgment\" - "
+        "explicitly introduced by Matthew as fulfilled prophecy of "
+        "Christ's own gentle, non-contentious ministry.",
+    ),
+    (
+        "Matthew", "Holy Bible", 21, 16, 16,
+        "Psalms", "Holy Bible", 8, 2, 2,
+        "quotation", "jesus-christ",
+        "\"Out of the mouth of babes and sucklings hast thou ordained "
+        "strength\" - Christ quotes this directly to the chief priests "
+        "when children praised Him in the temple.",
+    ),
+    (
+        "Matthew", "Holy Bible", 13, 14, 15,
+        "Isaiah", "Holy Bible", 6, 9, 10,
+        "quotation", "revelation",
+        "\"Hearing ye shall hear, and shall not understand\" - Christ "
+        "explains that He teaches in parables because this very "
+        "prophecy of spiritual dullness is fulfilled in His own "
+        "generation.",
+    ),
+    (
+        "Matthew", "Holy Bible", 13, 35, 35,
+        "Psalms", "Holy Bible", 78, 2, 2,
+        "quotation", "revelation",
+        "\"I will utter dark sayings of old\" - Matthew explicitly ties "
+        "Christ's use of parables to this psalm's own prophecy of "
+        "teaching in hidden sayings.",
+    ),
+    (
+        "Matthew", "Holy Bible", 26, 31, 31,
+        "Zechariah", "Holy Bible", 13, 7, 7,
+        "quotation", "jesus-christ",
+        "\"Smite the shepherd, and the sheep shall be scattered\" - "
+        "Christ quotes this directly the night of His betrayal, "
+        "foretelling the disciples' own scattering.",
+    ),
+    (
+        "John", "Holy Bible", 13, 18, 18,
+        "Psalms", "Holy Bible", 41, 9, 9,
+        "quotation", "atonement",
+        "\"He that eateth bread with me hath lifted up his heel against "
+        "me\" - Christ quotes this at the Last Supper, identifying His "
+        "own betrayal by Judas as fulfilling David's words.",
+    ),
+    (
+        "John", "Holy Bible", 15, 25, 25,
+        "Psalms", "Holy Bible", 69, 4, 4,
+        "quotation", "atonement",
+        "\"They hated me without a cause\" - Christ applies this psalm "
+        "of suffering directly to the world's hatred of Him.",
+    ),
+    (
+        "John", "Holy Bible", 19, 36, 36,
+        "Exodus", "Holy Bible", 12, 46, 46,
+        "typology", "atonement",
+        "The Passover lamb's bones were never to be broken - John "
+        "explicitly notes this was fulfilled when Christ's legs were "
+        "not broken on the cross, unlike the two thieves crucified with "
+        "Him.",
+    ),
+    (
+        "John", "Holy Bible", 19, 37, 37,
+        "Zechariah", "Holy Bible", 12, 10, 10,
+        "quotation", "atonement",
+        "\"They shall look on him whom they pierced\" - John explicitly "
+        "quotes this as fulfilled by the spear thrust into Christ's "
+        "side at the crucifixion.",
+    ),
+    (
+        "Acts", "Holy Bible", 3, 22, 22,
+        "Deuteronomy", "Holy Bible", 18, 15, 15,
+        "quotation", "prophets",
+        "\"A Prophet shall the Lord... raise up unto you... like unto "
+        "me\" - Peter quotes Moses' own prophecy directly, applying it "
+        "to Christ before the people at the temple.",
+    ),
+    (
+        "Acts", "Holy Bible", 2, 27, 27,
+        "Psalms", "Holy Bible", 16, 10, 10,
+        "quotation", "resurrection",
+        "\"Thou wilt not leave my soul in hell, neither wilt thou "
+        "suffer thine Holy One to see corruption\" - Peter quotes this "
+        "word for word at Pentecost as prophecy of Christ's own "
+        "resurrection before His body could decay.",
+    ),
+    (
+        "Romans", "Holy Bible", 9, 33, 33,
+        "Isaiah", "Holy Bible", 28, 16, 16,
+        "quotation", "jesus-christ",
+        "\"A stone of stumbling and rock of offence\" - Paul applies "
+        "Isaiah's cornerstone prophecy to Christ, whom many stumbled "
+        "over rather than believed on.",
+    ),
+    (
+        "Philippians", "Holy Bible", 2, 10, 11,
+        "Isaiah", "Holy Bible", 45, 23, 23,
+        "quotation", "jesus-christ",
+        "\"Every knee shall bow, every tongue... confess\" - Paul "
+        "quotes this directly, applying to Christ what Isaiah's own "
+        "words say only God Himself may claim.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 15, 54, 55,
+        "Isaiah", "Holy Bible", 25, 8, 8,
+        "quotation", "resurrection",
+        "\"He will swallow up death in victory\" - Paul quotes this "
+        "directly as fulfilled through Christ's resurrection, the "
+        "promise that death itself will finally be undone.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 15, 54, 55,
+        "Hosea", "Holy Bible", 13, 14, 14,
+        "quotation", "resurrection",
+        "\"O death, I will be thy plagues; O grave, I will be thy "
+        "destruction\" - Paul quotes this alongside Isaiah 25:8 above in "
+        "the same triumphant declaration over death through Christ's "
+        "resurrection.",
+    ),
+    (
+        "Galatians", "Holy Bible", 3, 8, 8,
+        "Genesis", "Holy Bible", 12, 3, 3,
+        "quotation", "covenants",
+        "\"In thee shall all nations be blessed\" - Paul explicitly "
+        "calls this verse itself \"the gospel\" preached beforehand to "
+        "Abraham, tying the Abrahamic covenant directly to salvation "
+        "through faith in Christ.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 10, 30, 30,
+        "Deuteronomy", "Holy Bible", 32, 35, 35,
+        "quotation", "judgment",
+        "\"Vengeance belongeth unto me... the Lord shall judge his "
+        "people\" - quoted directly to warn against turning away from "
+        "Christ after receiving the truth.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 12, 5, 6,
+        "Proverbs", "Holy Bible", 3, 11, 12,
+        "quotation", "trials-and-adversity",
+        "\"Whom the Lord loveth he correcteth\" - quoted directly to "
+        "teach that trials are evidence of God's fatherly love, not His "
+        "abandonment.",
+    ),
 ]
 
 
