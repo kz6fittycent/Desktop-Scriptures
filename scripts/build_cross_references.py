@@ -1152,6 +1152,51 @@ ENTRIES = [
         "Eden's own curse - mankind was driven out and barred from the "
         "tree in Genesis; the redeemed are welcomed back to it here.",
     ),
+    (
+        "Matthew", "Holy Bible", 26, 67, 67,
+        "Isaiah", "Holy Bible", 50, 6, 6,
+        "paraphrase", "atonement",
+        "\"I gave my back to the smiters, and my cheeks to them that "
+        "plucked off the hair\" - one of Isaiah's suffering-servant "
+        "songs, fulfilled when the council spat on Christ and struck "
+        "Him during His trial.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 5, 8, 8,
+        "Exodus", "Holy Bible", 12, 15, 15,
+        "typology", "atonement",
+        "Removing leaven from the house before Passover becomes, for "
+        "Paul, a call to keep the feast \"with the unleavened bread of "
+        "sincerity and truth\" rather than \"the leaven of malice and "
+        "wickedness\" - the same Passover-as-Christ imagery as 1 "
+        "Corinthians 5:7 above, applied to daily discipleship.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 10, 4, 4,
+        "Helaman", "The Book of Mormon", 5, 12, 12,
+        "typology", "jesus-christ",
+        "Both name \"the Rock\" as a title for Christ Himself outright "
+        "- Paul of the rock struck in the wilderness, Helaman of the "
+        "foundation his sons must build their lives upon.",
+    ),
+    (
+        "Acts", "Holy Bible", 15, 16, 17,
+        "Amos", "Holy Bible", 9, 11, 12,
+        "quotation", "church-of-jesus-christ",
+        "\"I will build again the tabernacle of David\" - James quotes "
+        "this directly at the Jerusalem council to show that Gentiles "
+        "being gathered into the Church, without first requiring "
+        "circumcision, was foretold by the prophets all along.",
+    ),
+    (
+        "Mark", "Holy Bible", 1, 2, 2,
+        "Malachi", "Holy Bible", 3, 1, 1,
+        "quotation", "prophets",
+        "\"I send my messenger before thy face, which shall prepare thy "
+        "way before thee\" - Mark opens his gospel by quoting this "
+        "directly, identifying John the Baptist as the promised "
+        "forerunner.",
+    ),
 ]
 
 
