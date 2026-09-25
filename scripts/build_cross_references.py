@@ -1776,6 +1776,32 @@ ENTRIES = [
         "immediately after encountering the resurrected Christ - a Zion "
         "society on two different continents.",
     ),
+    (
+        "Ether", "The Book of Mormon", 12, 27, 27,
+        "2 Corinthians", "Holy Bible", 12, 9, 9,
+        "quotation", "grace",
+        "\"My grace is sufficient for thee\" - Moroni echoes Paul's own "
+        "words almost verbatim: \"my grace is sufficient for all men "
+        "that humble themselves before me.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 96, 98,
+        "1 Thessalonians", "Holy Bible", 4, 16, 17,
+        "paraphrase", "second-coming",
+        "Both describe the same moment: the dead in Christ rising "
+        "first, then the living \"caught up\" to meet Him - Paul's own "
+        "account of the Second Coming and this modern revelation's "
+        "description of the same event.",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 7, 6, 8,
+        "James", "Holy Bible", 2, 17, 18,
+        "paraphrase", "faith",
+        "\"Faith, if it hath not works, is dead\" and \"except he shall "
+        "do it with real intent it profiteth him nothing\" both teach "
+        "that sincere action, not empty profession, is what makes faith "
+        "real.",
+    ),
 ]
 
 
