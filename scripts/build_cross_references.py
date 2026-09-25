@@ -1732,6 +1732,50 @@ ENTRIES = [
         "Himself models in Gethsemane: \"not my will, but thine, be "
         "done.\"",
     ),
+    # --- Filling in books untouched so far - checked which books had zero
+    # entries, then looked for well-known content there rather than only
+    # following citation-mining leads from already-popular verses.
+    (
+        "John", "Holy Bible", 10, 11, 11,
+        "Ezekiel", "Holy Bible", 34, 23, 24,
+        "paraphrase", "jesus-christ",
+        "Ezekiel prophesies one shepherd, \"my servant David,\" who "
+        "will feed and care for God's scattered flock - the same role "
+        "Christ claims centuries later: \"I am the good shepherd: the "
+        "good shepherd giveth his life for the sheep.\"",
+    ),
+    (
+        "Hebrews", "Holy Bible", 8, 8, 12,
+        "Jeremiah", "Holy Bible", 31, 31, 34,
+        "quotation", "covenants",
+        "The \"new covenant\" promised to the house of Israel - \"I "
+        "will put my laws into their mind, and write them in their "
+        "hearts\" - is quoted by Hebrews at unusual length, one of the "
+        "longest continuous Old Testament quotations anywhere in the "
+        "New Testament, to show Christ's covenant fulfilling and "
+        "replacing the old.",
+    ),
+    (
+        "Mark", "Holy Bible", 2, 5, 5,
+        "Enos", "The Book of Mormon", 1, 5, 8,
+        "paraphrase", "repentance",
+        "Enos hears almost the same words Christ later speaks to the "
+        "man sick of the palsy - \"thy sins are forgiven thee\" - the "
+        "same divine assurance of complete forgiveness, given directly, "
+        "centuries apart, and in Enos' case explicitly \"because of thy "
+        "faith in Christ\" though Christ's own ministry was still "
+        "generations away.",
+    ),
+    (
+        "Acts", "Holy Bible", 4, 32, 32,
+        "4 Nephi", "The Book of Mormon", 1, 15, 17,
+        "paraphrase", "zion",
+        "\"Of one heart and of one soul... had all things common\" and "
+        "\"there was no contention in the land, because of the love of "
+        "God\" both describe a unified, consecrated community "
+        "immediately after encountering the resurrected Christ - a Zion "
+        "society on two different continents.",
+    ),
 ]
 
 
