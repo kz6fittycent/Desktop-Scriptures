@@ -1197,6 +1197,44 @@ ENTRIES = [
         "directly, identifying John the Baptist as the promised "
         "forerunner.",
     ),
+    (
+        "Hebrews", "Holy Bible", 10, 1, 4,
+        "Alma", "The Book of Mormon", 34, 10, 14,
+        "paraphrase", "atonement",
+        "Both explicitly teach that animal sacrifice could never itself "
+        "take away sin - Amulek that \"it shall not be a human "
+        "sacrifice... but it must be an infinite and eternal "
+        "sacrifice,\" Hebrews that \"it is not possible that the blood "
+        "of bulls and goats should take away sins\" - each explaining "
+        "why a greater atonement was required.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 17, 17,
+        "Isaiah", "Holy Bible", 55, 1, 1,
+        "quotation", "salvation",
+        "\"Come... buy wine and milk without money and without "
+        "price\"/\"take the water of life freely\" - both invite all "
+        "who thirst to partake of salvation's blessings without cost, "
+        "the same invitation centuries apart.",
+    ),
+    (
+        "John", "Holy Bible", 10, 7, 9,
+        "2 Nephi", "The Book of Mormon", 9, 41, 41,
+        "typology", "jesus-christ",
+        "Both name Christ directly as the gate to salvation - John "
+        "records Christ's own words, \"I am the door of the sheep\"; "
+        "Nephi calls Him \"the keeper of the gate\" who \"employeth no "
+        "servant there.\"",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 27, 27, 27,
+        "Matthew", "Holy Bible", 5, 48, 48,
+        "paraphrase", "discipleship",
+        "\"What manner of men ought ye to be? Verily... even as I am\" "
+        "- the risen Christ's own standard for discipleship matches His "
+        "earlier teaching in the Sermon on the Mount, \"be ye therefore "
+        "perfect, even as your Father... is perfect.\"",
+    ),
 ]
 
 
