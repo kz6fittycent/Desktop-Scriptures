@@ -647,6 +647,97 @@ ENTRIES = [
         "that Rock was Christ\" - Paul's own explicit identification of "
         "the rock struck for water in the wilderness.",
     ),
+    # --- D&C's own explicit ties back to the Bible ---
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 70, 98,
+        "1 Corinthians", "Holy Bible", 15, 40, 42,
+        "paraphrase", "exaltation",
+        "\"Celestial\" and \"terrestrial\" bodies of differing glory - "
+        "Paul's own terms, which this vision borrows and greatly expands "
+        "into the doctrine of three degrees of glory, adding a third, "
+        "\"telestial,\" glory Paul doesn't name.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 45, 16, 59,
+        "Matthew", "Holy Bible", 24, None, None,
+        "paraphrase", "second-coming",
+        "The Lord's own retelling of the Olivet Discourse's signs of the "
+        "times, given directly to Joseph Smith - independently worded "
+        "from both the King James text and Joseph Smith's own separate "
+        "revision in Joseph Smith-Matthew above, but the same doctrine "
+        "of watching for the signs preceding the Second Coming.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 133, 48, 50,
+        "Isaiah", "Holy Bible", 63, 1, 3,
+        "quotation", "second-coming",
+        "\"His apparel... like him that treadeth in the wine-vat\" - "
+        "Christ's own return in glory and judgment, described in nearly "
+        "Isaiah's own words.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 132, 34, 38,
+        "Genesis", "Holy Bible", 16, 1, 4,
+        "paraphrase", "covenants",
+        "Retells Abraham and Sarah giving Hagar to Abraham as wife, "
+        "\"because this was the law\" of the time - used to teach that a "
+        "commandment from God can override an otherwise-binding law, "
+        "part of this section's broader teaching on covenants.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 107, 2, 4,
+        "Genesis", "Holy Bible", 14, 18, 20,
+        "paraphrase", "priesthood",
+        "\"The first priesthood is called the Melchizedek Priesthood, "
+        "because Melchizedek was such a great high priest\" - the same "
+        "Melchizedek Hebrews 7 and Alma 13 both draw on above, explaining "
+        "why the priesthood itself carries his name.",
+    ),
+    # --- More typology, scripture's own explicit connections ---
+    (
+        "Hebrews", "Holy Bible", 10, 19, 20,
+        "Matthew", "Holy Bible", 27, 51, 51,
+        "typology", "atonement",
+        "The temple veil torn in two at Christ's death, which Hebrews "
+        "explains as opening \"a new and living way\" into God's presence "
+        "\"through the veil, that is to say, his flesh\" - Christ's own "
+        "body as the veil, torn open by His atoning death.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 3, 20, 21,
+        "Genesis", "Holy Bible", 7, 1, 7,
+        "typology", "baptism",
+        "Peter explicitly reads Noah's family being saved through water "
+        "in the ark as \"the like figure whereunto even baptism doth "
+        "also now save us\" - the Flood as a type of baptism's own "
+        "saving power.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 11, 17, 19,
+        "Genesis", "Holy Bible", 22, 9, 13,
+        "typology", "faith",
+        "Abraham offering Isaac, \"accounting that God was able to raise "
+        "him up, even from the dead\" - Paul explicitly calls this \"a "
+        "figure\" of resurrection, Abraham's faith foreshadowing God's "
+        "own willingness to give His Son.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 9, 11, 12,
+        "Leviticus", "Holy Bible", 16, 14, 15,
+        "typology", "atonement",
+        "The high priest entering the Holy of Holies once a year with "
+        "sacrificial blood on the Day of Atonement - Paul explains "
+        "Christ fulfilled this by entering heaven itself \"by his own "
+        "blood,\" once, for all.",
+    ),
+    (
+        "Galatians", "Holy Bible", 3, 13, 13,
+        "Deuteronomy", "Holy Bible", 21, 22, 23,
+        "quotation", "atonement",
+        "\"Cursed is every one that hangeth on a tree\" - Paul quotes "
+        "this directly, teaching that Christ bore the law's own curse on "
+        "the cross so that others could be redeemed from it.",
+    ),
 ]
 
 
