@@ -1901,6 +1901,67 @@ ENTRIES = [
         "return - the apostasy these two verses anticipate is what the "
         "Restoration would later address.",
     ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 85, 6, 6,
+        "1 Kings", "Holy Bible", 19, 11, 12,
+        "paraphrase", "revelation",
+        "Elijah learns God speaks \"not in the wind... not in the "
+        "earthquake... not in the fire\" but in \"a still small voice\" "
+        "- the same \"still small voice, which whispereth through and "
+        "pierceth all things\" this modern revelation describes.",
+    ),
+    (
+        "Titus", "Holy Bible", 3, 5, 5,
+        "2 Nephi", "The Book of Mormon", 25, 23, 23,
+        "paraphrase", "grace",
+        "\"Not by works of righteousness which we have done, but "
+        "according to his mercy he saved us\" and \"it is by grace that "
+        "we are saved, after all we can do\" both teach that salvation "
+        "comes through Christ's mercy, not human effort alone - two of "
+        "scripture's clearest single-verse statements of the doctrine "
+        "of grace.",
+    ),
+    (
+        "Mormon", "The Book of Mormon", 9, 9, 9,
+        "James", "Holy Bible", 1, 17, 17,
+        "quotation", "godhead",
+        "\"God is the same yesterday, today, and forever, and in him "
+        "there is no variableness neither shadow of changing\" nearly "
+        "repeats James' own words, \"with whom is no variableness, "
+        "neither shadow of turning\" - the same doctrine of God's "
+        "unchanging nature.",
+    ),
+    (
+        "2 Timothy", "Holy Bible", 4, 7, 7,
+        "Moroni", "The Book of Mormon", 10, 34, 34,
+        "paraphrase", "testimony",
+        "Paul's final words - \"I have fought a good fight, I have "
+        "finished my course, I have kept the faith\" - and Moroni's own "
+        "farewell - \"I soon go to rest in the paradise of God... to "
+        "meet you before the pleasing bar of the great Jehovah\" - are "
+        "both a final witness given at the very end of a lifetime of "
+        "testimony, just before facing God.",
+    ),
+    (
+        "2 Peter", "Holy Bible", 3, 9, 9,
+        "Doctrine and Covenants", "Doctrine and Covenants", 18, 11, 11,
+        "paraphrase", "atonement",
+        "\"The Lord is not slack... not willing that any should "
+        "perish, but that all should come to repentance\" and \"he "
+        "suffered the pain of all men, that all men might repent and "
+        "come unto him\" both root patience toward sinners in the "
+        "Atonement's own reach - Christ has already paid for repentance "
+        "to be possible.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 68, 6, 6,
+        "Joshua", "Holy Bible", 1, 9, 9,
+        "paraphrase", "faith",
+        "\"Be strong and of a good courage... for the Lord thy God is "
+        "with thee\" and \"be of good cheer, and do not fear, for I the "
+        "Lord am with you, and will stand by you\" both promise the "
+        "same divine companionship to those the Lord sends out.",
+    ),
 ]
 
 
