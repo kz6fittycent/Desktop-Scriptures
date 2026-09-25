@@ -1235,6 +1235,205 @@ ENTRIES = [
         "earlier teaching in the Sermon on the Mount, \"be ye therefore "
         "perfect, even as your Father... is perfect.\"",
     ),
+    # --- "Other sheep I have": Christ quotes His own words from John twice
+    # more, identifying who they meant - a three-text network anchored on
+    # the same original verse, same pattern as the brazen serpent above.
+    (
+        "3 Nephi", "The Book of Mormon", 15, 21, 24,
+        "John", "Holy Bible", 10, 16, 16,
+        "quotation", "house-of-israel",
+        "Christ explicitly quotes His own words to the Nephites, \"ye "
+        "are they of whom I said: Other sheep I have which are not of "
+        "this fold\" - explaining that the promise of \"other sheep\" "
+        "beyond Jerusalem's fold meant the very people now hearing Him "
+        "in the Americas.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 16, 1, 3,
+        "John", "Holy Bible", 10, 16, 16,
+        "quotation", "house-of-israel",
+        "Christ clarifies that \"other sheep\" means still more than "
+        "even the Nephites - other scattered branches of Israel \"not "
+        "of this land, neither of the land of Jerusalem\" that He must "
+        "also visit.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 10, 59, 60,
+        "John", "Holy Bible", 10, 16, 16,
+        "quotation", "house-of-israel",
+        "Christ quotes His own words a third time, now to Joseph "
+        "Smith, identifying the Book of Mormon itself as proof that the "
+        "\"other sheep\" promise was literally fulfilled among the "
+        "Nephites.",
+    ),
+    # --- Found by mining which verses General Conference/Ensign/Liahona
+    # talks actually cite TOGETHER in the same talk (see data/verse_
+    # citations.json and data/liahona_citations.json) - a strong signal
+    # of a connection speakers themselves have already drawn repeatedly,
+    # each still verified against the real text before being added here.
+    (
+        "Matthew", "Holy Bible", 17, 5, 5,
+        "Joseph Smith--History", "Pearl of Great Price", 1, 17, 17,
+        "quotation", "jesus-christ,restoration",
+        "The Father's declaration is nearly word for word the same: "
+        "\"This is my beloved Son... hear ye him\" at the Mount of "
+        "Transfiguration becomes \"This is My Beloved Son. Hear Him!\" "
+        "at the First Vision - the same divine testimony given "
+        "seventeen centuries apart.",
+    ),
+    (
+        "Matthew", "Holy Bible", 17, 5, 5,
+        "3 Nephi", "The Book of Mormon", 11, 6, 7,
+        "quotation", "jesus-christ",
+        "\"Hear ye him\"/\"hear ye him\" - the Father's own words to the "
+        "apostles at the Transfiguration are echoed almost exactly when "
+        "He introduces the resurrected Christ to the Nephites.",
+    ),
+    (
+        "Joseph Smith--History", "Pearl of Great Price", 1, 17, 17,
+        "3 Nephi", "The Book of Mormon", 11, 6, 7,
+        "quotation", "jesus-christ,restoration",
+        "Both records preserve the Father's voice using nearly "
+        "identical language to introduce the Son and command that He "
+        "be heard - the same divine pattern repeating across "
+        "dispensations.",
+    ),
+    (
+        "Joseph Smith--History", "Pearl of Great Price", 1, 11, 13,
+        "James", "Holy Bible", 1, 5, 5,
+        "quotation", "revelation",
+        "Joseph Smith explicitly names his source: \"reading the "
+        "Epistle of James, first chapter and fifth verse\" - it was "
+        "pondering this very verse that drove him to pray and receive "
+        "the First Vision.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 20, 77, 77,
+        "Moroni", "The Book of Mormon", 4, 3, 3,
+        "quotation", "ordinances",
+        "The sacrament prayer on the bread is given in the Doctrine "
+        "and Covenants in nearly the same words the Nephites already "
+        "used centuries earlier, recorded by Moroni - the same "
+        "ordinance, restored with the same words.",
+    ),
+    (
+        "John", "Holy Bible", 3, 16, 16,
+        "Moses", "Pearl of Great Price", 1, 39, 39,
+        "paraphrase", "plan-of-salvation",
+        "Two of scripture's most quoted single verses state the same "
+        "doctrine from opposite directions: \"God so loved the world, "
+        "that he gave his only begotten Son\" is the motive; \"this is "
+        "my work and my glory - to bring to pass the immortality and "
+        "eternal life of man\" is the purpose that love accomplishes.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 14, 7, 7,
+        "Moses", "Pearl of Great Price", 1, 39, 39,
+        "paraphrase", "exaltation",
+        "\"Eternal life, which gift is the greatest of all the gifts of "
+        "God\" names exactly what Moses 1:39 calls God's own \"work and "
+        "glory\" - the same goal, described from the receiving end and "
+        "the giving end.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 2, 25, 25,
+        "Moses", "Pearl of Great Price", 1, 39, 39,
+        "paraphrase", "plan-of-salvation",
+        "\"Men are, that they might have joy\" and \"the immortality "
+        "and eternal life of man\" answer the same question - why "
+        "mortal life exists at all - each in its own single, oft-quoted "
+        "sentence.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 20, 77, 77,
+        "Mosiah", "The Book of Mormon", 18, 8, 10,
+        "paraphrase", "covenants",
+        "The sacrament prayer's promise to \"always remember him and "
+        "keep his commandments\" renews, week by week, the very "
+        "covenant Alma's converts first made at the waters of Mormon - "
+        "to \"bear one another's burdens,\" \"mourn with those that "
+        "mourn,\" and \"stand as witnesses of God at all times.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 1, 38, 38,
+        "Amos", "Holy Bible", 3, 7, 7,
+        "paraphrase", "prophets",
+        "\"The Lord God will do nothing, but he revealeth his secret "
+        "unto his servants the prophets\" and \"whether by mine own "
+        "voice or by the voice of my servants, it is the same\" both "
+        "teach that a living prophet's word carries the Lord's own "
+        "authority.",
+    ),
+    (
+        "Matthew", "Holy Bible", 5, 48, 48,
+        "Moroni", "The Book of Mormon", 10, 32, 32,
+        "paraphrase", "grace",
+        "\"Be ye therefore perfect\" is the command; \"be perfected in "
+        "him... then is his grace sufficient for you\" explains how - "
+        "perfection is reached through Christ's grace, not unaided "
+        "human effort.",
+    ),
+    (
+        "John", "Holy Bible", 17, 3, 3,
+        "Joseph Smith--History", "Pearl of Great Price", 1, 17, 17,
+        "paraphrase", "testimony",
+        "\"This is life eternal, that they might know thee the only "
+        "true God, and Jesus Christ\" defines eternal life as knowing "
+        "God personally - exactly what Joseph Smith received when the "
+        "Father and the Son appeared to him directly.",
+    ),
+    (
+        "John", "Holy Bible", 13, 34, 34,
+        "Moroni", "The Book of Mormon", 7, 47, 47,
+        "paraphrase", "charity",
+        "Christ's \"new commandment... that ye love one another\" and "
+        "Mormon's definition of charity as \"the pure love of Christ\" "
+        "describe the same defining Christian virtue from two "
+        "different vantage points, command and definition.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 93, 40, 40,
+        "Proverbs", "Holy Bible", 22, 6, 6,
+        "paraphrase", "children",
+        "\"I have commanded you to bring up your children in light and "
+        "truth\" and \"train up a child in the way he should go\" teach "
+        "the same parental duty, one as commandment, one as proverb.",
+    ),
+    (
+        "Luke", "Holy Bible", 22, 42, 42,
+        "Mosiah", "The Book of Mormon", 3, 19, 19,
+        "paraphrase", "obedience",
+        "Christ's own submission in Gethsemane - \"not my will, but "
+        "thine, be done\" - is the perfect pattern of the \"submissive, "
+        "meek, humble\" disposition Mosiah 3:19 teaches every disciple "
+        "must adopt, becoming \"as a child.\"",
+    ),
+    (
+        "Matthew", "Holy Bible", 28, 19, 19,
+        "Doctrine and Covenants", "Doctrine and Covenants", 18, 10, 10,
+        "paraphrase", "missionary-work",
+        "\"The worth of souls is great in the sight of God\" is the "
+        "reason behind the command to \"go ye therefore, and teach all "
+        "nations\" - the value of each soul is what makes the "
+        "missionary charge urgent.",
+    ),
+    (
+        "Articles of Faith", "Pearl of Great Price", 1, 13, 13,
+        "1 Corinthians", "Holy Bible", 13, 7, 7,
+        "quotation", "charity",
+        "\"We believe all things, we hope all things\" - the Articles "
+        "of Faith explicitly credit this to \"the admonition of Paul,\" "
+        "quoting his own definition of charity almost word for word.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 59, 23, 23,
+        "John", "Holy Bible", 14, 27, 27,
+        "paraphrase", "peace",
+        "\"Peace in this world, and eternal life in the world to come\" "
+        "and \"Peace I leave with you, my peace I give unto you\" both "
+        "name peace as Christ's own gift to the righteous, not "
+        "something the world can offer.",
+    ),
 ]
 
 
