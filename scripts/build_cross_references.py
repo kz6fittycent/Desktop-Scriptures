@@ -1642,6 +1642,96 @@ ENTRIES = [
         "matched to what His grace actually enables, not to unaided "
         "human effort alone.",
     ),
+    # --- A fourth mining pass, filtered specifically to Bible <-> LDS-
+    # scripture pairs (the highest-value case, since a Bible-internal
+    # pair is already well covered by public-domain resources like the
+    # Treasury of Scripture Knowledge - see this file's own docstring).
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 65, 2, 2,
+        "Daniel", "Holy Bible", 2, 44, 44,
+        "quotation", "restoration",
+        "\"The stone which is cut out of the mountain without hands\" - "
+        "D&C 65 explicitly quotes Daniel's own image, applying it to "
+        "the kingdom of God rolling forth to fill the whole earth in "
+        "the latter days.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 1, 10, 10,
+        "Daniel", "Holy Bible", 2, 44, 44,
+        "paraphrase", "restoration",
+        "Both describe a final kingdom that will \"never be destroyed\" "
+        "and gather \"all things\" together - Daniel's stone that fills "
+        "the whole earth, Paul's dispensation of the fulness of times.",
+    ),
+    (
+        "Joseph Smith--History", "Pearl of Great Price", 1, 17, 17,
+        "Revelation", "Holy Bible", 14, 6, 6,
+        "paraphrase", "restoration",
+        "\"Another angel fly in the midst of heaven, having the "
+        "everlasting gospel\" is read as prophecy of the angelic "
+        "ministrations - Moroni among them - that restored the gospel "
+        "beginning with the First Vision.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 130, 20, 21,
+        "Malachi", "Holy Bible", 3, 10, 10,
+        "paraphrase", "covenants",
+        "\"All blessings are predicated\" on obedience to God's law is "
+        "the very principle Malachi's tithing promise demonstrates: "
+        "bring the tithe, and the windows of heaven open in return.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 58, 42, 42,
+        "Isaiah", "Holy Bible", 1, 18, 18,
+        "paraphrase", "repentance",
+        "\"He who has repented of his sins... I, the Lord, remember "
+        "them no more\" and \"though your sins be as scarlet, they "
+        "shall be as white as snow\" both teach that true repentance "
+        "makes forgiveness complete, not partial.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 2, 1, 3,
+        "Malachi", "Holy Bible", 4, 5, 6,
+        "quotation", "temple",
+        "Moroni's first recorded words to Joseph Smith, in 1823, "
+        "already quote Malachi's Elijah prophecy directly - years "
+        "before Elijah's actual appearance in the Kirtland Temple "
+        "fulfilled it (see D&C 110 above).",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 6, 19, 19,
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 15, 15,
+        "paraphrase", "resurrection",
+        "\"Your body is the temple of the Holy Ghost\" and \"the spirit "
+        "and the body are the soul of man\" both teach that the body is "
+        "sacred, not incidental, to a person's spiritual life.",
+    ),
+    (
+        "Matthew", "Holy Bible", 28, 20, 20,
+        "Doctrine and Covenants", "Doctrine and Covenants", 84, 88, 88,
+        "paraphrase", "missionary-work",
+        "\"I will go before your face... mine angels round about you, "
+        "to bear you up\" is Christ's own promise of constant support "
+        "for those sent to teach, matching His \"lo, I am with you "
+        "alway\" at the very end of Matthew.",
+    ),
+    (
+        "Acts", "Holy Bible", 10, 38, 38,
+        "Luke", "Holy Bible", 2, 52, 52,
+        "paraphrase", "jesus-christ",
+        "\"Jesus increased in wisdom and stature\" and \"went about "
+        "doing good\" together sketch Christ's mortal life, from "
+        "growing boy to anointed, healing minister.",
+    ),
+    (
+        "Luke", "Holy Bible", 22, 42, 42,
+        "1 Nephi", "The Book of Mormon", 3, 7, 7,
+        "paraphrase", "obedience",
+        "Nephi's resolve, \"I will go and do the things which the Lord "
+        "hath commanded,\" is the same willing submission Christ "
+        "Himself models in Gethsemane: \"not my will, but thine, be "
+        "done.\"",
+    ),
 ]
 
 
