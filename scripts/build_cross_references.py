@@ -1802,6 +1802,105 @@ ENTRIES = [
         "that sincere action, not empty profession, is what makes faith "
         "real.",
     ),
+    (
+        "Luke", "Holy Bible", 22, 42, 42,
+        "1 Samuel", "Holy Bible", 15, 22, 22,
+        "paraphrase", "obedience",
+        "\"To obey is better than sacrifice\" and Christ's own \"not my "
+        "will, but thine, be done\" both teach that willing obedience "
+        "matters more than the outward form of devotion.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 93, 40, 40,
+        "3 John", "Holy Bible", 1, 4, 4,
+        "paraphrase", "children",
+        "\"I have no greater joy than to hear that my children walk in "
+        "truth\" is the same parental joy behind the commandment \"to "
+        "bring up your children in light and truth\" above.",
+    ),
+    # --- More book-coverage gap-filling ---
+    (
+        "1 Corinthians", "Holy Bible", 15, 20, 20,
+        "Job", "Holy Bible", 19, 25, 26,
+        "paraphrase", "resurrection",
+        "\"I know that my redeemer liveth... in my flesh shall I see "
+        "God\" is Job's own resurrection hope, realized when \"Christ "
+        "is risen from the dead, and become the firstfruits of them "
+        "that slept.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 40, 11, 11,
+        "Ecclesiastes", "Holy Bible", 12, 7, 7,
+        "paraphrase", "plan-of-salvation",
+        "\"The spirit shall return unto God who gave it\" and \"the "
+        "spirits of all men, as soon as they are departed from this "
+        "mortal body... are taken home to that God who gave them "
+        "life\" describe the same immediate destination of the spirit "
+        "at death.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 18, 32, 32,
+        "1 Samuel", "Holy Bible", 16, 7, 7,
+        "paraphrase", "judgment",
+        "\"The Lord seeth not as man seeth; for man looketh on the "
+        "outward appearance, but the Lord looketh on the heart\" and "
+        "\"he knows all the thoughts and intents of the heart\" both "
+        "teach that God judges by what's within, not outward "
+        "appearance.",
+    ),
+    (
+        "Luke", "Holy Bible", 4, 27, 27,
+        "2 Kings", "Holy Bible", 5, 10, 14,
+        "quotation", "faith",
+        "Naaman's healing after washing in the Jordan seven times, at "
+        "first refused in pride - Christ Himself cites this very story "
+        "by name to the people of Nazareth, teaching that faith, not "
+        "birthright, determines who receives God's power.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 18, 13, 13,
+        "Zephaniah", "Holy Bible", 3, 17, 17,
+        "paraphrase", "missionary-work",
+        "\"How great is his joy in the soul that repenteth\" and \"he "
+        "will rejoice over thee with joy... he will joy over thee with "
+        "singing\" both describe God's own joy - not just relief - over "
+        "a single soul returning to Him.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 12, 26, 26,
+        "Haggai", "Holy Bible", 2, 6, 7,
+        "quotation", "second-coming",
+        "\"Yet once more I shake not the earth only, but also heaven\" "
+        "- Hebrews quotes Haggai's own prophecy of a final, decisive "
+        "shaking of all things at the Lord's coming.",
+    ),
+    (
+        "Jacob", "The Book of Mormon", 2, 18, 19,
+        "1 Timothy", "Holy Bible", 6, 10, 10,
+        "paraphrase", "consecration",
+        "\"The love of money is the root of all evil\" and \"before ye "
+        "seek for riches, seek ye for the kingdom of God\" both warn "
+        "that the danger isn't riches themselves but placing them "
+        "ahead of God.",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 7, 47, 47,
+        "1 John", "Holy Bible", 4, 8, 8,
+        "paraphrase", "charity",
+        "\"God is love\" and \"charity is the pure love of Christ\" "
+        "both root the definition of true love in God's own nature, "
+        "not human sentiment.",
+    ),
+    (
+        "Jude", "Holy Bible", 1, 3, 3,
+        "2 Thessalonians", "Holy Bible", 2, 3, 3,
+        "paraphrase", "restoration",
+        "\"Earnestly contend for the faith which was once delivered\" "
+        "assumes that faith could be - and was - lost; Paul explicitly "
+        "warns that \"a falling away\" must come first, before Christ's "
+        "return - the apostasy these two verses anticipate is what the "
+        "Restoration would later address.",
+    ),
 ]
 
 
