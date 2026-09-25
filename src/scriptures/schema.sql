@@ -160,8 +160,12 @@ CREATE TABLE IF NOT EXISTS cross_references (
     -- paraphrase = same content/point, wording diverges meaningfully, or
     -- only part of the passage is quoted amid original commentary;
     -- translation = a JST-style revision of the very same underlying
-    -- narrative, not an independent quotation of it.
-    relationship            TEXT NOT NULL CHECK (relationship IN ('quotation', 'paraphrase', 'translation')),
+    -- narrative, not an independent quotation of it; typology = a symbol
+    -- or event scripture itself explicitly ties to Christ (the brazen
+    -- serpent, the Passover lamb), not a quotation of one passage by
+    -- another - see build_cross_references.py's own note on how strict
+    -- "explicitly" is held to here.
+    relationship            TEXT NOT NULL CHECK (relationship IN ('quotation', 'paraphrase', 'translation', 'typology')),
     -- Comma-separated Topical Guide topic slugs (see topics.slug) naming
     -- the doctrine this pairing is actually about - e.g. "atonement", or
     -- "second-coming,plan-of-salvation" for a passage that touches both.

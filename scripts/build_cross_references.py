@@ -45,12 +45,24 @@ Every note leads with what doctrine the passage is teaching and how both
 sides agree on it, then (where relevant) how the wording or scope
 differs - "how the doctrine aligns," not just "what changed."
 
-Three relationship kinds (see also schema.sql's own comment):
+Four relationship kinds (see also schema.sql's own comment):
 - "quotation": wording matches (allowing for translation-era spelling).
 - "paraphrase": same content/point, but wording diverges meaningfully, or
   only part of the passage is quoted amid original commentary.
 - "translation": a JST/Moses-style revision of the very same underlying
   narrative, not an independent quotation of it.
+- "typology": a symbol or event scripture itself explicitly identifies as
+  pointing to Christ or His mission - the brazen serpent, the Passover
+  lamb, Jonah's three days, and so on. Held to the same accuracy bar as
+  every other relationship here: the connection must be one scripture
+  itself states plainly (Christ's own "as Moses lifted up the serpent...
+  even so must the Son of man be lifted up," Paul's "Christ our passover
+  is sacrificed for us," Alma explicitly calling the brazen serpent "a
+  type"), never a connection only later tradition or this app's own
+  inference draws. A rich, well-known typological thread (like the
+  brazen serpent) is deliberately captured as several pair-wise entries
+  - one per pairing scripture itself makes - rather than one entry
+  trying to name every anchor at once.
 """
 
 from __future__ import annotations
@@ -552,6 +564,88 @@ ENTRIES = [
         "leap as an hart\" - Christ points to His own healing miracles "
         "as proof, to John the Baptist's disciples, that He is the "
         "promised Messiah these signs describe.",
+    ),
+    # --- Typology: symbols and events scripture itself explicitly ties to
+    # Christ, not a quotation of one passage by another. The brazen
+    # serpent gets three separate entries - one per pairing scripture
+    # itself makes - rather than trying to name every anchor in one row.
+    (
+        "John", "Holy Bible", 3, 14, 15,
+        "Numbers", "Holy Bible", 21, 8, 9,
+        "typology", "jesus-christ",
+        "Christ Himself draws this connection: \"as Moses lifted up the "
+        "serpent in the wilderness, even so must the Son of man be "
+        "lifted up.\" Looking to the brazen serpent in faith healed the "
+        "Israelites' snakebite; looking to Christ in faith saves from "
+        "sin.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 33, 19, 22,
+        "Numbers", "Holy Bible", 21, 8, 9,
+        "typology", "faith",
+        "Alma uses the word \"type\" outright: \"a type was raised up in "
+        "the wilderness, that whosoever would look upon it might live\" "
+        "- faith as simple as looking, whether at the serpent or at "
+        "Christ, is still enough to save.",
+    ),
+    (
+        "Helaman", "The Book of Mormon", 8, 14, 15,
+        "Numbers", "Holy Bible", 21, 8, 9,
+        "typology", "jesus-christ",
+        "Nephi (son of Helaman) makes the identical application "
+        "generations before Christ's own ministry: \"as he lifted up the "
+        "brazen serpent... even so shall he be lifted up who should "
+        "come.\"",
+    ),
+    (
+        "Matthew", "Holy Bible", 12, 39, 40,
+        "Jonah", "Holy Bible", 1, 17, 17,
+        "typology", "resurrection",
+        "\"As Jonas was three days and three nights in the whale's "
+        "belly; so shall the Son of man be three days and three nights "
+        "in the heart of the earth\" - Christ's own explicit sign of His "
+        "coming resurrection.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 5, 7, 7,
+        "Exodus", "Holy Bible", 12, 3, 7,
+        "typology", "atonement",
+        "\"Christ our passover is sacrificed for us\" - Paul explicitly "
+        "identifies the Passover lamb, whose blood protected Israel from "
+        "the destroyer, with Christ's own atoning sacrifice.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 7, 1, 17,
+        "Genesis", "Holy Bible", 14, 18, 20,
+        "typology", "priesthood",
+        "Melchizedek's priesthood, explicitly named as a type of "
+        "Christ's own eternal priesthood: \"a priest for ever after the "
+        "order of Melchisedec.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 13, 14, 19,
+        "Genesis", "Holy Bible", 14, 18, 20,
+        "typology", "priesthood",
+        "Alma teaches this same Melchizedek priesthood doctrine "
+        "centuries before Hebrews was written, calling him \"a high "
+        "priest after this same order\" - see Hebrews 7 above for Paul's "
+        "own version of the same teaching.",
+    ),
+    (
+        "John", "Holy Bible", 6, 31, 35,
+        "Exodus", "Holy Bible", 16, 14, 15,
+        "typology", "jesus-christ",
+        "\"Our fathers did eat manna... I am the bread of life\" - Christ "
+        "explicitly applies the wilderness manna to Himself as the true "
+        "bread that sustains eternal life.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 10, 1, 4,
+        "Exodus", "Holy Bible", 17, 5, 6,
+        "typology", "jesus-christ",
+        "\"They drank of that spiritual Rock that followed them: and "
+        "that Rock was Christ\" - Paul's own explicit identification of "
+        "the rock struck for water in the wilderness.",
     ),
 ]
 

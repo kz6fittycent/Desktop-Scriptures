@@ -31,9 +31,11 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     _migrate_add_chapter_metadata_columns(conn)
     _migrate_add_sync_columns(conn)
     _migrate_add_cross_reference_topic_slugs(conn)
+    _migrate_cross_references_typology_relationship(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
+    _backfill_migrated_cross_references_typology(conn)
     _backfill_reading_history(conn)
     _backfill_journal_entries_fts(conn)
     _ensure_device_id(conn)
@@ -180,6 +182,46 @@ def _migrate_add_cross_reference_topic_slugs(conn: sqlite3.Connection) -> None:
     '' (no topics tagged yet), same as schema.sql's own DEFAULT for a
     fresh database."""
     _add_column_if_missing(conn, "cross_references", "topic_slugs", "TEXT NOT NULL DEFAULT ''")
+
+
+def _migrate_cross_references_typology_relationship(conn: sqlite3.Connection) -> None:
+    """cross_references.relationship's CHECK constraint originally allowed
+    only ('quotation', 'paraphrase', 'translation') - 'typology' was added
+    later, for symbols/events scripture itself explicitly ties to Christ
+    (the brazen serpent, the Passover lamb, and so on) rather than a
+    direct quotation of one passage by another. `CREATE TABLE IF NOT
+    EXISTS` can't widen a CHECK constraint on a table that already exists,
+    and SQLite has no ALTER TABLE for constraints at all - same shape of
+    problem as _migrate_whole_verse_highlights above, same fix: rename the
+    old table aside here so schema.sql's own CREATE TABLE (below) creates
+    a fresh one with the new constraint, then
+    _backfill_migrated_cross_references_typology copies its rows forward
+    and drops it. A no-op on a fresh database, or one already migrated."""
+    row = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'cross_references'"
+    ).fetchone()
+    if row is None or "'typology'" in row["sql"]:
+        return
+    conn.execute("ALTER TABLE cross_references RENAME TO cross_references_pre_typology")
+
+
+def _backfill_migrated_cross_references_typology(conn: sqlite3.Connection) -> None:
+    old_table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'cross_references_pre_typology'"
+    ).fetchone()
+    if not old_table_exists:
+        return
+    conn.execute(
+        "INSERT INTO cross_references "
+        "(id, volume_slug, book_name, chapter_number, verse_start, verse_end, "
+        "related_volume_slug, related_book_name, related_chapter_number, "
+        "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
+        "SELECT id, volume_slug, book_name, chapter_number, verse_start, verse_end, "
+        "related_volume_slug, related_book_name, related_chapter_number, "
+        "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order "
+        "FROM cross_references_pre_typology"
+    )
+    conn.execute("DROP TABLE cross_references_pre_typology")
 
 
 def _add_column_if_missing(

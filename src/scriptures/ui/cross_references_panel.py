@@ -33,6 +33,7 @@ _RELATIONSHIP_VERB = {
     "quotation": "Quotes",
     "paraphrase": "Parallels",
     "translation": "Compare with",
+    "typology": "Connects to",
 }
 
 
