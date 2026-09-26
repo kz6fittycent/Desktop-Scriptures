@@ -4979,6 +4979,68 @@ ENTRIES = [
         "the bondage of corruption into the glorious liberty of the "
         "children of God.\"",
     ),
+    # --- Closing the gap toward 600: more Psalms/crucifixion prophecy ---
+    (
+        "Matthew", "Holy Bible", 27, 39, 39,
+        "Psalms", "Holy Bible", 22, 7, 8,
+        "quotation", "atonement",
+        "\"They shoot out the lip, they shake the head\" is fulfilled "
+        "almost exactly as those passing the cross \"reviled him, "
+        "wagging their heads\" - the same psalm of suffering already "
+        "quoted for Matthew 27:46 and John 19:24 above, now for the "
+        "mockery itself.",
+    ),
+    (
+        "2 Peter", "Holy Bible", 3, 8, 8,
+        "Psalms", "Holy Bible", 90, 4, 4,
+        "paraphrase", "second-coming",
+        "\"One day is with the Lord as a thousand years\" nearly "
+        "repeats Moses' own psalm, \"a thousand years in thy sight are "
+        "but as yesterday\" - God's patience measured on a scale "
+        "mortals can't otherwise imagine.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 6, 36, 36,
+        "Hebrews", "Holy Bible", 12, 2, 2,
+        "paraphrase", "faith",
+        "\"Look unto me in every thought\" and \"looking unto Jesus the "
+        "author and finisher of our faith\" both make Christ Himself, "
+        "not circumstance, the fixed point to watch.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 121, 34, 36,
+        "1 Peter", "Holy Bible", 5, 2, 3,
+        "paraphrase", "priesthood",
+        "Both warn against priesthood authority exercised for status "
+        "or gain - Peter that elders should serve \"not for filthy "
+        "lucre... not as being lords,\" this revelation that many "
+        "\"aspire to the honors of men\" and so are not chosen.",
+    ),
+    (
+        "2 Peter", "Holy Bible", 3, 13, 13,
+        "Isaiah", "Holy Bible", 65, 17, 17,
+        "quotation", "second-coming",
+        "\"New heavens and a new earth\" - Peter quotes Isaiah's own "
+        "prophecy directly as what the righteous still look for.",
+    ),
+    (
+        "Isaiah", "Holy Bible", 2, 4, 4,
+        "Micah", "Holy Bible", 4, 3, 3,
+        "quotation", "second-coming",
+        "Two prophets, writing independently, record the Lord's "
+        "millennial peace in nearly identical words: \"they shall beat "
+        "their swords into plowshares... nation shall not lift up "
+        "sword against nation.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 11, 9, 9,
+        "3 Nephi", "The Book of Mormon", 14, 7, 7,
+        "quotation", "prayer",
+        "\"Ask, and it shall be given you; seek, and ye shall find\" - "
+        "Luke's own independent record of the same teaching Matthew "
+        "preserves in the Sermon on the Mount, given again word for "
+        "word by the risen Christ to the Nephites.",
+    ),
 ]
 
 
