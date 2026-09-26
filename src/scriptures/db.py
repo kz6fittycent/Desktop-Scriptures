@@ -32,10 +32,12 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     _migrate_add_sync_columns(conn)
     _migrate_add_cross_reference_topic_slugs(conn)
     _migrate_cross_references_typology_relationship(conn)
+    _migrate_cross_references_tradition_relationship(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
     _backfill_migrated_cross_references_typology(conn)
+    _backfill_migrated_cross_references_tradition(conn)
     _backfill_reading_history(conn)
     _backfill_journal_entries_fts(conn)
     _ensure_device_id(conn)
@@ -222,6 +224,40 @@ def _backfill_migrated_cross_references_typology(conn: sqlite3.Connection) -> No
         "FROM cross_references_pre_typology"
     )
     conn.execute("DROP TABLE cross_references_pre_typology")
+
+
+def _migrate_cross_references_tradition_relationship(conn: sqlite3.Connection) -> None:
+    """Same shape of problem as _migrate_cross_references_typology_
+    relationship above, one relationship kind later: 'tradition' - a
+    widely-recognized thematic/traditional association scripture itself
+    doesn't explicitly state, a deliberately looser tier than the other
+    four. Rename the old table aside here; _backfill_migrated_cross_
+    references_tradition copies its rows forward and drops it."""
+    row = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'cross_references'"
+    ).fetchone()
+    if row is None or "'tradition'" in row["sql"]:
+        return
+    conn.execute("ALTER TABLE cross_references RENAME TO cross_references_pre_tradition")
+
+
+def _backfill_migrated_cross_references_tradition(conn: sqlite3.Connection) -> None:
+    old_table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'cross_references_pre_tradition'"
+    ).fetchone()
+    if not old_table_exists:
+        return
+    conn.execute(
+        "INSERT INTO cross_references "
+        "(id, volume_slug, book_name, chapter_number, verse_start, verse_end, "
+        "related_volume_slug, related_book_name, related_chapter_number, "
+        "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
+        "SELECT id, volume_slug, book_name, chapter_number, verse_start, verse_end, "
+        "related_volume_slug, related_book_name, related_chapter_number, "
+        "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order "
+        "FROM cross_references_pre_tradition"
+    )
+    conn.execute("DROP TABLE cross_references_pre_tradition")
 
 
 def _add_column_if_missing(

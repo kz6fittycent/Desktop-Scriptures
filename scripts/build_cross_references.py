@@ -45,7 +45,7 @@ Every note leads with what doctrine the passage is teaching and how both
 sides agree on it, then (where relevant) how the wording or scope
 differs - "how the doctrine aligns," not just "what changed."
 
-Four relationship kinds (see also schema.sql's own comment):
+Five relationship kinds (see also schema.sql's own comment):
 - "quotation": wording matches (allowing for translation-era spelling).
 - "paraphrase": same content/point, but wording diverges meaningfully, or
   only part of the passage is quoted amid original commentary.
@@ -63,6 +63,18 @@ Four relationship kinds (see also schema.sql's own comment):
   brazen serpent) is deliberately captured as several pair-wise entries
   - one per pairing scripture itself makes - rather than one entry
   trying to name every anchor at once.
+- "tradition": a deliberately looser fifth tier, added once the first
+  four kinds' well-documented, explicitly-stated candidates were largely
+  exhausted (confirmed by several independent passes converging on the
+  same set rather than finding new ones). Covers widely-recognized
+  thematic or traditional associations - e.g. Ruth's Boaz as a type of
+  Christ the kinsman-redeemer, or Song of Solomon read allegorically -
+  that scripture itself does not explicitly state the way the other four
+  kinds require. The UI labels these "Traditionally linked to" (not
+  "Quotes"/"Parallels"/"Connects to") specifically so a reader can tell
+  the two tiers apart at a glance; every "tradition" entry's own note
+  should likewise be candid that it's an interpretive reading, not a
+  textually-stated one.
 """
 
 from __future__ import annotations
@@ -5077,6 +5089,322 @@ ENTRIES = [
         "are learned they think they are wise, and they hearken not "
         "unto the counsel of God,\" both teach that learning without "
         "humility before God leads to folly, not wisdom.",
+    ),
+    # --- "tradition" tier: widely-recognized thematic/traditional
+    # associations, not something scripture itself explicitly states -
+    # added once the first four kinds' well-documented candidates were
+    # largely exhausted (see module docstring's own note on this). Every
+    # note below is candid that it's an interpretive reading.
+    (
+        "Matthew", "Holy Bible", 26, 14, 16,
+        "Genesis", "Holy Bible", 37, 23, 28,
+        "tradition", "jesus-christ",
+        "Joseph sold by his own brothers for silver is traditionally "
+        "read as foreshadowing Christ betrayed for thirty pieces of "
+        "silver by one of His own - a widely-recognized parallel, "
+        "though scripture itself never states the connection outright.",
+    ),
+    (
+        "Luke", "Holy Bible", 23, 41, 41,
+        "Genesis", "Holy Bible", 39, 20, 23,
+        "tradition", "jesus-christ",
+        "Joseph imprisoned though entirely innocent is traditionally "
+        "read as a type of Christ's own unjust condemnation - the same "
+        "innocence the repentant thief on the cross recognizes: \"this "
+        "man hath done nothing amiss.\"",
+    ),
+    (
+        "Philippians", "Holy Bible", 2, 9, 11,
+        "Genesis", "Holy Bible", 41, 39, 41,
+        "tradition", "jesus-christ",
+        "Joseph exalted to sit at Pharaoh's own right hand, given "
+        "authority over all Egypt, is traditionally read as "
+        "prefiguring Christ's own exaltation - \"God also hath highly "
+        "exalted him, and given him a name which is above every name.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 23, 34, 34,
+        "Genesis", "Holy Bible", 45, 4, 5,
+        "tradition", "forgiveness",
+        "Joseph's forgiveness of the very brothers who sold him is "
+        "traditionally compared to Christ's own forgiveness from the "
+        "cross of those who crucified Him - \"Father, forgive them; "
+        "for they know not what they do.\"",
+    ),
+    (
+        "John", "Holy Bible", 2, 5, 5,
+        "Genesis", "Holy Bible", 41, 55, 55,
+        "tradition", "jesus-christ",
+        "\"Go unto Joseph; what he saith to you, do\" is traditionally "
+        "read as an almost word-for-word foreshadowing of Mary's own "
+        "counsel at Cana: \"whatsoever he saith unto you, do it.\"",
+    ),
+    (
+        "John", "Holy Bible", 3, 17, 17,
+        "Genesis", "Holy Bible", 45, 7, 7,
+        "tradition", "jesus-christ",
+        "Joseph's mission \"to preserve you a posterity... and to save "
+        "your lives\" is traditionally read as a type of Christ's own "
+        "saving mission, sent \"that the world through him might be "
+        "saved.\"",
+    ),
+    (
+        "Ephesians", "Holy Bible", 1, 7, 7,
+        "Ruth", "Holy Bible", 4, 9, 10,
+        "tradition", "atonement",
+        "Boaz purchasing Ruth's redemption as her near kinsman is "
+        "traditionally read as a type of Christ's own redemption of "
+        "His people - \"in whom we have redemption through his "
+        "blood.\"",
+    ),
+    (
+        "Galatians", "Holy Bible", 4, 4, 5,
+        "Ruth", "Holy Bible", 2, 20, 20,
+        "tradition", "atonement",
+        "Boaz named Ruth's \"near kinsman\" - the Hebrew go'el, "
+        "kinsman-redeemer - is traditionally read as a type of Christ, "
+        "\"sent forth... to redeem them that were under the law.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 7, 14, 15,
+        "2 Kings", "Holy Bible", 4, 32, 35,
+        "tradition", "resurrection",
+        "Elisha raising the Shunammite woman's son is traditionally "
+        "read alongside Christ's own raising of the widow of Nain's "
+        "son as evidence of the same resurrection power at work "
+        "through God's prophets and through Christ Himself.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 1, 18, 19,
+        "Joshua", "Holy Bible", 2, 18, 21,
+        "tradition", "atonement",
+        "Rahab's household spared by the scarlet cord in her window is "
+        "traditionally read as a type of salvation marked by blood, "
+        "the same imagery Peter uses of being \"redeemed... with the "
+        "precious blood of Christ.\"",
+    ),
+    (
+        "Luke", "Holy Bible", 2, 21, 21,
+        "Genesis", "Holy Bible", 17, 12, 12,
+        "tradition", "covenants",
+        "Christ was circumcised the eighth day exactly as the law of "
+        "Abraham's covenant required - fulfilling the custom rather "
+        "than a stated prophecy, but traditionally noted as His own "
+        "submission to the very covenant He came to fulfill.",
+    ),
+    (
+        "Matthew", "Holy Bible", 6, 11, 11,
+        "Exodus", "Holy Bible", 16, 4, 4,
+        "tradition", "prayer",
+        "Manna gathered fresh each day, no more than a day's portion "
+        "at a time, is traditionally read behind the Lord's Prayer's "
+        "own request: \"give us this day our daily bread.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 9, 8, 8,
+        "Judges", "Holy Bible", 6, 36, 40,
+        "tradition", "revelation",
+        "Gideon's fleece is a widely-used example of seeking a "
+        "confirming sign before acting in faith - the same pattern "
+        "this revelation describes as studying a question out, then "
+        "asking for confirmation.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 2, 12, 13,
+        "Matthew", "Holy Bible", 1, 5, 5,
+        "tradition", "house-of-israel",
+        "Rahab and Ruth, both Gentile women, named openly in Christ's "
+        "own genealogy, are traditionally read as an early sign of the "
+        "same truth Paul later teaches - that those once \"far off\" "
+        "are \"made nigh by the blood of Christ.\"",
+    ),
+    (
+        "John", "Holy Bible", 19, 17, 17,
+        "Genesis", "Holy Bible", 22, 6, 6,
+        "tradition", "atonement",
+        "Isaac carrying the wood for his own sacrifice up the mountain "
+        "is traditionally read alongside Christ \"bearing his cross\" "
+        "to Golgotha - a son carrying the very instrument of his own "
+        "offering.",
+    ),
+    (
+        "James", "Holy Bible", 1, 5, 5,
+        "1 Kings", "Holy Bible", 3, 9, 9,
+        "tradition", "wisdom",
+        "Solomon's request for \"an understanding heart\" rather than "
+        "riches is traditionally cited alongside James' own invitation "
+        "to ask God for wisdom - both receiving it generously, without "
+        "being upbraided for the asking.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 119, 119,
+        "1 Kings", "Holy Bible", 8, 27, 27,
+        "tradition", "temple",
+        "Solomon's own wonder that \"the heaven and heaven of heavens "
+        "cannot contain\" God, even in the temple built for Him, is "
+        "traditionally read alongside this revelation's own "
+        "instruction to build \"a house of prayer, a house of God\" - "
+        "the same tension between God's infinite greatness and a "
+        "finite house built for His name.",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 4, 3, 3,
+        "Genesis", "Holy Bible", 14, 18, 18,
+        "tradition", "ordinances",
+        "Melchizedek bringing forth bread and wine is traditionally "
+        "read as an early foreshadowing of the sacrament, though "
+        "scripture itself does not state the connection the way it "
+        "names the Passover lamb or manna as types of Christ.",
+    ),
+    (
+        "Matthew", "Holy Bible", 3, 16, 16,
+        "Genesis", "Holy Bible", 8, 11, 11,
+        "tradition", "holy-ghost",
+        "The dove returning to Noah's ark with an olive leaf is "
+        "traditionally paired with the Holy Ghost descending \"like a "
+        "dove\" at Christ's own baptism - the same image of peace "
+        "after judgment, used in both settings.",
+    ),
+    (
+        "Matthew", "Holy Bible", 2, 2, 2,
+        "Numbers", "Holy Bible", 24, 17, 17,
+        "tradition", "jesus-christ",
+        "Balaam's prophecy of \"a Star out of Jacob\" is traditionally "
+        "read as pointing toward the very star the wise men later "
+        "followed to Bethlehem, \"where is he that is born King of the "
+        "Jews?\"",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 15, 52, 52,
+        "Leviticus", "Holy Bible", 23, 24, 24,
+        "tradition", "second-coming",
+        "The Feast of Trumpets is traditionally associated with the "
+        "same \"last trump\" Paul describes at the resurrection of the "
+        "dead, though Paul never names the feast directly.",
+    ),
+    (
+        "Isaiah", "Holy Bible", 53, 6, 6,
+        "Leviticus", "Holy Bible", 16, 21, 22,
+        "tradition", "atonement",
+        "The scapegoat, bearing Israel's confessed sins away into the "
+        "wilderness, is traditionally read as a type of Christ bearing "
+        "sin - \"the Lord hath laid on him the iniquity of us all\" - "
+        "a companion to the sacrificed goat's blood already covered "
+        "above.",
+    ),
+    (
+        "Isaiah", "Holy Bible", 53, 2, 2,
+        "1 Samuel", "Holy Bible", 16, 11, 13,
+        "tradition", "jesus-christ",
+        "David, the youngest and least expected of Jesse's sons, "
+        "anointed king while tending sheep, is traditionally compared "
+        "to the Messiah Isaiah describes as having \"no form nor "
+        "comeliness\" - greatness hidden in an unlikely, overlooked "
+        "beginning.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 105, 14, 14,
+        "1 Samuel", "Holy Bible", 17, 45, 47,
+        "tradition", "faith",
+        "David's confidence that \"the battle is the Lord's,\" not "
+        "decided by conventional weapons, is traditionally cited "
+        "alongside this revelation's own promise that the Lord's own "
+        "power, not human strength, secures Zion's victories.",
+    ),
+    (
+        "Matthew", "Holy Bible", 6, 26, 26,
+        "1 Kings", "Holy Bible", 17, 4, 6,
+        "tradition", "faith",
+        "Elijah fed by ravens in the wilderness is traditionally "
+        "paired with Christ's own teaching to \"behold the fowls of "
+        "the air... yet your heavenly Father feedeth them\" - both "
+        "making the same point about God's providential care.",
+    ),
+    (
+        "Mark", "Holy Bible", 12, 43, 44,
+        "1 Kings", "Holy Bible", 17, 14, 16,
+        "tradition", "faith",
+        "The widow of Zarephath's meal and oil not failing after she "
+        "gave what little she had is traditionally compared to the "
+        "widow's mite - two poor widows whose small, complete "
+        "offerings became sufficient through faith.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 5, 26, 26,
+        "Exodus", "Holy Bible", 30, 18, 20,
+        "tradition", "baptism",
+        "The bronze laver, where priests washed before entering God's "
+        "presence, is traditionally read as a type of baptism's own "
+        "cleansing, \"the washing of water by the word,\" before "
+        "approaching God.",
+    ),
+    (
+        "Revelation", "Holy Bible", 22, 16, 16,
+        "Song of Solomon", "Holy Bible", 2, 1, 1,
+        "tradition", "jesus-christ",
+        "\"I am the rose of Sharon, and the lily of the valleys\" is "
+        "traditionally read as a poetic description of Christ Himself "
+        "- an allegorical reading of the whole book, not a connection "
+        "scripture itself states, though Christ's own \"I am the root "
+        "and the offspring of David, and the bright and morning star\" "
+        "affirms the same self-description in plainer language.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 122, 9, 9,
+        "Esther", "Holy Bible", 4, 14, 16,
+        "tradition", "faith",
+        "Esther's willingness to risk everything for her people - \"if "
+        "I perish, I perish\" - after being reminded she may have "
+        "\"come to the kingdom for such a time as this,\" is "
+        "traditionally read alongside this revelation's own charge: "
+        "\"hold on thy way... fear not what man can do.\"",
+    ),
+    (
+        "Galatians", "Holy Bible", 4, 7, 7,
+        "Philemon", "Holy Bible", 1, 15, 16,
+        "tradition", "family",
+        "Paul's plea that Onesimus be received \"not now as a "
+        "servant, but... a brother beloved\" is traditionally read "
+        "alongside his own teaching elsewhere that through Christ "
+        "\"thou art no more a servant, but a son\" - forgiveness and "
+        "adoption modeled in a single, personal letter.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 4, 20, 20,
+        "Nahum", "Holy Bible", 1, 7, 7,
+        "tradition", "faith",
+        "\"The Lord is good, a strong hold in the day of trouble; and "
+        "he knoweth them that trust in him\" is the same confidence "
+        "Nephi expresses in his own psalm of trust: \"my God hath been "
+        "my support; he hath led me through mine afflictions.\"",
+    ),
+    (
+        "Hebrews", "Holy Bible", 11, 30, 30,
+        "Joshua", "Holy Bible", 6, 20, 20,
+        "paraphrase", "faith",
+        "\"By faith the walls of Jericho fell down\" - Hebrews retells "
+        "this same event as one of its prime examples of faith "
+        "accomplishing what force could not.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 10, 16, 16,
+        "Exodus", "Holy Bible", 12, 7, 7,
+        "tradition", "atonement",
+        "Israel's doorposts marked with the Passover lamb's blood, "
+        "protecting them from \"the destroyer,\" is traditionally "
+        "extended to \"the cup of blessing which we bless, is it not "
+        "the communion of the blood of Christ?\" - the same protecting "
+        "blood, applied sacramentally rather than architecturally.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 28, 19, 22,
+        "Daniel", "Holy Bible", 6, 22, 22,
+        "tradition", "faith",
+        "Daniel's deliverance from the lions - \"my God hath sent his "
+        "angel, and hath shut the lions' mouths\" - is traditionally "
+        "compared to the Three Nephites' own protection from wild "
+        "beasts and fire, both accounts of God shielding the faithful "
+        "from otherwise-certain harm.",
     ),
 ]
 

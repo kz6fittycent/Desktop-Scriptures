@@ -1,7 +1,11 @@
 """Cross-references tab: passages elsewhere in the corpus that quote,
 paraphrase, or (for the Joseph Smith Translation/Moses) are a translation-
-revision of something in the current chapter - see
-scripts/build_cross_references.py for how this list is curated and why.
+revision of something in the current chapter, plus a smaller set of
+widely-recognized traditional/thematic associations scripture itself
+doesn't explicitly state (labeled "Traditionally linked to" rather than
+one of the other four verbs, so a reader can tell the tiers apart at a
+glance) - see scripts/build_cross_references.py for how this list is
+curated and why.
 
 Unlike the Citations tab, each entry here points to exactly one other
 passage, so there's no accordion - every entry is a single clickable row
@@ -34,6 +38,12 @@ _RELATIONSHIP_VERB = {
     "paraphrase": "Parallels",
     "translation": "Compare with",
     "typology": "Connects to",
+    # Deliberately a longer, more hedged phrase than the other four - this
+    # is the one relationship kind scripture itself doesn't explicitly
+    # state (see build_cross_references.py's own note on the distinction),
+    # and the wording here is the main way a reader can tell the two
+    # tiers apart at a glance.
+    "tradition": "Traditionally linked to",
 }
 
 
