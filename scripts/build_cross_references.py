@@ -5041,6 +5041,43 @@ ENTRIES = [
         "preserves in the Sermon on the Mount, given again word for "
         "word by the risen Christ to the Nephites.",
     ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 118, 118,
+        "Proverbs", "Holy Bible", 4, 7, 7,
+        "paraphrase", "wisdom",
+        "\"Wisdom is the principal thing; therefore get wisdom\" and "
+        "\"seek ye diligently... seek learning, even by study and also "
+        "by faith\" both make the pursuit of wisdom a central "
+        "commandment, not an optional pursuit.",
+    ),
+    (
+        "Helaman", "The Book of Mormon", 12, 1, 6,
+        "Proverbs", "Holy Bible", 16, 18, 18,
+        "paraphrase", "humility",
+        "\"Pride goeth before destruction, and an haughty spirit "
+        "before a fall\" describes exactly the cycle Mormon laments "
+        "here: prosperity leads to pride, pride to forgetting God, "
+        "forgetting God to affliction.",
+    ),
+    (
+        "Revelation", "Holy Bible", 11, 15, 15,
+        "Psalms", "Holy Bible", 72, 8, 11,
+        "paraphrase", "second-coming",
+        "\"He shall have dominion also from sea to sea... all kings "
+        "shall fall down before him\" is the same universal reign John "
+        "later sees fulfilled: \"the kingdoms of this world are become "
+        "the kingdoms of our Lord, and of his Christ.\"",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 9, 28, 29,
+        "Proverbs", "Holy Bible", 1, 7, 7,
+        "paraphrase", "wisdom",
+        "\"The fear of the Lord is the beginning of knowledge: but "
+        "fools despise wisdom\" and Jacob's own warning, \"when they "
+        "are learned they think they are wise, and they hearken not "
+        "unto the counsel of God,\" both teach that learning without "
+        "humility before God leads to folly, not wisdom.",
+    ),
 ]
 
 
