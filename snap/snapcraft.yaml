@@ -47,11 +47,14 @@ description: |
   for it exists. The Topical Guide is Desktop Scriptures' own
   correlation of its local scripture text and that same citation index -
   not a copy of the Church's own, separately-copyrighted Topical Guide.
-  Cross-references are hand-curated the same way: a short, accuracy-first
-  list of well-documented parallel passages, each verified directly
-  against this app's own imported text rather than copied from any
-  outside source, and each tagged with the Topical Guide topic it's
-  actually teaching.
+  Cross-references are hand-curated the same way: an accuracy-first list
+  of 600 well-documented parallel passages - quotations, paraphrases,
+  JST/Moses-style revisions, and typology scripture itself explicitly
+  states, plus a smaller, distinctly-labeled "traditionally linked to"
+  tier for associations scripture doesn't explicitly state - each
+  verified directly against this app's own imported text rather than
+  copied from any outside source, and each tagged with the Topical Guide
+  topic it's actually teaching.
 
 adopt-info: desktop-scriptures
 license: MIT
