@@ -4385,6 +4385,157 @@ ENTRIES = [
         "purchased through suffering: \"I, God, have suffered these things for "
         "all, that they might not suffer if they would repent.\"",
     ),
+    # --- Fork: exhaustive citation mining + knowledge-based sweep ---
+    (
+        "John", "Holy Bible", 2, 17, 17,
+        "Psalms", "Holy Bible", 69, 9, 9,
+        "quotation", "jesus-christ",
+        "\"The zeal of thine house hath eaten me up\" - John explicitly notes the disciples remembered this psalm as Christ drove the money-changers from the temple.",
+    ),
+    (
+        "Acts", "Holy Bible", 1, 20, 20,
+        "Psalms", "Holy Bible", 109, 8, 8,
+        "quotation", "prophets",
+        "Peter quotes this psalm directly - \"let another take his office\" - as scriptural warrant for replacing Judas among the Twelve.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 27, 24, 29,
+        "John", "Holy Bible", 3, 3, 5,
+        "paraphrase", "repentance",
+        "Alma the younger's own testimony - \"I am born of the Spirit\" - is the same doctrine Christ teaches Nicodemus: \"except a man be born again, he cannot see the kingdom of God.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 42, 22, 22,
+        "Ephesians", "Holy Bible", 5, 25, 25,
+        "paraphrase", "marriage",
+        "\"Thou shalt love thy wife with all thy heart\" and \"husbands, love your wives, even as Christ also loved the church\" both make a husband's love the measure of the marriage covenant.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 11, 14, 15,
+        "Zechariah", "Holy Bible", 13, 6, 6,
+        "typology", "atonement",
+        "\"What are these wounds in thine hands?\" is answered centuries later when the risen Christ has the Nephites \"feel the prints of the nails\" in His own hands and feet.",
+    ),
+    (
+        "Enos", "The Book of Mormon", 1, 1, 2,
+        "Genesis", "Holy Bible", 32, 24, 30,
+        "paraphrase", "prayer",
+        "Enos uses the same distinctive word as Jacob's own night at Peniel: \"I will tell you of the wrestle which I had before God, before I received a remission of my sins\" - prayer as an actual wrestle, not a quick request.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 132, 7, 7,
+        "Matthew", "Holy Bible", 16, 19, 19,
+        "paraphrase", "priesthood",
+        "\"All covenants... that are not made... by him who is anointed\" echoes Christ's own promise of binding and loosing keys - \"whatsoever thou shalt bind on earth shall be bound in heaven.\"",
+    ),
+    (
+        "Alma", "The Book of Mormon", 32, 28, 30,
+        "Luke", "Holy Bible", 17, 6, 6,
+        "paraphrase", "faith",
+        "Alma's seed of faith, planted and nourished until it grows, and Christ's \"faith as a grain of mustard seed\" both use the same small-seed image for how little faith is needed to begin.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 5, 2, 2,
+        "Psalms", "Holy Bible", 51, 10, 10,
+        "paraphrase", "repentance",
+        "\"Create in me a clean heart, O God\" is David's own request for the same \"mighty change\" King Benjamin's people had already received.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 4, 34, 34,
+        "Proverbs", "Holy Bible", 3, 5, 6,
+        "paraphrase", "faith",
+        "\"Trust in the Lord with all thine heart; and lean not unto thine own understanding\" and Nephi's own \"I will not put my trust in the arm of flesh\" both set trusting God against relying on oneself.",
+    ),
+    (
+        "John", "Holy Bible", 1, 29, 29,
+        "Genesis", "Holy Bible", 22, 8, 8,
+        "typology", "atonement",
+        "\"God will provide himself a lamb\" - Abraham's own words before offering Isaac - are fulfilled when John the Baptist declares of Christ, \"Behold the Lamb of God, which taketh away the sin of the world.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 105, 14, 14,
+        "1 Samuel", "Holy Bible", 17, 47, 47,
+        "paraphrase", "faith",
+        "\"The battle is the Lord's\" - David's own confidence facing Goliath - matches this revelation's promise: \"I do not require at their hands to fight the battles of Zion... I will fight your battles.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 97, 21, 21,
+        "Psalms", "Holy Bible", 24, 3, 4,
+        "paraphrase", "zion",
+        "\"Who shall stand in his holy place? He that hath clean hands, and a pure heart\" is the same standard this revelation names outright: \"Zion - the pure in heart.\"",
+    ),
+    (
+        "Ether", "The Book of Mormon", 2, 15, 15,
+        "Genesis", "Holy Bible", 6, 3, 3,
+        "quotation", "repentance",
+        "\"My Spirit will not always strive with man\" - the Lord's warning before the Flood - is repeated nearly word for word to the brother of Jared as a warning of the same danger.",
+    ),
+    (
+        "Matthew", "Holy Bible", 9, 13, 13,
+        "Hosea", "Holy Bible", 6, 6, 6,
+        "quotation", "repentance",
+        "\"I will have mercy, and not sacrifice\" - Christ quotes Hosea directly to explain why He eats with sinners rather than the outwardly righteous.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 22, 24,
+        "Job", "Holy Bible", 42, 5, 5,
+        "paraphrase", "testimony",
+        "\"I have heard of thee by the hearing of the ear: but now mine eye seeth thee\" is Job's own move from secondhand belief to firsthand knowledge - the same shift this vision's own testimony describes: \"that he lives! For we saw him.\"",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 1, 3, 3,
+        "Psalms", "Holy Bible", 90, 2, 2,
+        "paraphrase", "godhead",
+        "\"From everlasting to everlasting, thou art God\" and \"I am without beginning of days or end of years\" both testify of God's own eternal, unbeginning existence.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 101, 26, 26,
+        "Isaiah", "Holy Bible", 11, 6, 9,
+        "paraphrase", "peace",
+        "\"The wolf also shall dwell with the lamb\" is Isaiah's own image for the Millennium's peace; this revelation states the same promise plainly: \"the enmity of man, and the enmity of beasts... shall cease.\"",
+    ),
+    (
+        "Revelation", "Holy Bible", 10, 9, 10,
+        "Ezekiel", "Holy Bible", 3, 1, 3,
+        "typology", "revelation",
+        "Both prophets are commanded to eat a book or roll before delivering its message - Ezekiel finds it \"in my mouth as honey for sweetness\"; John finds his \"sweet as honey,\" but \"bitter\" once received.",
+    ),
+    (
+        "Ether", "The Book of Mormon", 3, 12, 12,
+        "Numbers", "Holy Bible", 23, 19, 19,
+        "paraphrase", "truth",
+        "\"God is not a man, that he should lie\" and the brother of Jared's own testimony - \"thou art a God of truth, and canst not lie\" - both ground faith in God's own incapacity to deceive.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 4, 35, 35,
+        "2 Samuel", "Holy Bible", 22, 2, 3,
+        "paraphrase", "faith",
+        "David's \"the Lord is my rock, and my fortress\" and Nephi's own psalm - \"I will cry unto thee, my God, the rock of my righteousness\" - both use the same image of God as an unshakeable refuge.",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 1, 10, 10,
+        "Psalms", "Holy Bible", 8, 3, 4,
+        "paraphrase", "humility",
+        "\"What is man, that thou art mindful of him?\" and Moses' own reaction after beholding God's creations - \"now, for this cause I know that man is nothing\" - both teach humility before the vastness of God's works.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 132, 30, 30,
+        "Genesis", "Holy Bible", 17, 5, 5,
+        "paraphrase", "covenants",
+        "\"Thy name shall be... Abraham; for a father of many nations have I made thee\" is the same covenant this revelation recalls, still being fulfilled through Abraham's seed.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 1, 38, 38,
+        "Isaiah", "Holy Bible", 55, 11, 11,
+        "quotation", "word-of-god",
+        "\"My word... shall not return unto me void, but it shall accomplish that which I please\" is the same assurance this revelation gives of the Lord's own spoken word.",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 6, 31, 32,
+        "Exodus", "Holy Bible", 4, 10, 12,
+        "paraphrase", "prophets",
+        "Enoch's own self-doubt at his calling - \"I am but a lad, and all the people hate me\" - echoes Moses' \"I am not eloquent... I am slow of speech\" - the same reluctance the Lord answers in both.",
+    ),
 ]
 
 
