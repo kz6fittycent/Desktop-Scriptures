@@ -81,6 +81,8 @@ changed.
 
 ![2 Nephi 3 being read aloud, with the current verse highlighted and Pause/Stop controls](docs/screenshots/listen.png)
 
+![Doctrine and Covenants 6's Cross-references tab, showing three parallel passages each tagged with the doctrine at stake](docs/screenshots/cross-references.png)
+
 ## Install
 
 Desktop Scriptures is published on the Snap Store:
