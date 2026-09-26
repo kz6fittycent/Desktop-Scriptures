@@ -4536,6 +4536,449 @@ ENTRIES = [
         "paraphrase", "prophets",
         "Enoch's own self-doubt at his calling - \"I am but a lad, and all the people hate me\" - echoes Moses' \"I am not eloquent... I am slow of speech\" - the same reluctance the Lord answers in both.",
     ),
+    # --- Fork: second manual pass ---
+    (
+        "1 Corinthians", "Holy Bible", 2, 8, 8,
+        "Psalms", "Holy Bible", 24, 7, 10,
+        "paraphrase", "jesus-christ",
+        "\"The King of glory\" and \"the Lord of glory\" are the same "
+        "divine title - one anticipating Christ's triumphal reception "
+        "in heaven, the other naming Him crucified by rulers who "
+        "\"knew not\" they were crucifying the very King of glory.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 9, 20, 20,
+        "Psalms", "Holy Bible", 51, 17, 17,
+        "quotation", "repentance",
+        "\"A broken and a contrite heart\" - Christ's own words to the "
+        "Nephites echo David's psalm of repentance almost verbatim, "
+        "now naming that broken heart itself as the true sacrifice He "
+        "requires.",
+    ),
+    (
+        "Moses", "Pearl of Great Price", 1, 3, 4,
+        "Psalms", "Holy Bible", 90, 1, 2,
+        "paraphrase", "godhead",
+        "\"From everlasting to everlasting, thou art God\" and \"I "
+        "am... without beginning of days or end of years\" both "
+        "testify of God's eternal, timeless nature.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 41, 41,
+        "Psalms", "Holy Bible", 139, 7, 10,
+        "paraphrase", "godhead",
+        "\"Whither shall I go from thy spirit?\" and \"he comprehendeth "
+        "all things... is in all things\" both teach the same doctrine "
+        "of God's presence filling and reaching all creation.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 61, 36, 36,
+        "Isaiah", "Holy Bible", 43, 1, 2,
+        "paraphrase", "faith",
+        "\"When thou passest through the waters, I will be with thee\" "
+        "is the same divine companionship promised directly to the "
+        "elders literally crossing a river: \"I am in your midst, and "
+        "I have not forsaken you.\"",
+    ),
+    (
+        "Hebrews", "Holy Bible", 11, 3, 3,
+        "Psalms", "Holy Bible", 33, 6, 9,
+        "quotation", "faith",
+        "\"By the word of the Lord were the heavens made\" is the same "
+        "truth Paul teaches by faith: \"the worlds were framed by the "
+        "word of God, so that things which are seen were not made of "
+        "things which do appear.\"",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 4, 34, 34,
+        "Psalms", "Holy Bible", 146, 3, 4,
+        "paraphrase", "faith",
+        "\"Put not your trust in princes, nor in the son of man\" and "
+        "\"I will not put my trust in the arm of flesh\" both warn "
+        "against trusting mortal power in place of God.",
+    ),
+    (
+        "Ephesians", "Holy Bible", 2, 8, 10,
+        "2 Nephi", "The Book of Mormon", 25, 23, 23,
+        "paraphrase", "grace",
+        "\"By grace are ye saved through faith... not of works\" and "
+        "\"it is by grace that we are saved, after all we can do\" are "
+        "two of scripture's clearest single-passage statements that "
+        "salvation is a gift, not something fully earned.",
+    ),
+    (
+        "3 Nephi", "The Book of Mormon", 17, 24, 24,
+        "Helaman", "The Book of Mormon", 5, 43, 45,
+        "paraphrase", "jesus-christ",
+        "Both describe people \"encircled about as if by fire\" from "
+        "heaven - Nephi and Lehi in a Lamanite prison, and the Nephite "
+        "children surrounded by angels at Christ's own visit - the "
+        "same divine manifestation, decades apart.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 76, 22, 24,
+        "1 Corinthians", "Holy Bible", 15, 5, 8,
+        "paraphrase", "testimony",
+        "Both give a list of witnesses testifying that the resurrected "
+        "Christ was seen and known directly - Paul's catalogue of "
+        "those Christ appeared to, and \"the testimony, last of all\" "
+        "given by Joseph Smith and Sidney Rigdon: \"we saw him.\"",
+    ),
+    (
+        "Acts", "Holy Bible", 26, 22, 23,
+        "Isaiah", "Holy Bible", 42, 6, 7,
+        "paraphrase", "missionary-work",
+        "Paul explicitly cites \"the prophets\" testifying that Christ "
+        "\"should shew light unto the people, and to the Gentiles\" - "
+        "the same role Isaiah gives the Lord's servant, \"a light of "
+        "the Gentiles.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 64, 10, 10,
+        "Micah", "Holy Bible", 7, 18, 19,
+        "paraphrase", "forgiveness",
+        "\"I, the Lord, will forgive whom I will forgive\" and \"who is "
+        "a God like unto thee, that pardoneth iniquity... he retaineth "
+        "not his anger for ever\" both testify of God's own "
+        "willingness to forgive fully.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 6, 32, 32,
+        "Matthew", "Holy Bible", 18, 20, 20,
+        "quotation", "church-of-jesus-christ",
+        "\"As I said unto my disciples\" - Christ explicitly quotes His "
+        "own earlier promise, \"where two or three are gathered "
+        "together in my name, there am I in the midst of them,\" now "
+        "given directly to Joseph Smith and Oliver Cowdery.",
+    ),
+    (
+        "Mark", "Holy Bible", 12, 29, 29,
+        "Deuteronomy", "Holy Bible", 6, 4, 4,
+        "quotation", "godhead",
+        "\"Hear, O Israel: The Lord our God is one Lord\" - Christ "
+        "quotes the Shema directly, naming it \"the first of all the "
+        "commandments.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 101, 16, 16,
+        "Psalms", "Holy Bible", 46, 10, 10,
+        "quotation", "faith",
+        "\"Be still, and know that I am God\" is quoted directly, "
+        "comforting the Saints concerning Zion just as the psalm "
+        "comforts against every earthly upheaval.",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 7, 16, 16,
+        "John", "Holy Bible", 1, 4, 5,
+        "paraphrase", "jesus-christ",
+        "\"The life was the light of men\" and \"the Spirit of Christ "
+        "is given to every man, that he may know good from evil\" both "
+        "teach that Christ's own light reaches and enlightens everyone, "
+        "not only believers.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 1, 11, 14,
+        "Amos", "Holy Bible", 8, 11, 12,
+        "paraphrase", "restoration",
+        "Amos foretells \"a famine... of hearing the words of the "
+        "Lord\"; this revelation answers it directly, the Lord's own "
+        "voice going forth again \"unto the ends of the earth, that "
+        "all that will hear may hear.\"",
+    ),
+    (
+        "Ephesians", "Holy Bible", 4, 4, 6,
+        "Malachi", "Holy Bible", 2, 10, 10,
+        "paraphrase", "church-of-jesus-christ",
+        "\"Have we not all one father? hath not one God created us?\" "
+        "and \"one Lord, one faith, one baptism, One God and Father of "
+        "all\" both root unity among believers in having one common "
+        "God.",
+    ),
+    (
+        "Mosiah", "The Book of Mormon", 24, 13, 14,
+        "Isaiah", "Holy Bible", 40, 31, 31,
+        "paraphrase", "trials-and-adversity",
+        "\"They that wait upon the Lord shall renew their strength\" "
+        "and the Lord's own voice to Alma's people in bondage - \"lift "
+        "up your heads and be of good comfort\" - both promise renewed "
+        "strength to the afflicted who trust in Him.",
+    ),
+    (
+        "Alma", "The Book of Mormon", 41, 3, 5,
+        "Galatians", "Holy Bible", 6, 7, 7,
+        "paraphrase", "judgment",
+        "\"Whatsoever a man soweth, that shall he also reap\" is the "
+        "same law of restoration Alma teaches: men \"judged according "
+        "to their works,\" good returning good and evil returning "
+        "evil.",
+    ),
+    (
+        "Luke", "Holy Bible", 16, 10, 10,
+        "Alma", "The Book of Mormon", 37, 6, 7,
+        "paraphrase", "obedience",
+        "\"He that is faithful in that which is least is faithful also "
+        "in much\" is the same principle Alma teaches: \"by small and "
+        "simple things are great things brought to pass.\"",
+    ),
+    (
+        "Revelation", "Holy Bible", 3, 7, 8,
+        "Isaiah", "Holy Bible", 22, 22, 22,
+        "quotation", "priesthood",
+        "\"He that hath the key of David, he that openeth, and no man "
+        "shutteth\" - John quotes Isaiah's own image of authority "
+        "directly, applying it to Christ.",
+    ),
+    (
+        "2 Nephi", "The Book of Mormon", 28, 7, 8,
+        "Isaiah", "Holy Bible", 5, 20, 20,
+        "paraphrase", "truth",
+        "\"Eat, drink, and be merry, for tomorrow we die... and it "
+        "shall be well with us\" is the same moral confusion Isaiah "
+        "warns against: \"woe unto them that call evil good, and good "
+        "evil.\"",
+    ),
+    (
+        "Moroni", "The Book of Mormon", 9, 6, 6,
+        "Galatians", "Holy Bible", 6, 9, 9,
+        "paraphrase", "endure-to-the-end",
+        "\"Let us not be weary in well doing: for in due season we "
+        "shall reap, if we faint not\" is the same encouragement Mormon "
+        "gives his son amid discouragement: \"let us labor diligently; "
+        "for if we should cease to labor, we should be brought under "
+        "condemnation.\"",
+    ),
+    (
+        "Helaman", "The Book of Mormon", 10, 7, 7,
+        "Matthew", "Holy Bible", 16, 19, 19,
+        "paraphrase", "priesthood",
+        "\"Whatsoever ye shall seal on earth shall be sealed in "
+        "heaven\" closely matches the sealing power Christ promises "
+        "Peter: \"whatsoever thou shalt bind on earth shall be bound "
+        "in heaven.\"",
+    ),
+    (
+        "Revelation", "Holy Bible", 12, 7, 9,
+        "Doctrine and Covenants", "Doctrine and Covenants", 29, 36, 38,
+        "paraphrase", "premortal-life",
+        "\"There was war in heaven: Michael and his angels fought "
+        "against the dragon\" and this revelation's own account of "
+        "Satan's rebellion - \"Give me thine honor, which is my "
+        "power\" - both narrate the same premortal war.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 101, 26, 31,
+        "Isaiah", "Holy Bible", 11, 6, 9,
+        "paraphrase", "second-coming",
+        "\"The wolf also shall dwell with the lamb\" is the same "
+        "millennial peace this revelation describes at length - \"the "
+        "enmity of man, and the enmity of beasts... shall cease from "
+        "before my face.\"",
+    ),
+    (
+        "2 Corinthians", "Holy Bible", 6, 2, 2,
+        "Alma", "The Book of Mormon", 34, 32, 33,
+        "paraphrase", "repentance",
+        "\"Now is the accepted time... now is the day of salvation\" "
+        "and \"this life is the time for men to prepare to meet God\" "
+        "both teach that mortality itself is the appointed time to "
+        "repent, not a time to presume upon later.",
+    ),
+    (
+        "Revelation", "Holy Bible", 5, 5, 5,
+        "Genesis", "Holy Bible", 49, 10, 10,
+        "paraphrase", "jesus-christ",
+        "\"The Lion of the tribe of Juda... hath prevailed\" fulfills "
+        "the ancient blessing that \"the sceptre shall not depart from "
+        "Judah... until Shiloh come.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 27, 5, 5,
+        "Matthew", "Holy Bible", 26, 29, 29,
+        "quotation", "second-coming",
+        "\"I will drink of the fruit of the vine with you on the "
+        "earth\" repeats Christ's own promise at the Last Supper "
+        "almost word for word: \"I will not drink henceforth of this "
+        "fruit of the vine, until that day when I drink it new with "
+        "you in my Father's kingdom.\"",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 15, 21, 22,
+        "Mosiah", "The Book of Mormon", 16, 7, 9,
+        "paraphrase", "resurrection",
+        "\"As in Adam all die, even so in Christ shall all be made "
+        "alive\" is the same doctrine Abinadi teaches: without "
+        "Christ's own resurrection breaking \"the bands of death,\" "
+        "\"there could have been no resurrection\" for anyone.",
+    ),
+    (
+        "Mark", "Holy Bible", 10, 14, 14,
+        "Doctrine and Covenants", "Doctrine and Covenants", 137, 10, 10,
+        "paraphrase", "children",
+        "\"Suffer the little children to come unto me... of such is "
+        "the kingdom of God\" is the same doctrine this revelation "
+        "states outright: \"all children who die before they arrive "
+        "at the years of accountability are saved in the celestial "
+        "kingdom of heaven.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 3, 1, 2,
+        "Numbers", "Holy Bible", 23, 19, 19,
+        "paraphrase", "truth",
+        "\"God is not a man, that he should lie... shall he not make "
+        "it good?\" is the same reliability this revelation teaches: "
+        "\"the works, and the designs, and the purposes of God cannot "
+        "be frustrated, neither can they come to naught.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 20, 17, 19,
+        "Malachi", "Holy Bible", 3, 6, 6,
+        "paraphrase", "godhead",
+        "\"I am the Lord, I change not\" is the same unchanging nature "
+        "this revelation confesses: \"from everlasting to everlasting "
+        "the same unchangeable God.\"",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 1, 19, 20,
+        "2 Nephi", "The Book of Mormon", 9, 28, 29,
+        "paraphrase", "wisdom",
+        "\"I will destroy the wisdom of the wise\" and \"when they are "
+        "learned they think they are wise, and they hearken not unto "
+        "the counsel of God\" both warn that worldly learning can "
+        "become a stumbling block rather than a strength.",
+    ),
+    (
+        "Proverbs", "Holy Bible", 1, 7, 7,
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 118, 118,
+        "paraphrase", "wisdom",
+        "\"The fear of the Lord is the beginning of knowledge\" and "
+        "\"seek learning, even by study and also by faith\" both join "
+        "reverence for God to the pursuit of real knowledge, rather "
+        "than treating the two as opposites.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 5, 4, 6,
+        "Psalms", "Holy Bible", 110, 4, 4,
+        "quotation", "priesthood",
+        "\"Thou art a priest for ever after the order of Melchisedec\" "
+        "is quoted directly, alongside the teaching that \"no man "
+        "taketh this honour unto himself, but he that is called of "
+        "God, as was Aaron\" - the same Melchizedek Priesthood chain "
+        "as Genesis 14, Alma 13, and D&C 107 above.",
+    ),
+    (
+        "2 Corinthians", "Holy Bible", 11, 3, 3,
+        "Moses", "Pearl of Great Price", 4, 6, 6,
+        "paraphrase", "temptation",
+        "\"The serpent beguiled Eve through his subtilty\" restates "
+        "almost word for word what Moses records directly: Satan "
+        "\"sought also to beguile Eve.\"",
+    ),
+    (
+        "Romans", "Holy Bible", 6, 23, 23,
+        "Alma", "The Book of Mormon", 42, 15, 15,
+        "paraphrase", "atonement",
+        "\"The wages of sin is death; but the gift of God is eternal "
+        "life through Jesus Christ\" is the same exchange Alma "
+        "explains through the Atonement: \"God himself atoneth for the "
+        "sins of the world, to bring about the plan of mercy.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 29, 39, 40,
+        "2 Nephi", "The Book of Mormon", 2, 11, 11,
+        "paraphrase", "agency",
+        "\"It must needs be that the devil should tempt the children "
+        "of men, or they could not be agents unto themselves\" is the "
+        "same doctrine Lehi teaches: \"it must needs be, that there is "
+        "an opposition in all things\" for agency to mean anything at "
+        "all.",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 42, 22, 26,
+        "Matthew", "Holy Bible", 5, 27, 28,
+        "quotation", "chastity",
+        "\"He that looketh upon a woman to lust after her shall deny "
+        "the faith\" restates Christ's own teaching almost word for "
+        "word: \"whosoever looketh on a woman to lust after her hath "
+        "committed adultery with her already in his heart.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 42, 30, 31,
+        "Acts", "Holy Bible", 20, 35, 35,
+        "paraphrase", "consecration",
+        "The commandment to \"remember the poor, and consecrate of thy "
+        "properties for their support\" is the same principle Paul "
+        "quotes from the Lord Jesus: \"it is more blessed to give than "
+        "to receive.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 59, 7, 8,
+        "1 Thessalonians", "Holy Bible", 5, 18, 18,
+        "paraphrase", "gratitude",
+        "\"Thou shalt thank the Lord thy God in all things\" is the "
+        "same commandment Paul gives: \"in every thing give thanks: "
+        "for this is the will of God in Christ Jesus concerning you.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 25, 12, 12,
+        "Ephesians", "Holy Bible", 5, 19, 19,
+        "paraphrase", "prayer",
+        "\"The song of the righteous is a prayer unto me\" matches "
+        "Paul's own instruction to the saints: \"speaking to "
+        "yourselves in psalms and hymns and spiritual songs... making "
+        "melody in your heart to the Lord.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 50, 23, 24,
+        "1 John", "Holy Bible", 4, 1, 1,
+        "paraphrase", "revelation",
+        "\"That which doth not edify is not of God, and is darkness\" "
+        "gives the same test John commands: \"believe not every "
+        "spirit, but try the spirits whether they are of God.\"",
+    ),
+    (
+        "Matthew", "Holy Bible", 20, 25, 27,
+        "Doctrine and Covenants", "Doctrine and Covenants", 121, 41, 42,
+        "paraphrase", "priesthood",
+        "\"Whosoever will be great among you, let him be your "
+        "minister\" is the same principle this revelation teaches of "
+        "priesthood power: it can only be maintained \"by persuasion, "
+        "by long-suffering, by gentleness and meekness, and by love "
+        "unfeigned,\" never by dominion.",
+    ),
+    (
+        "1 Peter", "Holy Bible", 4, 8, 8,
+        "Proverbs", "Holy Bible", 10, 12, 12,
+        "quotation", "charity",
+        "\"Charity shall cover the multitude of sins\" restates the "
+        "proverb almost exactly: \"love covereth all sins.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 98, 23, 24,
+        "Matthew", "Holy Bible", 5, 38, 39,
+        "paraphrase", "peace",
+        "Bearing an offense patiently \"and revile not against them, "
+        "neither seek revenge\" is the same doctrine Christ teaches: "
+        "\"ye have heard... an eye for an eye... but I say unto you, "
+        "that ye resist not evil.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 98, 16, 16,
+        "Matthew", "Holy Bible", 26, 52, 52,
+        "paraphrase", "peace",
+        "\"Renounce war and proclaim peace\" is the same warning Christ "
+        "gives Peter in Gethsemane: \"all they that take the sword "
+        "shall perish with the sword.\"",
+    ),
+    (
+        "Doctrine and Covenants", "Doctrine and Covenants", 88, 25, 26,
+        "Romans", "Holy Bible", 8, 19, 22,
+        "paraphrase", "creation",
+        "\"The earth abideth the law of a celestial kingdom, for it "
+        "filleth the measure of its creation\" is the same hope Paul "
+        "describes: \"the creature itself also shall be delivered from "
+        "the bondage of corruption into the glorious liberty of the "
+        "children of God.\"",
+    ),
 ]
 
 
