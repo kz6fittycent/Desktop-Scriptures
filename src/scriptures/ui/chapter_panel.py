@@ -41,7 +41,8 @@ from scriptures.data_access import (
 from scriptures.ui.card_grid import FlowLayout
 from scriptures.ui.tag_chip import TagChip
 
-PANEL_WIDTH = 300
+PANEL_WIDTH = 380  # initial width only now - see reading_view.py's QSplitter
+PANEL_MIN_WIDTH = 240  # floor for dragging the splitter narrower than this
 AUTOSAVE_DELAY_MS = 900
 NOTE_FONT_FAMILY = "Ubuntu Mono"
 
@@ -216,7 +217,11 @@ class ChapterPanel(QWidget):
         self.chapter_id = chapter_id
         self._verses_by_id = {v.id: v for v in verses}
         self._verse_entries: dict[int, VerseNoteEntry] = {}
-        self.setFixedWidth(PANEL_WIDTH)
+        # Not setFixedWidth: this panel lives inside reading_view.py's
+        # QSplitter now, alongside the reading pane, so its width tracks
+        # whatever the user drags the splitter to - a scroll area's
+        # resizable content wraps fine at any width above PANEL_MIN_WIDTH.
+        self.setMinimumWidth(PANEL_MIN_WIDTH)
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)

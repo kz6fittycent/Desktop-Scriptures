@@ -510,6 +510,18 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.window_bg};
             border: 1px solid {p.border};
         }}
+        /* The reading-view/side-panel divider (a QSplitter, so the user
+        can drag it to give Study/Citations/Cross-references more room) -
+        left unstyled, it renders as a bare, unthemed gray sash the same
+        way the tab scroll buttons above did before they got a rule too. */
+        QSplitter::handle:horizontal {{
+            background-color: {p.border};
+            width: 3px;
+            margin: 2px 0px;
+        }}
+        QSplitter::handle:horizontal:hover {{
+            background-color: {p.primary};
+        }}
         /* Accordion header for one cited verse in the Citations tab - a
         left-aligned toggle button rather than a small icon button, since
         its whole row (including the "cited N times" count) is the click

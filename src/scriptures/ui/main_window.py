@@ -256,6 +256,11 @@ class MainWindow(QMainWindow):
         # via selected_side_tab so it survives Previous/Next navigation.
         self._side_tab_index = 0
 
+        # Same reasoning as _side_tab_index above, for the side panel's
+        # width: None until the user actually drags the splitter, letting
+        # ReadingView fall back to its own default width until then.
+        self._panel_width: int | None = None
+
         # Reading streak dwell gate: a chapter only counts as "read" once
         # it's been open, uninterrupted, for READING_STREAK_DWELL_MS -
         # _set_content() cancels this whenever the user navigates away
@@ -1044,6 +1049,9 @@ class MainWindow(QMainWindow):
     def _on_side_tab_changed(self, index: int) -> None:
         self._side_tab_index = index
 
+    def _on_panel_width_changed(self, width: int) -> None:
+        self._panel_width = width
+
     @staticmethod
     def _chapter_label(volume: Volume, chapter: Chapter) -> str:
         """Card/breadcrumb label for one chapter - "Section N" for D&C,
@@ -1618,12 +1626,14 @@ class MainWindow(QMainWindow):
             has_next=next_target is not None,
             armed_highlight=self._armed_highlight,
             selected_side_tab=self._side_tab_index,
+            panel_width=self._panel_width,
             subtitle=self._chapter_subtitle(chapter),
             tts_voice=self._tts_voice,
         )
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)
         view.side_tab_changed.connect(self._on_side_tab_changed)
+        view.panel_width_changed.connect(self._on_panel_width_changed)
         view.chapter_link_activated.connect(self._on_search_result_selected)
         view.topic_link_activated.connect(self._show_topic_detail)
         if prev_target is not None:

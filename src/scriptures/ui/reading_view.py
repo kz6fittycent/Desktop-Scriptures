@@ -18,7 +18,11 @@ scripts/build_cross_references.py) - each clickable straight through to
 that other chapter. Selecting which tab is current is tracked by
 MainWindow and threaded back in via selected_side_tab, so it survives
 Previous/Next chapter navigation even though each navigation rebuilds
-this whole view from scratch.
+this whole view from scratch. The reading pane and this side panel sit
+in a QSplitter rather than a fixed division, so the user can drag the
+divider to give the side panel more (or less) room than its default
+width - that width is tracked and threaded back in the same way, via
+panel_width/panel_width_changed.
 
 Highlighting is armed from the Highlighter menu (see main_window.py) rather
 than anything on this screen. Each verse's body is a read-only QTextEdit
@@ -28,21 +32,31 @@ being able to mark a whole verse; releasing the drag while a color is
 armed applies (or, in "clear" mode, removes) that color over just the
 selected span, matching the "highlighter pen" metaphor - pick a color
 once, then mark up several verses without re-opening the menu each time.
+The drag itself isn't confined to one verse either - dragging past a
+verse's own top or bottom continues the same selection into its
+neighbors, applied (or cleared) across all of them together on release;
+see _VerseTextEdit's own docstring for how a selection is made to span
+sibling widgets Qt wouldn't otherwise let it cross. Right-clicking
+directly on a highlighted word or phrase offers a quick "Remove
+Highlight" instead, without needing to arm "Clear Highlight" and
+re-drag over it.
 """
 
 from __future__ import annotations
 
 import sqlite3
 
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
+from PySide6.QtCore import QEvent, Qt, QPoint, QTimer, Signal
+from PySide6.QtGui import QAction, QColor, QFont, QIcon, QPixmap, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import (
+    QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QSplitter,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
@@ -61,7 +75,7 @@ from scriptures.data_access import (
     get_note,
     get_tags,
 )
-from scriptures.ui.chapter_panel import PANEL_WIDTH, ChapterPanel
+from scriptures.ui.chapter_panel import PANEL_MIN_WIDTH, PANEL_WIDTH, ChapterPanel
 from scriptures.ui.citations_panel import CitationsPanel
 from scriptures.ui.cross_references_panel import CrossReferencesPanel
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
@@ -69,18 +83,58 @@ from scriptures.ui.tts_playback import ReadableVerse, TtsController
 
 VERSE_NUMBER_WIDTH = 32
 
+_COLOR_ICON_CACHE: dict[str, QIcon] = {}
+
+
+def _solid_color_icon(hex_color: str) -> QIcon:
+    """A small solid-color square for a highlight color's own context-menu
+    entry - the same swatch-not-just-a-name idea as the Highlighter menu's
+    _HighlightColorRow, cached per color since every verse's context menu
+    wants the identical three icons."""
+    icon = _COLOR_ICON_CACHE.get(hex_color)
+    if icon is None:
+        pixmap = QPixmap(16, 16)
+        pixmap.fill(QColor(hex_color))
+        icon = QIcon(pixmap)
+        _COLOR_ICON_CACHE[hex_color] = icon
+    return icon
+
 
 class _VerseTextEdit(QTextEdit):
     """Read-only, frameless, auto-height display for one verse's body text.
 
     A QTextEdit rather than a QLabel so the text is natively drag-selectable
-    down to the character - `range_selected` reports the selection's
-    [start, end) offsets straight into `verse.text`, since the document
-    here holds nothing but that plain text (no markup, no verse-number
-    prefix) - offsets always match Python string indices exactly.
+    down to the character - offsets reported here always match Python
+    string indices straight into `verse.text`, since the document holds
+    nothing but that plain text (no markup, no verse-number prefix).
+
+    Qt's own text selection is confined to whichever single widget the
+    drag started in - it doesn't extend into a sibling widget just
+    because the cursor moves over one, and the moment the cursor leaves
+    this widget's own bounds Qt stops delivering it mouseMoveEvent at
+    all (there's no implicit "keep sending me events" the way, say, a
+    slider's handle gets - only an explicit OS-level grabMouse() gives
+    that, and it's deliberately NOT used here: if release ever failed to
+    fire for any reason, a stuck grab can freeze mouse input for the
+    whole application, not just this widget, which is a far worse
+    failure than a highlight drag simply not spanning verses).
+
+    So letting a highlight drag span several verses in one continuous
+    gesture works the other way around: this widget only announces that
+    a drag has begun (`drag_started`, from mousePressEvent) and otherwise
+    stays out of it entirely - no mouseMoveEvent/mouseReleaseEvent
+    overrides here at all. ReadingView, the only thing that ever needs
+    to know about a drag crossing a verse boundary, installs its own
+    temporary QApplication-wide event filter for the duration (see its
+    own eventFilter and _on_verse_drag_started/_extended/_finished) -
+    purely observational, never consuming or blocking an event, so a bug
+    in it can misjudge a drag but can never lock up input the way a
+    stuck grab could.
     """
 
-    range_selected = Signal(int, int)
+    drag_started = Signal()
+    highlight_remove_requested = Signal(int, int)
+    highlight_color_requested = Signal(str)
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -92,6 +146,7 @@ class _VerseTextEdit(QTextEdit):
         self.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
         self.document().setDocumentMargin(0)
         self.viewport().setAutoFillBackground(False)
+        self._current_highlights: list[Highlight] = []
 
     def resizeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         super().resizeEvent(event)
@@ -149,6 +204,7 @@ class _VerseTextEdit(QTextEdit):
             span.setPosition(hl.end_offset, QTextCursor.MoveMode.KeepAnchor)
             span.setCharFormat(fmt)
 
+        self._current_highlights = highlights
         self._adjust_height()
 
     def clear_selection(self) -> None:
@@ -167,15 +223,67 @@ class _VerseTextEdit(QTextEdit):
         self.style().unpolish(self)
         self.style().polish(self)
 
-    def mouseReleaseEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
-        super().mouseReleaseEvent(event)
-        if event.button() != Qt.MouseButton.LeftButton:
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        super().mousePressEvent(event)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.drag_started.emit()
+
+    def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        # Left deliberately unhandled while dragging: ReadingView's
+        # QApplication-wide event filter is the sole owner of selection
+        # updates during a drag (it's the only thing that can see the
+        # cursor once it crosses into a sibling verse). Letting Qt's own
+        # default handling run here too would fight it for control of
+        # this same widget's selection on every single move event -
+        # each one setting a slightly different range - which is exactly
+        # what produced the jitter and the occasional "selection ends up
+        # empty at release" failure. Only forward hover-only moves (no
+        # button held) so things like the I-beam cursor still update.
+        if event.buttons() & Qt.MouseButton.LeftButton:
             return
-        cursor = self.textCursor()
-        start, end = cursor.selectionStart(), cursor.selectionEnd()
-        if start == end:
-            return
-        self.range_selected.emit(start, end)
+        super().mouseMoveEvent(event)
+
+    def contextMenuEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        offset = self.cursorForPosition(event.pos()).position()
+        hit = next(
+            (h for h in self._current_highlights if h.start_offset <= offset < h.end_offset), None
+        )
+        has_selection = self.textCursor().hasSelection()
+
+        menu = self.createStandardContextMenu()
+        standard_actions = menu.actions()
+        first_standard = standard_actions[0] if standard_actions else None
+
+        # Built in the order they should appear, then inserted as one
+        # block ahead of Copy/Select All - "act on what's already
+        # highlighted here" before "highlight what I just selected."
+        new_actions: list[QAction] = []
+        if hit is not None:
+            remove_action = QAction("Remove Highlight", self)
+            remove_action.triggered.connect(
+                lambda checked=False, s=hit.start_offset, e=hit.end_offset: (
+                    self.highlight_remove_requested.emit(s, e)
+                )
+            )
+            new_actions.append(remove_action)
+        if has_selection:
+            for color in ("yellow", "pink", "orange"):
+                color_action = QAction(f"Highlight {color.capitalize()}", self)
+                color_action.setIcon(_solid_color_icon(HIGHLIGHT_COLORS[color].background))
+                color_action.triggered.connect(
+                    lambda checked=False, c=color: self.highlight_color_requested.emit(c)
+                )
+                new_actions.append(color_action)
+
+        if new_actions:
+            if first_standard is not None:
+                for action in new_actions:
+                    menu.insertAction(first_standard, action)
+                menu.insertSeparator(first_standard)
+            else:
+                menu.addActions(new_actions)
+
+        menu.exec(event.globalPos())
 
 
 class ReadingView(QWidget):
@@ -186,6 +294,7 @@ class ReadingView(QWidget):
     side_tab_changed = Signal(int)
     chapter_link_activated = Signal(int)
     topic_link_activated = Signal(int)
+    panel_width_changed = Signal(int)
 
     def __init__(
         self,
@@ -197,6 +306,7 @@ class ReadingView(QWidget):
         font_family: str,
         font_size: int,
         *,
+        panel_width: int | None = None,
         has_previous: bool = False,
         has_next: bool = False,
         armed_highlight: str | None = None,
@@ -282,6 +392,11 @@ class ReadingView(QWidget):
         self._number_labels: dict[int, QLabel] = {}
         self._body_widgets: dict[int, _VerseTextEdit] = {}
         self._annotate_buttons: dict[int, QPushButton] = {}
+        self._verse_index: dict[int, int] = {v.id: i for i, v in enumerate(verses)}
+        # Set only while a highlight drag is in progress - see
+        # _on_verse_drag_started/eventFilter below.
+        self._drag_anchor_verse: Verse | None = None
+        self._drag_anchor_offset: int = 0
         for verse in verses:
             row = QHBoxLayout()
             row.setSpacing(10)
@@ -304,9 +419,11 @@ class ReadingView(QWidget):
                 self._number_labels[verse.id] = number_label
 
             body = _VerseTextEdit()
-            body.range_selected.connect(
-                lambda start, end, v=verse: self._on_range_selected(v, start, end)
+            body.drag_started.connect(lambda v=verse: self._on_verse_drag_started(v))
+            body.highlight_remove_requested.connect(
+                lambda start, end, v=verse: self._on_highlight_remove_requested(v, start, end)
             )
+            body.highlight_color_requested.connect(self._on_verse_highlight_color_requested)
             row.addWidget(body, 1)
             self._body_widgets[verse.id] = body
 
@@ -333,13 +450,15 @@ class ReadingView(QWidget):
 
         reading_column.addLayout(nav_row)
 
-        outer.addLayout(reading_column, 1)
+        reading_container = QWidget()
+        reading_container.setLayout(reading_column)
+        reading_container.setMinimumWidth(400)
 
         self._panel = ChapterPanel(conn, chapter_id, verses, annotated_ids)
         self._panel.verse_annotation_changed.connect(self._refresh_verse_indicator)
 
         self._side_tabs = QTabWidget()
-        self._side_tabs.setFixedWidth(PANEL_WIDTH)
+        self._side_tabs.setMinimumWidth(PANEL_MIN_WIDTH)
         self._side_tabs.addTab(self._panel, "Study")
 
         citations_panel = CitationsPanel(verses)
@@ -355,7 +474,23 @@ class ReadingView(QWidget):
 
         self._side_tabs.setCurrentIndex(selected_side_tab)
         self._side_tabs.currentChanged.connect(self.side_tab_changed)
-        outer.addWidget(self._side_tabs)
+
+        # A QSplitter rather than a plain stretch-factor split so the user
+        # can drag the divider themselves - Study/Citations/Cross-references
+        # habitually want more room than the reading pane's own default
+        # share leaves them. Neither side is collapsible: dragging past
+        # each one's minimum width just stops there instead of hiding it
+        # entirely, which would strand the user with no way to get it back
+        # short of reopening the chapter.
+        self._panel_width = panel_width if panel_width is not None else PANEL_WIDTH
+        self._splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._splitter.setChildrenCollapsible(False)
+        self._splitter.addWidget(reading_container)
+        self._splitter.addWidget(self._side_tabs)
+        self._splitter.setStretchFactor(0, 1)
+        self._splitter.setStretchFactor(1, 0)
+        self._splitter.splitterMoved.connect(self._on_splitter_moved)
+        outer.addWidget(self._splitter)
 
         self.apply_theme(palette, font_family, font_size)
 
@@ -375,6 +510,21 @@ class ReadingView(QWidget):
         # one explicit pass, all against the now-final width, avoids the
         # cascade instead of waiting it out.
         QTimer.singleShot(0, self._finalize_verse_layout)
+
+        # Same reasoning as above: this view has no real width yet at
+        # construction time, so setSizes() here would split against a
+        # provisional one. Fixing it up next turn instead gives the side
+        # panel its actual requested width and hands the reading pane
+        # whatever's left, rather than an even 50/50 split.
+        QTimer.singleShot(0, self._finalize_splitter_sizes)
+
+    def _finalize_splitter_sizes(self) -> None:
+        total_width = self._splitter.width()
+        self._splitter.setSizes([max(total_width - self._panel_width, 0), self._panel_width])
+
+    def _on_splitter_moved(self, _pos: int, _index: int) -> None:
+        self._panel_width = self._splitter.sizes()[1]
+        self.panel_width_changed.emit(self._panel_width)
 
     def _finalize_verse_layout(self) -> None:
         self._content_layout.activate()
@@ -426,20 +576,165 @@ class ReadingView(QWidget):
         count = cross_references_panel.reference_count
         return f"Cross-references ({count})" if count else "Cross-references"
 
-    def _on_range_selected(self, verse: Verse, start: int, end: int) -> None:
-        # Selection is otherwise left alone here - with no highlighter
-        # armed, dragging across verse text is just ordinary text
-        # selection (e.g. to copy it), and clearing it out from under the
-        # user right after they made it would defeat that.
+    def _on_verse_drag_started(self, verse: Verse) -> None:
+        """A verse widget's own mousePressEvent, left button - the one
+        and only thing it tells ReadingView about a drag; everything
+        past this point (does it cross into another verse? has the
+        button been released yet?) is watched for centrally instead, via
+        a temporary application-wide event filter - see eventFilter and
+        its own docstring for why nothing here uses grabMouse().
+
+        Only installs that filter if one isn't already active: if a
+        previous drag's release was ever somehow missed (leaving
+        _drag_anchor_verse still set), this just points the existing
+        filter at the new anchor instead of installing a second one -
+        self-healing the moment any new drag starts, rather than
+        accumulating duplicate filters."""
+        if self._drag_anchor_verse is None:
+            QApplication.instance().installEventFilter(self)
+        self._drag_anchor_verse = verse
+        self._drag_anchor_offset = self._body_widgets[verse.id].textCursor().position()
+
+    def eventFilter(self, obj, event) -> bool:  # noqa: N802 (Qt naming convention)
+        if self._drag_anchor_verse is None:
+            return super().eventFilter(obj, event)
+        event_type = event.type()
+        if event_type == QEvent.Type.MouseMove:
+            if event.buttons() & Qt.MouseButton.LeftButton:
+                self._on_verse_drag_extended(event.globalPosition().toPoint())
+        elif event_type == QEvent.Type.MouseButtonRelease:
+            if event.button() == Qt.MouseButton.LeftButton:
+                self._on_verse_drag_finished()
+                QApplication.instance().removeEventFilter(self)
+                self._drag_anchor_verse = None
+        # Never consumes anything (always defers to the base
+        # implementation's own answer, normally False) - this is a purely
+        # observational tap on the event stream, not an interception, so
+        # every other widget in the app keeps receiving these events
+        # completely normally throughout the drag.
+        return super().eventFilter(obj, event)
+
+    def _on_verse_drag_extended(self, global_pos: QPoint) -> None:
+        """Fires on every mouse-move anywhere in the app for as long as a
+        drag begun in _drag_anchor_verse's own widget is in progress,
+        however far the cursor has since wandered from it. With no
+        highlighter armed this is a no-op - dragging is just ordinary
+        text selection (e.g. to copy it) confined to whichever single
+        verse Qt's own selection already handles.
+
+        With a color (or "clear") armed, extends a fake selection across
+        every verse between the drag's start and wherever the cursor is
+        now, using the exact same setTextCursor mechanism a plain
+        same-widget drag already uses natively - the verses outside that
+        range get their own selection cleared, so narrowing the drag back
+        un-highlights-preview verses it had covered a moment ago."""
         if self._armed_highlight is None:
             return
-        if self._armed_highlight == "clear":
-            clear_highlight_range(self.conn, verse.id, start, end)
-        else:
-            add_highlight(self.conn, verse.id, self._armed_highlight, start, end)
+        anchor_verse = self._drag_anchor_verse
+        anchor_offset = self._drag_anchor_offset
+
+        target_verse, target_offset = self._verse_and_offset_at_global(global_pos)
+        if target_verse is None:
+            return
+        anchor_index = self._verse_index[anchor_verse.id]
+        target_index = self._verse_index[target_verse.id]
+        lo_index, hi_index = sorted((anchor_index, target_index))
+        forward = anchor_index <= target_index
+
+        for index, verse in enumerate(self._verses):
+            widget = self._body_widgets[verse.id]
+            if index < lo_index or index > hi_index:
+                widget.clear_selection()
+                continue
+            text_len = len(verse.text)
+            if forward:
+                start = anchor_offset if index == anchor_index else 0
+                end = target_offset if index == target_index else text_len
+            else:
+                start = target_offset if index == target_index else 0
+                end = anchor_offset if index == anchor_index else text_len
+            cursor = widget.textCursor()
+            cursor.setPosition(start)
+            cursor.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
+            widget.setTextCursor(cursor)
+
+    def _verse_and_offset_at_global(self, global_pos: QPoint) -> tuple[Verse | None, int]:
+        """Which verse (and character offset into its text) a global mouse
+        position falls over, hit-testing by each row's own vertical span
+        in self._content's coordinate space rather than requiring the
+        point to land exactly inside that verse's own _VerseTextEdit -
+        the point may be a little to the side of it (over the verse
+        number, say) while still vertically within that row. A point
+        above the first verse or below the last one clamps to that verse's
+        own start/end, so dragging past either end of the list still
+        extends the selection instead of doing nothing."""
+        if not self._verses:
+            return None, 0
+        content_pos = self._content.mapFromGlobal(global_pos)
+        first_widget = self._body_widgets[self._verses[0].id]
+        if content_pos.y() < first_widget.mapTo(self._content, QPoint(0, 0)).y():
+            return self._verses[0], 0
+        for verse in self._verses:
+            widget = self._body_widgets[verse.id]
+            top = widget.mapTo(self._content, QPoint(0, 0)).y()
+            if top <= content_pos.y() <= top + widget.height():
+                local = widget.mapFromGlobal(global_pos)
+                offset = widget.cursorForPosition(local).position()
+                return verse, max(0, min(offset, len(verse.text)))
+        last_verse = self._verses[-1]
+        return last_verse, len(last_verse.text)
+
+    def _on_verse_drag_finished(self) -> None:
+        # With no highlighter armed, a plain drag is just ordinary text
+        # selection (e.g. to copy it) - deliberately left in place rather
+        # than applied or cleared, which also means it's left in place
+        # for the user to right-click within a moment later and choose a
+        # color from there instead (see _on_verse_highlight_color_requested).
+        if self._armed_highlight is None:
+            return
+        self._apply_to_current_selection(self._armed_highlight)
+
+    def _on_verse_highlight_color_requested(self, color: str) -> None:
+        """The right-click context menu's own color choice - independent
+        of whatever's armed in the Highlighter menu, applied to whatever
+        verse(s) are currently selected (however that selection was made:
+        a drag with nothing armed, left in place for exactly this)."""
+        self._apply_to_current_selection(color)
+
+    def _apply_to_current_selection(self, mode: str) -> None:
+        """mode is a highlight color, or "clear" - applied across every
+        verse that currently has a selection (a multi-verse drag can leave
+        more than one), then clears each of their selections and
+        re-renders. Shared by the drag-release handler above (using
+        whatever's armed in the Highlighter menu) and the context menu's
+        own direct color/remove choices."""
+        changed_verses = []
+        for verse in self._verses:
+            widget = self._body_widgets[verse.id]
+            cursor = widget.textCursor()
+            if not cursor.hasSelection():
+                continue
+            start, end = cursor.selectionStart(), cursor.selectionEnd()
+            if mode == "clear":
+                clear_highlight_range(self.conn, verse.id, start, end)
+            else:
+                add_highlight(self.conn, verse.id, mode, start, end)
+            changed_verses.append(verse)
+            widget.clear_selection()
+        if not changed_verses:
+            return
+        self._verse_highlights = get_highlights(self.conn, self.chapter_id)
+        for verse in changed_verses:
+            self._render_verse(verse)
+
+    def _on_highlight_remove_requested(self, verse: Verse, start: int, end: int) -> None:
+        """A verse's own right-click "Remove Highlight" - independent of
+        whatever's currently armed in the Highlighter menu, since removing
+        one specific highlight the user just clicked on shouldn't require
+        arming "Clear Highlight" and re-dragging over it first."""
+        clear_highlight_range(self.conn, verse.id, start, end)
         self._verse_highlights = get_highlights(self.conn, self.chapter_id)
         self._render_verse(verse)
-        self._body_widgets[verse.id].clear_selection()
 
     def set_armed_highlight(self, color: str | None) -> None:
         """Called by MainWindow when the Highlighter menu selection
