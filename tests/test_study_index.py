@@ -390,6 +390,20 @@ def test_split_discourse_limits() -> None:
     print("test_split_discourse_limits: PASSED")
 
 
+@_with_fake_works
+def test_not_implemented_fails_fast_without_retrying() -> None:
+    env = _Env()
+    try:
+        env.server.script = [("status", 501, None)]
+        result = env.build()
+        assert result["ok"] is False
+        assert "may not offer embeddings" in result["message"], result["message"]
+        assert len(env.server.requests) == 1
+        print("test_not_implemented_fails_fast_without_retrying: PASSED")
+    finally:
+        env.close()
+
+
 if __name__ == "__main__":
     app = QCoreApplication.instance() or QCoreApplication(sys.argv)
     test_split_discourse_limits()
@@ -398,6 +412,7 @@ if __name__ == "__main__":
     test_retry_after_and_backoff_recover()
     test_too_large_batches_are_halved()
     test_auth_failure_stops_and_flags_api_key()
+    test_not_implemented_fails_fast_without_retrying()
     test_cancel_then_resume_and_incremental_rebuild()
     test_changing_model_or_dimensions_rebuilds_from_scratch()
     print("All study index tests passed.")

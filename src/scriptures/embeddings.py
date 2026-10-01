@@ -129,17 +129,20 @@ class EmbeddingRequest(QObject):
         detail = _server_message(body) or reply.errorString()
         if error in AUTH_ERRORS or status in (401, 403):
             self.failed.emit(detail, "auth", -1.0)
-        elif status == 429 or (isinstance(status, int) and status >= 500):
-            self.failed.emit(detail, "retry", retry_after if retry_after is not None else -1.0)
-        elif status in (400, 413, 422):
-            self.failed.emit(detail, "too_large", -1.0)
-        elif status == 404:
+        elif status in (404, 501):
+            # 501 is what llama.cpp's server (e.g. a local inference snap)
+            # sends when it wasn't started with embeddings enabled -
+            # permanent, so not worth the 5xx retry/backoff below.
             self.failed.emit(
                 f"{detail} - this endpoint may not offer embeddings, or the embedding "
                 "model name isn't one it knows.",
                 "fatal",
                 -1.0,
             )
+        elif status == 429 or (isinstance(status, int) and status >= 500):
+            self.failed.emit(detail, "retry", retry_after if retry_after is not None else -1.0)
+        elif status in (400, 413, 422):
+            self.failed.emit(detail, "too_large", -1.0)
         elif status is None and error in _RETRYABLE_NETWORK_ERRORS:
             self.failed.emit(detail, "retry", -1.0)
         else:
