@@ -84,11 +84,14 @@ CANDIDATES = sum(group[3] for group in CANDIDATE_GROUPS)
 # it entirely by meaning and by words.
 KEY_TOPICS = 3
 KEY_PASSAGES_PER_TOPIC = 3
-# Key passages are listed after this many of the index's own Standard
-# Works candidates, not first: small models favor whatever comes first in
-# a list, and a wrongly matched topic's passages (Judgment's "judge not"
-# for a question about the Book of Mormon's truth) got picked from the
-# front just for being there.
+# Where key passages go in the candidate list. A small model mostly takes
+# the first ten or so items in order - gemma3-4b offered Moroni 10:4-5 at
+# #15 for "how to know if the Book of Mormon is true" picked #1-#10 - so
+# position decides. Each chosen topic's single most central passage leads
+# the list; the rest follow this many of the index's own Standard Works
+# candidates. (Putting every key passage first hurt when topics were
+# matched by the index - Judgment's "judge not" got picked for that same
+# question - but the chat model's own topic choice is far more reliable.)
 KEY_PASSAGES_AFTER = 8
 
 # Which topics a question is about is asked of the chat model - picking
@@ -335,7 +338,12 @@ def gather_candidates(
         )
     if conn is not None:
         keys = _key_passage_hits(conn, index, query, vector, hits, topic_ids)
-        hits = hits[:KEY_PASSAGES_AFTER] + keys + hits[KEY_PASSAGES_AFTER:]
+        leads, rest, seen_topics = [], [], set()
+        for hit in keys:  # keys come in topic order, most central first
+            topic = hit.meta.get("key_topic")
+            (rest if topic in seen_topics else leads).append(hit)
+            seen_topics.add(topic)
+        hits = leads + hits[:KEY_PASSAGES_AFTER] + rest + hits[KEY_PASSAGES_AFTER:]
     return hits
 
 
@@ -348,18 +356,28 @@ def fallback_hits(hits: list[study_index.SearchHit]) -> list[study_index.SearchH
     return chosen
 
 
+def _shares_a_word(hit: study_index.SearchHit, question: str) -> bool:
+    title = set(re.findall(r"[a-z']+", hit.text.partition("\n")[0].lower()))
+    return any(word in title for word in extract_keywords(question, limit=12))
+
+
 def with_minimums(
-    chosen: list[study_index.SearchHit], candidates: list[study_index.SearchHit]
+    chosen: list[study_index.SearchHit],
+    candidates: list[study_index.SearchHit],
+    question: str = "",
 ) -> list[study_index.SearchHit]:
     """`chosen` plus, for each MIN_PER_TIER tier it has fewer of than the
-    minimum, the index's best remaining candidates from that tier."""
+    minimum, the index's best remaining candidates from that tier - only
+    ones whose title shares a word with the question, since in testing
+    unrelated talks were otherwise forced in (for "Who is Teancum", a
+    talk titled "Where Your Treasure Is")."""
     result = list(chosen)
     for level, minimum in MIN_PER_TIER.items():
         have = sum(1 for h in result if tier(h) == level)
         for hit in candidates:
             if have >= minimum:
                 break
-            if tier(hit) == level and hit not in result:
+            if tier(hit) == level and hit not in result and _shares_a_word(hit, question):
                 result.append(hit)
                 have += 1
     return result
@@ -668,5 +686,5 @@ class StudyQuestionAsker(QObject):
         chosen_hits = [self._hits[i] for i in chosen]
         # A follow-up that asked for one volume or kind gets only that.
         if detect_filters(self._questions)[0] is None:
-            chosen_hits = with_minimums(chosen_hits, self._hits)
+            chosen_hits = with_minimums(chosen_hits, self._hits, self._query)
         self.succeeded.emit(self._results(by_tier(chosen_hits)), "")

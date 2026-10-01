@@ -152,8 +152,10 @@ def test_model_choice_orders_results_and_text_comes_from_the_database() -> None:
         assert result.get("note") == "", result
         results = result["results"]
         # The model's two picks (both scripture - the Standard Works group
-        # is listed first), plus the always-shown talk and article.
-        assert [r.kind for r in results] == ["scripture", "scripture", "talk", "article"], results
+        # is listed first), plus the always-shown talk "The Power of Faith"
+        # (its title shares "faith" with the question). The article,
+        # "Gathering Israel", shares nothing with it, so isn't forced in.
+        assert [r.kind for r in results] == ["scripture", "scripture", "talk"], results
         prompt = server.chat_requests[0]["messages"][1]["content"]
         # The model's #2 then #1, in that order.
         listed = [line for line in prompt.splitlines() if line.startswith("[")]
@@ -254,6 +256,10 @@ def test_candidates_cover_every_group_and_results_follow_tier_order() -> None:
         result = _ask(env, server, [query])
         shown = [r.kind for r in result["results"]]
         assert shown[: len(picked)] == ["scripture"] * len(picked), shown
+        assert "talk" in shown and "article" not in shown, shown
+        # A question sharing a word with the article's title does get it.
+        result = _ask(env, server, ["faith and gathering"])
+        shown = [r.kind for r in result["results"]]
         assert "talk" in shown and "article" in shown, shown
         assert shown.index("talk") < shown.index("article"), shown
         # ...but not after a follow-up that asked for scripture only.

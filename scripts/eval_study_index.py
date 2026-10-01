@@ -155,7 +155,7 @@ def select(chat_url: str, chat_model: str, question: str, vector, index) -> tupl
         chosen = None
     if not chosen:
         return study_ask.fallback_hits(hits), True
-    return study_ask.by_tier(study_ask.with_minimums([hits[i] for i in chosen], hits)), False
+    return study_ask.by_tier(study_ask.with_minimums([hits[i] for i in chosen], hits, question)), False
 
 
 def main() -> None:
