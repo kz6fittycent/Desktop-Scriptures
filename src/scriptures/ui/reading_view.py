@@ -77,6 +77,7 @@ from scriptures.data_access import (
 from scriptures.ui.chapter_panel import PANEL_MIN_WIDTH, PANEL_WIDTH, ChapterPanel
 from scriptures.ui.citations_panel import CitationsPanel
 from scriptures.ui.cross_references_panel import CrossReferencesPanel
+from scriptures.ui.word_study_panel import WordStudyPanel
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
 from scriptures.ui.tts_playback import ReadableVerse, TtsController
 
@@ -135,6 +136,7 @@ class _VerseTextEdit(QTextEdit):
     highlight_remove_requested = Signal(int, int)
     highlight_color_requested = Signal(str)
     cross_reference_requested = Signal()
+    word_lookup_requested = Signal(str)
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -277,6 +279,19 @@ class _VerseTextEdit(QTextEdit):
         cross_reference_action = QAction("Add Cross-reference…", self)
         cross_reference_action.triggered.connect(self.cross_reference_requested)
         new_actions.append(cross_reference_action)
+        # The selection if there is one (a word or short phrase), otherwise
+        # the word that was right-clicked.
+        if has_selection:
+            word = self.textCursor().selectedText().strip()
+        else:
+            word_cursor = self.cursorForPosition(event.pos())
+            word_cursor.select(QTextCursor.SelectionType.WordUnderCursor)
+            word = word_cursor.selectedText().strip()
+        word = word.strip(".,;:!?()[]'\"")
+        if word and len(word.split()) <= 3:
+            lookup_action = QAction(f"Look Up Original Word: {word}", self)
+            lookup_action.triggered.connect(lambda checked=False, w=word: self.word_lookup_requested.emit(w))
+            new_actions.append(lookup_action)
 
         if new_actions:
             if first_standard is not None:
@@ -430,6 +445,7 @@ class ReadingView(QWidget):
             body.cross_reference_requested.connect(
                 lambda v=verse: self._on_cross_reference_requested(v)
             )
+            body.word_lookup_requested.connect(self._on_word_lookup_requested)
             row.addWidget(body, 1)
             self._body_widgets[verse.id] = body
 
@@ -479,6 +495,17 @@ class ReadingView(QWidget):
         self._side_tabs.addTab(
             self._cross_references_panel,
             self._cross_references_tab_label(self._cross_references_panel),
+        )
+
+        self._word_study_panel = WordStudyPanel(conn)
+        self._side_tabs.addTab(self._word_study_panel, "Word Study")
+        self._side_tabs.setTabToolTip(
+            self._side_tabs.indexOf(self._cross_references_panel),
+            "Cross-references: passages elsewhere that quote, parallel, or connect to this chapter",
+        )
+        self._side_tabs.setTabToolTip(
+            self._side_tabs.indexOf(self._word_study_panel),
+            "Word Study: the Hebrew or Aramaic words behind the English",
         )
 
         self._side_tabs.setCurrentIndex(selected_side_tab)
@@ -582,14 +609,21 @@ class ReadingView(QWidget):
 
     @staticmethod
     def _cross_references_tab_label(cross_references_panel: CrossReferencesPanel) -> str:
+        # "Cross-refs" rather than "Cross-references" - with Word Study
+        # added, four full labels didn't fit the panel's default width
+        # (the tab's tooltip spells it out).
         count = cross_references_panel.reference_count
-        return f"Cross-references ({count})" if count else "Cross-references"
+        return f"Cross-refs ({count})" if count else "Cross-refs"
 
     def _refresh_cross_references_tab_label(self) -> None:
         index = self._side_tabs.indexOf(self._cross_references_panel)
         self._side_tabs.setTabText(
             index, self._cross_references_tab_label(self._cross_references_panel)
         )
+
+    def _on_word_lookup_requested(self, word: str) -> None:
+        self._side_tabs.setCurrentWidget(self._word_study_panel)
+        self._word_study_panel.look_up(word)
 
     def _on_cross_reference_requested(self, verse: Verse) -> None:
         """A verse's own right-click "Add Cross-reference..." - pre-fills

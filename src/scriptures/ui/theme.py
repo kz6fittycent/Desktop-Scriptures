@@ -479,7 +479,7 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             border-bottom: none;
             border-top-left-radius: {BUTTON_RADIUS}px;
             border-top-right-radius: {BUTTON_RADIUS}px;
-            padding: 8px 14px;
+            padding: 8px 10px;
             margin-right: 2px;
             font-weight: bold;
         }}
