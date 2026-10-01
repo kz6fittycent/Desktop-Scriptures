@@ -357,8 +357,17 @@ def fallback_hits(hits: list[study_index.SearchHit]) -> list[study_index.SearchH
 
 
 def _shares_a_word(hit: study_index.SearchHit, question: str) -> bool:
-    title = set(re.findall(r"[a-z']+", hit.text.partition("\n")[0].lower()))
-    return any(word in title for word in extract_keywords(question, limit=12))
+    """Whether a talk or article's title is plausibly about the question:
+    it shares at least two of the question's significant words, or its
+    only one. One shared word was too loose - "sisters" alone brought in
+    "A Plea to My Sisters" for "Where are Nephi's sisters mentioned?". A
+    heuristic, not a judgment: two common words can still match an
+    unrelated title ("relationship" and "Christ" for "What was Mark's
+    relationship to Christ?")."""
+    title = {re.sub(r"'s$", "", w) for w in re.findall(r"[a-z']+", hit.text.partition("\n")[0].lower())}
+    keywords = list(dict.fromkeys(snippet_keywords(question)))
+    shared = sum(1 for word in keywords if word in title)
+    return shared >= min(2, len(keywords)) and shared > 0
 
 
 def with_minimums(

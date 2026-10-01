@@ -148,13 +148,13 @@ def test_model_choice_orders_results_and_text_comes_from_the_database() -> None:
     try:
         assert env.build()["ok"]
         server.chat_reply = "[2, 1]"
-        result = _ask(env, server, ["faith hope things not seen"])
+        result = _ask(env, server, ["the power of faith"])
         assert result.get("note") == "", result
         results = result["results"]
         # The model's two picks (both scripture - the Standard Works group
         # is listed first), plus the always-shown talk "The Power of Faith"
-        # (its title shares "faith" with the question). The article,
-        # "Gathering Israel", shares nothing with it, so isn't forced in.
+        # (its title shares "power" and "faith" with the question). The
+        # article, "Gathering Israel", shares nothing, so isn't forced in.
         assert [r.kind for r in results] == ["scripture", "scripture", "talk"], results
         prompt = server.chat_requests[0]["messages"][1]["content"]
         # The model's #2 then #1, in that order.
@@ -231,7 +231,7 @@ def test_candidates_cover_every_group_and_results_follow_tier_order() -> None:
     try:
         assert env.build()["ok"]
         index = si.StudyIndex(env.index_conn)
-        query = "faith hope"
+        query = "the power of faith"
         hits = study_ask.gather_candidates(index, [query], query, fake_embedding(query))
         kinds = [h.kind for h in hits]
         # Both talk cards are present even though scripture text matches
@@ -257,8 +257,8 @@ def test_candidates_cover_every_group_and_results_follow_tier_order() -> None:
         shown = [r.kind for r in result["results"]]
         assert shown[: len(picked)] == ["scripture"] * len(picked), shown
         assert "talk" in shown and "article" not in shown, shown
-        # A question sharing a word with the article's title does get it.
-        result = _ask(env, server, ["faith and gathering"])
+        # A question sharing two words with the article's title gets it too.
+        result = _ask(env, server, ["the power of faith in gathering israel"])
         shown = [r.kind for r in result["results"]]
         assert "talk" in shown and "article" in shown, shown
         assert shown.index("talk") < shown.index("article"), shown
@@ -298,6 +298,19 @@ def test_snippets_show_the_question_words_the_opening_hides() -> None:
     prompt = study_ask.selection_messages(["Where are Nephi's sisters mentioned?"], [hit])[1]["content"]
     assert "my sisters" in prompt
     print("test_snippets_show_the_question_words_the_opening_hides: PASSED")
+
+
+def test_forced_talks_need_two_shared_words() -> None:
+    def talk(title):
+        return si.SearchHit(1, "k", "talk", f'General Conference: "{title}" - A. Speaker', None, None, {}, 1.0, 1, 1)
+    # Possessives normalize ("Mark's" -> "mark").
+    assert study_ask.snippet_keywords("What was Mark's relationship to Christ?") == ["mark", "relationship", "christ"]
+    assert study_ask._shares_a_word(talk("Eternal Marriage"), "eternal marriage")
+    assert not study_ask._shares_a_word(talk("A Plea to My Sisters"), "Where are Nephi's sisters mentioned?")
+    assert study_ask._shares_a_word(talk("The Book of Mormon—a Book from God"), "how can I know the Book of Mormon is true")
+    assert study_ask._shares_a_word(talk("Faith"), "faith")  # a one-word question needs one
+    assert not study_ask._shares_a_word(talk("Where Your Treasure Is"), "Who is Teancum")
+    print("test_forced_talks_need_two_shared_words: PASSED")
 
 
 def test_parse_topic_choice() -> None:
@@ -360,6 +373,7 @@ if __name__ == "__main__":
     test_parse_selection()
     test_follow_up_filters()
     test_parse_topic_choice()
+    test_forced_talks_need_two_shared_words()
     test_snippets_show_the_question_words_the_opening_hides()
     test_retrieval_query_and_prompt()
     test_model_choice_orders_results_and_text_comes_from_the_database()

@@ -465,6 +465,23 @@ def test_old_schema_index_is_reset() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+@_with_fake_works
+def test_possessive_names_still_match_by_keyword() -> None:
+    """FTS5 splits "Alma's" into "alma" + "s", so searching the phrase
+    "alma's" found almost nothing - every name asked about in the
+    possessive was effectively missing from keyword search."""
+    env = _Env()
+    try:
+        assert env.build()["ok"]
+        index = si.StudyIndex(env.index_conn)
+        hits = index._keyword_ranking("Where is God's light described?", {"scripture"}, None, 10)
+        keys = [env.index_conn.execute("SELECT key FROM pieces WHERE id = ?", (h,)).fetchone()[0] for h in hits]
+        assert any("Genesis" in k for k in keys), keys
+        print("test_possessive_names_still_match_by_keyword: PASSED")
+    finally:
+        env.close()
+
+
 def test_split_discourse_limits() -> None:
     giant_paragraph = " ".join(f"Sentence number {i} is here." for i in range(400))
     parts = si.split_discourse("Short opening.\n\n" + giant_paragraph + "\n\nShort close.")
@@ -553,4 +570,5 @@ if __name__ == "__main__":
     test_old_schema_index_is_reset()
     test_latest_tag_is_the_same_model()
     test_adjacent_windows_merge_and_kind_limits_apply()
+    test_possessive_names_still_match_by_keyword()
     print("All study index tests passed.")

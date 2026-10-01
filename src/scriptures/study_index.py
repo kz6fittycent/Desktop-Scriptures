@@ -968,7 +968,13 @@ class StudyIndex:
     def _keyword_ranking(
         self, query_text: str, kinds: set[str] | None, volume_slugs: set[str] | None, limit: int
     ) -> list[int]:
-        keywords = extract_keywords(query_text, limit=12)
+        # "Mark's" -> "mark": FTS5 splits a possessive into "mark" + "s", so
+        # the phrase "mark's" only matched text with that exact possessive -
+        # 1 piece for "mark's" against 2,414 for "mark". Every name asked
+        # about in the possessive ("Nephi's sisters", "Mark's relationship
+        # to Christ") was effectively missing from keyword search.
+        keywords = [re.sub(r"'s$", "", k) for k in extract_keywords(query_text, limit=12)]
+        keywords = [k for k in dict.fromkeys(keywords) if k]
         if not keywords:
             return []
         match = " OR ".join('"' + k.replace('"', '""') + '"' for k in keywords)
