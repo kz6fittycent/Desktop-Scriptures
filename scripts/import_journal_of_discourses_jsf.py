@@ -50,7 +50,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from scriptures.db import connect  # noqa: E402
+from scriptures.db import compact, connect  # noqa: E402
 
 VOLUME_NAME = "Journal of Discourses"
 VOLUME_SLUG = "journal-of-discourses"
@@ -190,6 +190,7 @@ def main() -> None:
 
     conn = connect(db_path)
     summary = import_all(conn, by_volume)
+    compact(conn)
     conn.close()
 
     print()

@@ -530,6 +530,16 @@ def _sync_bundled_cross_references(conn: sqlite3.Connection) -> None:
             )
 
 
+def compact(conn: sqlite3.Connection) -> None:
+    """Commit, then VACUUM away the free pages a bulk import/rebuild leaves
+    behind. Every script under scripts/ that writes data/scriptures.db
+    calls this last: that file is committed to git and shipped as-is, and
+    left uncompacted it had grown to ~85MB with ~28MB of it empty pages -
+    close enough to GitHub's 100MB per-file push limit to matter."""
+    conn.commit()
+    conn.execute("VACUUM")
+
+
 def fts5_available(conn: sqlite3.Connection) -> bool:
     """Confirm the SQLite build this Python was linked against supports FTS5.
     Ubuntu's system SQLite has FTS5 enabled, but this is worth checking

@@ -73,7 +73,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from scriptures.db import connect  # noqa: E402
+from scriptures.db import compact, connect  # noqa: E402
 
 # Case-sensitive on purpose - see module docstring. "DISCOURS\w*" rather
 # than a literal "DISCOURSES" so an OCR misread of that specific word
@@ -201,7 +201,7 @@ def main() -> None:
             chars_removed += len(row["text"]) - len(cleaned)
             conn.execute("UPDATE verses SET text = ? WHERE id = ?", (cleaned, row["id"]))
             changed += 1
-    conn.commit()
+    compact(conn)
 
     print(f"Verses inspected: {len(rows)}")
     print(f"Verses changed:   {changed}")

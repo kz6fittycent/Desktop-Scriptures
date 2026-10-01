@@ -222,13 +222,27 @@ def parse_article(html: str, url: str, issue_year: int, issue_month: int) -> tup
     return citation, references
 
 
-def load(output_path: Path) -> dict[str, list[dict]]:
+def load(output_path: Path) -> dict[str, dict]:
+    """Already-harvested articles, keyed by URL - see save() for the
+    file's shape."""
     if not output_path.exists():
         return {}
-    return json.loads(output_path.read_text(encoding="utf-8")).get("citations", {})
+    articles = json.loads(output_path.read_text(encoding="utf-8")).get("articles", [])
+    return {article["url"]: article for article in articles}
 
 
-def save(output_path: Path, citations: dict[str, list[dict]]) -> None:
+def save(output_path: Path, articles: dict[str, dict]) -> None:
+    """One entry per citing article - its metadata once, plus every
+    verse reference it cites - rather than one entry per verse repeating
+    the same article's metadata under each verse it cites: an article
+    cites ~18 verses on average, so the per-verse shape repeated each
+    title/author/URL that many times over, and grew past GitHub's 50MB
+    large-file warning on its way toward the hard 100MB push limit.
+    citations.py inverts this back to per-verse at load time.
+
+    Written one article per line, sorted by URL, so a re-harvest's diff
+    (see .github/workflows/refresh-liahona-citations.yml - a human
+    reviews it before merging) is just one added line per new article."""
     output = {
         "_source": "churchofjesuschrist.org Ensign/Liahona magazine (English, 1971-present)",
         "_harvested": date.today().isoformat(),
@@ -236,17 +250,24 @@ def save(output_path: Path, citations: dict[str, list[dict]]) -> None:
             "Metadata only (article title, author, date, churchofjesuschrist.org URL) - "
             "never article text, per copyright. Citations are detected via each article's "
             "own hyperlinks to /study/scriptures/..., never by reading article prose. See "
-            "scripts/harvest_liahona_citations.py. Keyed by the exact verse reference string "
-            "used in the imported database (e.g. 'Genesis 1:1')."
+            "scripts/harvest_liahona_citations.py. One entry per article; each article's "
+            "references are the exact verse reference strings used in the imported database "
+            "(e.g. 'Genesis 1:1')."
         ),
-        "citations": citations,
     }
-    output_path.write_text(json.dumps(output, indent=2, ensure_ascii=False), encoding="utf-8")
+    header = json.dumps(output, indent=2, ensure_ascii=False)
+    lines = [
+        "  " + json.dumps(articles[url], ensure_ascii=False, separators=(", ", ": "))
+        for url in sorted(articles)
+    ]
+    # header ends in "\n}" - reopen it to append the articles array.
+    text = header[:-2] + ',\n  "articles": [\n' + ",\n".join(lines) + "\n  ]\n}\n"
+    output_path.write_text(text, encoding="utf-8")
 
 
 def harvest(conn, output_path: Path) -> None:
-    citations = load(output_path)
-    seen_urls = {c["url"] for entries in citations.values() for c in entries}
+    articles = load(output_path)
+    seen_urls = set(articles)
 
     today = date.today()
     stats = {
@@ -291,7 +312,7 @@ def harvest(conn, output_path: Path) -> None:
             if not references:
                 continue
 
-            resolved_any = False
+            resolved = []
             for reference in references:
                 exists = conn.execute(
                     "SELECT 1 FROM verses WHERE reference = ?", (reference,)
@@ -299,10 +320,10 @@ def harvest(conn, output_path: Path) -> None:
                 if not exists:
                     stats["unresolved_references"] += 1
                     continue
-                citations.setdefault(reference, []).append(dict(citation))
+                resolved.append(reference)
                 stats["citation_links"] += 1
-                resolved_any = True
-            if resolved_any:
+            if resolved:
+                articles[article_url] = {**citation, "references": sorted(resolved)}
                 stats["articles_with_citations"] += 1
                 seen_urls.add(article_url)
                 print(f"    {href}: {len(references)} reference(s)")
@@ -311,7 +332,7 @@ def harvest(conn, output_path: Path) -> None:
         # partway through (this can take well over an hour end-to-end)
         # keeps everything harvested so far, and re-running the script
         # picks up where it left off via seen_urls above.
-        save(output_path, citations)
+        save(output_path, articles)
 
     print()
     print("Harvest summary:")

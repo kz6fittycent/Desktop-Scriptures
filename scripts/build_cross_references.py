@@ -85,7 +85,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from scriptures.db import connect  # noqa: E402
+from scriptures.db import compact, connect  # noqa: E402
 
 # (book, volume, chapter, verse_start, verse_end,
 #  related_book, related_volume, related_chapter, related_verse_start, related_verse_end,
@@ -5489,6 +5489,7 @@ def main() -> None:
     db_path = Path(sys.argv[1]) if len(sys.argv) > 1 else PROJECT_ROOT / "data" / "scriptures.db"
     conn = connect(db_path)
     rebuild(conn)
+    compact(conn)
     conn.close()
     print()
     print(f"Database written to: {db_path}")

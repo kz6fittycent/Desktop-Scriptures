@@ -155,7 +155,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from scriptures.db import connect  # noqa: E402
+from scriptures.db import compact, connect  # noqa: E402
 
 VOLUME_NAME = "Joseph Smith Translation"  # display name; most LDS readers won't recognize "Inspired Version"
 VOLUME_SLUG = "inspired-version"
@@ -682,6 +682,7 @@ def main() -> None:
 
     if book_name == "--all":
         import_all(paragraphs, conn)
+        compact(conn)
         conn.close()
         print()
         print(f"Database written to: {db_path}")
@@ -716,6 +717,7 @@ def main() -> None:
     chapters = parse_book(paragraphs, book_name, start, end)
     print(f"Importing Joseph Smith Translation, {book_name} ...")
     summary = import_book(conn, book_name, chapters, testament_id, sort_order)
+    compact(conn)
     conn.close()
 
     print()

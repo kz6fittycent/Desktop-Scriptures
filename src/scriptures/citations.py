@@ -65,9 +65,18 @@ def _load_gc() -> dict[str, list[dict]]:
 
 
 def _load_liahona() -> dict[str, list[dict]]:
+    """liahona_citations.json is stored one entry per article (see
+    harvest_liahona_citations.py's save() for why), so it's inverted
+    here into the same per-verse shape as verse_citations.json."""
     global _liahona_cache
     if _liahona_cache is None:
-        _liahona_cache = _load(LIAHONA_CITATIONS_PATH)
+        _liahona_cache = {}
+        if LIAHONA_CITATIONS_PATH.exists():
+            data = json.loads(LIAHONA_CITATIONS_PATH.read_text(encoding="utf-8"))
+            for article in data["articles"]:
+                citation = {k: article[k] for k in ("talk_title", "speaker", "date", "url")}
+                for reference in article["references"]:
+                    _liahona_cache.setdefault(reference, []).append(citation)
     return _liahona_cache
 
 

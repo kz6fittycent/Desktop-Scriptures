@@ -60,7 +60,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from scriptures.db import connect  # noqa: E402
+from scriptures.db import compact, connect  # noqa: E402
 
 import harvest_citations as hc  # noqa: E402
 
@@ -628,6 +628,7 @@ def main() -> None:
     db_path = Path(sys.argv[1]) if len(sys.argv) > 1 else PROJECT_ROOT / "data" / "scriptures.db"
     conn = connect(db_path)
     rebuild(conn)
+    compact(conn)
     conn.close()
     print()
     print(f"Database written to: {db_path}")

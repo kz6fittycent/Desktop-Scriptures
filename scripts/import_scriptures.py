@@ -28,7 +28,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from scriptures.db import connect, fts5_available  # noqa: E402
+from scriptures.db import compact, connect, fts5_available  # noqa: E402
 
 VOLUMES_JSON = PROJECT_ROOT / "data" / "volumes.json"
 
@@ -206,6 +206,7 @@ def main() -> None:
     else:
         print("  Unmatched book names: none")
 
+    compact(conn)
     conn.close()
     print()
     print(f"Database written to: {db_path}")

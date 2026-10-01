@@ -30,8 +30,10 @@ sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 from harvest_liahona_citations import (  # noqa: E402
     _normalize_book_name,
     issue_url_prefix,
+    load,
     month_range,
     parse_article,
+    save,
 )
 
 # Trimmed but structurally real fragment: og:title meta tag, the
@@ -131,6 +133,39 @@ def test_parse_article_handles_missing_author() -> None:
     print("test_parse_article_handles_missing_author: PASSED")
 
 
+def test_save_and_load_round_trip_one_line_per_article() -> None:
+    """The file is stored per article (see save()'s docstring), one line
+    each, sorted by URL - and load() reads back exactly what was saved."""
+    import json
+    import shutil
+    import tempfile
+
+    articles = {
+        "https://example.org/b": {
+            "talk_title": "B", "speaker": "S", "date": "May 2020",
+            "url": "https://example.org/b", "references": ["Alma 32:21"],
+        },
+        "https://example.org/a": {
+            "talk_title": "A \u2014 \"quoted\"", "speaker": "", "date": "June 1999",
+            "url": "https://example.org/a", "references": ["Genesis 1:1", "Moroni 10:4"],
+        },
+    }
+    tmp_root = Path(tempfile.mkdtemp(prefix="liahona-save-test-"))
+    try:
+        path = tmp_root / "liahona_citations.json"
+        save(path, articles)
+        assert load(path) == articles
+        lines = path.read_text(encoding="utf-8").splitlines()
+        article_lines = [line for line in lines if line.startswith('  {"talk_title"')]
+        assert [json.loads(line.rstrip(","))["url"] for line in article_lines] == [
+            "https://example.org/a",
+            "https://example.org/b",
+        ]
+        print("test_save_and_load_round_trip_one_line_per_article: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     test_month_range_spans_year_boundary()
     test_month_range_single_month()
@@ -142,4 +177,5 @@ if __name__ == "__main__":
     test_parse_article_extracts_metadata_and_expands_verse_ranges()
     test_parse_article_returns_none_without_a_title()
     test_parse_article_handles_missing_author()
+    test_save_and_load_round_trip_one_line_per_article()
     print("All harvest_liahona_citations.py tests passed.")
