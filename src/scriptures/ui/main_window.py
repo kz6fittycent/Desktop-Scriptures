@@ -34,6 +34,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
+from scriptures import ai_setup
 from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
     Book,
@@ -74,6 +75,7 @@ from scriptures import tts
 from scriptures.temple_recommend import should_show_reminder as should_show_temple_reminder
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.study_index_dialog import StudyIndexDialog
+from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.cfm_box import CfmBox
@@ -641,6 +643,10 @@ class MainWindow(QMainWindow):
         # this menu only holds its configuration.
         ai_menu = self.menuBar().addMenu("&AI Integration")
 
+        ai_wizard_action = QAction("AI Setup Wizard...", self)
+        ai_wizard_action.triggered.connect(self._show_ai_setup_wizard)
+        ai_menu.addAction(ai_wizard_action)
+
         ai_settings_action = QAction("AI Settings...", self)
         ai_settings_action.triggered.connect(self._show_ai_settings)
         ai_menu.addAction(ai_settings_action)
@@ -648,6 +654,11 @@ class MainWindow(QMainWindow):
         study_index_action = QAction("Build Study Index...", self)
         study_index_action.triggered.connect(self._show_study_index)
         ai_menu.addAction(study_index_action)
+
+        ai_menu.addSeparator()
+        ai_guide_action = QAction("AI Setup Guide...", self)
+        ai_guide_action.triggered.connect(self._show_ai_setup_guide)
+        ai_menu.addAction(ai_guide_action)
 
         # No "About" dialog - the dropdown itself carries the same
         # verbiage a popup would have (version, the unofficial-app
@@ -1040,17 +1051,61 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, dialog.embedding_dimensions)
         self._update_search_placeholder()
 
-    def _show_study_index(self) -> None:
+    def _show_ai_setup_wizard(self) -> None:
+        wizard = AiSetupWizard(
+            {
+                "base_url": get_setting(self.conn, AI_BASE_URL_SETTING, ""),
+                "api_key": get_setting(self.conn, AI_API_KEY_SETTING, ""),
+                "model": get_setting(self.conn, AI_MODEL_SETTING, ""),
+                "embeddings_base_url": get_setting(self.conn, AI_EMBEDDING_BASE_URL_SETTING, ""),
+                "embedding_model": get_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, ""),
+            },
+            link_color=theming.get_app_palette(self._app_theme, self._app_accent).primary,
+            parent=self,
+        )
+        if wizard.exec() != QDialog.DialogCode.Accepted:
+            return
+        set_setting(self.conn, AI_ENABLED_SETTING, "true")
+        set_setting(self.conn, AI_BASE_URL_SETTING, wizard.base_url)
+        set_setting(self.conn, AI_API_KEY_SETTING, wizard.api_key)
+        set_setting(self.conn, AI_MODEL_SETTING, wizard.model)
+        set_setting(self.conn, AI_EMBEDDING_BASE_URL_SETTING, wizard.embeddings_base_url)
+        set_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, wizard.embeddings_api_key)
+        set_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, wizard.embedding_model)
+        set_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, wizard.embedding_dimensions)
+        self._update_search_placeholder()
+        if wizard.build_now:
+            self._show_study_index(start_immediately=True)
+
+    def _show_ai_setup_guide(self) -> None:
+        # A link inside the dialog rather than opening the browser
+        # directly - see the Family History reminder's history in this
+        # file: QDesktopServices.openUrl() could report success without
+        # anything visibly opening.
+        box = QMessageBox(self)
+        box.setWindowTitle("AI Setup Guide")
+        box.setTextFormat(Qt.TextFormat.RichText)
+        box.setText(
+            "Which AI service to use, which models work well on which computers, and "
+            "step-by-step setups for OpenAI, Ollama, and Ubuntu's inference snaps:<br><br>"
+            f"{guide_link_html(ai_setup.AI_SETUP_GUIDE_URL)}<br><br>"
+            "Or let <b>AI Integration → AI Setup Wizard...</b> find what's already "
+            "running on this computer and set it up for you."
+        )
+        box.exec()
+
+    def _show_study_index(self, start_immediately: bool = False) -> None:
         config = self._current_ai_config()
         embedding_model = get_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, "")
         if config is None or not embedding_model:
-            QMessageBox.information(
+            answer = QMessageBox.question(
                 self,
                 "Study Index",
-                "The study index is built through your own AI endpoint's embeddings. "
-                "Turn on AI-assisted search and enter an Embedding model under "
-                "AI Integration → AI Settings first.",
+                "The study index is built through an AI service's embedding model, and "
+                "that isn't set up yet. Open the AI Setup Wizard?",
             )
+            if answer == QMessageBox.StandardButton.Yes:
+                self._show_ai_setup_wizard()
             return
         dimensions = get_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, "")
         StudyIndexDialog(
@@ -1064,6 +1119,7 @@ class MainWindow(QMainWindow):
             embedding_model,
             int(dimensions) if dimensions else None,
             parent=self,
+            start_immediately=start_immediately,
         ).exec()
 
     def _update_search_placeholder(self) -> None:

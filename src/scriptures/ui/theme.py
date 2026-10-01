@@ -674,6 +674,24 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary};
             border: 2px solid {p.primary};
         }}
+        /* AI Setup Wizard choice cards (see ai_setup_wizard.py) - an
+           exclusive set of checkable buttons standing in for radio
+           buttons, for the same visibility reason as ToggleRow. */
+        QPushButton#choiceCard {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+            padding: 8px 12px;
+            text-align: left;
+        }}
+        QPushButton#choiceCard:hover {{
+            border: 1px solid {p.primary};
+        }}
+        QPushButton#choiceCard:checked {{
+            background-color: {p.card_bg};
+            border: 2px solid {p.primary};
+            font-weight: bold;
+        }}
         QLabel#templeRecommendMessage {{
             font-size: 15px;
             font-weight: bold;

@@ -30,12 +30,18 @@ from scriptures import study_index
 from scriptures.ai_client import AiConfig
 from scriptures.embeddings import IndexBuilder
 
-# Measured on the full corpus: the stored text plus its keyword index
-# take about 1.5 bytes per character of indexed text.
-_TEXT_BYTES_PER_CHAR = 1.5
-# Each vector number is stored as float16.
+# Measured on the full corpus (embeddinggemma, 768 dimensions, 16KB
+# pages - 246MB in all): the stored text, its details, and its keyword
+# index take about 2.6 bytes per character of indexed text; each vector
+# takes 2 bytes per dimension (float16) plus about 180 bytes for its
+# hash, row, and index entry.
+_TEXT_BYTES_PER_CHAR = 2.6
 _BYTES_PER_DIMENSION = 2
-_TYPICAL_DIMENSIONS = 1536
+_BYTES_PER_VECTOR_OVERHEAD = 180
+# Shown when the dimensions aren't known yet: 768 is what local
+# embedding models (embeddinggemma, nomic-embed-text) return; OpenAI's
+# text-embedding-3-small returns 1536 unless Embedding dimensions is set.
+_TYPICAL_DIMENSIONS = 768
 
 
 def _megabytes(n: float) -> str:
@@ -50,10 +56,15 @@ class StudyIndexDialog(QDialog):
         embedding_model: str,
         embedding_dimensions: int | None,
         parent: QWidget | None = None,
+        *,
+        start_immediately: bool = False,
     ):
         super().__init__(parent)
         self.setWindowTitle("Study Index")
-        self.setMinimumWidth(480)
+        # A fixed width lets adjustSize() work out the wrapped paragraphs'
+        # real height (see _fit_height) - with only a minimum width, Qt
+        # sized the dialog too short and clipped them.
+        self.setFixedWidth(560)
         self._scripture_conn = scripture_conn
         self._config = config
         self._model = embedding_model
@@ -113,6 +124,9 @@ class StudyIndexDialog(QDialog):
         layout.addLayout(buttons)
 
         self._refresh_estimate()
+        if start_immediately:
+            # e.g. the AI Setup Wizard's "start building when I click Finish"
+            self._toggle_build()
 
     def _refresh_estimate(self) -> None:
         QGuiApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
@@ -129,15 +143,19 @@ class StudyIndexDialog(QDialog):
 
         text_bytes = estimate.total_chars * _TEXT_BYTES_PER_CHAR
         if self._dimensions:
-            vector_bytes = estimate.unique_texts * self._dimensions * _BYTES_PER_DIMENSION
+            vector_bytes = estimate.unique_texts * (
+                self._dimensions * _BYTES_PER_DIMENSION + _BYTES_PER_VECTOR_OVERHEAD
+            )
             disk = f"about {_megabytes(text_bytes + vector_bytes)} of disk space in total"
         else:
-            vector_bytes = estimate.unique_texts * _TYPICAL_DIMENSIONS * _BYTES_PER_DIMENSION
+            vector_bytes = estimate.unique_texts * (
+                _TYPICAL_DIMENSIONS * _BYTES_PER_DIMENSION + _BYTES_PER_VECTOR_OVERHEAD
+            )
             disk = (
                 f"about {_megabytes(text_bytes)} of disk space plus the vectors - "
-                f"around {_megabytes(vector_bytes)} more for a typical "
-                f"{_TYPICAL_DIMENSIONS:,}-dimension model (setting Embedding "
-                "dimensions in AI Settings, where supported, makes this smaller)"
+                f"around {_megabytes(vector_bytes)} more for a typical local model "
+                f"({_TYPICAL_DIMENSIONS:,} dimensions), or about twice that for OpenAI's "
+                "unless Embedding dimensions is set in AI Settings"
             )
         pending = estimate.unique_texts - estimate.embedded
         if pending == 0:
@@ -155,6 +173,13 @@ class StudyIndexDialog(QDialog):
             )
             self._estimate_label.setTextFormat(Qt.TextFormat.RichText)
             self._build_button.setText("Resume" if estimate.embedded else "Build")
+        self._fit_height()
+
+    def _fit_height(self) -> None:
+        """The estimate's text (and so its height) changes over time."""
+        self.layout().activate()
+        self.setFixedHeight(self.layout().heightForWidth(self.width()) if self.layout().hasHeightForWidth()
+                            else self.sizeHint().height())
 
     def _toggle_build(self) -> None:
         if self._builder is not None:
