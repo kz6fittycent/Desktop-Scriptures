@@ -7,6 +7,7 @@ independent of the schema.
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -916,6 +917,54 @@ def get_topic_verses(conn: sqlite3.Connection, topic_id: int) -> list[Verse]:
         Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
         for r in rows
     ]
+
+
+@dataclass(frozen=True)
+class KeyPassage:
+    """One of a topic's curated landmark passages (topic_key_verses) - a
+    single verse or a range in one chapter, resolved to that chapter."""
+
+    reference: str
+    volume_slug: str
+    chapter_id: int
+    verse_start: int
+    verse_end: int
+    text: str
+
+
+_KEY_RANGE_RE = re.compile(r"^(?P<book>.+?)\s+(?P<chapter>\d+):(?P<start>\d+)(?:-(?P<end>\d+))?$")
+
+
+def get_topic_key_passages(conn: sqlite3.Connection, topic_id: int) -> list[KeyPassage]:
+    """A topic's key passages, most central first, with their verse text
+    joined. One that doesn't resolve (e.g. a book this database hasn't
+    synced in yet) is left out, like get_topic_verses."""
+    passages = []
+    for row in conn.execute(
+        "SELECT volume_slug, reference FROM topic_key_verses WHERE topic_id = ? ORDER BY sort_order",
+        (topic_id,),
+    ).fetchall():
+        match = _KEY_RANGE_RE.match(row["reference"])
+        if not match:
+            continue
+        start = int(match["start"])
+        end = int(match["end"]) if match["end"] else start
+        verses = conn.execute(
+            "SELECT v.chapter_id, v.text FROM verses v JOIN chapters c ON c.id = v.chapter_id "
+            "JOIN books b ON b.id = c.book_id JOIN volumes vol ON vol.id = b.volume_id "
+            "WHERE vol.slug = ? AND b.name = ? AND c.chapter_number = ? "
+            "AND v.verse_number BETWEEN ? AND ? ORDER BY v.verse_number",
+            (row["volume_slug"], match["book"], int(match["chapter"]), start, end),
+        ).fetchall()
+        if not verses:
+            continue
+        passages.append(
+            KeyPassage(
+                row["reference"], row["volume_slug"], verses[0]["chapter_id"], start, end,
+                " ".join(v["text"] for v in verses),
+            )
+        )
+    return passages
 
 
 def get_topic_talks(conn: sqlite3.Connection, topic_id: int) -> list[TopicTalk]:

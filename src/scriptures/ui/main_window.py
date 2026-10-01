@@ -55,6 +55,7 @@ from scriptures.data_access import (
     get_testaments,
     get_topic,
     get_topics,
+    get_topic_key_passages,
     get_topic_talks,
     get_topic_verses,
     get_verses,
@@ -1496,7 +1497,7 @@ class MainWindow(QMainWindow):
 
         verses = get_topic_verses(self.conn, topic_id)
         talks = get_topic_talks(self.conn, topic_id)
-        view = TopicDetailView(topic, verses, talks)
+        view = TopicDetailView(topic, verses, talks, get_topic_key_passages(self.conn, topic_id))
         # Same handler Search uses: resolve a chapter id into its full
         # volume/testament/book path and navigate there.
         view.scripture_selected.connect(self._on_search_result_selected)

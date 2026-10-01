@@ -12,9 +12,10 @@ Guide" card (see main_window.py's TOPICAL_GUIDE_ID):
 - A topic list, reusing CardGridWidget exactly like every other
   navigation level (wired up in main_window.py directly - there's no
   dedicated list widget here, unlike the detail view below).
-- TopicDetailView: one topic's description, then its supporting
-  scriptures (clickable through to the reading view, same interaction as
-  a search result) and citing talks (clickable out to
+- TopicDetailView: one topic's description, then its hand-curated key
+  scriptures (see scripts/build_topic_key_verses.py), its other supporting
+  scriptures (both clickable through to the reading view, same
+  interaction as a search result), and citing talks (clickable out to
   churchofjesuschrist.org, same interaction as the Citations tab).
 """
 
@@ -24,7 +25,7 @@ from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFrame, QLabel, QScrollArea, QVBoxLayout, QWidget
 
-from scriptures.data_access import Topic, TopicTalk, Verse
+from scriptures.data_access import KeyPassage, Topic, TopicTalk, Verse
 
 
 def _truncate(text: str, limit: int = 140) -> str:
@@ -38,9 +39,9 @@ class _ScriptureRow(QFrame):
 
     clicked = Signal(int)
 
-    def __init__(self, verse: Verse, parent: QWidget | None = None):
+    def __init__(self, chapter_id: int, reference: str, text: str, parent: QWidget | None = None):
         super().__init__(parent)
-        self._chapter_id = verse.chapter_id
+        self._chapter_id = chapter_id
         self.setObjectName("resultRow")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
@@ -48,12 +49,12 @@ class _ScriptureRow(QFrame):
         layout.setContentsMargins(12, 8, 12, 8)
         layout.setSpacing(2)
 
-        primary = QLabel(verse.reference)
+        primary = QLabel(reference)
         primary.setObjectName("resultPrimary")
         primary.setWordWrap(True)
         layout.addWidget(primary)
 
-        secondary = QLabel(_truncate(verse.text))
+        secondary = QLabel(_truncate(text))
         secondary.setObjectName("resultSecondary")
         secondary.setWordWrap(True)
         layout.addWidget(secondary)
@@ -111,6 +112,7 @@ class TopicDetailView(QWidget):
         topic: Topic,
         verses: list[Verse],
         talks: list[TopicTalk],
+        key_passages: list[KeyPassage] = (),
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
@@ -138,12 +140,27 @@ class TopicDetailView(QWidget):
         content_layout.setContentsMargins(0, 12, 4, 0)
         content_layout.setSpacing(12)
 
+        if key_passages:
+            header = QLabel("Key Scriptures")
+            header.setObjectName("searchSectionHeader")
+            content_layout.addWidget(header)
+            for passage in key_passages:
+                row = _ScriptureRow(passage.chapter_id, passage.reference, passage.text)
+                row.clicked.connect(self.scripture_selected)
+                content_layout.addWidget(row)
+
+        # A keyword-matched verse that's already inside a key passage
+        # isn't listed again below it.
+        covered = {
+            (p.chapter_id, n) for p in key_passages for n in range(p.verse_start, p.verse_end + 1)
+        }
+        verses = [v for v in verses if (v.chapter_id, v.verse_number) not in covered]
         if verses:
-            header = QLabel("Scriptures")
+            header = QLabel("More Scriptures" if key_passages else "Scriptures")
             header.setObjectName("searchSectionHeader")
             content_layout.addWidget(header)
             for verse in verses:
-                row = _ScriptureRow(verse)
+                row = _ScriptureRow(verse.chapter_id, verse.reference, verse.text)
                 row.clicked.connect(self.scripture_selected)
                 content_layout.addWidget(row)
 
@@ -154,7 +171,7 @@ class TopicDetailView(QWidget):
             for talk in talks:
                 content_layout.addWidget(_TalkRow(talk))
 
-        if not verses and not talks:
+        if not verses and not talks and not key_passages:
             empty = QLabel("No references yet for this topic.")
             empty.setObjectName("resultSecondary")
             empty.setWordWrap(True)

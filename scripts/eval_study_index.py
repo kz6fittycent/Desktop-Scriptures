@@ -120,23 +120,36 @@ def duplicate_slots(hits: list[si.SearchHit]) -> int:
     return duplicates
 
 
+def chat(chat_url: str, chat_model: str, messages: list[dict], temperature: float) -> str:
+    request = urllib.request.Request(
+        chat_url.rstrip("/") + "/chat/completions",
+        data=json.dumps({"model": chat_model, "temperature": temperature, "messages": messages}).encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=300) as response:
+        return json.loads(response.read())["choices"][0]["message"]["content"]
+
+
+# The main database, for Topical Guide key passages (see main()).
+SCRIPTURES_CONN = None
+
+
 def select(chat_url: str, chat_model: str, question: str, vector, index) -> tuple[list, bool]:
     """The app's AI-search pipeline, synchronously: candidates, then the
     chat model's choice (see study_ask.py)."""
     from scriptures import study_ask
 
-    hits = study_ask.gather_candidates(index, [question], question, vector)
-    request = urllib.request.Request(
-        chat_url.rstrip("/") + "/chat/completions",
-        data=json.dumps({
-            "model": chat_model, "temperature": 0.1,
-            "messages": study_ask.selection_messages([question], hits),
-        }).encode(),
-        headers={"Content-Type": "application/json"},
-    )
+    topic_ids = None
+    if SCRIPTURES_CONN is not None:
+        topics = study_ask.all_topics(SCRIPTURES_CONN)
+        try:
+            content = chat(chat_url, chat_model, study_ask.topic_messages([question], topics), 0)
+            topic_ids = study_ask.parse_topic_choice(content, topics)
+        except (OSError, ValueError, KeyError, IndexError):
+            topic_ids = None
+    hits = study_ask.gather_candidates(index, [question], question, vector, SCRIPTURES_CONN, topic_ids)
     try:
-        with urllib.request.urlopen(request, timeout=300) as response:
-            content = json.loads(response.read())["choices"][0]["message"]["content"]
+        content = chat(chat_url, chat_model, study_ask.selection_messages([question], hits), 0.1)
         chosen = study_ask.parse_selection(content, len(hits))
     except (OSError, ValueError, KeyError, IndexError):
         chosen = None
@@ -152,13 +165,25 @@ def main() -> None:
     parser.add_argument("model")
     parser.add_argument("--api-key", default="")
     parser.add_argument("--select", nargs=2, metavar=("CHAT_URL", "CHAT_MODEL"))
+    parser.add_argument(
+        "--questions", default=str(QUESTIONS_PATH),
+        help="question file (default: study_index_eval_questions.json; see also "
+        "study_index_heldout_questions.json)",
+    )
+    parser.add_argument(
+        "--scriptures-db", default=str(PROJECT_ROOT / "data" / "scriptures.db"),
+        help="main database, for Topical Guide key passages (default: data/scriptures.db)",
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
+    global SCRIPTURES_CONN
+    SCRIPTURES_CONN = sqlite3.connect(f"file:{args.scriptures_db}?mode=ro", uri=True)
+    SCRIPTURES_CONN.row_factory = sqlite3.Row
     conn = sqlite3.connect(f"file:{args.index_db}?mode=ro", uri=True)
     conn.row_factory = sqlite3.Row
     index = si.StudyIndex(conn)
-    questions = json.loads(QUESTIONS_PATH.read_text(encoding="utf-8"))["questions"]
+    questions = json.loads(Path(args.questions).read_text(encoding="utf-8"))["questions"]
 
     mixed_ranks, scripture_ranks, selected_ranks, dupes, fallbacks = [], [], [], 0, 0
     for item in questions:

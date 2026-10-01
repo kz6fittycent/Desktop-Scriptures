@@ -44,6 +44,7 @@ from scriptures import study_index
 from scriptures.ai_client import AUTH_ERRORS, AiConfig, build_request
 from scriptures.ask import citations_for, extract_keywords
 from scriptures.citations import Citation
+from scriptures.data_access import get_topic_key_passages
 from scriptures.embeddings import QueryEmbedder
 
 MAX_SELECTED = 10
@@ -75,6 +76,32 @@ CANDIDATE_GROUPS = (
     ("other", {"discourse", "topic", "note"}, None, 3),
 )
 CANDIDATES = sum(group[3] for group in CANDIDATE_GROUPS)
+# Topical Guide key passages (see scripts/build_topic_key_verses.py) added
+# to the candidates: from the best-matching topics, the most central few
+# of each. They catch the landmark verse a question is really after when
+# its wording doesn't match the question's at all - Moroni 10:4 never says
+# "Book of Mormon", so "how can I know the Book of Mormon is true" missed
+# it entirely by meaning and by words.
+KEY_TOPICS = 3
+KEY_PASSAGES_PER_TOPIC = 3
+# Key passages are listed after this many of the index's own Standard
+# Works candidates, not first: small models favor whatever comes first in
+# a list, and a wrongly matched topic's passages (Judgment's "judge not"
+# for a question about the Book of Mormon's truth) got picked from the
+# front just for being there.
+KEY_PASSAGES_AFTER = 8
+
+# Which topics a question is about is asked of the chat model - picking
+# from 61 names is easy even for a small model, unlike recalling verses -
+# since matching by meaning chose Judgment and Restoration over Testimony
+# for "how can I know the Book of Mormon is true". The index's own topic
+# ranking is the fallback when the model's reply isn't usable.
+TOPIC_PROMPT = (
+    "You match a question to Topical Guide topics. Reply with ONLY a JSON "
+    "array of the numbers of the 1 or 2 topics that best fit the question, "
+    "most relevant first - e.g. [12] or [12, 40]. If none clearly fit, reply []."
+)
+
 # Shown, per tier, when the chat model's selection isn't usable.
 FALLBACK_PER_TIER = (4, 2, 1, 1)
 # Always shown, per tier, even when the chat model picked none from it:
@@ -205,15 +232,96 @@ def by_tier(hits: list[study_index.SearchHit]) -> list[study_index.SearchHit]:
     return sorted(hits, key=tier)  # stable
 
 
+def topic_messages(questions: list[str], topics: list[tuple[int, str]]) -> list[dict]:
+    listing = "\n".join(f"{number}. {name}" for number, (_id, name) in enumerate(topics, start=1))
+    return [
+        {"role": "system", "content": TOPIC_PROMPT},
+        {"role": "user", "content": f"Question: {' '.join(questions)}\n\nTopics:\n{listing}"},
+    ]
+
+
+def parse_topic_choice(content: str, topics: list[tuple[int, str]]) -> list[int] | None:
+    """Topic ids the model chose (at most KEY_TOPICS - it sometimes lists
+    more than asked), [] for an explicit "none fit", None if unusable."""
+    chosen = parse_selection(content, len(topics))
+    if chosen is None:
+        return None
+    return [topics[i][0] for i in chosen[:KEY_TOPICS]]
+
+
+def all_topics(conn: sqlite3.Connection) -> list[tuple[int, str]]:
+    return [(r[0], r[1]) for r in conn.execute("SELECT id, name FROM topics ORDER BY name")]
+
+
+def _key_passage_hits(
+    conn: sqlite3.Connection,
+    index: study_index.StudyIndex,
+    query: str,
+    vector: list[float] | None,
+    already: list[study_index.SearchHit],
+    topic_ids: list[int] | None = None,
+) -> list[study_index.SearchHit]:
+    """Key passages of the given topics (or, without any, of the index's
+    best-matching ones) as scripture candidates, skipping any that
+    overlap a scripture candidate already found."""
+    def overlaps(hit: study_index.SearchHit, book: str, chapter: int, start: int, end: int) -> bool:
+        m = hit.meta
+        return (
+            hit.kind == "scripture" and m.get("book") == book and m.get("chapter") == chapter
+            and m.get("verse_start", 0) <= end and m.get("verse_end", 0) >= start
+        )
+
+    if topic_ids is None:
+        topic_ids = [
+            h.meta["topic_id"]
+            for h in index.search(query, vector, kinds={"topic"}, limit=KEY_TOPICS)
+            if h.meta.get("topic_id") is not None
+        ]
+    found: list[study_index.SearchHit] = []
+    for topic_id in topic_ids:
+        row = conn.execute("SELECT name, slug FROM topics WHERE id = ?", (topic_id,)).fetchone()
+        if row is None:
+            continue
+        topic_name, topic_slug = row[0], row[1]
+        for passage in get_topic_key_passages(conn, topic_id)[:KEY_PASSAGES_PER_TOPIC]:
+            book, _, rest = passage.reference.rpartition(" ")
+            chapter = int(rest.split(":")[0])
+            if any(overlaps(h, book, chapter, passage.verse_start, passage.verse_end) for h in already + found):
+                continue
+            found.append(
+                study_index.SearchHit(
+                    piece_id=0,
+                    key=f"key:{topic_slug}:{passage.reference}",
+                    kind="scripture",
+                    text=f"{passage.reference}\n{passage.text}",
+                    volume_slug=passage.volume_slug,
+                    chapter_id=passage.chapter_id,
+                    meta={
+                        "reference": passage.reference, "book": book, "chapter": chapter,
+                        "verse_start": passage.verse_start, "verse_end": passage.verse_end,
+                        "key_topic": topic_name,
+                    },
+                    score=0.0,
+                    semantic_rank=None,
+                    keyword_rank=None,
+                )
+            )
+    return found
+
+
 def gather_candidates(
     index: study_index.StudyIndex,
     questions: list[str],
     query: str,
     vector: list[float] | None,
+    conn: sqlite3.Connection | None = None,
+    topic_ids: list[int] | None = None,
 ) -> list[study_index.SearchHit]:
     """The candidates the chat model chooses from: one search per
-    CANDIDATE_GROUPS group, or - when a follow-up asked for one volume or
-    kind of source (detect_filters) - a single search restricted to it."""
+    CANDIDATE_GROUPS group plus - given the main database `conn` - the
+    best-matching Topical Guide topics' key passages, listed first; or,
+    when a follow-up asked for one volume or kind of source
+    (detect_filters), a single search restricted to it."""
     kinds, volumes = detect_filters(questions)
     if kinds:
         return index.search(query, vector, kinds=kinds, volume_slugs=volumes, limit=CANDIDATES)
@@ -225,6 +333,9 @@ def gather_candidates(
                 kind_limits=study_index.MIXED_KIND_LIMITS, limit=count,
             )
         )
+    if conn is not None:
+        keys = _key_passage_hits(conn, index, query, vector, hits, topic_ids)
+        hits = hits[:KEY_PASSAGES_AFTER] + keys + hits[KEY_PASSAGES_AFTER:]
     return hits
 
 
@@ -283,9 +394,12 @@ def selection_messages(questions: list[str], hits: list[study_index.SearchHit]) 
     lines = []
     for number, hit in enumerate(hits, start=1):
         heading, _, body = hit.text.partition("\n")
+        label = _KIND_LABELS.get(hit.kind, hit.kind)
         if hit.kind == "scripture":
             heading = hit.meta.get("reference", heading)
-        line = f"[{number}] ({_KIND_LABELS.get(hit.kind, hit.kind)}) {heading}"
+            if hit.meta.get("key_topic"):
+                label = f"Scripture - a key passage on {hit.meta['key_topic']}"
+        line = f"[{number}] ({label}) {heading}"
         if body:
             line += f" - {_snippet(body)}"
         lines.append(line)
@@ -462,16 +576,53 @@ class StudyQuestionAsker(QObject):
     def _maybe_search(self) -> None:
         if not (self._embedded and self._loaded):
             return
+        if detect_filters(self._questions)[0] is not None:
+            self._gather(None)  # a filtered follow-up uses no topics
+            return
+        self._topics = all_topics(self.conn)
+        self._manager = QNetworkAccessManager(self)
+        payload = json.dumps(
+            {
+                "model": self._chat_config.model or "gpt-4o-mini",
+                "temperature": 0,
+                "messages": topic_messages(self._questions, self._topics),
+            }
+        ).encode("utf-8")
+        self._topic_reply = self._manager.post(
+            build_request(self._chat_config, "/chat/completions"), payload
+        )
+        self._topic_reply.finished.connect(self._on_topics)
+
+    def _on_topics(self) -> None:
+        reply = self._topic_reply
+        topic_ids = None
+        if reply.error() == QNetworkReply.NetworkError.NoError:
+            try:
+                content = json.loads(bytes(reply.readAll()))["choices"][0]["message"]["content"]
+                topic_ids = parse_topic_choice(content, self._topics)
+            except (ValueError, KeyError, IndexError, TypeError):
+                topic_ids = None
+        elif reply.error() in AUTH_ERRORS:
+            reply.deleteLater()
+            self.failed.emit(reply.errorString(), True)
+            return
+        reply.deleteLater()
+        self._gather(topic_ids)
+
+    def _gather(self, topic_ids: list[int] | None) -> None:
         self._hits = gather_candidates(
             self._index,
             self._questions,
             self._query,
             self._vector if self._index.is_loaded() else None,
+            self.conn,
+            topic_ids,
         )
         if not self._hits:
             self.succeeded.emit([], "")
             return
-        self._manager = QNetworkAccessManager(self)
+        if self._manager is None:
+            self._manager = QNetworkAccessManager(self)
         payload = json.dumps(
             {
                 "model": self._chat_config.model or "gpt-4o-mini",

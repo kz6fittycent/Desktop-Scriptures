@@ -102,7 +102,7 @@ Features under consideration for future versions:
 - [ ] Apocrypha?
 - [x] Wiki
 - [x] JST (v1.3)
-- [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics; v2.2.2 - expanded further to 61 topics and put in alphabetical order)
+- [x] Topical Guide (v2.0.1 - expanded from 25 to 46 topics; v2.2.2 - expanded further to 61 topics and put in alphabetical order; v2.3.1 - each topic now opens with hand-curated Key Scriptures, 368 landmark passages in all - Moroni 10:4-5 for Testimony, D&C 132:19 for Marriage, Moses 1:39 for the Plan of Salvation - chosen from the verses General Conference talks and Ensign/Liahona articles on each topic cite most, then checked by hand against the text; see `scripts/build_topic_key_verses.py`. AI-assisted search draws on them too, so a question finds a topic's landmark verses even when they don't share its words)
 - [x] Syncing capability (v2.0 - point at a folder already kept in sync by Nextcloud, OneDrive, Google Drive, Dropbox, or similar)
 - [x] Theme enhancements (v2.0 - a choice of accent colors, loosely inspired by Ubuntu's Yaru accent picker)
 - [x] Listen to the scriptures - voice capability (v2.2.1 - a "Listen" button in the reading view reads the current chapter aloud verse by verse, highlighting each as it goes, using a fully offline neural TTS engine (Piper); pick from 4 bundled voices - American or British English, male or female - under Menu → Voice)

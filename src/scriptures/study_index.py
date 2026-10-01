@@ -447,6 +447,17 @@ def _topic_pieces(conn: sqlite3.Connection) -> list[Piece]:
             )
         ]
         body = topic["description"]
+        key = [
+            r["reference"]
+            for r in conn.execute(
+                "SELECT reference FROM topic_key_verses WHERE topic_id = ? ORDER BY sort_order",
+                (topic["id"],),
+            )
+        ]
+        if key:
+            # The curated landmarks (see build_topic_key_verses.py) - what
+            # a question about this topic most likely needs.
+            body += "\nKey scriptures: " + "; ".join(key)
         if references:
             body += "\nScriptures: " + "; ".join(references)
         pieces.append(

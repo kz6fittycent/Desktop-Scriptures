@@ -125,6 +125,24 @@ CREATE TABLE IF NOT EXISTS topic_talks (
 
 CREATE INDEX IF NOT EXISTS idx_topic_talks_topic ON topic_talks(topic_id);
 
+-- Each topic's hand-curated landmark passages (e.g. Moroni 10:4-5 for
+-- Testimony) - see scripts/build_topic_key_verses.py for how they were
+-- chosen and why topic_verses' keyword-matched verses weren't enough.
+-- `reference` is one verse or a range within one chapter ("Moroni
+-- 10:4-5"); `volume_slug` disambiguates it the same way topic_verses'
+-- does. Developer-authored, synced forward like the rest of the Topical
+-- Guide (see db.py's _sync_bundled_topic_key_verses).
+CREATE TABLE IF NOT EXISTS topic_key_verses (
+    id           INTEGER PRIMARY KEY,
+    topic_id     INTEGER NOT NULL REFERENCES topics(id),
+    volume_slug  TEXT NOT NULL,
+    reference    TEXT NOT NULL,
+    sort_order   INTEGER NOT NULL,
+    UNIQUE (topic_id, reference)
+);
+
+CREATE INDEX IF NOT EXISTS idx_topic_key_verses_topic ON topic_key_verses(topic_id);
+
 -- Cross-references: passages that quote, closely paraphrase, or are a JST/
 -- Moses-style translation-revision of another passage elsewhere in the
 -- corpus - developer-curated like the Topical Guide above, and synced

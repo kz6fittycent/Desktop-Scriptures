@@ -35,12 +35,16 @@ from test_study_index import _Env, _with_fake_works, fake_embedding  # noqa: E40
 
 
 class ChatAndEmbeddingsServer:
-    """`chat_reply` is the assistant message content to send back (or an
-    (http_status, body) tuple to fail with)."""
+    """`chat_reply` answers the candidate-selection request (or an
+    (http_status, body) tuple fails it); `topic_reply` answers the topic
+    request that comes first (see study_ask.TOPIC_PROMPT) - "[]", no
+    topic, by default. `chat_requests` records selection requests only."""
 
     def __init__(self):
         self.chat_reply: object = "[]"
+        self.topic_reply: object = "[]"
         self.chat_requests: list[dict] = []
+        self.topic_requests: list[dict] = []
         server = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -61,12 +65,14 @@ class ChatAndEmbeddingsServer:
                     data = [{"index": i, "embedding": fake_embedding(t)} for i, t in enumerate(body["input"])]
                     self._send(200, {"data": data})
                     return
-                server.chat_requests.append(body)
-                if isinstance(server.chat_reply, tuple):
-                    status, payload = server.chat_reply
+                is_topic = body["messages"][0]["content"] == study_ask.TOPIC_PROMPT
+                (server.topic_requests if is_topic else server.chat_requests).append(body)
+                reply = server.topic_reply if is_topic else server.chat_reply
+                if isinstance(reply, tuple):
+                    status, payload = reply
                     self._send(status, payload)
                     return
-                self._send(200, {"choices": [{"message": {"content": server.chat_reply}}]})
+                self._send(200, {"choices": [{"message": {"content": reply}}]})
 
         self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
@@ -263,14 +269,71 @@ def test_candidates_cover_every_group_and_results_follow_tier_order() -> None:
         env.close()
 
 
+def test_parse_topic_choice() -> None:
+    topics = [(10, "Faith"), (20, "Hope"), (30, "Charity"), (40, "Prayer")]
+    assert study_ask.parse_topic_choice("[3]", topics) == [30]
+    # It sometimes lists more than asked; at most KEY_TOPICS are kept.
+    assert study_ask.parse_topic_choice("[1, 2, 3, 4]", topics) == [10, 20, 30][: study_ask.KEY_TOPICS]
+    assert study_ask.parse_topic_choice("[]", topics) == []
+    assert study_ask.parse_topic_choice("Faith, I think", topics) is None
+    print("test_parse_topic_choice: PASSED")
+
+
+@_with_fake_works
+def test_key_passages_from_the_chosen_topic_join_the_candidates() -> None:
+    env = _Env()
+    server = ChatAndEmbeddingsServer()
+    try:
+        # A key passage the question's words would never find: Faith's
+        # (fixture) key passage is Alma 32:28, about planting a seed.
+        topic_id = env.conn.execute("SELECT id FROM topics WHERE slug = 'faith'").fetchone()[0]
+        env.conn.execute(
+            "INSERT INTO topic_key_verses (topic_id, volume_slug, reference, sort_order) "
+            "VALUES (?, 'book-of-mormon', 'Alma 32:28', 1)",
+            (topic_id,),
+        )
+        env.conn.commit()
+        assert env.build()["ok"]
+        index = si.StudyIndex(env.index_conn)
+        question = "light and darkness"
+
+        hits = study_ask.gather_candidates(index, [question], question, None, env.conn, [topic_id])
+        keys = [h for h in hits if h.meta.get("key_topic")]
+        assert [h.meta["reference"] for h in keys] == ["Alma 32:28"], [h.meta for h in hits]
+        assert keys[0].chapter_id == 2 and keys[0].volume_slug == "book-of-mormon"
+        prompt = study_ask.selection_messages([question], hits)[1]["content"]
+        assert "(Scripture - a key passage on Faith) Alma 32:28" in prompt, prompt
+        # No topics, no key passages.
+        assert not [h for h in study_ask.gather_candidates(index, [question], question, None, env.conn, [])
+                    if h.meta.get("key_topic")]
+
+        # End to end: the topic request is made first, listing the topics.
+        # (By meaning, this tiny fixture's search already returns every
+        # scripture window - including Alma 32:28's - so the key passage is
+        # correctly skipped there as a duplicate.)
+        server.topic_reply = "[1]"
+        server.chat_reply = "[1]"
+        result = _ask(env, server, [question])
+        assert result.get("results"), result
+        assert "1. Faith" in server.topic_requests[0]["messages"][1]["content"]
+        listed = server.chat_requests[0]["messages"][1]["content"]
+        assert "Alma 32:2" in listed  # the passage is offered either way
+        print("test_key_passages_from_the_chosen_topic_join_the_candidates: PASSED")
+    finally:
+        server.close()
+        env.close()
+
+
 if __name__ == "__main__":
     app = QCoreApplication.instance() or QCoreApplication(sys.argv)
     test_parse_selection()
     test_follow_up_filters()
+    test_parse_topic_choice()
     test_retrieval_query_and_prompt()
     test_model_choice_orders_results_and_text_comes_from_the_database()
     test_falls_back_to_index_order_when_the_model_reply_is_unusable()
     test_auth_failure_is_reported()
     test_every_kind_resolves_to_something_clickable()
     test_candidates_cover_every_group_and_results_follow_tier_order()
+    test_key_passages_from_the_chosen_topic_join_the_candidates()
     print("All study ask tests passed.")

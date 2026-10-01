@@ -417,6 +417,7 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                                 ),
                             )
         _sync_bundled_topics(conn)
+        _sync_bundled_topic_key_verses(conn)
         _sync_bundled_cross_references(conn)
         conn.commit()
     finally:
@@ -486,6 +487,27 @@ def _sync_bundled_topics(conn: sqlite3.Connection) -> None:
                 )
 
 
+def _sync_bundled_topic_key_verses(conn: sqlite3.Connection) -> None:
+    """Key verses are a small, whole curated list per topic - mirrored
+    from the bundled copy exactly (replaced, not merged), so a passage
+    removed or reordered upstream is removed or reordered here too.
+    Matched to local topics by slug. A bundled database from before this
+    table existed has none to copy, and leaves the local table as is."""
+    has_table = conn.execute(
+        "SELECT 1 FROM bundled.sqlite_master WHERE type = 'table' AND name = 'topic_key_verses'"
+    ).fetchone()
+    if not has_table:
+        return
+    conn.execute("DELETE FROM topic_key_verses")
+    conn.execute(
+        "INSERT INTO topic_key_verses (topic_id, volume_slug, reference, sort_order) "
+        "SELECT t.id, bk.volume_slug, bk.reference, bk.sort_order "
+        "FROM bundled.topic_key_verses bk "
+        "JOIN bundled.topics bt ON bt.id = bk.topic_id "
+        "JOIN topics t ON t.slug = bt.slug"
+    )
+
+
 def _sync_bundled_cross_references(conn: sqlite3.Connection) -> None:
     """Cross-references are developer-authored, like topics above - synced
     the same way, matched by the full (volume/book/chapter/verse-range)
@@ -530,12 +552,25 @@ def _sync_bundled_cross_references(conn: sqlite3.Connection) -> None:
             )
 
 
+# Settings connect() writes into whatever database it opens that must never
+# ship in data/scriptures.db: a device_id there would give every fresh
+# install the same sync identity (see _ensure_device_id), and the FTS
+# backfill flag describes one particular copy's history, not the data.
+_DEVICE_SPECIFIC_SETTINGS = ("device_id", "journal_entries_fts_backfilled")
+
+
 def compact(conn: sqlite3.Connection) -> None:
-    """Commit, then VACUUM away the free pages a bulk import/rebuild leaves
-    behind. Every script under scripts/ that writes data/scriptures.db
-    calls this last: that file is committed to git and shipped as-is, and
-    left uncompacted it had grown to ~85MB with ~28MB of it empty pages -
-    close enough to GitHub's 100MB per-file push limit to matter."""
+    """Prepare data/scriptures.db for shipping: drop the device-specific
+    settings connect() just added (see _DEVICE_SPECIFIC_SETTINGS), commit,
+    then VACUUM away the free pages a bulk import/rebuild leaves behind.
+    Every script under scripts/ that writes data/scriptures.db calls this
+    last: that file is committed to git and shipped as-is, and left
+    uncompacted it had grown to ~85MB with ~28MB of it empty pages - close
+    enough to GitHub's 100MB per-file push limit to matter."""
+    conn.execute(
+        f"DELETE FROM settings WHERE key IN ({','.join('?' * len(_DEVICE_SPECIFIC_SETTINGS))})",
+        _DEVICE_SPECIFIC_SETTINGS,
+    )
     conn.commit()
     conn.execute("VACUUM")
 
