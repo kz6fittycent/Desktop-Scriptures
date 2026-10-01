@@ -67,6 +67,7 @@ from scriptures.data_access import (
     get_tag_targets,
     search_chapters,
     search_journal_entries,
+    search_lexicon,
     search_notes,
     search_tags_by_name,
     search_verse_references,
@@ -74,6 +75,7 @@ from scriptures.data_access import (
 )
 from scriptures.study_ask import StudySearch
 from scriptures.ui.ai_conversation import AiConversationSection
+from scriptures.ui.lexicon_dialog import LexiconDialog
 from scriptures.ui.export import export_search_results
 from scriptures.ui.result_row import ResultRow, truncate_text as _truncate
 
@@ -250,6 +252,9 @@ class SearchView(QWidget):
         chapter_rows = [
             ResultRow(m.chapter_id, m.label) for m in search_chapters(self.conn, query)
         ]
+        # A word ("Messiah") or Strong's number ("H4899") - the Hebrew/
+        # Aramaic words it means or translates (see search_lexicon).
+        lexicon_entries = search_lexicon(self.conn, query)
         seen_verse_ids: set[int] = set()
         verse_rows = []
         for v in [*search_verse_references(self.conn, query), *search_verses(self.conn, query)]:
@@ -271,12 +276,26 @@ class SearchView(QWidget):
         self._add_section("Notes", note_rows)
         self._add_journal_section(journal_rows)
         self._add_section("Chapters", chapter_rows)
+        if lexicon_entries:
+            header = QLabel("Hebrew Words")
+            header.setObjectName("searchSectionHeader")
+            self._results_layout.addWidget(header)
+            for entry in lexicon_entries:
+                row = ResultRow(
+                    0,
+                    # Transliteration first: Qt lays a line out right to left
+                    # when it *starts* with Hebrew, which right-aligned the row.
+                    f"{entry.transliteration} · {entry.lemma} · Strong's {entry.strongs}",
+                    _truncate(f"{entry.gloss} - KJV: {entry.kjv_renderings}"),
+                )
+                row.clicked.connect(lambda _id, s=entry.strongs: LexiconDialog(self.conn, s, self).exec())
+                self._results_layout.addWidget(row)
         self._add_section("Verses", verse_rows)
 
         # Not _show_message() - that clears the whole layout, which would
         # also wipe the AI placeholder/section above if one is pending or
         # already showing. A plain inline note alongside it instead.
-        if not (chapter_rows or verse_rows or note_rows or journal_rows or matched_tags):
+        if not (chapter_rows or verse_rows or note_rows or journal_rows or matched_tags or lexicon_entries):
             no_keyword_results = QLabel(
                 f'No keyword results for "{query}".'
                 if self.ai_config is not None

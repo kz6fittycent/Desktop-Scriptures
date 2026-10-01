@@ -33,6 +33,7 @@ from scriptures.ai_client import AiConfig
 from scriptures.ask import AskedReference, QuestionAsker
 from scriptures.citations import Citation
 from scriptures.study_ask import StudyQuestionAsker, StudyResult, StudySearch
+from scriptures.ui.lexicon_dialog import LexiconDialog
 from scriptures.ui.result_row import ResultRow, truncate_text
 
 DISCLAIMER = (
@@ -289,6 +290,12 @@ class AiConversationSection(QWidget):
             self._thread_layout.addWidget(note_label)
 
     def _add_study_result(self, result: StudyResult) -> None:
+        if result.strongs:
+            # ResultRow's id is unused here - the row opens the lexicon entry.
+            row = ResultRow(0, result.title, f"{result.kind_label} · {truncate_text(result.detail)}")
+            row.clicked.connect(lambda _id, s=result.strongs: LexiconDialog(self.conn, s, self).exec())
+            self._thread_layout.addWidget(row)
+            return
         if result.url:
             self._thread_layout.addWidget(_LinkRow(result.title, result.kind_label, result.url))
             return

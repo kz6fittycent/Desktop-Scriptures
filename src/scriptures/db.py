@@ -418,6 +418,7 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                             )
         _sync_bundled_topics(conn)
         _sync_bundled_topic_key_verses(conn)
+        _sync_bundled_lexicon(conn)
         _sync_bundled_cross_references(conn)
         conn.commit()
     finally:
@@ -505,6 +506,25 @@ def _sync_bundled_topic_key_verses(conn: sqlite3.Connection) -> None:
         "FROM bundled.topic_key_verses bk "
         "JOIN bundled.topics bt ON bt.id = bk.topic_id "
         "JOIN topics t ON t.slug = bt.slug"
+    )
+
+
+def _sync_bundled_lexicon(conn: sqlite3.Connection) -> None:
+    """The lexicon is developer-authored reference data - mirrored from
+    the bundled copy exactly, like topic_key_verses (a corrected
+    definition upstream replaces the old one here). A bundled database
+    from before the lexicon existed leaves the local table as is."""
+    has_table = conn.execute(
+        "SELECT 1 FROM bundled.sqlite_master WHERE type = 'table' AND name = 'lexicon_entries'"
+    ).fetchone()
+    if not has_table:
+        return
+    conn.execute("DELETE FROM lexicon_entries")
+    conn.execute(
+        "INSERT INTO lexicon_entries (strongs, language, lemma, transliteration, pronunciation, "
+        "derivation, definition, kjv_renderings, gloss) "
+        "SELECT strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
+        "kjv_renderings, gloss FROM bundled.lexicon_entries"
     )
 
 

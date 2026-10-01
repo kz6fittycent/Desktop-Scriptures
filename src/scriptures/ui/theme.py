@@ -692,6 +692,10 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             border: 2px solid {p.primary};
             font-weight: bold;
         }}
+        /* The word itself in a lexicon entry (see lexicon_dialog.py). */
+        QLabel#lexiconHebrew {{
+            font-size: 34px;
+        }}
         QLabel#templeRecommendMessage {{
             font-size: 15px;
             font-weight: bold;

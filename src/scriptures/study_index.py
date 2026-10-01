@@ -30,6 +30,8 @@ What gets indexed ("pieces"):
   cites. Metadata only, never talk/article text (see citations.py).
 - note: the reader's own notes. Journal entries are deliberately NOT
   included.
+- lexicon: each Hebrew/Aramaic word in the lexicon (Strong's number,
+  meaning, definition, derivation, KJV renderings).
 
 Storage lives in its own SQLite file next to the main database
 (index_path_for), never inside it: in a source checkout the main database
@@ -98,6 +100,7 @@ MIXED_KIND_LIMITS = {
     "cross_reference": 2,
     "user_cross_reference": 2,
     "note": 2,
+    "lexicon": 2,
 }
 
 KINDS = (
@@ -109,6 +112,7 @@ KINDS = (
     "talk",
     "article",
     "note",
+    "lexicon",
 )
 
 _RELATIONSHIP_VERB = {
@@ -279,6 +283,7 @@ def collect_pieces(conn: sqlite3.Connection) -> list[Piece]:
     pieces.extend(_user_cross_reference_pieces(conn))
     pieces.extend(_citing_work_pieces())
     pieces.extend(_note_pieces(conn))
+    pieces.extend(_lexicon_pieces(conn))
     return pieces
 
 
@@ -595,6 +600,41 @@ def _note_pieces(conn: sqlite3.Connection) -> list[Piece]:
         )
         for r in rows
     ]
+
+
+def _lexicon_pieces(conn: sqlite3.Connection) -> list[Piece]:
+    """One piece per original-language lexicon entry (see
+    scripts/import_hebrew_lexicon.py) - so a question about what a word
+    means ("What does Christ mean?") can find the entry whose definition
+    or KJV renderings say it ("anointed... the Messiah"), by meaning or by
+    words, even though the question never uses them."""
+    pieces = []
+    for r in conn.execute(
+        "SELECT strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
+        "kjv_renderings, gloss FROM lexicon_entries ORDER BY id"
+    ):
+        language = "Aramaic" if r["language"] == "aramaic" else "Hebrew"
+        body = f"Meaning: {r['gloss']}. Definition: {r['definition']}."
+        if r["derivation"]:
+            body += f" Derivation: {r['derivation']}"
+        if r["kjv_renderings"]:
+            body += f" The King James Version translates it: {r['kjv_renderings']}"
+        pieces.append(
+            Piece(
+                key=f"lexicon:{r['strongs']}",
+                kind="lexicon",
+                heading=f"{language} word {r['lemma']} ({r['transliteration']}), Strong's {r['strongs']}",
+                body=body,
+                meta={
+                    "strongs": r["strongs"],
+                    "lemma": r["lemma"],
+                    "transliteration": r["transliteration"],
+                    "gloss": r["gloss"],
+                    "language": r["language"],
+                },
+            )
+        )
+    return pieces
 
 
 # ---------------------------------------------------------------------

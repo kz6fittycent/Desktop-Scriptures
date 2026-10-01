@@ -77,6 +77,7 @@ from scriptures import tts
 from scriptures.temple_recommend import should_show_reminder as should_show_temple_reminder
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.study_index_dialog import StudyIndexDialog
+from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
@@ -701,6 +702,7 @@ class MainWindow(QMainWindow):
                 "Scripture Citation Index</a> for General Conference citation data."
             )
         )
+        help_menu.addAction(self._help_menu_label(LEXICON_CREDIT))
         help_menu.addAction(
             self._help_menu_label(
                 "Read the scriptures officially at "

@@ -967,6 +967,74 @@ def get_topic_key_passages(conn: sqlite3.Connection, topic_id: int) -> list[KeyP
     return passages
 
 
+@dataclass(frozen=True)
+class LexiconEntry:
+    """One original-language word (see lexicon_entries in schema.sql)."""
+
+    strongs: str
+    language: str
+    lemma: str
+    transliteration: str
+    pronunciation: str
+    derivation: str
+    definition: str
+    kjv_renderings: str
+    gloss: str
+
+
+_LEXICON_COLUMNS = (
+    "strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
+    "kjv_renderings, gloss"
+)
+
+
+def get_lexicon_entry(conn: sqlite3.Connection, strongs: str) -> LexiconEntry | None:
+    row = conn.execute(
+        f"SELECT {_LEXICON_COLUMNS} FROM lexicon_entries WHERE strongs = ?", (strongs.upper(),)
+    ).fetchone()
+    return LexiconEntry(*row) if row else None
+
+
+def search_lexicon(conn: sqlite3.Connection, query: str, limit: int = 10) -> list[LexiconEntry]:
+    """Lexicon entries for a short query: a Strong's number ("H4899"), or a
+    word matched against each entry's gloss, KJV renderings, and
+    transliteration - so "Messiah" finds mashiach (H4899) through its KJV
+    rendering. Whole-word matches only ("anointed", not "anointing"):
+    exact matches first (the gloss or the KJV's first rendering is the
+    word itself), then glosses containing it, then other renderings."""
+    query = query.strip()
+    if re.fullmatch(r"[HhGg]\d{1,5}", query):
+        entry = get_lexicon_entry(conn, query)
+        return [entry] if entry else []
+    words = re.findall(r"[A-Za-z]{3,}", query)
+    if not words or len(words) > 3:
+        return []
+    phrase = " ".join(words).lower()
+    pattern = re.compile(rf"\b{re.escape(phrase)}\b", re.IGNORECASE)
+    like = f"%{phrase}%"
+    rows = conn.execute(
+        f"SELECT {_LEXICON_COLUMNS} FROM lexicon_entries "
+        "WHERE gloss LIKE ? OR kjv_renderings LIKE ? OR transliteration LIKE ?",
+        (like, like, like),
+    ).fetchall()
+    def first(text: str) -> str:
+        return re.split(r"[,;:.]", text, maxsplit=1)[0].strip(" ()[]{}").lower()
+
+    scored = []
+    for row in rows:
+        entry = LexiconEntry(*row)
+        if first(entry.gloss) == phrase:
+            scored.append((0, entry))  # the word's own meaning: "sabbath" -> H7676
+        elif first(entry.kjv_renderings) == phrase:
+            scored.append((1, entry))  # the KJV's main rendering: "Jehovah" -> H3068
+        elif pattern.search(entry.gloss):
+            scored.append((2, entry))  # ...before compounds: "Jehovah-nissi"
+        elif pattern.search(entry.kjv_renderings) or pattern.search(entry.transliteration):
+            scored.append((3, entry))
+    scored.sort(key=lambda item: (item[0], int(item[1].strongs[1:])))
+    return [entry for _rank, entry in scored[:limit]]
+
+
 def get_topic_talks(conn: sqlite3.Connection, topic_id: int) -> list[TopicTalk]:
     rows = conn.execute(
         "SELECT talk_title, speaker, date, url FROM topic_talks "

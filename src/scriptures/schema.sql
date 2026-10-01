@@ -143,6 +143,26 @@ CREATE TABLE IF NOT EXISTS topic_key_verses (
 
 CREATE INDEX IF NOT EXISTS idx_topic_key_verses_topic ON topic_key_verses(topic_id);
 
+-- Original-language word lexicon, one row per Strong's number ("H4899").
+-- Developer-authored by scripts/import_hebrew_lexicon.py (see its
+-- docstring for sources and licenses - the definitions are Strong's 1894
+-- dictionary in Open Scriptures' CC BY-SA edition, the glosses STEPBible's
+-- CC BY ones), synced forward like the Topical Guide (see db.py's
+-- _sync_bundled_lexicon). `language` is 'hebrew' or 'aramaic' (the
+-- Aramaic portions of Daniel and Ezra); Greek is planned the same way.
+CREATE TABLE IF NOT EXISTS lexicon_entries (
+    id              INTEGER PRIMARY KEY,
+    strongs         TEXT NOT NULL UNIQUE,
+    language        TEXT NOT NULL,
+    lemma           TEXT NOT NULL,
+    transliteration TEXT NOT NULL DEFAULT '',
+    pronunciation   TEXT NOT NULL DEFAULT '',
+    derivation      TEXT NOT NULL DEFAULT '',
+    definition      TEXT NOT NULL DEFAULT '',
+    kjv_renderings  TEXT NOT NULL DEFAULT '',
+    gloss           TEXT NOT NULL DEFAULT ''
+);
+
 -- Cross-references: passages that quote, closely paraphrase, or are a JST/
 -- Moses-style translation-revision of another passage elsewhere in the
 -- corpus - developer-curated like the Topical Guide above, and synced

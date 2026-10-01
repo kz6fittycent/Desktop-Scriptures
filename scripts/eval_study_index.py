@@ -14,6 +14,9 @@ Reports, over all questions:
 - hit@5 / hit@10: share of questions with at least one listed passage
   in the top 5 / top 10 results (mixed - talks, topics, and so on
   included, since that's what a user sees);
+A question's listed answers may also be Strong's numbers ("H4899"), met
+by that lexicon entry - see study_index_lexicon_questions.json.
+
 - MRR@10: mean reciprocal rank of the first listed passage (1.0 = always
   first, 0.5 = typically second, 0 = never in the top 10);
   (with the same per-kind caps AI search uses);
@@ -70,6 +73,9 @@ def covers(range_ref: str, wanted: str) -> bool:
 
 
 def is_relevant(hit: si.SearchHit, wanted: list[str]) -> bool:
+    # A Strong's number ("H4899") is answered by that lexicon entry.
+    if hit.kind == "lexicon":
+        return hit.meta.get("strongs") in wanted
     candidates = [hit.meta.get("reference"), hit.meta.get("related_reference")]
     return any(c and covers(c, w) for c in candidates for w in wanted)
 

@@ -74,6 +74,10 @@ CANDIDATE_GROUPS = (
     ("cross_references", {"cross_reference", "user_cross_reference"}, None, 3),
     ("lectures_on_faith", {"scripture"}, {"lectures-on-faith"}, 1),
     ("other", {"discourse", "topic", "note"}, None, 3),
+    # A question about what a word means ("What does Christ mean?") is
+    # answered by a lexicon entry ("anointed... the Messiah") the
+    # question's own words never mention.
+    ("lexicon", {"lexicon"}, None, 3),
 )
 CANDIDATES = sum(group[3] for group in CANDIDATE_GROUPS)
 # Topical Guide key passages (see scripts/build_topic_key_verses.py) added
@@ -123,6 +127,7 @@ _KIND_LABELS = {
     "cross_reference": "Cross-reference",
     "user_cross_reference": "Your cross-reference",
     "note": "Your note",
+    "lexicon": "Hebrew/Aramaic word",
 }
 
 SELECTION_PROMPT = (
@@ -148,6 +153,8 @@ class StudyResult:
     chapter_id: int | None = None
     topic_id: int | None = None
     url: str | None = None
+    # A lexicon entry's Strong's number ("H4899") - opens that entry.
+    strongs: str | None = None
     citations: list[Citation] = field(default_factory=list)
 
     @property
@@ -538,6 +545,14 @@ def to_result(
             detail=_snippet(" ".join(r[1] for r in rows), 400, keywords),
             chapter_id=hit.chapter_id,
             citations=citations_for([r[2] for r in rows]),
+        )
+    if hit.kind == "lexicon":
+        gloss = meta.get("gloss", "")
+        return StudyResult(
+            kind="lexicon",
+            title=heading,
+            detail=f"{gloss} - {_snippet(body, keywords=keywords)}" if gloss else _snippet(body, keywords=keywords),
+            strongs=meta.get("strongs"),
         )
     if hit.kind in ("talk", "article"):
         return StudyResult(kind=hit.kind, title=heading, url=meta.get("url"))
