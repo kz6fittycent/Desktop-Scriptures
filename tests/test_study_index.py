@@ -353,10 +353,10 @@ def test_cancel_then_resume_and_incremental_rebuild() -> None:
         third = env.build()
         assert third["ok"]
         assert [r["body"]["input"] for r in env.server.requests] == [
-            ["My note on Genesis 1:\nCreation and light"]
+            ["My note on Genesis 1\nCreation and light"]
         ]
-        notes = env.index_conn.execute("SELECT text FROM pieces WHERE kind = 'note'").fetchall()
-        assert [n["text"] for n in notes] == ["My note on Genesis 1:\nCreation and light"]
+        notes = env.index_conn.execute("SELECT body FROM pieces WHERE kind = 'note'").fetchall()
+        assert [n["body"] for n in notes] == ["Creation and light"]
         print("test_cancel_then_resume_and_incremental_rebuild: PASSED")
     finally:
         env.close()
@@ -389,6 +389,79 @@ def test_embeddings_config_never_leaks_the_chat_key() -> None:
     separate = embeddings_config(chat, " http://localhost:11434/v1 ", "", "embeddinggemma")
     assert (separate.base_url, separate.api_key) == ("http://localhost:11434/v1", "")
     print("test_embeddings_config_never_leaks_the_chat_key: PASSED")
+
+
+@_with_fake_works
+def test_bible_and_jst_duplicates_collapse_to_one_result() -> None:
+    env = _Env()
+    try:
+        # A JST Genesis 1 identical to the KJV one.
+        env.conn.execute(
+            "INSERT INTO volumes (id, name, slug, sort_order) "
+            "VALUES (7, 'Joseph Smith Translation', 'inspired-version', 7)"
+        )
+        env.conn.execute("INSERT INTO books (id, volume_id, name, sort_order) VALUES (9, 7, 'Genesis', 1)")
+        env.conn.execute("INSERT INTO chapters (id, book_id, chapter_number) VALUES (9, 9, 1)")
+        env.conn.execute(
+            "INSERT INTO verses (chapter_id, verse_number, text, reference) "
+            "SELECT 9, verse_number, text, reference FROM verses WHERE chapter_id = 1"
+        )
+        env.conn.commit()
+        assert env.build()["ok"]
+        hits = si.StudyIndex(env.index_conn).search(
+            "light day night darkness", fake_embedding("light day night darkness"), limit=10
+        )
+        passages = [h.meta["reference"] for h in hits if h.kind == "scripture"]
+        assert len(passages) == len(set(passages)), passages
+        assert "Genesis 1:3-5" in passages
+        print("test_bible_and_jst_duplicates_collapse_to_one_result: PASSED")
+    finally:
+        env.close()
+
+
+@_with_fake_works
+def test_model_formats_apply_to_documents_and_queries() -> None:
+    assert si.format_query("embeddinggemma:latest", "faith") == "task: search result | query: faith"
+    assert si.format_query("nomic-embed-text", "faith") == "search_query: faith"
+    assert si.format_query("text-embedding-3-small", "faith") == "faith"
+    env = _Env()
+    try:
+        assert env.build(model="embeddinggemma")["ok"]
+        inputs = [t for r in env.server.requests for t in r["body"]["input"]]
+        assert "title: Genesis 1:1-3 | text: In the beginning" in "\n".join(inputs)
+        assert all(t.startswith("title: ") for t in inputs)
+        print("test_model_formats_apply_to_documents_and_queries: PASSED")
+    finally:
+        env.close()
+
+
+def test_old_schema_index_is_reset() -> None:
+    import sqlite3 as _sqlite3
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-study-index-schema-"))
+    try:
+        path = tmp / "study_index.db"
+        old = _sqlite3.connect(path)
+        old.execute("CREATE TABLE pieces (id INTEGER PRIMARY KEY, key TEXT, text TEXT)")
+        old.execute("CREATE TABLE vectors (content_hash TEXT PRIMARY KEY, vector BLOB)")
+        old.execute("INSERT INTO vectors VALUES ('x', x'00')")
+        old.commit()
+        old.close()
+        conn = si.connect_index(path)
+        columns = {r["name"] for r in conn.execute("PRAGMA table_info(pieces)")}
+        assert {"heading", "body"} <= columns and "text" not in columns, columns
+        assert conn.execute("SELECT COUNT(*) FROM vectors").fetchone()[0] == 0
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == si.SCHEMA_VERSION
+        conn.close()
+        # Reopening a current-version index leaves it alone.
+        conn = si.connect_index(path)
+        conn.execute("INSERT INTO vectors VALUES ('y', x'00')")
+        conn.commit()
+        conn.close()
+        assert si.connect_index(path).execute("SELECT COUNT(*) FROM vectors").fetchone()[0] == 1
+        print("test_old_schema_index_is_reset: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def test_split_discourse_limits() -> None:
@@ -427,4 +500,7 @@ if __name__ == "__main__":
     test_not_implemented_fails_fast_without_retrying()
     test_cancel_then_resume_and_incremental_rebuild()
     test_changing_model_or_dimensions_rebuilds_from_scratch()
+    test_bible_and_jst_duplicates_collapse_to_one_result()
+    test_model_formats_apply_to_documents_and_queries()
+    test_old_schema_index_is_reset()
     print("All study index tests passed.")

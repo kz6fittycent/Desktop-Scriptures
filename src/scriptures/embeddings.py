@@ -180,7 +180,9 @@ class QueryEmbedder(QObject):
         parent: QObject | None = None,
     ):
         super().__init__(parent)
-        self._request = EmbeddingRequest(config, model, [text], dimensions, self)
+        self._request = EmbeddingRequest(
+            config, model, [study_index.format_query(model, text)], dimensions, self
+        )
         self._request.succeeded.connect(lambda vectors: self.ready.emit(vectors[0]))
         self._request.failed.connect(lambda message, _kind, _after: self.failed.emit(message))
 
@@ -299,7 +301,9 @@ class IndexBuilder(QObject):
     def _next_batch(self) -> None:
         if self._cancelled:
             return
-        self._batch = study_index.texts_for(self._index_conn, self._pending[: self._batch_size])
+        self._batch = study_index.texts_for(
+            self._index_conn, self._pending[: self._batch_size], self._model
+        )
         if not self._batch:
             self._finish(True, "The study index is up to date.")
             return

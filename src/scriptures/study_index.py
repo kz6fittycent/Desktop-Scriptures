@@ -12,7 +12,9 @@ vectors here.
 
 What gets indexed ("pieces"):
 
-- scripture: every volume's verses in small overlapping windows (up to
+- scripture: every volume's verses (headed by the reference alone - an
+  earlier "(volume name)" suffix made "Lectures on Faith" match any
+  question about faith) in small overlapping windows (up to
   WINDOW verses, and up to WINDOW_MAX_CHARS - Lectures on Faith's long
   paragraphs make for fewer verses per window), each overlapping the next
   by one verse, so each piece carries a little surrounding context rather
@@ -73,10 +75,12 @@ DISCOURSE_MAX_CHARS = 2000
 # references add little to what the card means and just cost tokens.
 MAX_CARD_REFERENCES = 60
 MAX_TOPIC_REFERENCES = 80
-# Journal of Discourses titles are often a long run-on synopsis (up to
-# ~900 characters) - repeated in full on every part of a discourse, it
-# would swamp a short part's own meaning.
-MAX_HEADING_TITLE_CHARS = 200
+# Journal of Discourses titles are often a long run-on synopsis of
+# topics joined by em dashes (up to ~900 characters) - repeated on every
+# part of a discourse, it swamped each part's own meaning and matched
+# almost any question. Only the first topic goes in the heading (cut to
+# this length); the full title stays in the piece's meta.
+MAX_HEADING_TITLE_CHARS = 100
 
 # Reciprocal rank fusion's damping constant - the conventional value.
 RRF_K = 60
@@ -100,6 +104,17 @@ _RELATIONSHIP_VERB = {
     "tradition": "is traditionally linked to",
 }
 
+# Bumped whenever the schema or what gets embedded changes shape -
+# connect_index() discards an index from any other version (it's derived
+# data; rebuilding it is always possible) rather than migrating it.
+SCHEMA_VERSION = 2
+
+# Each vector is one 1-3KB row (512-1536 float16 numbers plus its hash).
+# At SQLite's default 4KB page only one or two fit per page, wasting
+# ~20% of the vectors table (measured: 163MB for 122MB of vectors at 768
+# dimensions); 16KB pages pack them with little waste.
+PAGE_SIZE = 16384
+
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS pieces (
     id            INTEGER PRIMARY KEY,
@@ -107,24 +122,31 @@ CREATE TABLE IF NOT EXISTS pieces (
     kind          TEXT NOT NULL,
     volume_slug   TEXT,
     chapter_id    INTEGER,
-    text          TEXT NOT NULL,
+    heading       TEXT NOT NULL,
+    body          TEXT NOT NULL,
     meta          TEXT NOT NULL DEFAULT '{}',
     content_hash  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_pieces_hash ON pieces(content_hash);
 
+-- heading and body are separate columns so keyword relevance can weight
+-- them differently (see StudyIndex._keyword_ranking) - otherwise a word
+-- in a heading every piece of a book shares, like "Faith" in "Lectures
+-- on Faith", would make the whole book match.
 CREATE VIRTUAL TABLE IF NOT EXISTS pieces_fts USING fts5(
-    text, content='pieces', content_rowid='id'
+    heading, body, content='pieces', content_rowid='id'
 );
 CREATE TRIGGER IF NOT EXISTS pieces_ai AFTER INSERT ON pieces BEGIN
-    INSERT INTO pieces_fts(rowid, text) VALUES (new.id, new.text);
+    INSERT INTO pieces_fts(rowid, heading, body) VALUES (new.id, new.heading, new.body);
 END;
 CREATE TRIGGER IF NOT EXISTS pieces_ad AFTER DELETE ON pieces BEGIN
-    INSERT INTO pieces_fts(pieces_fts, rowid, text) VALUES ('delete', old.id, old.text);
+    INSERT INTO pieces_fts(pieces_fts, rowid, heading, body)
+        VALUES ('delete', old.id, old.heading, old.body);
 END;
 CREATE TRIGGER IF NOT EXISTS pieces_au AFTER UPDATE ON pieces BEGIN
-    INSERT INTO pieces_fts(pieces_fts, rowid, text) VALUES ('delete', old.id, old.text);
-    INSERT INTO pieces_fts(rowid, text) VALUES (new.id, new.text);
+    INSERT INTO pieces_fts(pieces_fts, rowid, heading, body)
+        VALUES ('delete', old.id, old.heading, old.body);
+    INSERT INTO pieces_fts(rowid, heading, body) VALUES (new.id, new.heading, new.body);
 END;
 
 -- float16, L2-normalized - see the module docstring.
@@ -142,16 +164,26 @@ CREATE TABLE IF NOT EXISTS index_meta (
 
 @dataclass(frozen=True)
 class Piece:
+    """`heading` says what the piece is (a reference, a title and
+    speaker); `body` is its content. Kept apart so a model's document
+    format (see EmbeddingFormat) and keyword weighting can treat them
+    differently; `text` joins them for display or for a prompt."""
+
     key: str
     kind: str
-    text: str
+    heading: str
+    body: str
     volume_slug: str | None = None
     chapter_id: int | None = None
     meta: dict = field(default_factory=dict)
 
     @property
+    def text(self) -> str:
+        return f"{self.heading}\n{self.body}" if self.body else self.heading
+
+    @property
     def content_hash(self) -> str:
-        return hashlib.sha256(self.text.encode("utf-8")).hexdigest()
+        return hashlib.sha256(f"{self.heading}\x00{self.body}".encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -193,10 +225,25 @@ def index_path_for(scripture_conn: sqlite3.Connection) -> Path:
 
 
 def connect_index(path: Path) -> sqlite3.Connection:
+    """Open (creating if needed) a study index. One from a different
+    SCHEMA_VERSION is emptied first - see SCHEMA_VERSION."""
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
+    version = conn.execute("PRAGMA user_version").fetchone()[0]
+    has_tables = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'pieces'"
+    ).fetchone()
+    if has_tables and version != SCHEMA_VERSION:
+        for name in ("pieces_fts", "pieces", "vectors", "index_meta"):
+            conn.execute(f"DROP TABLE IF EXISTS {name}")
+        conn.commit()
+    if not has_tables or version != SCHEMA_VERSION:
+        # Only takes effect on an empty file, or with the VACUUM after it.
+        conn.execute(f"PRAGMA page_size = {PAGE_SIZE}")
+        conn.execute("VACUUM")
     conn.executescript(_SCHEMA)
+    conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
     conn.commit()
     return conn
 
@@ -244,7 +291,7 @@ def _windows(lengths: list[int]) -> list[tuple[int, int]]:
 
 def _scripture_pieces(conn: sqlite3.Connection) -> list[Piece]:
     rows = conn.execute(
-        "SELECT vol.slug AS volume_slug, vol.name AS volume_name, b.name AS book_name, "
+        "SELECT vol.slug AS volume_slug, b.name AS book_name, "
         "c.id AS chapter_id, c.chapter_number, v.verse_number, v.text "
         "FROM verses v JOIN chapters c ON c.id = v.chapter_id "
         "JOIN books b ON b.id = c.book_id JOIN volumes vol ON vol.id = b.volume_id "
@@ -269,7 +316,8 @@ def _scripture_pieces(conn: sqlite3.Connection) -> list[Piece]:
                     key=f"scripture:{first['volume_slug']}:{first['book_name']}:"
                     f"{first['chapter_number']}:{verses}",
                     kind="scripture",
-                    text=f"{reference} ({first['volume_name']})\n{body}",
+                    heading=reference,
+                    body=body,
                     volume_slug=first["volume_slug"],
                     chapter_id=first["chapter_id"],
                     meta={
@@ -346,7 +394,7 @@ def _discourse_pieces(conn: sqlite3.Connection) -> list[Piece]:
     ).fetchall()
     pieces = []
     for row in rows:
-        title = row["title"] or ""
+        title = (row["title"] or "").split("—")[0].strip()
         if len(title) > MAX_HEADING_TITLE_CHARS:
             title = title[:MAX_HEADING_TITLE_CHARS].rsplit(" ", 1)[0] + "..."
         heading = (
@@ -358,7 +406,8 @@ def _discourse_pieces(conn: sqlite3.Connection) -> list[Piece]:
                 Piece(
                     key=f"discourse:{row['book_name']}:{row['chapter_number']}:{part_number}",
                     kind="discourse",
-                    text=f"{heading}\n{part}",
+                    heading=heading,
+                    body=part,
                     volume_slug="journal-of-discourses",
                     chapter_id=row["chapter_id"],
                     meta={
@@ -383,14 +432,15 @@ def _topic_pieces(conn: sqlite3.Connection) -> list[Piece]:
                 (topic["id"], MAX_TOPIC_REFERENCES),
             )
         ]
-        text = f"Topical Guide: {topic['name']}\n{topic['description']}"
+        body = topic["description"]
         if references:
-            text += "\nScriptures: " + "; ".join(references)
+            body += "\nScriptures: " + "; ".join(references)
         pieces.append(
             Piece(
                 key=f"topic:{topic['slug']}",
                 kind="topic",
-                text=text,
+                heading=f"Topical Guide: {topic['name']}",
+                body=body,
                 meta={"topic_id": topic["id"], "name": topic["name"], "slug": topic["slug"]},
             )
         )
@@ -405,7 +455,8 @@ def _range_label(book: str, chapter: int, start: int | None, end: int | None) ->
     return f"{book} {chapter}:{start}-{end}"
 
 
-def _cross_reference_text(row: sqlite3.Row, verb: str) -> tuple[str, str, str]:
+def _cross_reference_text(row: sqlite3.Row, verb: str) -> tuple[str, str, str, str]:
+    """(heading, body, this side's reference, the other side's)."""
     a = _range_label(row["book_name"], row["chapter_number"], row["verse_start"], row["verse_end"])
     b = _range_label(
         row["related_book_name"],
@@ -413,10 +464,7 @@ def _cross_reference_text(row: sqlite3.Row, verb: str) -> tuple[str, str, str]:
         row["related_verse_start"],
         row["related_verse_end"],
     )
-    text = f"Cross-reference: {a} {verb} {b}"
-    if row["note"]:
-        text += f"\n{row['note']}"
-    return text, a, b
+    return f"Cross-reference: {a} {verb} {b}", row["note"] or "", a, b
 
 
 def _cross_reference_pieces(conn: sqlite3.Connection) -> list[Piece]:
@@ -424,19 +472,20 @@ def _cross_reference_pieces(conn: sqlite3.Connection) -> list[Piece]:
     pieces = []
     for row in conn.execute("SELECT * FROM cross_references ORDER BY sort_order"):
         verb = _RELATIONSHIP_VERB.get(row["relationship"], "relates to")
-        text, a, b = _cross_reference_text(row, verb)
+        heading, body, a, b = _cross_reference_text(row, verb)
         topics = [
             topic_names[s.strip()]
             for s in row["topic_slugs"].split(",")
             if s.strip() in topic_names
         ]
         if topics:
-            text += "\nTopics: " + ", ".join(topics)
+            body += "\nTopics: " + ", ".join(topics)
         pieces.append(
             Piece(
                 key=f"cross_reference:{row['volume_slug']}:{a}|{row['related_volume_slug']}:{b}",
                 kind="cross_reference",
-                text=text,
+                heading=heading,
+                body=body,
                 volume_slug=row["volume_slug"],
                 meta={
                     "reference": a,
@@ -454,12 +503,13 @@ def _user_cross_reference_pieces(conn: sqlite3.Connection) -> list[Piece]:
     for row in conn.execute(
         "SELECT * FROM user_cross_references WHERE deleted_at IS NULL ORDER BY id"
     ):
-        text, a, b = _cross_reference_text(row, "(the reader's own link) see also")
+        heading, body, a, b = _cross_reference_text(row, "(the reader's own link) see also")
         pieces.append(
             Piece(
                 key=f"user_cross_reference:{row['id']}",
                 kind="user_cross_reference",
-                text=text,
+                heading=heading,
+                body=body,
                 volume_slug=row["volume_slug"],
                 meta={
                     "reference": a,
@@ -476,22 +526,22 @@ def _citing_work_pieces() -> list[Piece]:
     for work in iter_citing_works():
         kind = "talk" if work.source_label == "General Conference" else "article"
         byline = ", ".join(part for part in (work.speaker, work.date) if part)
-        text = f"{work.source_label}: \"{work.talk_title}\""
+        heading = f"{work.source_label}: \"{work.talk_title}\""
         if byline:
-            text += f" - {byline}"
-        text += "\nCites: " + "; ".join(work.references[:MAX_CARD_REFERENCES])
+            heading += f" - {byline}"
+        body = "Cites: " + "; ".join(work.references[:MAX_CARD_REFERENCES])
         pieces.append(
             Piece(
                 key=f"{kind}:{work.url}",
                 kind=kind,
-                text=text,
+                heading=heading,
+                body=body,
                 meta={
                     "title": work.talk_title,
                     "speaker": work.speaker,
                     "date": work.date,
                     "url": work.url,
                     "source": work.source_label,
-                    "references": work.references,
                 },
             )
         )
@@ -512,7 +562,8 @@ def _note_pieces(conn: sqlite3.Connection) -> list[Piece]:
         Piece(
             key=f"note:{r['id']}",
             kind="note",
-            text=f"My note on {r['reference']}:\n{r['text']}",
+            heading=f"My note on {r['reference']}",
+            body=r["text"],
             volume_slug=r["volume_slug"],
             chapter_id=r["chapter_id"],
             meta={"reference": r["reference"], "note_id": r["id"]},
@@ -544,17 +595,18 @@ def sync_pieces(index_conn: sqlite3.Connection, pieces: list[Piece]) -> None:
         current = existing.get(piece.key)
         if current is None:
             index_conn.execute(
-                "INSERT INTO pieces (key, kind, volume_slug, chapter_id, text, meta, content_hash) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (piece.key, piece.kind, piece.volume_slug, piece.chapter_id, piece.text, meta,
-                 content_hash),
+                "INSERT INTO pieces "
+                "(key, kind, volume_slug, chapter_id, heading, body, meta, content_hash) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (piece.key, piece.kind, piece.volume_slug, piece.chapter_id, piece.heading,
+                 piece.body, meta, content_hash),
             )
         elif current[1] != content_hash or current[2] != meta:
             index_conn.execute(
-                "UPDATE pieces SET kind = ?, volume_slug = ?, chapter_id = ?, text = ?, meta = ?, "
-                "content_hash = ? WHERE id = ?",
-                (piece.kind, piece.volume_slug, piece.chapter_id, piece.text, meta, content_hash,
-                 current[0]),
+                "UPDATE pieces SET kind = ?, volume_slug = ?, chapter_id = ?, heading = ?, body = ?, "
+                "meta = ?, content_hash = ? WHERE id = ?",
+                (piece.kind, piece.volume_slug, piece.chapter_id, piece.heading, piece.body, meta,
+                 content_hash, current[0]),
             )
     stale_ids = [(piece_id,) for key, (piece_id, _h, _m) in existing.items() if key not in wanted_keys]
     index_conn.executemany("DELETE FROM pieces WHERE id = ?", stale_ids)
@@ -564,12 +616,62 @@ def sync_pieces(index_conn: sqlite3.Connection, pieces: list[Piece]) -> None:
     index_conn.commit()
 
 
+@dataclass(frozen=True)
+class EmbeddingFormat:
+    """How a given embedding model expects its input. Some models are
+    trained with task prefixes and work noticeably better when given them
+    - a question and a passage aren't embedded the same way. `version`
+    goes into the index's model fingerprint, so changing a format here
+    re-embeds everything with it next build."""
+
+    name: str
+    query: str = "{q}"
+    document: str = "{heading}\n{body}"
+    version: int = 1
+
+    def format_query(self, question: str) -> str:
+        return self.query.format(q=question)
+
+    def format_document(self, heading: str, body: str) -> str:
+        return self.document.format(heading=heading, body=body).strip()
+
+
+# Matched by substring of the configured model name, first match wins.
+# Prefixes are each model's own documented ones.
+EMBEDDING_FORMATS = (
+    EmbeddingFormat(
+        "embeddinggemma",
+        query="task: search result | query: {q}",
+        document="title: {heading} | text: {body}",
+    ),
+    EmbeddingFormat(
+        "nomic-embed",
+        query="search_query: {q}",
+        document="search_document: {heading}\n{body}",
+    ),
+)
+_DEFAULT_FORMAT = EmbeddingFormat("default")
+
+
+def embedding_format(model: str) -> EmbeddingFormat:
+    lowered = model.lower()
+    return next((f for f in EMBEDDING_FORMATS if f.name in lowered), _DEFAULT_FORMAT)
+
+
+def format_query(model: str, question: str) -> str:
+    return embedding_format(model).format_query(question)
+
+
 def configure_model(index_conn: sqlite3.Connection, model: str, dimensions: int | None) -> bool:
     """Record which embedding model (and requested dimensions) this
     index's vectors come from. Returns True if that changed from what was
     recorded - in which case every existing vector was just deleted, since
     vectors from two different models aren't comparable."""
-    fingerprint = json.dumps({"model": model, "dimensions": dimensions}, sort_keys=True)
+    fmt = embedding_format(model)
+    fingerprint = json.dumps(
+        {"model": model, "dimensions": dimensions, "format": f"{fmt.name}:{fmt.version}"},
+        sort_keys=True,
+    )
     row = index_conn.execute("SELECT value FROM index_meta WHERE key = 'embedding'").fetchone()
     if row is not None and row["value"] == fingerprint:
         return False
@@ -607,15 +709,20 @@ def pending_hashes(index_conn: sqlite3.Connection) -> list[str]:
     ]
 
 
-def texts_for(index_conn: sqlite3.Connection, hashes: list[str]) -> list[tuple[str, str]]:
-    """(content_hash, text) for each of `hashes`, in the same order."""
+def texts_for(
+    index_conn: sqlite3.Connection, hashes: list[str], model: str
+) -> list[tuple[str, str]]:
+    """(content_hash, text to embed) for each of `hashes`, in the same
+    order - the text formatted the way `model` expects a document."""
     if not hashes:
         return []
+    fmt = embedding_format(model)
     rows = index_conn.execute(
-        f"SELECT content_hash, text FROM pieces WHERE content_hash IN ({','.join('?' * len(hashes))})",
+        f"SELECT content_hash, heading, body FROM pieces "
+        f"WHERE content_hash IN ({','.join('?' * len(hashes))})",
         hashes,
     ).fetchall()
-    by_hash = {r["content_hash"]: r["text"] for r in rows}
+    by_hash = {r["content_hash"]: fmt.format_document(r["heading"], r["body"]) for r in rows}
     return [(h, by_hash[h]) for h in hashes if h in by_hash]
 
 
@@ -663,8 +770,8 @@ def index_status(index_conn: sqlite3.Connection) -> IndexStatus:
         "SELECT COUNT(*) FROM vectors WHERE content_hash IN (SELECT content_hash FROM pieces)"
     ).fetchone()[0]
     pending_chars = index_conn.execute(
-        "SELECT COALESCE(SUM(LENGTH(text)), 0) FROM ("
-        "  SELECT MIN(p.text) AS text FROM pieces p "
+        "SELECT COALESCE(SUM(chars), 0) FROM ("
+        "  SELECT MIN(LENGTH(p.heading) + LENGTH(p.body)) AS chars FROM pieces p "
         "  LEFT JOIN vectors v ON v.content_hash = p.content_hash "
         "  WHERE v.content_hash IS NULL GROUP BY p.content_hash)"
     ).fetchone()[0]
@@ -799,7 +906,8 @@ class StudyIndex:
         if volume_slugs:
             sql += f" AND p.volume_slug IN ({','.join('?' * len(volume_slugs))})"
             params.extend(sorted(volume_slugs))
-        sql += " ORDER BY bm25(pieces_fts) LIMIT ?"
+        # A heading word counts a fifth as much as a body word.
+        sql += " ORDER BY bm25(pieces_fts, 0.2, 1.0) LIMIT ?"
         params.append(limit)
         return [r["id"] for r in self.conn.execute(sql, params)]
 
@@ -830,29 +938,49 @@ class StudyIndex:
         for ranking in (semantic_rank, keyword_rank):
             for piece_id, rank in ranking.items():
                 fused[piece_id] = fused.get(piece_id, 0.0) + 1.0 / (RRF_K + rank)
-        best = sorted(fused, key=lambda pid: fused[pid], reverse=True)[:limit]
-        if not best:
+        ranked = sorted(fused, key=lambda pid: fused[pid], reverse=True)
+        if not ranked:
             return []
 
+        # Fetch more than `limit`, since duplicates get dropped below.
+        candidates_ids = ranked[: limit * 3]
         rows = {
             r["id"]: r
             for r in self.conn.execute(
-                f"SELECT * FROM pieces WHERE id IN ({','.join('?' * len(best))})", best
+                f"SELECT * FROM pieces WHERE id IN ({','.join('?' * len(candidates_ids))})",
+                candidates_ids,
             )
         }
-        return [
-            SearchHit(
-                piece_id=pid,
-                key=rows[pid]["key"],
-                kind=rows[pid]["kind"],
-                text=rows[pid]["text"],
-                volume_slug=rows[pid]["volume_slug"],
-                chapter_id=rows[pid]["chapter_id"],
-                meta=json.loads(rows[pid]["meta"]),
-                score=fused[pid],
-                semantic_rank=semantic_rank.get(pid),
-                keyword_rank=keyword_rank.get(pid),
+        hits: list[SearchHit] = []
+        seen_passages: set[tuple] = set()
+        for pid in candidates_ids:
+            row = rows.get(pid)
+            if row is None:
+                continue
+            meta = json.loads(row["meta"])
+            if row["kind"] == "scripture":
+                # The Bible and the Joseph Smith Translation share book/
+                # chapter/verse numbering and mostly the same wording -
+                # one result per passage, the higher-ranked one.
+                passage = (meta.get("book"), meta.get("chapter"), meta.get("verse_start"),
+                           meta.get("verse_end"))
+                if passage in seen_passages:
+                    continue
+                seen_passages.add(passage)
+            hits.append(
+                SearchHit(
+                    piece_id=pid,
+                    key=row["key"],
+                    kind=row["kind"],
+                    text=f"{row['heading']}\n{row['body']}" if row["body"] else row["heading"],
+                    volume_slug=row["volume_slug"],
+                    chapter_id=row["chapter_id"],
+                    meta=meta,
+                    score=fused[pid],
+                    semantic_rank=semantic_rank.get(pid),
+                    keyword_rank=keyword_rank.get(pid),
+                )
             )
-            for pid in best
-            if pid in rows
-        ]
+            if len(hits) >= limit:
+                break
+        return hits
