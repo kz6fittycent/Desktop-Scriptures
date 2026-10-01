@@ -289,6 +289,42 @@ CREATE TRIGGER IF NOT EXISTS journal_entries_au AFTER UPDATE ON journal_entries 
     INSERT INTO journal_entries_fts(rowid, text) VALUES (new.id, new.text);
 END;
 
+-- User-added cross-references: the reader's own counterpart to the
+-- developer-curated cross_references table above, shown alongside it in
+-- the Cross-references tab (always labeled as the reader's own, so it's
+-- never mistaken for a curated entry). Same column shape and the same
+-- natural-key identification of each side (volume slug + book name +
+-- chapter number, never a chapter_id - see cross_references' own comment
+-- on why), which also makes these rows sync-ready as-is: sync.py matches
+-- them across devices by those same columns, with no id remapping.
+-- There's no relationship/topic_slugs here - a reader's own link is just
+-- "see also," with an optional free-text note. add_user_cross_reference()
+-- reuses an existing (even soft-deleted) row for the same pair rather
+-- than inserting a duplicate; `deleted_at` is a tombstone for the same
+-- sync reason as notes' own.
+CREATE TABLE IF NOT EXISTS user_cross_references (
+    id                      INTEGER PRIMARY KEY,
+    volume_slug             TEXT NOT NULL,
+    book_name               TEXT NOT NULL,
+    chapter_number          INTEGER NOT NULL,
+    verse_start             INTEGER,
+    verse_end               INTEGER,
+    related_volume_slug     TEXT NOT NULL,
+    related_book_name       TEXT NOT NULL,
+    related_chapter_number  INTEGER NOT NULL,
+    related_verse_start     INTEGER,
+    related_verse_end       INTEGER,
+    note                    TEXT NOT NULL DEFAULT '',
+    created_at              TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at              TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at              TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_cross_references_primary
+    ON user_cross_references(volume_slug, book_name, chapter_number);
+CREATE INDEX IF NOT EXISTS idx_user_cross_references_related
+    ON user_cross_references(related_volume_slug, related_book_name, related_chapter_number);
+
 -- Tags are user-defined labels. A tag can be applied to a verse or a chapter,
 -- acting as a lightweight, user-built cross-reference system.
 CREATE TABLE IF NOT EXISTS tags (

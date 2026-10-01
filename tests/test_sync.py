@@ -276,9 +276,50 @@ def test_missing_sync_folder_raises() -> None:
         shutil.rmtree(tmp_root, ignore_errors=True)
 
 
+def test_user_cross_reference_sync_merges_and_propagates_deletion() -> None:
+    """A reader's own cross-reference added on one device reaches the
+    other, and a later removal on that other device comes back as a
+    tombstone. Both sides land in Genesis 1 here (verse 1 <-> verse 3),
+    the only chapter this test's minimal seed has - same-chapter links
+    are allowed, as long as the verse ranges differ."""
+    tmp_root = Path(tempfile.mkdtemp(prefix="scriptures-sync-test-"))
+    sync_folder = tmp_root / "sync"
+    sync_folder.mkdir()
+
+    try:
+        conn_a, _ = _make_device(tmp_root, "device_a")
+        conn_b, _ = _make_device(tmp_root, "device_b")
+
+        da.add_user_cross_reference(conn_a, 1, 1, None, 1, 3, None, "light and creation")
+        row_id = conn_a.execute("SELECT id FROM user_cross_references").fetchone()["id"]
+        _set_updated_at(conn_a, "user_cross_references", row_id, "2026-01-01 00:00:00")
+
+        export_device_state(conn_a, sync_folder)
+        import_and_merge(conn_b, sync_folder)
+
+        results_b = da.get_cross_references(conn_b, 1)
+        assert len(results_b) == 1, results_b
+        assert results_b[0].relationship == "user"
+        assert results_b[0].note == "light and creation"
+        assert results_b[0].related_reference == "Genesis 1:3"
+
+        # Device B removes it later; device A picks up the tombstone.
+        da.delete_user_cross_reference(conn_b, results_b[0].user_id)
+        _set_updated_at(conn_b, "user_cross_references", results_b[0].user_id, "2026-01-02 00:00:00")
+        export_device_state(conn_b, sync_folder)
+        import_and_merge(conn_a, sync_folder)
+
+        assert da.get_cross_references(conn_a, 1) == []
+
+        print("test_user_cross_reference_sync_merges_and_propagates_deletion: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     test_export_file_contents()
     test_two_device_sync_merges_and_propagates_deletion()
     test_journal_entry_sync_merges_edits_and_deletion()
+    test_user_cross_reference_sync_merges_and_propagates_deletion()
     test_missing_sync_folder_raises()
     print("All sync tests passed.")

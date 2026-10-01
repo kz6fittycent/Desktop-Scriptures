@@ -10,7 +10,8 @@ any) is in use.
 Two independent operations:
 
 - `export_device_state` writes this device's entire current state (every
-  note/journal entry/tag assignment/highlight/reading-log row it has,
+  note/journal entry/tag assignment/highlight/reading-log/user
+  cross-reference row it has,
   including soft-deleted ones - see schema.sql's `deleted_at` columns) to
   <folder>/device-<this device's id>.json.
 - `import_and_merge` reads every device-*.json file present in the folder
@@ -219,6 +220,27 @@ def _export_highlights(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return out
 
 
+# user_cross_references already identifies both sides by natural key
+# (volume slug/book name/chapter number + verse range - see schema.sql),
+# so its rows export and merge as-is, with no target resolution step.
+_USER_CROSS_REFERENCE_KEY_COLUMNS = (
+    "volume_slug", "book_name", "chapter_number", "verse_start", "verse_end",
+    "related_volume_slug", "related_book_name", "related_chapter_number",
+    "related_verse_start", "related_verse_end",
+)
+
+
+def _export_user_cross_references(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    out = []
+    for r in conn.execute("SELECT * FROM user_cross_references"):
+        record = {column: r[column] for column in _USER_CROSS_REFERENCE_KEY_COLUMNS}
+        record.update(
+            {"note": r["note"], "updated_at": r["updated_at"], "deleted_at": r["deleted_at"]}
+        )
+        out.append(record)
+    return out
+
+
 def _export_reading_log(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     out = []
     for r in conn.execute("SELECT * FROM reading_log"):
@@ -253,6 +275,7 @@ def export_device_state(conn: sqlite3.Connection, sync_folder: Path) -> Path:
         "tag_assignments": _export_tag_assignments(conn),
         "highlights": _export_highlights(conn),
         "reading_log": _export_reading_log(conn),
+        "user_cross_references": _export_user_cross_references(conn),
     }
 
     dest = _device_file_path(sync_folder, device_id)
@@ -428,6 +451,44 @@ def _apply_highlight(conn: sqlite3.Connection, record: dict[str, Any]) -> None:
         )
 
 
+def _user_cross_reference_key(record: dict[str, Any]) -> tuple:
+    return tuple(record[column] for column in _USER_CROSS_REFERENCE_KEY_COLUMNS)
+
+
+def _apply_user_cross_reference(conn: sqlite3.Connection, record: dict[str, Any]) -> None:
+    """Applied even if this device doesn't have one side's book synced in
+    yet - unlike a note's target, nothing here needs resolving to a local
+    id, and get_cross_references already skips a row whose other side
+    isn't present, so it simply starts showing up once that content
+    arrives."""
+    key = _user_cross_reference_key(record)
+    existing = conn.execute(
+        "SELECT id, updated_at FROM user_cross_references WHERE "
+        "volume_slug = ? AND book_name = ? AND chapter_number = ? "
+        "AND verse_start IS ? AND verse_end IS ? "
+        "AND related_volume_slug = ? AND related_book_name = ? AND related_chapter_number = ? "
+        "AND related_verse_start IS ? AND related_verse_end IS ? "
+        "ORDER BY updated_at DESC, id DESC LIMIT 1",
+        key,
+    ).fetchone()
+    if existing and existing["updated_at"] >= record["updated_at"]:
+        return
+    if existing:
+        conn.execute(
+            "UPDATE user_cross_references SET note = ?, updated_at = ?, deleted_at = ? WHERE id = ?",
+            (record["note"], record["updated_at"], record["deleted_at"], existing["id"]),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO user_cross_references "
+            "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
+            "related_volume_slug, related_book_name, related_chapter_number, "
+            "related_verse_start, related_verse_end, note, updated_at, deleted_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            key + (record["note"], record["updated_at"], record["deleted_at"]),
+        )
+
+
 def _apply_reading_log(conn: sqlite3.Connection, record: dict[str, Any]) -> None:
     chapter_id = None
     if record["target"] is not None:
@@ -467,6 +528,7 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
     tags: dict[tuple, dict[str, Any]] = {}
     highlights: dict[tuple, dict[str, Any]] = {}
     reading_log: dict[tuple, dict[str, Any]] = {}
+    user_cross_references: dict[tuple, dict[str, Any]] = {}
 
     for payload in _read_device_files(sync_folder):
         for rec in payload.get("notes", []):
@@ -480,6 +542,8 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
             _keep_latest(highlights, key, rec)
         for rec in payload.get("reading_log", []):
             _keep_latest(reading_log, rec["read_date"], rec)
+        for rec in payload.get("user_cross_references", []):
+            _keep_latest(user_cross_references, _user_cross_reference_key(rec), rec)
 
     for rec in notes.values():
         _apply_note(conn, rec)
@@ -491,6 +555,8 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
         _apply_highlight(conn, rec)
     for rec in reading_log.values():
         _apply_reading_log(conn, rec)
+    for rec in user_cross_references.values():
+        _apply_user_cross_reference(conn, rec)
 
     conn.commit()
 

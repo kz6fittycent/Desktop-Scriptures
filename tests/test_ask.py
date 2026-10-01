@@ -3,7 +3,7 @@ logic (Stage 2 of the AI-assisted search feature - see ai_client.py's
 module docstring).
 
 No test framework, no network, no Qt event loop required - resolve_references
-and _parse_reference are plain functions over a local SQLite database, so
+and parse_reference are plain functions over a local SQLite database, so
 this only ever exercises that half (never QuestionAsker's actual HTTP call,
 which needs a running Qt application to test - see the offscreen Qt driver
 scripts used ad hoc elsewhere in this project for that side instead).
@@ -31,7 +31,7 @@ from scriptures.ask import (  # noqa: E402
     _extract_json_array,
     _extract_keywords,
     _merge_references,
-    _parse_reference,
+    parse_reference,
     _search_local_verses_by_keywords,
     resolve_references,
     unresolved_candidates,
@@ -93,27 +93,27 @@ def _make_db() -> tuple[sqlite3.Connection, Path]:
     return conn, tmp_root
 
 
-def test_parse_reference() -> None:
-    assert _parse_reference("3 Nephi 11:18-22") == ("3 Nephi", 11, 18, 22)
-    assert _parse_reference("3 Nephi 11:18") == ("3 Nephi", 11, 18, None)
-    assert _parse_reference("3 Nephi 11") == ("3 Nephi", 11, None, None)
-    assert _parse_reference("Doctrine and Covenants 76") == ("Doctrine and Covenants", 76, None, None)
-    assert _parse_reference("not a reference at all") is None
-    print("test_parse_reference: PASSED")
+def testparse_reference() -> None:
+    assert parse_reference("3 Nephi 11:18-22") == ("3 Nephi", 11, 18, 22)
+    assert parse_reference("3 Nephi 11:18") == ("3 Nephi", 11, 18, None)
+    assert parse_reference("3 Nephi 11") == ("3 Nephi", 11, None, None)
+    assert parse_reference("Doctrine and Covenants 76") == ("Doctrine and Covenants", 76, None, None)
+    assert parse_reference("not a reference at all") is None
+    print("testparse_reference: PASSED")
 
 
-def test_parse_reference_normalizes_abbreviations() -> None:
+def testparse_reference_normalizes_abbreviations() -> None:
     """The bug report: "D&C" (by far the most common way this volume is
     actually cited) and other standard LDS abbreviations must resolve to
     the same canonical book name a spelled-out reference would - see
     _BOOK_ALIASES."""
-    assert _parse_reference("D&C 76:22") == ("Doctrine and Covenants", 76, 22, None)
-    assert _parse_reference("D & C 76:22") == ("Doctrine and Covenants", 76, 22, None)
-    assert _parse_reference("d&c 76:22") == ("Doctrine and Covenants", 76, 22, None)
-    assert _parse_reference("1 Ne. 3:7") == ("1 Nephi", 3, 7, None)
-    assert _parse_reference("Moro. 10:4") == ("Moroni", 10, 4, None)
-    assert _parse_reference("JS-H 1:17") == ("Joseph Smith--History", 1, 17, None)
-    print("test_parse_reference_normalizes_abbreviations: PASSED")
+    assert parse_reference("D&C 76:22") == ("Doctrine and Covenants", 76, 22, None)
+    assert parse_reference("D & C 76:22") == ("Doctrine and Covenants", 76, 22, None)
+    assert parse_reference("d&c 76:22") == ("Doctrine and Covenants", 76, 22, None)
+    assert parse_reference("1 Ne. 3:7") == ("1 Nephi", 3, 7, None)
+    assert parse_reference("Moro. 10:4") == ("Moroni", 10, 4, None)
+    assert parse_reference("JS-H 1:17") == ("Joseph Smith--History", 1, 17, None)
+    print("testparse_reference_normalizes_abbreviations: PASSED")
 
 
 def test_resolve_abbreviated_references() -> None:
@@ -367,8 +367,8 @@ def test_resolve_attaches_real_citations() -> None:
 
 
 if __name__ == "__main__":
-    test_parse_reference()
-    test_parse_reference_normalizes_abbreviations()
+    testparse_reference()
+    testparse_reference_normalizes_abbreviations()
     test_resolve_abbreviated_references()
     test_unresolved_candidates_reports_partial_misses()
     test_extract_keywords()

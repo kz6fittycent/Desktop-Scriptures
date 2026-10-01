@@ -70,7 +70,6 @@ from scriptures.data_access import (
     add_highlight,
     clear_highlight_range,
     get_annotated_verse_ids,
-    get_cross_references,
     get_highlights,
     get_note,
     get_tags,
@@ -135,6 +134,7 @@ class _VerseTextEdit(QTextEdit):
     drag_started = Signal()
     highlight_remove_requested = Signal(int, int)
     highlight_color_requested = Signal(str)
+    cross_reference_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -274,6 +274,9 @@ class _VerseTextEdit(QTextEdit):
                     lambda checked=False, c=color: self.highlight_color_requested.emit(c)
                 )
                 new_actions.append(color_action)
+        cross_reference_action = QAction("Add Cross-reference…", self)
+        cross_reference_action.triggered.connect(self.cross_reference_requested)
+        new_actions.append(cross_reference_action)
 
         if new_actions:
             if first_standard is not None:
@@ -424,6 +427,9 @@ class ReadingView(QWidget):
                 lambda start, end, v=verse: self._on_highlight_remove_requested(v, start, end)
             )
             body.highlight_color_requested.connect(self._on_verse_highlight_color_requested)
+            body.cross_reference_requested.connect(
+                lambda v=verse: self._on_cross_reference_requested(v)
+            )
             row.addWidget(body, 1)
             self._body_widgets[verse.id] = body
 
@@ -464,12 +470,15 @@ class ReadingView(QWidget):
         citations_panel = CitationsPanel(verses)
         self._side_tabs.addTab(citations_panel, self._citations_tab_label(citations_panel))
 
-        cross_references = get_cross_references(conn, chapter_id)
-        cross_references_panel = CrossReferencesPanel(cross_references)
-        cross_references_panel.chapter_selected.connect(self.chapter_link_activated)
-        cross_references_panel.topic_selected.connect(self.topic_link_activated)
+        self._cross_references_panel = CrossReferencesPanel(conn, chapter_id, title)
+        self._cross_references_panel.chapter_selected.connect(self.chapter_link_activated)
+        self._cross_references_panel.topic_selected.connect(self.topic_link_activated)
+        self._cross_references_panel.references_changed.connect(
+            self._refresh_cross_references_tab_label
+        )
         self._side_tabs.addTab(
-            cross_references_panel, self._cross_references_tab_label(cross_references_panel)
+            self._cross_references_panel,
+            self._cross_references_tab_label(self._cross_references_panel),
         )
 
         self._side_tabs.setCurrentIndex(selected_side_tab)
@@ -575,6 +584,25 @@ class ReadingView(QWidget):
     def _cross_references_tab_label(cross_references_panel: CrossReferencesPanel) -> str:
         count = cross_references_panel.reference_count
         return f"Cross-references ({count})" if count else "Cross-references"
+
+    def _refresh_cross_references_tab_label(self) -> None:
+        index = self._side_tabs.indexOf(self._cross_references_panel)
+        self._side_tabs.setTabText(
+            index, self._cross_references_tab_label(self._cross_references_panel)
+        )
+
+    def _on_cross_reference_requested(self, verse: Verse) -> None:
+        """A verse's own right-click "Add Cross-reference..." - pre-fills
+        the dialog with whichever verses currently have a selection (a
+        multi-verse drag can leave several), or just the verse that was
+        right-clicked if none do."""
+        selected = [
+            v.verse_number for v in self._verses if self._body_widgets[v.id].textCursor().hasSelection()
+        ]
+        if not selected:
+            selected = [verse.verse_number]
+        self._side_tabs.setCurrentWidget(self._cross_references_panel)
+        self._cross_references_panel.open_add_dialog(min(selected), max(selected))
 
     def _on_verse_drag_started(self, verse: Verse) -> None:
         """A verse widget's own mousePressEvent, left button - the one

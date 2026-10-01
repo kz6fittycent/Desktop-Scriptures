@@ -145,7 +145,7 @@ _REFERENCE_RE = re.compile(
 )
 
 
-def _parse_reference(text: str) -> tuple[str, int, int | None, int | None] | None:
+def parse_reference(text: str) -> tuple[str, int, int | None, int | None] | None:
     match = _REFERENCE_RE.match(text.strip())
     if not match:
         return None
@@ -255,7 +255,7 @@ def _citations_for(references: list[str]) -> list[Citation]:
 
 
 def _resolve_one(conn: sqlite3.Connection, candidate: str) -> AskedReference | None:
-    parsed = _parse_reference(candidate)
+    parsed = parse_reference(candidate)
     if parsed is None:
         return None
     book, chapter_number, verse_start, verse_end = parsed

@@ -144,6 +144,10 @@ class CrossReference:
     relationship: str
     topics: list[CrossReferenceTopic]
     note: str
+    # Set only for the reader's own entries (user_cross_references - see
+    # schema.sql), never for a curated one; also what the UI keys off of
+    # to label an entry as "yours" and offer to remove it.
+    user_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -939,67 +943,198 @@ def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[Cros
     resolved to that other chapter's own chapter_id for navigation. A row
     whose other side isn't present in this database yet (e.g. an older
     writable copy that hasn't synced in that book) is simply left out,
-    the same tolerance get_topic_verses already has."""
+    the same tolerance get_topic_verses already has.
+
+    The curated entries come first, in their own sort_order, followed by
+    any the reader added themselves (user_cross_references), oldest
+    first - relationship "user", no topics, and user_id set."""
     location = get_chapter_location(conn, chapter_id)
     if location is None:
         return []
     volume, _testament, book, chapter = location
+    this_side = (volume.slug, book.name, chapter.chapter_number)
 
-    rows = conn.execute(
+    curated_rows = conn.execute(
         "SELECT * FROM cross_references "
         "WHERE (volume_slug = ? AND book_name = ? AND chapter_number = ?) "
         "   OR (related_volume_slug = ? AND related_book_name = ? AND related_chapter_number = ?) "
         "ORDER BY sort_order",
-        (
-            volume.slug, book.name, chapter.chapter_number,
-            volume.slug, book.name, chapter.chapter_number,
-        ),
+        this_side + this_side,
+    ).fetchall()
+    user_rows = conn.execute(
+        "SELECT * FROM user_cross_references "
+        "WHERE deleted_at IS NULL AND ("
+        "   (volume_slug = ? AND book_name = ? AND chapter_number = ?) "
+        "   OR (related_volume_slug = ? AND related_book_name = ? AND related_chapter_number = ?)) "
+        "ORDER BY created_at, id",
+        this_side + this_side,
     ).fetchall()
 
     results = []
-    for row in rows:
-        is_primary_side = (
-            row["volume_slug"] == volume.slug
-            and row["book_name"] == book.name
-            and row["chapter_number"] == chapter.chapter_number
-        )
-        if is_primary_side:
-            local_start, local_end = row["verse_start"], row["verse_end"]
-            other_volume_slug = row["related_volume_slug"]
-            other_book_name = row["related_book_name"]
-            other_chapter_number = row["related_chapter_number"]
-            other_start, other_end = row["related_verse_start"], row["related_verse_end"]
-        else:
-            local_start, local_end = row["related_verse_start"], row["related_verse_end"]
-            other_volume_slug = row["volume_slug"]
-            other_book_name = row["book_name"]
-            other_chapter_number = row["chapter_number"]
-            other_start, other_end = row["verse_start"], row["verse_end"]
-
-        other_chapter = conn.execute(
-            "SELECT c.id FROM chapters c "
-            "JOIN books b ON b.id = c.book_id "
-            "JOIN volumes vol ON vol.id = b.volume_id "
-            "WHERE vol.slug = ? AND b.name = ? AND c.chapter_number = ?",
-            (other_volume_slug, other_book_name, other_chapter_number),
-        ).fetchone()
-        if other_chapter is None:
+    for row in curated_rows:
+        oriented = _orient_cross_reference_row(conn, row, this_side)
+        if oriented is None:
             continue
-
+        local_start, local_end, related_reference, related_chapter_id = oriented
         results.append(
             CrossReference(
                 verse_start=local_start,
                 verse_end=local_end,
-                related_reference=_format_reference(
-                    other_book_name, other_chapter_number, other_start, other_end
-                ),
-                related_chapter_id=other_chapter["id"],
+                related_reference=related_reference,
+                related_chapter_id=related_chapter_id,
                 relationship=row["relationship"],
                 topics=_resolve_topic_slugs(conn, row["topic_slugs"]),
                 note=row["note"],
             )
         )
+    for row in user_rows:
+        oriented = _orient_cross_reference_row(conn, row, this_side)
+        if oriented is None:
+            continue
+        local_start, local_end, related_reference, related_chapter_id = oriented
+        results.append(
+            CrossReference(
+                verse_start=local_start,
+                verse_end=local_end,
+                related_reference=related_reference,
+                related_chapter_id=related_chapter_id,
+                relationship="user",
+                topics=[],
+                note=row["note"],
+                user_id=row["id"],
+            )
+        )
     return results
+
+
+def _orient_cross_reference_row(
+    conn: sqlite3.Connection, row: sqlite3.Row, this_side: tuple[str, str, int]
+) -> tuple[int | None, int | None, str, int] | None:
+    """For a cross_references/user_cross_references row (same column
+    shape), whichever side is NOT `this_side` (volume slug, book name,
+    chapter number) is "the other one": returns this side's own verse
+    range, the other side's display reference, and the other side's local
+    chapter_id - or None if the other side's chapter isn't in this
+    database (see get_cross_references)."""
+    is_primary_side = (row["volume_slug"], row["book_name"], row["chapter_number"]) == this_side
+    if is_primary_side:
+        local_start, local_end = row["verse_start"], row["verse_end"]
+        other_volume_slug = row["related_volume_slug"]
+        other_book_name = row["related_book_name"]
+        other_chapter_number = row["related_chapter_number"]
+        other_start, other_end = row["related_verse_start"], row["related_verse_end"]
+    else:
+        local_start, local_end = row["related_verse_start"], row["related_verse_end"]
+        other_volume_slug = row["volume_slug"]
+        other_book_name = row["book_name"]
+        other_chapter_number = row["chapter_number"]
+        other_start, other_end = row["verse_start"], row["verse_end"]
+
+    other_chapter = conn.execute(
+        "SELECT c.id FROM chapters c "
+        "JOIN books b ON b.id = c.book_id "
+        "JOIN volumes vol ON vol.id = b.volume_id "
+        "WHERE vol.slug = ? AND b.name = ? AND c.chapter_number = ?",
+        (other_volume_slug, other_book_name, other_chapter_number),
+    ).fetchone()
+    if other_chapter is None:
+        return None
+    related_reference = _format_reference(other_book_name, other_chapter_number, other_start, other_end)
+    return local_start, local_end, related_reference, other_chapter["id"]
+
+
+def find_chapter_for_reference(
+    conn: sqlite3.Connection, book_name: str, chapter_number: int
+) -> int | None:
+    """The chapter_id for a typed-in book name (matched case-insensitively)
+    + chapter number, for the reader's own cross-references. Unlike
+    get_chapter_by_loose_reference, a book name that exists in more than
+    one volume - the Joseph Smith Translation reuses the King James
+    Bible's own book names - deterministically resolves to the earliest
+    volume (i.e. the Holy Bible over the JST), rather than whichever row
+    SQLite happens to return first."""
+    r = conn.execute(
+        "SELECT c.id FROM chapters c "
+        "JOIN books b ON b.id = c.book_id "
+        "JOIN volumes vol ON vol.id = b.volume_id "
+        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ? "
+        "ORDER BY vol.sort_order LIMIT 1",
+        (book_name, chapter_number),
+    ).fetchone()
+    return r["id"] if r else None
+
+
+def get_chapter_verse_count(conn: sqlite3.Connection, chapter_id: int) -> int:
+    r = conn.execute(
+        "SELECT MAX(verse_number) AS n FROM verses WHERE chapter_id = ?", (chapter_id,)
+    ).fetchone()
+    return r["n"] or 0
+
+
+def add_user_cross_reference(
+    conn: sqlite3.Connection,
+    chapter_id: int,
+    verse_start: int | None,
+    verse_end: int | None,
+    related_chapter_id: int,
+    related_verse_start: int | None,
+    related_verse_end: int | None,
+    note: str = "",
+) -> None:
+    """Save one of the reader's own cross-references between two passages
+    (each a chapter_id plus an optional verse range - both None for the
+    whole chapter). A single-verse range is stored with verse_end NULL,
+    the same convention cross_references already uses. Re-adding a pair
+    that already exists (even a removed one) updates that same row's note
+    and restores it rather than inserting a duplicate, so sync.py only
+    ever sees one record per pair."""
+    if verse_end == verse_start:
+        verse_end = None
+    if related_verse_end == related_verse_start:
+        related_verse_end = None
+    this_side = get_chapter_location(conn, chapter_id)
+    other_side = get_chapter_location(conn, related_chapter_id)
+    if this_side is None or other_side is None:
+        raise ValueError("Both passages must be chapters in this database")
+    key = (
+        this_side[0].slug, this_side[2].name, this_side[3].chapter_number, verse_start, verse_end,
+        other_side[0].slug, other_side[2].name, other_side[3].chapter_number,
+        related_verse_start, related_verse_end,
+    )
+    existing = conn.execute(
+        "SELECT id FROM user_cross_references WHERE "
+        "volume_slug = ? AND book_name = ? AND chapter_number = ? "
+        "AND verse_start IS ? AND verse_end IS ? "
+        "AND related_volume_slug = ? AND related_book_name = ? AND related_chapter_number = ? "
+        "AND related_verse_start IS ? AND related_verse_end IS ?",
+        key,
+    ).fetchone()
+    if existing:
+        conn.execute(
+            "UPDATE user_cross_references SET note = ?, updated_at = datetime('now'), "
+            "deleted_at = NULL WHERE id = ?",
+            (note, existing["id"]),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO user_cross_references "
+            "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
+            "related_volume_slug, related_book_name, related_chapter_number, "
+            "related_verse_start, related_verse_end, note) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            key + (note,),
+        )
+    conn.commit()
+
+
+def delete_user_cross_reference(conn: sqlite3.Connection, user_cross_reference_id: int) -> None:
+    """Soft delete (tombstone), same reason as delete_note."""
+    conn.execute(
+        "UPDATE user_cross_references SET deleted_at = datetime('now'), updated_at = datetime('now') "
+        "WHERE id = ?",
+        (user_cross_reference_id,),
+    )
+    conn.commit()
 
 
 def _resolve_topic_slugs(conn: sqlite3.Connection, topic_slugs: str) -> list[CrossReferenceTopic]:

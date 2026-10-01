@@ -20,8 +20,17 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from scriptures.data_access import get_cross_references  # noqa: E402
+from scriptures.data_access import (  # noqa: E402
+    add_user_cross_reference,
+    delete_user_cross_reference,
+    find_chapter_for_reference,
+    get_cross_references,
+)
 from scriptures.db import connect  # noqa: E402
+from scriptures.ui.add_cross_reference_dialog import (  # noqa: E402
+    parse_verse_range,
+    resolve_related_passage,
+)
 
 import build_cross_references as bcr  # noqa: E402
 
@@ -226,6 +235,84 @@ def test_unresolvable_topic_slug_is_skipped_not_erroring() -> None:
         shutil.rmtree(tmp_root, ignore_errors=True)
 
 
+def test_user_cross_reference_shows_on_both_sides_after_curated() -> None:
+    conn, tmp_root = _make_db()
+    try:
+        _seed(conn)
+        conn.execute(
+            "INSERT INTO cross_references "
+            "(volume_slug, book_name, chapter_number, verse_start, verse_end, "
+            "related_volume_slug, related_book_name, related_chapter_number, "
+            "related_verse_start, related_verse_end, relationship, topic_slugs, note, sort_order) "
+            "VALUES ('book-of-mormon', '2 Nephi', 12, NULL, NULL, "
+            "'holy-bible', 'Isaiah', 2, NULL, NULL, 'quotation', '', 'curated', 1)"
+        )
+        conn.commit()
+        # 2 Nephi 12:5 <-> Holy Bible Isaiah 2:1, a single verse each -
+        # a 5-5 range is normalized to a single verse.
+        add_user_cross_reference(conn, 2, 5, 5, 1, 1, None, "mine")
+
+        nephi_side = get_cross_references(conn, 2)
+        assert [cr.relationship for cr in nephi_side] == ["quotation", "user"]
+        mine = nephi_side[1]
+        assert (mine.verse_start, mine.verse_end) == (5, None)
+        assert mine.related_reference == "Isaiah 2:1"
+        assert mine.related_chapter_id == 1
+        assert mine.user_id is not None
+        assert nephi_side[0].user_id is None
+
+        isaiah_side = get_cross_references(conn, 1)
+        assert isaiah_side[1].related_reference == "2 Nephi 12:5"
+        assert isaiah_side[1].verse_start == 1
+        # The JST's same-named Isaiah 2 never picks it up.
+        assert get_cross_references(conn, 3) == []
+
+        # Re-adding the same pair updates it rather than duplicating it,
+        # and also brings a removed one back.
+        delete_user_cross_reference(conn, mine.user_id)
+        assert [cr.relationship for cr in get_cross_references(conn, 2)] == ["quotation"]
+        add_user_cross_reference(conn, 2, 5, None, 1, 1, None, "edited")
+        assert conn.execute("SELECT COUNT(*) FROM user_cross_references").fetchone()[0] == 1
+        assert get_cross_references(conn, 2)[1].note == "edited"
+
+        print("test_user_cross_reference_shows_on_both_sides_after_curated: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
+def test_typed_reference_resolution() -> None:
+    conn, tmp_root = _make_db()
+    try:
+        _seed(conn)
+        # A book name shared with the JST resolves to the Holy Bible.
+        assert find_chapter_for_reference(conn, "isaiah", 2) == 1
+        assert resolve_related_passage(conn, "Isaiah 2:5") == (1, 5, None)
+        assert resolve_related_passage(conn, "2 nephi 12:1-5") == (2, 1, 5)
+        assert resolve_related_passage(conn, "2 Ne. 12") == (2, None, None)
+        for bad in ("Isaiah 99", "Isaiah 2:6", "not a reference", "2 Nephi 12:5-1"):
+            try:
+                resolve_related_passage(conn, bad)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(f"expected ValueError for {bad!r}")
+
+        assert parse_verse_range("", 5) == (None, None)
+        assert parse_verse_range(" 2 - 4 ", 5) == (2, 4)
+        assert parse_verse_range("3-3", 5) == (3, None)
+        for bad in ("0", "6", "abc", "4-2"):
+            try:
+                parse_verse_range(bad, 5)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(f"expected ValueError for {bad!r}")
+
+        print("test_typed_reference_resolution: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     test_cross_reference_resolves_both_directions()
     test_reference_string_collision_does_not_leak_across_volumes()
@@ -233,4 +320,6 @@ if __name__ == "__main__":
     test_verify_entry_catches_bad_chapter()
     test_verify_entry_catches_unknown_topic_slug()
     test_unresolvable_topic_slug_is_skipped_not_erroring()
+    test_user_cross_reference_shows_on_both_sides_after_curated()
+    test_typed_reference_resolution()
     print("All cross-reference tests passed.")
