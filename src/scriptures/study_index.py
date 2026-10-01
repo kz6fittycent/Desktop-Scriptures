@@ -662,19 +662,44 @@ def format_query(model: str, question: str) -> str:
     return embedding_format(model).format_query(question)
 
 
+def canonical_model(model: str) -> str:
+    """The same model can be named more than one way - Ollama treats
+    "embeddinggemma" and "embeddinggemma:latest" as one model (":latest"
+    is its default tag), and its model list reports the latter. Compared
+    in this form, so typing one and picking the other from a list (as the
+    AI Setup Wizard does) isn't mistaken for a model change, which would
+    discard every vector."""
+    model = model.strip()
+    return model[: -len(":latest")] if model.endswith(":latest") else model
+
+
+def _fingerprint(model: str, dimensions: int | None) -> dict:
+    fmt = embedding_format(model)
+    return {
+        "model": canonical_model(model),
+        "dimensions": dimensions,
+        "format": f"{fmt.name}:{fmt.version}",
+    }
+
+
 def configure_model(index_conn: sqlite3.Connection, model: str, dimensions: int | None) -> bool:
     """Record which embedding model (and requested dimensions) this
     index's vectors come from. Returns True if that changed from what was
     recorded - in which case every existing vector was just deleted, since
     vectors from two different models aren't comparable."""
-    fmt = embedding_format(model)
-    fingerprint = json.dumps(
-        {"model": model, "dimensions": dimensions, "format": f"{fmt.name}:{fmt.version}"},
-        sort_keys=True,
-    )
+    wanted = _fingerprint(model, dimensions)
+    fingerprint = json.dumps(wanted, sort_keys=True)
     row = index_conn.execute("SELECT value FROM index_meta WHERE key = 'embedding'").fetchone()
-    if row is not None and row["value"] == fingerprint:
-        return False
+    if row is not None:
+        recorded = json.loads(row["value"])
+        recorded["model"] = canonical_model(recorded.get("model", ""))
+        if recorded == wanted:
+            if row["value"] != fingerprint:  # store it in canonical form
+                index_conn.execute(
+                    "UPDATE index_meta SET value = ? WHERE key = 'embedding'", (fingerprint,)
+                )
+                index_conn.commit()
+            return False
     index_conn.execute("DELETE FROM vectors")
     index_conn.execute("DELETE FROM index_meta WHERE key = 'vector_dimensions'")
     index_conn.execute(
@@ -804,7 +829,12 @@ def estimate_build(
     them, which the build itself does, takes longer the first time). A
     model/dimensions change means everything is pending again."""
     texts = {p.content_hash: len(p.text) for p in collect_pieces(scripture_conn)}
-    if recorded_model(index_conn) == (model, dimensions):
+    recorded, recorded_dimensions = recorded_model(index_conn)
+    if (
+        recorded is not None
+        and canonical_model(recorded) == canonical_model(model)
+        and recorded_dimensions == dimensions
+    ):
         embedded_hashes = {
             r[0] for r in index_conn.execute("SELECT content_hash FROM vectors")
         }

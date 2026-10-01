@@ -488,6 +488,26 @@ def test_not_implemented_fails_fast_without_retrying() -> None:
         env.close()
 
 
+@_with_fake_works
+def test_latest_tag_is_the_same_model() -> None:
+    """Ollama's "name" and "name:latest" are one model - switching between
+    the two spellings (the AI Setup Wizard picks the listed one) must not
+    discard and re-send every vector."""
+    env = _Env()
+    try:
+        assert env.build(model="embed-a")["ok"]
+        env.server.requests.clear()
+        result = env.build(model="embed-a:latest")
+        assert result["ok"] and not result["builder"].model_changed
+        assert env.server.requests == [], len(env.server.requests)
+        assert si.canonical_model(" embed-a:latest ") == "embed-a"
+        estimate = si.estimate_build(env.conn, env.index_conn, "embed-a:latest", None)
+        assert estimate.embedded == estimate.unique_texts
+        print("test_latest_tag_is_the_same_model: PASSED")
+    finally:
+        env.close()
+
+
 if __name__ == "__main__":
     app = QCoreApplication.instance() or QCoreApplication(sys.argv)
     test_split_discourse_limits()
@@ -503,4 +523,5 @@ if __name__ == "__main__":
     test_bible_and_jst_duplicates_collapse_to_one_result()
     test_model_formats_apply_to_documents_and_queries()
     test_old_schema_index_is_reset()
+    test_latest_tag_is_the_same_model()
     print("All study index tests passed.")
