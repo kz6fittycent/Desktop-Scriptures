@@ -21,6 +21,8 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
+from pathlib import Path
 
 from PySide6.QtCore import QObject, QTimer, Signal
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
@@ -183,6 +185,46 @@ class QueryEmbedder(QObject):
         self._request.failed.connect(lambda message, _kind, _after: self.failed.emit(message))
 
 
+def _database_path(conn: sqlite3.Connection) -> Path:
+    return Path(next(row[2] for row in conn.execute("PRAGMA database_list") if row[1] == "main"))
+
+
+class _Preparer(QObject):
+    """Runs a build's one-time preparation - collecting ~80k pieces and
+    syncing them into the index, several seconds on a first build - on a
+    background thread, so the window doesn't freeze. sqlite3 connections
+    can't cross threads, so it opens its own to the same two files.
+    `done(result)` is delivered back on the main thread: a
+    (model_changed, total, embedded, pending_hashes) tuple, or the
+    exception that stopped it."""
+
+    done = Signal(object)
+
+    def start(
+        self, scripture_path: Path, index_path: Path, model: str, dimensions: int | None
+    ) -> None:
+        threading.Thread(
+            target=self._run, args=(scripture_path, index_path, model, dimensions), daemon=True
+        ).start()
+
+    def _run(self, scripture_path: Path, index_path: Path, model: str, dimensions: int | None) -> None:
+        try:
+            scripture_conn = sqlite3.connect(scripture_path)
+            scripture_conn.row_factory = sqlite3.Row
+            index_conn = study_index.connect_index(index_path)
+            try:
+                model_changed = study_index.configure_model(index_conn, model, dimensions)
+                study_index.sync_pieces(index_conn, study_index.collect_pieces(scripture_conn))
+                status = study_index.index_status(index_conn)
+                pending = study_index.pending_hashes(index_conn)
+            finally:
+                index_conn.close()
+                scripture_conn.close()
+            self.done.emit((model_changed, status.unique_texts, status.embedded, pending))
+        except Exception as exc:  # noqa: BLE001 - reported to the user, not swallowed
+            self.done.emit(exc)
+
+
 class IndexBuilder(QObject):
     """Brings a study index fully up to date: re-collects every piece from
     the main database (cheap, about a second), syncs the index to match,
@@ -226,9 +268,14 @@ class IndexBuilder(QObject):
         self.model_changed = False
 
     def start(self) -> None:
-        # Deferred a tick so a dialog can show "Preparing..." before the
-        # (brief, synchronous) collect/sync step runs.
-        QTimer.singleShot(0, self._prepare)
+        self._preparer = _Preparer(self)
+        self._preparer.done.connect(self._on_prepared)
+        self._preparer.start(
+            _database_path(self._scripture_conn),
+            _database_path(self._index_conn),
+            self._model,
+            self._dimensions,
+        )
 
     def cancel(self) -> None:
         if self._done:
@@ -239,18 +286,13 @@ class IndexBuilder(QObject):
             self._request = None
         self._finish(False, "")
 
-    def _prepare(self) -> None:
+    def _on_prepared(self, result: object) -> None:
         if self._cancelled:
             return
-        self.model_changed = study_index.configure_model(
-            self._index_conn, self._model, self._dimensions
-        )
-        study_index.sync_pieces(
-            self._index_conn, study_index.collect_pieces(self._scripture_conn)
-        )
-        status = study_index.index_status(self._index_conn)
-        self._total, self._embedded = status.unique_texts, status.embedded
-        self._pending = study_index.pending_hashes(self._index_conn)
+        if isinstance(result, Exception):
+            self._finish(False, f"Couldn't prepare the study index: {result}")
+            return
+        self.model_changed, self._total, self._embedded, self._pending = result
         self.progress.emit(self._embedded, self._total)
         self._next_batch()
 
