@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QCheckBox,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -35,6 +34,7 @@ from PySide6.QtWidgets import (
 
 from scriptures.ai_client import AiConfig, ConnectionTester, embeddings_config
 from scriptures.embeddings import EmbeddingRequest
+from scriptures.ui.toggle_row import ToggleRow
 
 
 class AiSettingsDialog(QDialog):
@@ -74,7 +74,7 @@ class AiSettingsDialog(QDialog):
         intro.setWordWrap(True)
         layout.addWidget(intro)
 
-        self._enabled_check = QCheckBox("Enable AI-assisted search")
+        self._enabled_check = ToggleRow("Enable AI-assisted search")
         self._enabled_check.setChecked(enabled)
         layout.addWidget(self._enabled_check)
 

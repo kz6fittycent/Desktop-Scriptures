@@ -10,7 +10,6 @@ from datetime import date, timedelta
 
 from PySide6.QtCore import QDate, Qt
 from PySide6.QtWidgets import (
-    QCheckBox,
     QDateEdit,
     QDialog,
     QDialogButtonBox,
@@ -24,6 +23,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures.temple_recommend import format_reminder_message
+from scriptures.ui.toggle_row import ToggleRow
 
 
 class TempleRecommendOptionsDialog(QDialog):
@@ -52,7 +52,7 @@ class TempleRecommendOptionsDialog(QDialog):
         intro.setWordWrap(True)
         layout.addWidget(intro)
 
-        self._enabled_checkbox = QCheckBox("Remind me before it expires")
+        self._enabled_checkbox = ToggleRow("Remind me before it expires")
         self._enabled_checkbox.setChecked(enabled)
         layout.addWidget(self._enabled_checkbox)
 

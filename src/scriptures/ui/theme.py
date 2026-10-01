@@ -644,6 +644,36 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary};
             border: 2px solid {p.primary};
         }}
+        /* ToggleRow (see toggle_row.py) - a settings dialog's on/off
+           switch, same construction as the reminder rows above but at
+           normal text size, since it's a primary setting rather than a
+           secondary "don't remind me" footnote. */
+        QFrame#toggleRow {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+        }}
+        QFrame#toggleRow:hover {{
+            background-color: {p.card_bg};
+            border: 1px solid {p.primary};
+        }}
+        QLabel#toggleRowLabel {{
+            font-weight: bold;
+            background: transparent;
+        }}
+        QPushButton#toggleRowToggle {{
+            background-color: {p.surface};
+            border: 2px solid {p.text};
+            border-radius: 4px;
+            color: #FFFFFF;
+            font-weight: bold;
+            padding: 0px;
+            min-width: 0px;
+        }}
+        QPushButton#toggleRowToggle:checked {{
+            background-color: {p.primary};
+            border: 2px solid {p.primary};
+        }}
         QLabel#templeRecommendMessage {{
             font-size: 15px;
             font-weight: bold;
