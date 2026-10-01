@@ -69,14 +69,15 @@ against this app's own imported text rather than copied from any outside
 source, and each tagged with the Topical Guide topic it's actually
 teaching so it's clear what doctrine is at stake, not just which words
 changed.
-The Hebrew lexicon - what a Hebrew or Aramaic word means, searchable by
-its English meaning ("Messiah" finds *mashiach*, "anointed") - combines
-Strong's Hebrew dictionary (1894, public domain) in
-[Open Scriptures](https://github.com/openscriptures/strongs)' corrected
-edition, licensed CC BY-SA (that license applies to the lexicon data,
-not to this app's MIT-licensed code), with short word meanings from
-[STEP Bible](https://www.STEPBible.org) (Tyndale House, Cambridge),
-licensed CC BY 4.0; see `scripts/import_lexicon.py`.
+The Hebrew and Greek lexicons - what a Hebrew, Aramaic, or Greek word
+means, searchable by its English meaning ("Messiah" finds *mashiach*,
+"anointed"; "love" finds *agape*) and shown in the reading view's Word
+Study tab - combine Strong's Hebrew and Greek dictionaries (public
+domain) in [Open Scriptures](https://github.com/openscriptures/strongs)'
+corrected editions, licensed CC BY-SA (that license applies to the
+lexicon data, not to this app's MIT-licensed code), with short word
+meanings from [STEP Bible](https://www.STEPBible.org) (Tyndale House,
+Cambridge), licensed CC BY 4.0; see `scripts/import_lexicon.py`.
 
 ## Screenshots
 
