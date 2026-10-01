@@ -73,6 +73,7 @@ from scriptures.sync import sync_now
 from scriptures import tts
 from scriptures.temple_recommend import should_show_reminder as should_show_temple_reminder
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
+from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
 from scriptures.ui.cfm_box import CfmBox
@@ -128,6 +129,10 @@ AI_ENABLED_SETTING = "ai_enabled"
 AI_BASE_URL_SETTING = "ai_api_base_url"
 AI_API_KEY_SETTING = "ai_api_key"
 AI_MODEL_SETTING = "ai_model"
+# The study index's embedding model (and optional dimensions) - see
+# study_index.py. Blank model = no study index.
+AI_EMBEDDING_MODEL_SETTING = "ai_embedding_model"
+AI_EMBEDDING_DIMENSIONS_SETTING = "ai_embedding_dimensions"
 
 # Local-only, same reasoning as the AI settings above: whether the
 # landing page's Church News box is allowed to fetch anything from
@@ -638,6 +643,10 @@ class MainWindow(QMainWindow):
         ai_settings_action.triggered.connect(self._show_ai_settings)
         ai_menu.addAction(ai_settings_action)
 
+        study_index_action = QAction("Build Study Index...", self)
+        study_index_action.triggered.connect(self._show_study_index)
+        ai_menu.addAction(study_index_action)
+
         # No "About" dialog - the dropdown itself carries the same
         # verbiage a popup would have (version, the unofficial-app
         # disclaimer required by the project's own stated policy, and
@@ -1011,6 +1020,8 @@ class MainWindow(QMainWindow):
             base_url=get_setting(self.conn, AI_BASE_URL_SETTING, ""),
             api_key=get_setting(self.conn, AI_API_KEY_SETTING, ""),
             model=get_setting(self.conn, AI_MODEL_SETTING, ""),
+            embedding_model=get_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, ""),
+            embedding_dimensions=get_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, ""),
             parent=self,
         )
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -1019,7 +1030,30 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, AI_BASE_URL_SETTING, dialog.base_url)
         set_setting(self.conn, AI_API_KEY_SETTING, dialog.api_key)
         set_setting(self.conn, AI_MODEL_SETTING, dialog.model)
+        set_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, dialog.embedding_model)
+        set_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, dialog.embedding_dimensions)
         self._update_search_placeholder()
+
+    def _show_study_index(self) -> None:
+        config = self._current_ai_config()
+        embedding_model = get_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, "")
+        if config is None or not embedding_model:
+            QMessageBox.information(
+                self,
+                "Study Index",
+                "The study index is built through your own AI endpoint's embeddings. "
+                "Turn on AI-assisted search and enter an Embedding model under "
+                "AI Integration → AI Settings first.",
+            )
+            return
+        dimensions = get_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, "")
+        StudyIndexDialog(
+            self.conn,
+            config,
+            embedding_model,
+            int(dimensions) if dimensions else None,
+            parent=self,
+        ).exec()
 
     def _update_search_placeholder(self) -> None:
         """The search bar's placeholder/tooltip are the only hint that

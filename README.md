@@ -24,7 +24,8 @@ A handful of landing-page extras are opt-in and off by default, only
 reaching the network once you turn them on: AI-assisted search (ask a
 question in your own words - and refine it conversationally with
 follow-ups - to get pointed at real, matching scripture, using your own
-AI endpoint), a Church News headline, a Come Follow Me helper showing
+AI endpoint, plus an optional study index built through that same endpoint
+so AI features can find passages by meaning), a Church News headline, a Come Follow Me helper showing
 this week's lesson, and an Inspirational Message featuring whatever's
 currently on churchofjesuschrist.org's own homepage. A General
 Conference reminder (also opt-in, also off by default) shows once a day
@@ -97,7 +98,7 @@ Features under consideration for future versions:
 
 - [x] Reading history (v1.3 - Resume Reading now shows your last 5 chapters, most recent first)
 - [x] AI-assisted search (v2.0 - ask a question in your own words in the search bar, then refine it conversationally with follow-ups, and get pointed at real, matching scripture; opt-in, bring-your-own AI endpoint - OpenAI, another compatible provider, or a locally-run server; see the AI Integration menu - v2.0.1 also surfaces any General Conference talks already known to cite a suggested verse)
-- [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.)
+- [ ] Talk prep helper (uses AI to suggest supporting scriptures, talks, etc.) - groundwork in v2.2.7: an opt-in "study index" (AI Integration → Build Study Index...) that embeds everything the app knows - every volume, the Journal of Discourses, Lectures on Faith, the Topical Guide, cross-references, General Conference and Ensign/Liahona titles plus the verses they cite, and your notes (never your Journal) - through your own endpoint's embeddings, so AI features can find passages by meaning. Built and stored on your own computer only (no download, nothing bundled); stop and resume any time, and re-running it only sends what's new. See `src/scriptures/study_index.py`
 - [ ] Apocrypha?
 - [x] Wiki
 - [x] JST (v1.3)

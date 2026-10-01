@@ -28,7 +28,8 @@ description: |
   reaching the network once you turn them on: AI-assisted search (ask a
   question in your own words - and refine it conversationally with
   follow-ups - to get pointed at real, matching scripture, using your own
-  AI endpoint), a Church News headline, a Come Follow Me helper showing
+  AI endpoint, plus an optional study index built through that same
+  endpoint so AI features can find passages by meaning), a Church News headline, a Come Follow Me helper showing
   this week's lesson, and an Inspirational Message featuring whatever's
   currently on churchofjesuschrist.org's own homepage. A General
   Conference reminder (also opt-in, also off by default) shows once a day

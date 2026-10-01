@@ -43,7 +43,7 @@ else is missing") is exactly the bug this fixes.
 On the initial question of a conversation (not a follow-up refinement -
 see AiConversationSection), coverage is also supplemented by a plain
 local keyword search: the question's own significant words (stopwords
-stripped - see _extract_keywords) are run through the same FTS5 index
+stripped - see extract_keywords) are run through the same FTS5 index
 the ordinary keyword search already uses, across every volume, and any
 real matches not already suggested by the model are appended. This
 exists because a model's own citation recall is necessarily uneven -
@@ -350,7 +350,7 @@ _STOPWORDS = frozenset(
 )
 
 
-def _extract_keywords(question: str, limit: int = 6) -> list[str]:
+def extract_keywords(question: str, limit: int = 6) -> list[str]:
     """A rough, stopword-stripped set of the question's own significant
     words, order preserved and deduplicated - see the module docstring's
     note on why this (not asking the model for keywords) backs the local
@@ -599,7 +599,7 @@ class QuestionAsker(QObject):
         misses = unresolved_candidates(self.conn, candidates)
 
         if self._is_initial_question:
-            keywords = _extract_keywords(self.question)
+            keywords = extract_keywords(self.question)
             # Over-fetched well past LOCAL_SUPPLEMENT_LIMIT - the top
             # bm25 matches for a common word can easily be entirely the
             # same verses the model already suggested (its own picks are

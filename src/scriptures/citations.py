@@ -95,6 +95,44 @@ def _magazine_label(display_date: str) -> str:
     return LIAHONA_LABEL if (year, month) >= _LIAHONA_START else ENSIGN_LABEL
 
 
+@dataclass(frozen=True)
+class CitingWork:
+    """One talk or article with every verse it cites - the per-work view
+    of the same data get_citations() serves per verse, for the study
+    index's talk/article summary cards (see study_index.py)."""
+
+    talk_title: str
+    speaker: str
+    date: str
+    url: str
+    source_label: str
+    references: list[str]
+
+
+def iter_citing_works() -> list[CitingWork]:
+    """Every known General Conference talk and Ensign/Liahona article,
+    each once, with the verses it cites in sorted order."""
+    works: dict[str, CitingWork] = {}
+    for loader, label_for in (
+        (_load_gc, lambda _date: GENERAL_CONFERENCE_LABEL),
+        (_load_liahona, _magazine_label),
+    ):
+        for reference, entries in loader().items():
+            for c in entries:
+                work = works.get(c["url"])
+                if work is None:
+                    work = CitingWork(
+                        c["talk_title"], c["speaker"], c["date"], c["url"], label_for(c["date"]), []
+                    )
+                    works[c["url"]] = work
+                work.references.append(reference)
+    for work in works.values():
+        # verse_citations.json sometimes lists the same talk more than
+        # once under one verse.
+        work.references[:] = sorted(set(work.references))
+    return sorted(works.values(), key=lambda w: w.url)
+
+
 def get_citations(reference: str) -> list[Citation]:
     """Every citing work for a verse - General Conference talks and
     Ensign/Liahona articles alike - keyed by its exact Verse.reference

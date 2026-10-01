@@ -29,7 +29,7 @@ from scriptures.ask import (  # noqa: E402
     AskedReference,
     _extract_candidates,
     _extract_json_array,
-    _extract_keywords,
+    extract_keywords,
     _merge_references,
     parse_reference,
     _search_local_verses_by_keywords,
@@ -148,14 +148,14 @@ def test_unresolved_candidates_reports_partial_misses() -> None:
 def test_extract_keywords() -> None:
     """The exact bug report: a full question reduces to just its real
     content word(s), stopwords stripped."""
-    assert _extract_keywords("when was the term christian first used") == ["christian"]
-    assert _extract_keywords("How did Christ organize the Nephite church?") == [
+    assert extract_keywords("when was the term christian first used") == ["christian"]
+    assert extract_keywords("How did Christ organize the Nephite church?") == [
         "christ",
         "organize",
         "nephite",
         "church",
     ]
-    assert _extract_keywords("the a of in on") == []
+    assert extract_keywords("the a of in on") == []
     print("test_extract_keywords: PASSED")
 
 

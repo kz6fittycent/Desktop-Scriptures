@@ -1,2 +1,5 @@
 PySide6==6.11.2
 piper-tts==1.8.0
+# Already pulled in by piper-tts (via onnxruntime); listed because the
+# study index (src/scriptures/study_index.py) imports it directly.
+numpy>=1.24,<3

@@ -20,3 +20,8 @@ data/tts_voices/
 # Overnight/background run logs (e.g. scripts/harvest_liahona_citations.py
 # left running unattended via nohup) - just console output, not data.
 *.log
+
+# The study index (see src/scriptures/study_index.py) - built per device
+# through the user's own AI endpoint, 100MB+, never shipped. Running from
+# a source checkout puts it next to data/scriptures.db.
+data/study_index.db

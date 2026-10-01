@@ -8,6 +8,10 @@ provider with a compatible endpoint, or a locally-run server such as
 Ollama's), plus which model to ask for. A "Test Connection" button
 confirms the base URL + key actually work before the user leaves the
 dialog, without spending any completion tokens.
+
+Also holds the optional embedding model (and dimensions) the study index
+is built with - see study_index.py and the "Build Study Index..." dialog.
+Blank means no study index; nothing else changes.
 """
 
 from __future__ import annotations
@@ -30,8 +34,9 @@ from scriptures.ai_client import AiConfig, ConnectionTester
 
 
 class AiSettingsDialog(QDialog):
-    """On accept, `enabled`/`base_url`/`api_key`/`model` hold the final
-    values to persist - see main_window.py's `_show_ai_settings`."""
+    """On accept, `enabled`/`base_url`/`api_key`/`model`/
+    `embedding_model`/`embedding_dimensions` hold the final values to
+    persist - see main_window.py's `_show_ai_settings`."""
 
     def __init__(
         self,
@@ -40,6 +45,8 @@ class AiSettingsDialog(QDialog):
         base_url: str,
         api_key: str,
         model: str,
+        embedding_model: str = "",
+        embedding_dimensions: str = "",
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
@@ -86,6 +93,26 @@ class AiSettingsDialog(QDialog):
         self._model_edit.setPlaceholderText("gpt-4o-mini")
         form.addRow("Model:", self._model_edit)
 
+        self._embedding_model_edit = QLineEdit(embedding_model)
+        self._embedding_model_edit.setPlaceholderText(
+            "e.g. text-embedding-3-small, or nomic-embed-text on Ollama"
+        )
+        self._embedding_model_edit.setToolTip(
+            "Used to build the study index (AI Integration → Build Study Index...). "
+            "Leave blank if your endpoint doesn't offer embeddings."
+        )
+        form.addRow("Embedding model:", self._embedding_model_edit)
+
+        self._embedding_dimensions_edit = QLineEdit(embedding_dimensions)
+        self._embedding_dimensions_edit.setPlaceholderText(
+            "Optional - e.g. 512 for text-embedding-3-* (smaller index)"
+        )
+        self._embedding_dimensions_edit.setToolTip(
+            "Only some providers support this (OpenAI's text-embedding-3 models do). "
+            "Leave blank to use the model's own size."
+        )
+        form.addRow("Embedding dimensions:", self._embedding_dimensions_edit)
+
         layout.addLayout(form)
 
         test_row = QHBoxLayout()
@@ -101,9 +128,18 @@ class AiSettingsDialog(QDialog):
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
-        buttons.accepted.connect(self.accept)
+        buttons.accepted.connect(self._on_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
+
+    def _on_accept(self) -> None:
+        dimensions = self._embedding_dimensions_edit.text().strip()
+        if dimensions and (not dimensions.isdigit() or int(dimensions) <= 0):
+            QMessageBox.warning(
+                self, "AI Settings", "Embedding dimensions should be a whole number, or blank."
+            )
+            return
+        self.accept()
 
     def _toggle_key_visibility(self, show: bool) -> None:
         self._api_key_edit.setEchoMode(
@@ -158,3 +194,11 @@ class AiSettingsDialog(QDialog):
     @property
     def model(self) -> str:
         return self._model_edit.text().strip()
+
+    @property
+    def embedding_model(self) -> str:
+        return self._embedding_model_edit.text().strip()
+
+    @property
+    def embedding_dimensions(self) -> str:
+        return self._embedding_dimensions_edit.text().strip()
