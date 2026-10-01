@@ -186,11 +186,11 @@ class CrossReferencesPanel(QWidget):
         outer.setContentsMargins(0, 0, 0, 0)
 
         add_row = QHBoxLayout()
-        add_row.addStretch(1)
         add_button = QPushButton("Add Cross-reference…")
         add_button.setToolTip("Link a passage here to another one anywhere in the scriptures")
         add_button.clicked.connect(lambda: self.open_add_dialog())
         add_row.addWidget(add_button)
+        add_row.addStretch(1)
         outer.addLayout(add_row)
 
         self._scroll = QScrollArea()
