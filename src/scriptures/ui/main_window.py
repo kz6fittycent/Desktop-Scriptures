@@ -34,7 +34,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
-from scriptures.ai_client import AiConfig
+from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
     Book,
     Chapter,
@@ -132,6 +132,8 @@ AI_MODEL_SETTING = "ai_model"
 # The study index's embedding model (and optional dimensions) - see
 # study_index.py. Blank model = no study index.
 AI_EMBEDDING_MODEL_SETTING = "ai_embedding_model"
+AI_EMBEDDING_BASE_URL_SETTING = "ai_embedding_base_url"
+AI_EMBEDDING_API_KEY_SETTING = "ai_embedding_api_key"
 AI_EMBEDDING_DIMENSIONS_SETTING = "ai_embedding_dimensions"
 
 # Local-only, same reasoning as the AI settings above: whether the
@@ -1020,6 +1022,8 @@ class MainWindow(QMainWindow):
             base_url=get_setting(self.conn, AI_BASE_URL_SETTING, ""),
             api_key=get_setting(self.conn, AI_API_KEY_SETTING, ""),
             model=get_setting(self.conn, AI_MODEL_SETTING, ""),
+            embeddings_base_url=get_setting(self.conn, AI_EMBEDDING_BASE_URL_SETTING, ""),
+            embeddings_api_key=get_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, ""),
             embedding_model=get_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, ""),
             embedding_dimensions=get_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, ""),
             parent=self,
@@ -1030,6 +1034,8 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, AI_BASE_URL_SETTING, dialog.base_url)
         set_setting(self.conn, AI_API_KEY_SETTING, dialog.api_key)
         set_setting(self.conn, AI_MODEL_SETTING, dialog.model)
+        set_setting(self.conn, AI_EMBEDDING_BASE_URL_SETTING, dialog.embeddings_base_url)
+        set_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, dialog.embeddings_api_key)
         set_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, dialog.embedding_model)
         set_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, dialog.embedding_dimensions)
         self._update_search_placeholder()
@@ -1049,7 +1055,12 @@ class MainWindow(QMainWindow):
         dimensions = get_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, "")
         StudyIndexDialog(
             self.conn,
-            config,
+            embeddings_config(
+                config,
+                get_setting(self.conn, AI_EMBEDDING_BASE_URL_SETTING, ""),
+                get_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, ""),
+                embedding_model,
+            ),
             embedding_model,
             int(dimensions) if dimensions else None,
             parent=self,

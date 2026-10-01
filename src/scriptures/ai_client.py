@@ -32,6 +32,19 @@ class AiConfig:
     model: str
 
 
+def embeddings_config(
+    chat: AiConfig, embeddings_base_url: str, embeddings_api_key: str, embedding_model: str
+) -> AiConfig:
+    """Where embedding requests for the study index go (see
+    study_index.py). A blank embeddings URL means "same endpoint as chat."
+    A different URL uses only its own key (possibly none, e.g. a local
+    Ollama) - never the chat endpoint's, so a hosted provider's API key
+    can't leak to some other server just because it was left blank."""
+    if not embeddings_base_url.strip():
+        return AiConfig(chat.base_url, chat.api_key, embedding_model)
+    return AiConfig(embeddings_base_url.strip(), embeddings_api_key.strip(), embedding_model)
+
+
 # Qt's own classification of "the server specifically rejected this for an
 # auth reason" (401/403-shaped errors), as opposed to a network-level
 # problem like a wrong port or a dead server - the two need very different

@@ -35,7 +35,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from PySide6.QtCore import QCoreApplication, QEventLoop, QTimer  # noqa: E402
 
 from scriptures import study_index as si  # noqa: E402
-from scriptures.ai_client import AiConfig  # noqa: E402
+from scriptures.ai_client import AiConfig, embeddings_config  # noqa: E402
 from scriptures.citations import CitingWork  # noqa: E402
 from scriptures.db import connect  # noqa: E402
 from scriptures.embeddings import IndexBuilder  # noqa: E402
@@ -380,6 +380,17 @@ def test_changing_model_or_dimensions_rebuilds_from_scratch() -> None:
         env.close()
 
 
+def test_embeddings_config_never_leaks_the_chat_key() -> None:
+    chat = AiConfig("https://api.openai.com/v1", "sk-chat", "gpt-4o-mini")
+    same = embeddings_config(chat, "", "ignored", "text-embedding-3-small")
+    assert (same.base_url, same.api_key, same.model) == (
+        "https://api.openai.com/v1", "sk-chat", "text-embedding-3-small"
+    )
+    separate = embeddings_config(chat, " http://localhost:11434/v1 ", "", "embeddinggemma")
+    assert (separate.base_url, separate.api_key) == ("http://localhost:11434/v1", "")
+    print("test_embeddings_config_never_leaks_the_chat_key: PASSED")
+
+
 def test_split_discourse_limits() -> None:
     giant_paragraph = " ".join(f"Sentence number {i} is here." for i in range(400))
     parts = si.split_discourse("Short opening.\n\n" + giant_paragraph + "\n\nShort close.")
@@ -407,6 +418,7 @@ def test_not_implemented_fails_fast_without_retrying() -> None:
 if __name__ == "__main__":
     app = QCoreApplication.instance() or QCoreApplication(sys.argv)
     test_split_discourse_limits()
+    test_embeddings_config_never_leaks_the_chat_key()
     test_collect_pieces_covers_every_source_but_the_journal()
     test_build_embeds_everything_and_search_ranks_by_meaning()
     test_retry_after_and_backoff_recover()
