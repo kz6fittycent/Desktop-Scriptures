@@ -125,7 +125,7 @@ def select(chat_url: str, chat_model: str, question: str, vector, index) -> tupl
     chat model's choice (see study_ask.py)."""
     from scriptures import study_ask
 
-    hits = index.search(question, vector, kind_limits=si_kind_limits(), limit=study_ask.CANDIDATES)
+    hits = study_ask.gather_candidates(index, [question], question, vector)
     request = urllib.request.Request(
         chat_url.rstrip("/") + "/chat/completions",
         data=json.dumps({
@@ -141,8 +141,8 @@ def select(chat_url: str, chat_model: str, question: str, vector, index) -> tupl
     except (OSError, ValueError, KeyError, IndexError):
         chosen = None
     if not chosen:
-        return hits[: study_ask.FALLBACK_COUNT], True
-    return [hits[i] for i in chosen], False
+        return study_ask.fallback_hits(hits), True
+    return study_ask.by_tier(study_ask.with_minimums([hits[i] for i in chosen], hits)), False
 
 
 def main() -> None:

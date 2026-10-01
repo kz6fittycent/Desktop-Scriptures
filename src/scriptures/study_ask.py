@@ -46,11 +46,43 @@ from scriptures.ask import citations_for, extract_keywords
 from scriptures.citations import Citation
 from scriptures.embeddings import QueryEmbedder
 
-CANDIDATES = 24
 MAX_SELECTED = 10
-# Shown when the chat model's selection isn't usable.
-FALLBACK_COUNT = 8
 SNIPPET_CHARS = 220
+
+STANDARD_WORKS = frozenset(
+    {"holy-bible", "book-of-mormon", "doctrine-and-covenants", "pearl-of-great-price",
+     # JST excerpts are part of the published Bible's footnotes/appendix.
+     "inspired-version"}
+)
+
+# Candidates for the chat model, gathered per group so every group is
+# always represented. One mixed search wasn't enough: a talk or article is
+# indexed as just its title plus the verses it cites, which scores below a
+# passage of real text, so for "eternal marriage" none of the many
+# conference talks on it made the top 24 at all. (name, kinds, volumes,
+# how many). Sized against scripts/eval_study_index.py --select: with 12
+# Standard Works slots (Lectures on Faith sharing them) scripture hit@10
+# fell from 81% to 69% - too few good verses reached the model at all.
+CANDIDATE_GROUPS = (
+    ("standard_works", {"scripture"}, STANDARD_WORKS, 16),
+    ("talks", {"talk"}, None, 4),
+    ("articles", {"article"}, None, 3),
+    # Curated cross-references point straight at the scripture a question
+    # is after (and often bring in the right verse when the passage search
+    # alone missed it) - their own slots, not shared with the rest below.
+    ("cross_references", {"cross_reference", "user_cross_reference"}, None, 3),
+    ("lectures_on_faith", {"scripture"}, {"lectures-on-faith"}, 1),
+    ("other", {"discourse", "topic", "note"}, None, 3),
+)
+CANDIDATES = sum(group[3] for group in CANDIDATE_GROUPS)
+# Shown, per tier, when the chat model's selection isn't usable.
+FALLBACK_PER_TIER = (4, 2, 1, 1)
+# Always shown, per tier, even when the chat model picked none from it:
+# General Conference talks and Ensign/Liahona articles are central to
+# preparing a talk, and in testing a 4B model sometimes chose none at all
+# for "eternal marriage" - a topic covered in dozens of each - despite
+# four strong talks among its options.
+MIN_PER_TIER = {1: 2, 2: 1}
 
 _KIND_LABELS = {
     "scripture": "Scripture",
@@ -152,6 +184,74 @@ def detect_filters(questions: list[str]) -> tuple[set[str] | None, set[str] | No
         if volumes:
             return {"scripture"}, volumes
     return None, None
+
+
+def tier(hit: study_index.SearchHit) -> int:
+    """Display order, by source (the user's chosen ranking): the Standard
+    Works, then General Conference talks, then Ensign/Liahona articles,
+    then everything else - Journal of Discourses, Lectures on Faith,
+    Topical Guide, cross-references, notes. Within a tier, the chat
+    model's (or the index's) order is kept."""
+    if hit.kind == "scripture" and hit.volume_slug in STANDARD_WORKS:
+        return 0
+    if hit.kind == "talk":
+        return 1
+    if hit.kind == "article":
+        return 2
+    return 3
+
+
+def by_tier(hits: list[study_index.SearchHit]) -> list[study_index.SearchHit]:
+    return sorted(hits, key=tier)  # stable
+
+
+def gather_candidates(
+    index: study_index.StudyIndex,
+    questions: list[str],
+    query: str,
+    vector: list[float] | None,
+) -> list[study_index.SearchHit]:
+    """The candidates the chat model chooses from: one search per
+    CANDIDATE_GROUPS group, or - when a follow-up asked for one volume or
+    kind of source (detect_filters) - a single search restricted to it."""
+    kinds, volumes = detect_filters(questions)
+    if kinds:
+        return index.search(query, vector, kinds=kinds, volume_slugs=volumes, limit=CANDIDATES)
+    hits: list[study_index.SearchHit] = []
+    for _name, group_kinds, group_volumes, count in CANDIDATE_GROUPS:
+        hits.extend(
+            index.search(
+                query, vector, kinds=group_kinds, volume_slugs=group_volumes,
+                kind_limits=study_index.MIXED_KIND_LIMITS, limit=count,
+            )
+        )
+    return hits
+
+
+def fallback_hits(hits: list[study_index.SearchHit]) -> list[study_index.SearchHit]:
+    """A few of the index's best from each tier, for when the chat
+    model's selection isn't usable."""
+    chosen: list[study_index.SearchHit] = []
+    for level, count in enumerate(FALLBACK_PER_TIER):
+        chosen.extend([h for h in hits if tier(h) == level][:count])
+    return chosen
+
+
+def with_minimums(
+    chosen: list[study_index.SearchHit], candidates: list[study_index.SearchHit]
+) -> list[study_index.SearchHit]:
+    """`chosen` plus, for each MIN_PER_TIER tier it has fewer of than the
+    minimum, the index's best remaining candidates from that tier."""
+    result = list(chosen)
+    for level, minimum in MIN_PER_TIER.items():
+        have = sum(1 for h in result if tier(h) == level)
+        for hit in candidates:
+            if have >= minimum:
+                break
+            if tier(hit) == level and hit not in result:
+                result.append(hit)
+                have += 1
+    return result
 
 
 def retrieval_query(questions: list[str]) -> str:
@@ -362,15 +462,11 @@ class StudyQuestionAsker(QObject):
     def _maybe_search(self) -> None:
         if not (self._embedded and self._loaded):
             return
-        kinds, volumes = detect_filters(self._questions)
-        self._hits = self._index.search(
+        self._hits = gather_candidates(
+            self._index,
+            self._questions,
             self._query,
             self._vector if self._index.is_loaded() else None,
-            kinds=kinds,
-            volume_slugs=volumes,
-            # Per-kind caps only make sense for a mixed list.
-            kind_limits=None if kinds else study_index.MIXED_KIND_LIMITS,
-            limit=CANDIDATES,
         )
         if not self._hits:
             self.succeeded.emit([], "")
@@ -391,7 +487,7 @@ class StudyQuestionAsker(QObject):
 
     def _fallback(self, why: str) -> None:
         self.succeeded.emit(
-            self._results(self._hits[:FALLBACK_COUNT]),
+            self._results(fallback_hits(self._hits)),
             f"Showing the study index's best matches - {why}",
         )
 
@@ -418,4 +514,8 @@ class StudyQuestionAsker(QObject):
         if not chosen:
             self._fallback("the AI didn't think any of them fit, so these may be loose matches.")
             return
-        self.succeeded.emit(self._results([self._hits[i] for i in chosen]), "")
+        chosen_hits = [self._hits[i] for i in chosen]
+        # A follow-up that asked for one volume or kind gets only that.
+        if detect_filters(self._questions)[0] is None:
+            chosen_hits = with_minimums(chosen_hits, self._hits)
+        self.succeeded.emit(self._results(by_tier(chosen_hits)), "")

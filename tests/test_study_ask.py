@@ -145,7 +145,9 @@ def test_model_choice_orders_results_and_text_comes_from_the_database() -> None:
         result = _ask(env, server, ["faith hope things not seen"])
         assert result.get("note") == "", result
         results = result["results"]
-        assert len(results) == 2
+        # The model's two picks (both scripture - the Standard Works group
+        # is listed first), plus the always-shown talk and article.
+        assert [r.kind for r in results] == ["scripture", "scripture", "talk", "article"], results
         prompt = server.chat_requests[0]["messages"][1]["content"]
         # The model's #2 then #1, in that order.
         listed = [line for line in prompt.splitlines() if line.startswith("[")]
@@ -214,6 +216,53 @@ def test_every_kind_resolves_to_something_clickable() -> None:
         env.close()
 
 
+@_with_fake_works
+def test_candidates_cover_every_group_and_results_follow_tier_order() -> None:
+    env = _Env()
+    server = ChatAndEmbeddingsServer()
+    try:
+        assert env.build()["ok"]
+        index = si.StudyIndex(env.index_conn)
+        query = "faith hope"
+        hits = study_ask.gather_candidates(index, [query], query, fake_embedding(query))
+        kinds = [h.kind for h in hits]
+        # Both talk cards are present even though scripture text matches
+        # "faith" far more strongly.
+        assert kinds.count("talk") == 1 and kinds.count("article") == 1, kinds
+        assert "scripture" in kinds, kinds
+        assert {"discourse", "topic"} & set(kinds), kinds
+
+        # The model picks everything in reverse; display follows the tiers.
+        server.chat_reply = json.dumps(list(range(len(hits), 0, -1)))
+        result = _ask(env, server, [query])
+        shown = [r.kind for r in result["results"]]
+        tiers = {"scripture": 0, "talk": 1, "article": 2}
+        ranks = [tiers.get(k, 3) for k in shown]
+        assert ranks == sorted(ranks), shown
+
+        # The model picks only scripture: the talk and article are still
+        # shown (the fixtures have one of each).
+        scripture_only = [i + 1 for i, h in enumerate(hits) if h.kind == "scripture"]
+        picked = scripture_only[:3]
+        server.chat_reply = json.dumps(picked)
+        result = _ask(env, server, [query])
+        shown = [r.kind for r in result["results"]]
+        assert shown[: len(picked)] == ["scripture"] * len(picked), shown
+        assert "talk" in shown and "article" in shown, shown
+        assert shown.index("talk") < shown.index("article"), shown
+        # ...but not after a follow-up that asked for scripture only.
+        result = _ask(env, server, [query, "just the Bible"])
+        assert "talk" not in [r.kind for r in result["results"]]
+
+        fallback = study_ask.fallback_hits(hits)
+        assert [study_ask.tier(h) for h in fallback] == sorted(study_ask.tier(h) for h in fallback)
+        assert {study_ask.tier(h) for h in fallback} >= {0, 1, 2}
+        print("test_candidates_cover_every_group_and_results_follow_tier_order: PASSED")
+    finally:
+        server.close()
+        env.close()
+
+
 if __name__ == "__main__":
     app = QCoreApplication.instance() or QCoreApplication(sys.argv)
     test_parse_selection()
@@ -223,4 +272,5 @@ if __name__ == "__main__":
     test_falls_back_to_index_order_when_the_model_reply_is_unusable()
     test_auth_failure_is_reported()
     test_every_kind_resolves_to_something_clickable()
+    test_candidates_cover_every_group_and_results_follow_tier_order()
     print("All study ask tests passed.")
