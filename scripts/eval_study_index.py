@@ -16,10 +16,16 @@ Reports, over all questions:
   included, since that's what a user sees);
 - MRR@10: mean reciprocal rank of the first listed passage (1.0 = always
   first, 0.5 = typically second, 0 = never in the top 10);
+  (with the same per-kind caps AI search uses);
 - the same three restricted to scripture pieces only;
 - duplicate slots: top-10 results repeating the same book/chapter/verses
   as a higher result (the Bible and the JST share numbering and most
   wording).
+
+With --select CHAT_URL CHAT_MODEL, also scores the full AI-search
+pipeline (src/scriptures/study_ask.py): the index's candidates, narrowed
+and reordered by that chat model - "selected" below - falling back to the
+index's own order when the model's reply isn't usable, as the app does.
 
 Scores are only meaningful relative to each other - run before and after
 a change. The question list isn't exhaustive, so a "miss" may still have
@@ -81,6 +87,11 @@ def embed(url: str, api_key: str, model: str, text: str) -> list[float]:
         return json.loads(response.read())["data"][0]["embedding"]
 
 
+def si_kind_limits() -> dict | None:
+    # The same per-kind caps AI search uses, when this version has them.
+    return getattr(si, "MIXED_KIND_LIMITS", None)
+
+
 def format_query(model: str, question: str) -> str:
     # Uses the index's own per-model query formatting when this version
     # of study_index.py has one.
@@ -109,12 +120,38 @@ def duplicate_slots(hits: list[si.SearchHit]) -> int:
     return duplicates
 
 
+def select(chat_url: str, chat_model: str, question: str, vector, index) -> tuple[list, bool]:
+    """The app's AI-search pipeline, synchronously: candidates, then the
+    chat model's choice (see study_ask.py)."""
+    from scriptures import study_ask
+
+    hits = index.search(question, vector, kind_limits=si_kind_limits(), limit=study_ask.CANDIDATES)
+    request = urllib.request.Request(
+        chat_url.rstrip("/") + "/chat/completions",
+        data=json.dumps({
+            "model": chat_model, "temperature": 0.1,
+            "messages": study_ask.selection_messages([question], hits),
+        }).encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=300) as response:
+            content = json.loads(response.read())["choices"][0]["message"]["content"]
+        chosen = study_ask.parse_selection(content, len(hits))
+    except (OSError, ValueError, KeyError, IndexError):
+        chosen = None
+    if not chosen:
+        return hits[: study_ask.FALLBACK_COUNT], True
+    return [hits[i] for i in chosen], False
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("index_db")
     parser.add_argument("embeddings_url")
     parser.add_argument("model")
     parser.add_argument("--api-key", default="")
+    parser.add_argument("--select", nargs=2, metavar=("CHAT_URL", "CHAT_MODEL"))
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -123,14 +160,18 @@ def main() -> None:
     index = si.StudyIndex(conn)
     questions = json.loads(QUESTIONS_PATH.read_text(encoding="utf-8"))["questions"]
 
-    mixed_ranks, scripture_ranks, dupes = [], [], 0
+    mixed_ranks, scripture_ranks, selected_ranks, dupes, fallbacks = [], [], [], 0, 0
     for item in questions:
         vector = embed(args.embeddings_url, args.api_key, args.model, format_query(args.model, item["q"]))
-        mixed = index.search(item["q"], vector, limit=10)
+        mixed = index.search(item["q"], vector, kind_limits=si_kind_limits(), limit=10)
         scripture = index.search(item["q"], vector, kinds={"scripture"}, limit=10)
         mixed_ranks.append([i for i, h in enumerate(mixed, 1) if is_relevant(h, item["refs"])])
         scripture_ranks.append([i for i, h in enumerate(scripture, 1) if is_relevant(h, item["refs"])])
         dupes += duplicate_slots(mixed)
+        if args.select:
+            chosen, fell_back = select(args.select[0], args.select[1], item["q"], vector, index)
+            fallbacks += fell_back
+            selected_ranks.append([i for i, h in enumerate(chosen, 1) if is_relevant(h, item["refs"])])
         if args.verbose:
             print(f"\nQ: {item['q']}  -> relevant at {mixed_ranks[-1] or 'none'}")
             for i, h in enumerate(mixed[:5], 1):
@@ -143,6 +184,10 @@ def main() -> None:
     print(f"\n{len(questions)} questions, model {args.model}")
     print(f"  mixed:          hit@5 {m5:.0%}  hit@10 {m10:.0%}  MRR@10 {mmrr:.3f}")
     print(f"  scripture only: hit@5 {s5:.0%}  hit@10 {s10:.0%}  MRR@10 {smrr:.3f}")
+    if args.select:
+        c5, c10, cmrr = score(selected_ranks)
+        print(f"  selected:       hit@5 {c5:.0%}  hit@10 {c10:.0%}  MRR@10 {cmrr:.3f}"
+              f"  ({fallbacks} fell back to index order)")
     print(f"  duplicate slots in mixed top 10: {dupes} of {10 * len(questions)}")
 
 

@@ -57,7 +57,7 @@ import hashlib
 import json
 import re
 import sqlite3
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import numpy as np
@@ -84,6 +84,21 @@ MAX_HEADING_TITLE_CHARS = 100
 
 # Reciprocal rank fusion's damping constant - the conventional value.
 RRF_K = 60
+
+# Per-kind caps for a mixed result list (see StudyIndex.search) - scripture
+# is uncapped; everything else can't crowd it out. Found necessary in
+# testing: "celestial marriage" filled 9 of 10 slots with Journal of
+# Discourses sermons, whose 19th-century speakers used the phrase far more
+# often (and often to mean plural marriage).
+MIXED_KIND_LIMITS = {
+    "discourse": 2,
+    "talk": 3,
+    "article": 2,
+    "topic": 2,
+    "cross_reference": 2,
+    "user_cross_reference": 2,
+    "note": 2,
+}
 
 KINDS = (
     "scripture",
@@ -397,10 +412,9 @@ def _discourse_pieces(conn: sqlite3.Connection) -> list[Piece]:
         title = (row["title"] or "").split("—")[0].strip()
         if len(title) > MAX_HEADING_TITLE_CHARS:
             title = title[:MAX_HEADING_TITLE_CHARS].rsplit(" ", 1)[0] + "..."
-        heading = (
-            f"Journal of Discourses, {row['book_name']}: \"{title}\" - "
-            f"{row['speaker']}, {row['discourse_date']}"
-        )
+        # 325 of the 1,003 discourses have no recorded date.
+        byline = ", ".join(part for part in (row["speaker"], row["discourse_date"]) if part)
+        heading = f"Journal of Discourses, {row['book_name']}: \"{title}\" - {byline}"
         for part_number, part in enumerate(split_discourse(row["text"]), start=1):
             pieces.append(
                 Piece(
@@ -868,20 +882,42 @@ class StudyIndex:
     def invalidate(self) -> None:
         self._ids = self._matrix = self._kinds = self._volumes = None
 
-    def _load(self) -> None:
-        if self._ids is not None:
-            return
-        rows = self.conn.execute(
+    def is_loaded(self) -> bool:
+        return self._ids is not None
+
+    @staticmethod
+    def _arrays_from(conn: sqlite3.Connection) -> tuple:
+        rows = conn.execute(
             "SELECT p.id, p.kind, p.volume_slug, v.vector FROM pieces p "
             "JOIN vectors v ON v.content_hash = p.content_hash ORDER BY p.id"
         ).fetchall()
-        self._ids = np.array([r["id"] for r in rows], dtype=np.int64)
-        self._kinds = np.array([r["kind"] for r in rows], dtype=object)
-        self._volumes = np.array([r["volume_slug"] or "" for r in rows], dtype=object)
+        ids = np.array([r[0] for r in rows], dtype=np.int64)
+        kinds = np.array([r[1] for r in rows], dtype=object)
+        volumes = np.array([r[2] or "" for r in rows], dtype=object)
         if rows:
-            self._matrix = np.vstack([np.frombuffer(r["vector"], dtype=np.float16) for r in rows])
+            matrix = np.vstack([np.frombuffer(r[3], dtype=np.float16) for r in rows])
         else:
-            self._matrix = np.zeros((0, 0), dtype=np.float16)
+            matrix = np.zeros((0, 0), dtype=np.float16)
+        return ids, kinds, volumes, matrix
+
+    @staticmethod
+    def load_arrays(index_path: Path) -> tuple:
+        """The in-memory search arrays, read through a connection of its
+        own - safe to call from a background thread (see
+        study_ask._VectorLoader), then hand the result to adopt_arrays()
+        on the thread that owns this StudyIndex."""
+        conn = sqlite3.connect(f"file:{index_path}?mode=ro", uri=True)
+        try:
+            return StudyIndex._arrays_from(conn)
+        finally:
+            conn.close()
+
+    def adopt_arrays(self, arrays: tuple) -> None:
+        self._ids, self._kinds, self._volumes, self._matrix = arrays
+
+    def _load(self) -> None:
+        if self._ids is None:
+            self.adopt_arrays(self._arrays_from(self.conn))
 
     def _mask(self, kinds: set[str] | None, volume_slugs: set[str] | None) -> np.ndarray:
         mask = np.ones(len(self._ids), dtype=bool)
@@ -948,12 +984,22 @@ class StudyIndex:
         *,
         kinds: set[str] | None = None,
         volume_slugs: set[str] | None = None,
+        kind_limits: dict[str, int] | None = None,
         limit: int = 20,
     ) -> list[SearchHit]:
         """The best `limit` pieces for a question, fusing semantic
         similarity (when `query_vector` - the question embedded with the
         index's own model - is given) with keyword relevance. Optionally
-        restricted to certain kinds and/or volumes."""
+        restricted to certain kinds and/or volumes, and/or capped per kind
+        (`kind_limits`, e.g. MIXED_KIND_LIMITS) so no one kind of source
+        can fill the list.
+
+        Scripture results are consolidated: overlapping or adjacent
+        windows of the same chapter merge into one wider result (e.g.
+        Alma 32:27-29 and 32:29-31 become Alma 32:27-31) at the higher-
+        ranked one's place, and the Bible and the JST - which share book/
+        chapter/verse numbering and mostly the same wording - count as the
+        same chapter for this."""
         candidates = limit * 5
         semantic = (
             self._semantic_ranking(query_vector, kinds, volume_slugs, candidates)
@@ -972,31 +1018,28 @@ class StudyIndex:
         if not ranked:
             return []
 
-        # Fetch more than `limit`, since duplicates get dropped below.
-        candidates_ids = ranked[: limit * 3]
         rows = {
             r["id"]: r
             for r in self.conn.execute(
-                f"SELECT * FROM pieces WHERE id IN ({','.join('?' * len(candidates_ids))})",
-                candidates_ids,
+                f"SELECT * FROM pieces WHERE id IN ({','.join('?' * len(ranked))})", ranked
             )
         }
         hits: list[SearchHit] = []
-        seen_passages: set[tuple] = set()
-        for pid in candidates_ids:
+        kind_counts: dict[str, int] = {}
+        # (book, chapter) -> indexes into `hits` of that chapter's results
+        by_chapter: dict[tuple, list[int]] = {}
+        for pid in ranked:
             row = rows.get(pid)
             if row is None:
                 continue
             meta = json.loads(row["meta"])
+            if row["kind"] == "scripture" and self._merge_into(hits, by_chapter, meta):
+                continue
+            if kind_limits and kind_counts.get(row["kind"], 0) >= kind_limits.get(row["kind"], limit):
+                continue
+            kind_counts[row["kind"]] = kind_counts.get(row["kind"], 0) + 1
             if row["kind"] == "scripture":
-                # The Bible and the Joseph Smith Translation share book/
-                # chapter/verse numbering and mostly the same wording -
-                # one result per passage, the higher-ranked one.
-                passage = (meta.get("book"), meta.get("chapter"), meta.get("verse_start"),
-                           meta.get("verse_end"))
-                if passage in seen_passages:
-                    continue
-                seen_passages.add(passage)
+                by_chapter.setdefault((meta.get("book"), meta.get("chapter")), []).append(len(hits))
             hits.append(
                 SearchHit(
                     piece_id=pid,
@@ -1014,3 +1057,27 @@ class StudyIndex:
             if len(hits) >= limit:
                 break
         return hits
+
+    @staticmethod
+    def _merge_into(hits: list[SearchHit], by_chapter: dict[tuple, list[int]], meta: dict) -> bool:
+        """If this scripture window overlaps or touches one already in
+        `hits` from the same chapter, widen that one to cover both and
+        return True (this window takes no slot of its own)."""
+        start, end = meta.get("verse_start"), meta.get("verse_end")
+        if start is None:
+            return False
+        for index in by_chapter.get((meta.get("book"), meta.get("chapter")), []):
+            existing = hits[index]
+            ex_start, ex_end = existing.meta["verse_start"], existing.meta["verse_end"]
+            if start <= ex_end + 1 and end >= ex_start - 1:
+                new_start, new_end = min(start, ex_start), max(end, ex_end)
+                merged_meta = dict(existing.meta)
+                merged_meta.update(
+                    verse_start=new_start,
+                    verse_end=new_end,
+                    reference=f"{merged_meta['book']} {merged_meta['chapter']}:"
+                    + (f"{new_start}" if new_start == new_end else f"{new_start}-{new_end}"),
+                )
+                hits[index] = replace(existing, meta=merged_meta)
+                return True
+        return False

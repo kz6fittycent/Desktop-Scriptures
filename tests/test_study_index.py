@@ -411,9 +411,10 @@ def test_bible_and_jst_duplicates_collapse_to_one_result() -> None:
         hits = si.StudyIndex(env.index_conn).search(
             "light day night darkness", fake_embedding("light day night darkness"), limit=10
         )
-        passages = [h.meta["reference"] for h in hits if h.kind == "scripture"]
-        assert len(passages) == len(set(passages)), passages
-        assert "Genesis 1:3-5" in passages
+        genesis = [h for h in hits if h.kind == "scripture" and h.meta["book"] == "Genesis"]
+        # KJV and JST Genesis 1, two windows each - all one result.
+        assert len(genesis) == 1, [(h.volume_slug, h.meta["reference"]) for h in genesis]
+        assert genesis[0].meta["verse_start"] <= 3 and genesis[0].meta["verse_end"] >= 5
         print("test_bible_and_jst_duplicates_collapse_to_one_result: PASSED")
     finally:
         env.close()
@@ -508,6 +509,33 @@ def test_latest_tag_is_the_same_model() -> None:
         env.close()
 
 
+@_with_fake_works
+def test_adjacent_windows_merge_and_kind_limits_apply() -> None:
+    env = _Env()
+    try:
+        assert env.build()["ok"]
+        index = si.StudyIndex(env.index_conn)
+        # Genesis 1's two windows (1-3, 3-5) both match "light" - one
+        # merged result, not two.
+        hits = index.search("light God", fake_embedding("light God"), limit=10)
+        genesis = [h for h in hits if h.kind == "scripture" and h.meta["book"] == "Genesis"]
+        assert len(genesis) == 1, [h.meta["reference"] for h in genesis]
+        assert genesis[0].meta["reference"] == "Genesis 1:1-5", genesis[0].meta
+        assert (genesis[0].meta["verse_start"], genesis[0].meta["verse_end"]) == (1, 5)
+
+        # Many discourse parts mention prayer; a limit of 1 keeps one.
+        unlimited = index.search("prayer revelation", fake_embedding("prayer revelation"), limit=10)
+        assert sum(h.kind == "discourse" for h in unlimited) > 1
+        limited = index.search(
+            "prayer revelation", fake_embedding("prayer revelation"), kind_limits={"discourse": 1},
+            limit=10,
+        )
+        assert sum(h.kind == "discourse" for h in limited) == 1
+        print("test_adjacent_windows_merge_and_kind_limits_apply: PASSED")
+    finally:
+        env.close()
+
+
 if __name__ == "__main__":
     app = QCoreApplication.instance() or QCoreApplication(sys.argv)
     test_split_discourse_limits()
@@ -524,4 +552,5 @@ if __name__ == "__main__":
     test_model_formats_apply_to_documents_and_queries()
     test_old_schema_index_is_reset()
     test_latest_tag_is_the_same_model()
+    test_adjacent_windows_merge_and_kind_limits_apply()
     print("All study index tests passed.")

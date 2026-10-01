@@ -34,7 +34,8 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
-from scriptures import ai_setup
+from scriptures import ai_setup, study_index
+from scriptures.study_ask import StudySearch
 from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
     Book,
@@ -264,6 +265,11 @@ class MainWindow(QMainWindow):
         # reset to "Study" every time - tracked here and threaded back in
         # via selected_side_tab so it survives Previous/Next navigation.
         self._side_tab_index = 0
+        # See _current_study_search - built once, so the study index's
+        # vectors stay loaded between searches; reset whenever AI settings
+        # or the index itself may have changed.
+        self._study_search: StudySearch | None = None
+        self._study_search_checked = False
 
         # Same reasoning as _side_tab_index above, for the side panel's
         # width: None until the user actually drags the splitter, letting
@@ -1049,6 +1055,7 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, dialog.embeddings_api_key)
         set_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, dialog.embedding_model)
         set_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, dialog.embedding_dimensions)
+        self._reset_study_search()
         self._update_search_placeholder()
 
     def _show_ai_setup_wizard(self) -> None:
@@ -1073,6 +1080,7 @@ class MainWindow(QMainWindow):
         set_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, wizard.embeddings_api_key)
         set_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, wizard.embedding_model)
         set_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, wizard.embedding_dimensions)
+        self._reset_study_search()
         self._update_search_placeholder()
         if wizard.build_now:
             self._show_study_index(start_immediately=True)
@@ -1121,6 +1129,8 @@ class MainWindow(QMainWindow):
             parent=self,
             start_immediately=start_immediately,
         ).exec()
+        # A build (or Delete Index) may have changed it.
+        self._reset_study_search()
 
     def _update_search_placeholder(self) -> None:
         """The search bar's placeholder/tooltip are the only hint that
@@ -1506,8 +1516,14 @@ class MainWindow(QMainWindow):
             return
         self._path = [{"label": "Search", "action": self._run_search}]
         self._update_breadcrumb()
-        view = SearchView(self.conn, ai_config=self._current_ai_config())
+        ai_config = self._current_ai_config()
+        view = SearchView(
+            self.conn,
+            ai_config=ai_config,
+            study=self._current_study_search() if ai_config is not None else None,
+        )
         view.result_selected.connect(self._on_search_result_selected)
+        view.topic_selected.connect(self._show_topic_detail)
         view.journal_entry_selected.connect(self._on_journal_result_selected)
         view.set_query(query)
         self._set_content(view)
@@ -1530,6 +1546,51 @@ class MainWindow(QMainWindow):
             api_key=get_setting(self.conn, AI_API_KEY_SETTING, ""),
             model=get_setting(self.conn, AI_MODEL_SETTING, ""),
         )
+
+    def _current_study_search(self) -> StudySearch | None:
+        """The study index for AI search to use, or None to keep using
+        plain AI search (study_ask.py vs. ask.py): needs an embedding
+        model set, and an index with vectors made by that same model -
+        a question embedded by any other model can't be compared to them."""
+        if self._study_search_checked:
+            return self._study_search
+        self._study_search_checked = True
+        config = self._current_ai_config()
+        model = get_setting(self.conn, AI_EMBEDDING_MODEL_SETTING, "")
+        index_path = study_index.index_path_for(self.conn)
+        if config is None or not model or not index_path.exists():
+            return None
+        index_conn = study_index.connect_index(index_path)
+        recorded, recorded_dimensions = study_index.recorded_model(index_conn)
+        dimensions = get_setting(self.conn, AI_EMBEDDING_DIMENSIONS_SETTING, "")
+        dimensions = int(dimensions) if dimensions else None
+        has_vectors = index_conn.execute("SELECT 1 FROM vectors LIMIT 1").fetchone() is not None
+        if (
+            not has_vectors
+            or recorded is None
+            or study_index.canonical_model(recorded) != study_index.canonical_model(model)
+            or recorded_dimensions != dimensions
+        ):
+            index_conn.close()
+            return None
+        self._study_search = StudySearch(
+            index=study_index.StudyIndex(index_conn),
+            index_path=index_path,
+            embedding_config=embeddings_config(
+                config,
+                get_setting(self.conn, AI_EMBEDDING_BASE_URL_SETTING, ""),
+                get_setting(self.conn, AI_EMBEDDING_API_KEY_SETTING, ""),
+                model,
+            ),
+            embedding_dimensions=dimensions,
+        )
+        return self._study_search
+
+    def _reset_study_search(self) -> None:
+        if self._study_search is not None:
+            self._study_search.index.conn.close()
+        self._study_search = None
+        self._study_search_checked = False
 
     def _on_search_result_selected(self, chapter_id: int) -> None:
         location = get_chapter_location(self.conn, chapter_id)

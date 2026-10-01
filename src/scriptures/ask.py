@@ -237,7 +237,7 @@ def _canonical_book_name(book: str) -> str:
     return _BOOK_ALIASES.get(_normalize_book_key(book), book)
 
 
-def _citations_for(references: list[str]) -> list[Citation]:
+def citations_for(references: list[str]) -> list[Citation]:
     """Real, already-harvested citing talks for any of these verse
     references, deduplicated by URL (the same talk often cites more than
     one verse in a range or chapter), capped at MAX_CITATIONS_PER_REFERENCE."""
@@ -272,7 +272,7 @@ def _resolve_one(conn: sqlite3.Connection, candidate: str) -> AskedReference | N
             return None
         label = f"{book} {chapter_number}"
         snippet = " ".join(r["text"] for r in rows)
-        citations = _citations_for([r["reference"] for r in rows])
+        citations = citations_for([r["reference"] for r in rows])
         return AskedReference(chapter.id, None, label, snippet, citations)
 
     verse_end = verse_end or verse_start
@@ -287,10 +287,10 @@ def _resolve_one(conn: sqlite3.Connection, candidate: str) -> AskedReference | N
     chapter_id = matched_verses[0].chapter_id
     if len(matched_verses) == 1:
         v = matched_verses[0]
-        return AskedReference(chapter_id, v.id, v.reference, v.text, _citations_for([v.reference]))
+        return AskedReference(chapter_id, v.id, v.reference, v.text, citations_for([v.reference]))
     label = f"{book} {chapter_number}:{verse_start}-{verse_end}"
     snippet = " ".join(v.text for v in matched_verses)
-    citations = _citations_for([v.reference for v in matched_verses])
+    citations = citations_for([v.reference for v in matched_verses])
     return AskedReference(chapter_id, matched_verses[0].id, label, snippet, citations)
 
 
@@ -422,7 +422,7 @@ def _search_local_verses_by_keywords(
 
     return [
         AskedReference(
-            row["chapter_id"], row["id"], row["reference"], row["text"], _citations_for([row["reference"]])
+            row["chapter_id"], row["id"], row["reference"], row["text"], citations_for([row["reference"]])
         )
         for row in interleaved
     ]

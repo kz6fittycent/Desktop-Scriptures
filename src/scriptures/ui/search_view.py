@@ -72,6 +72,7 @@ from scriptures.data_access import (
     search_verse_references,
     search_verses,
 )
+from scriptures.study_ask import StudySearch
 from scriptures.ui.ai_conversation import AiConversationSection
 from scriptures.ui.export import export_search_results
 from scriptures.ui.result_row import ResultRow, truncate_text as _truncate
@@ -125,16 +126,19 @@ class _JournalResultRow(QFrame):
 class SearchView(QWidget):
     result_selected = Signal(int)
     journal_entry_selected = Signal(str)
+    topic_selected = Signal(int)
 
     def __init__(
         self,
         conn: sqlite3.Connection,
         ai_config: AiConfig | None = None,
+        study: StudySearch | None = None,
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
         self.conn = conn
         self.ai_config = ai_config
+        self.study = study
         self._query = ""
         self._ai_section: AiConversationSection | None = None
 
@@ -223,8 +227,11 @@ class SearchView(QWidget):
         # replacement for them. AiConversationSection owns its own
         # placeholder/results/follow-up input from here on.
         if self.ai_config is not None:
-            self._ai_section = AiConversationSection(self.conn, self.ai_config, query, parent=self)
+            self._ai_section = AiConversationSection(
+                self.conn, self.ai_config, query, study=self.study, parent=self
+            )
             self._ai_section.result_selected.connect(self.result_selected)
+            self._ai_section.topic_selected.connect(self.topic_selected)
             self._results_layout.addWidget(self._ai_section)
 
         matched_tags = search_tags_by_name(self.conn, query)

@@ -32,12 +32,23 @@ from PySide6.QtWidgets import (
 from scriptures.ai_client import AiConfig
 from scriptures.ask import AskedReference, QuestionAsker
 from scriptures.citations import Citation
+from scriptures.study_ask import StudyQuestionAsker, StudyResult, StudySearch
 from scriptures.ui.result_row import ResultRow, truncate_text
 
 DISCLAIMER = (
     "This only suggests real matches from Desktop Scriptures' own text - "
     "it can't discuss doctrine or explain further."
 )
+# With a study index (see study_ask.py), results come from the index and
+# the model only chooses among them.
+STUDY_DISCLAIMER = (
+    "Every result comes from Desktop Scriptures' own library - scripture, "
+    "talks, and more, found by meaning - and the AI only chooses among "
+    "them. It can't discuss doctrine or explain further."
+)
+# Citing talks shown under each scripture result - the index's own talk
+# and article results already cover the rest.
+STUDY_CITATIONS_PER_RESULT = 2
 
 
 class _TalkRow(QFrame):
@@ -70,10 +81,41 @@ class _TalkRow(QFrame):
         # cue (and since get_citations() merges General Conference talks
         # and Liahona articles together, a hardcoded "General Conference
         # talk" label here would be wrong for the latter).
-        subtitle = QLabel(f"{citation.source_label} · {citation.speaker} · {citation.date}")
+        # Some harvested entries have no speaker (or date) - skip empty
+        # parts rather than showing "Ensign ·  · January 2004".
+        subtitle = QLabel(
+            " · ".join(part for part in (citation.source_label, citation.speaker, citation.date) if part)
+        )
         subtitle.setObjectName("resultSecondary")
         subtitle.setWordWrap(True)
         layout.addWidget(subtitle)
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if event.button() == Qt.MouseButton.LeftButton:
+            QDesktopServices.openUrl(QUrl(self._url))
+        super().mousePressEvent(event)
+
+
+class _LinkRow(QFrame):
+    """A talk or article result from the study index - opens its page on
+    churchofjesuschrist.org, like _TalkRow."""
+
+    def __init__(self, title: str, subtitle: str, url: str, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setObjectName("resultRow")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setToolTip("Open at churchofjesuschrist.org")
+        self._url = url
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 8, 12, 8)
+        layout.setSpacing(2)
+        primary = QLabel(title)
+        primary.setObjectName("resultPrimary")
+        primary.setWordWrap(True)
+        layout.addWidget(primary)
+        secondary = QLabel(subtitle)
+        secondary.setObjectName("resultSecondary")
+        layout.addWidget(secondary)
 
     def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         if event.button() == Qt.MouseButton.LeftButton:
@@ -87,17 +129,23 @@ class AiConversationSection(QWidget):
     widget exists."""
 
     result_selected = Signal(int)
+    topic_selected = Signal(int)
 
     def __init__(
         self,
         conn: sqlite3.Connection,
         ai_config: AiConfig,
         question: str,
+        study: StudySearch | None = None,
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
         self.conn = conn
         self.ai_config = ai_config
+        self._study = study
+        # With a study index: the whole line of questioning so far (see
+        # study_ask.retrieval_query).
+        self._questions: list[str] = []
         self._history: list[tuple[str, list[str]]] = []
         self._asker: QuestionAsker | None = None
         self._pending_placeholder: QLabel | None = None
@@ -121,7 +169,7 @@ class AiConversationSection(QWidget):
         # Persistent, not a one-time dismissible banner - sits right where
         # the user is about to type, so it's re-seen every follow-up, not
         # just skimmed past once.
-        caption = QLabel(DISCLAIMER)
+        caption = QLabel(STUDY_DISCLAIMER if study is not None else DISCLAIMER)
         caption.setObjectName("resultSecondary")
         caption.setWordWrap(True)
         layout.addWidget(caption)
@@ -149,6 +197,16 @@ class AiConversationSection(QWidget):
         self._pending_placeholder.setWordWrap(True)
         self._thread_layout.addWidget(self._pending_placeholder)
 
+        if self._study is not None:
+            self._questions.append(question)
+            study = self._study
+            self._asker = StudyQuestionAsker(
+                self.conn, study.index, study.index_path, self.ai_config, study.embedding_config,
+                study.embedding_dimensions, self._questions, parent=self,
+            )
+            self._asker.succeeded.connect(self._on_study_succeeded)
+            self._asker.failed.connect(self._on_failed)
+            return
         self._asker = QuestionAsker(
             self.conn, self.ai_config, question, history=list(self._history), parent=self
         )
@@ -212,6 +270,59 @@ class AiConversationSection(QWidget):
             missed_label.setObjectName("resultSecondary")
             missed_label.setWordWrap(True)
             self._thread_layout.addWidget(missed_label)
+
+    def _on_study_succeeded(self, results: list[StudyResult], note: str) -> None:
+        self._asker = None
+        self._clear_placeholder()
+        self._set_busy(False)
+        if not results:
+            empty = QLabel("No matches for that.")
+            empty.setObjectName("resultSecondary")
+            empty.setWordWrap(True)
+            self._thread_layout.addWidget(empty)
+        for result in results:
+            self._add_study_result(result)
+        if note:
+            note_label = QLabel(note)
+            note_label.setObjectName("resultSecondary")
+            note_label.setWordWrap(True)
+            self._thread_layout.addWidget(note_label)
+
+    def _add_study_result(self, result: StudyResult) -> None:
+        if result.url:
+            self._thread_layout.addWidget(_LinkRow(result.title, result.kind_label, result.url))
+            return
+        if result.topic_id is not None:
+            # ResultRow carries one id; here it's the topic's, routed to
+            # topic_selected rather than result_selected.
+            row = ResultRow(result.topic_id, result.title, truncate_text(result.detail))
+            row.clicked.connect(self.topic_selected)
+            self._thread_layout.addWidget(row)
+            return
+        if result.chapter_id is None:
+            return
+        detail = truncate_text(result.detail) if result.kind == "scripture" else (
+            f"{result.kind_label} · {truncate_text(result.detail)}" if result.detail else result.kind_label
+        )
+        row = ResultRow(result.chapter_id, result.title, detail)
+        row.clicked.connect(self.result_selected)
+        self._thread_layout.addWidget(row)
+        citations = result.citations[:STUDY_CITATIONS_PER_RESULT]
+        if citations:
+            # Indented under a label so a citing talk reads as belonging to
+            # the verse above it, not as a result the AI chose - in a mixed
+            # list (unlike plain AI search's all-scripture one) the two
+            # were otherwise indistinguishable.
+            cited = QWidget()
+            cited_layout = QVBoxLayout(cited)
+            cited_layout.setContentsMargins(28, 0, 0, 0)
+            cited_layout.setSpacing(4)
+            label = QLabel("Cited in")
+            label.setObjectName("resultSecondary")
+            cited_layout.addWidget(label)
+            for citation in citations:
+                cited_layout.addWidget(_TalkRow(citation))
+            self._thread_layout.addWidget(cited)
 
     def _on_failed(self, message: str, needs_api_key: bool) -> None:
         self._asker = None
