@@ -30,7 +30,7 @@ What gets indexed ("pieces"):
   cites. Metadata only, never talk/article text (see citations.py).
 - note: the reader's own notes. Journal entries are deliberately NOT
   included.
-- lexicon: each Hebrew/Aramaic word in the lexicon (Strong's number,
+- lexicon: each Hebrew/Aramaic/Greek word in the lexicon (Strong's number,
   meaning, definition, derivation, KJV renderings).
 
 Storage lives in its own SQLite file next to the main database
@@ -604,7 +604,7 @@ def _note_pieces(conn: sqlite3.Connection) -> list[Piece]:
 
 def _lexicon_pieces(conn: sqlite3.Connection) -> list[Piece]:
     """One piece per original-language lexicon entry (see
-    scripts/import_hebrew_lexicon.py) - so a question about what a word
+    scripts/import_lexicon.py) - so a question about what a word
     means ("What does Christ mean?") can find the entry whose definition
     or KJV renderings say it ("anointed... the Messiah"), by meaning or by
     words, even though the question never uses them."""
@@ -613,7 +613,7 @@ def _lexicon_pieces(conn: sqlite3.Connection) -> list[Piece]:
         "SELECT strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
         "kjv_renderings, gloss FROM lexicon_entries ORDER BY id"
     ):
-        language = "Aramaic" if r["language"] == "aramaic" else "Hebrew"
+        language = {"aramaic": "Aramaic", "greek": "Greek"}.get(r["language"], "Hebrew")
         body = f"Meaning: {r['gloss']}. Definition: {r['definition']}."
         if r["derivation"]:
             body += f" Derivation: {r['derivation']}"

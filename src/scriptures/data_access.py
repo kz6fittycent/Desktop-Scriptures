@@ -995,13 +995,36 @@ def get_lexicon_entry(conn: sqlite3.Connection, strongs: str) -> LexiconEntry | 
     return LexiconEntry(*row) if row else None
 
 
-def search_lexicon(conn: sqlite3.Connection, query: str, limit: int = 10) -> list[LexiconEntry]:
+def _kjv_roots(word: str) -> list[str]:
+    """Likely roots of an inflected KJV word, most likely first:
+    "anointed" -> "anoint"; "loveth" -> "love"; "blessings" -> "blessing",
+    "bless". A rough rule, not a stemmer - wrong guesses just find nothing."""
+    roots = []
+    for ending, replacements in (
+        ("eth", ("e", "")), ("est", ("e", "")), ("ing", ("e", "")), ("ied", ("y",)),
+        ("ed", ("", "e")), ("es", ("", "e")), ("s", ("",)),
+    ):
+        if word.endswith(ending) and len(word) - len(ending) >= 3:
+            stem = word[: -len(ending)]
+            roots.extend(stem + r for r in replacements)
+            if ending in ("es", "s"):
+                roots.extend(_kjv_roots(stem))
+            break
+    return [r for r in dict.fromkeys(roots) if r != word]
+
+
+def search_lexicon(
+    conn: sqlite3.Connection, query: str, limit: int = 10, preferred_language: str | None = None
+) -> list[LexiconEntry]:
     """Lexicon entries for a short query: a Strong's number ("H4899"), or a
     word matched against each entry's gloss, KJV renderings, and
     transliteration - so "Messiah" finds mashiach (H4899) through its KJV
     rendering. Whole-word matches only ("anointed", not "anointing"):
     exact matches first (the gloss or the KJV's first rendering is the
-    word itself), then glosses containing it, then other renderings."""
+    word itself), then glosses containing it, then other renderings.
+    `preferred_language` ("hebrew" - Aramaic included - or "greek") puts
+    that language's matches first: Greek reading the New Testament, Hebrew
+    the Old."""
     query = query.strip()
     if re.fullmatch(r"[HhGg]\d{1,5}", query):
         entry = get_lexicon_entry(conn, query)
@@ -1010,28 +1033,53 @@ def search_lexicon(conn: sqlite3.Connection, query: str, limit: int = 10) -> lis
     if not words or len(words) > 3:
         return []
     phrase = " ".join(words).lower()
-    pattern = re.compile(rf"\b{re.escape(phrase)}\b", re.IGNORECASE)
-    like = f"%{phrase}%"
-    rows = conn.execute(
-        f"SELECT {_LEXICON_COLUMNS} FROM lexicon_entries "
-        "WHERE gloss LIKE ? OR kjv_renderings LIKE ? OR transliteration LIKE ?",
-        (like, like, like),
-    ).fetchall()
-    def first(text: str) -> str:
-        return re.split(r"[,;:.]", text, maxsplit=1)[0].strip(" ()[]{}").lower()
+    # The phrase itself, then (for one word) its root with a common KJV
+    # ending removed - "anointed" also finds Greek chrio, whose KJV
+    # renderings say only "anoint". Root matches rank after exact ones.
+    forms = [phrase] + (_kjv_roots(phrase) if len(words) == 1 else [])
 
-    scored = []
-    for row in rows:
-        entry = LexiconEntry(*row)
-        if first(entry.gloss) == phrase:
-            scored.append((0, entry))  # the word's own meaning: "sabbath" -> H7676
-        elif first(entry.kjv_renderings) == phrase:
-            scored.append((1, entry))  # the KJV's main rendering: "Jehovah" -> H3068
-        elif pattern.search(entry.gloss):
-            scored.append((2, entry))  # ...before compounds: "Jehovah-nissi"
-        elif pattern.search(entry.kjv_renderings) or pattern.search(entry.transliteration):
-            scored.append((3, entry))
-    scored.sort(key=lambda item: (item[0], int(item[1].strongs[1:])))
+    def first(text: str) -> str:
+        # A verb's gloss reads "to anoint" - its word is "anoint".
+        word = re.split(r"[,;:.]", text, maxsplit=1)[0].strip(" ()[]{}").lower()
+        return word[3:] if word.startswith("to ") else word
+
+    best: dict[str, tuple[int, LexiconEntry]] = {}
+    for form_index, form in enumerate(forms):
+        pattern = re.compile(rf"\b{re.escape(form)}\b", re.IGNORECASE)
+        like = f"%{form}%"
+        rows = conn.execute(
+            f"SELECT {_LEXICON_COLUMNS} FROM lexicon_entries "
+            "WHERE gloss LIKE ? OR kjv_renderings LIKE ? OR transliteration LIKE ?",
+            (like, like, like),
+        ).fetchall()
+        offset = 0 if form_index == 0 else 4
+        for row in rows:
+            entry = LexiconEntry(*row)
+            if first(entry.gloss) == form:
+                rank = 0  # the word's own meaning: "sabbath" -> H7676
+            elif first(entry.kjv_renderings) == form:
+                rank = 1  # the KJV's main rendering: "Jehovah" -> H3068
+            elif pattern.search(entry.gloss):
+                rank = 2  # ...before compounds: "Jehovah-nissi"
+            elif pattern.search(entry.kjv_renderings) or pattern.search(entry.transliteration):
+                rank = 3
+            else:
+                continue
+            rank += offset
+            if entry.strongs not in best or rank < best[entry.strongs][0]:
+                best[entry.strongs] = (rank, entry)
+    scored = list(best.values())
+
+    def other_language(entry: LexiconEntry) -> bool:
+        if preferred_language is None:
+            return False
+        language = "hebrew" if entry.language == "aramaic" else entry.language
+        return language != preferred_language
+
+    # Ties: Hebrew before Greek (the Old Testament comes first), then by number.
+    scored.sort(key=lambda item: (
+        other_language(item[1]), item[0], item[1].strongs[0] != "H", int(item[1].strongs[1:])
+    ))
     return [entry for _rank, entry in scored[:limit]]
 
 

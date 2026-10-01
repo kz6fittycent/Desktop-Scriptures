@@ -1,30 +1,254 @@
 {
-  "_note": "Benchmark for the Hebrew lexicon layer (scripts/import_hebrew_lexicon.py): questions about what a word or name means, each paired with the Strong's numbers whose lexicon entry answers it. A hit counts if a lexicon result is one of them. Run with: python3 scripts/eval_study_index.py INDEX URL MODEL --questions scripts/study_index_lexicon_questions.json. Questions about New Testament words (Christ, Hosanna) will gain Greek answers when the Greek lexicon is added.",
+  "_note": "Benchmark for the original-language lexicon (scripts/import_lexicon.py): questions about what a word or name means, each paired with the Strong's numbers (Hebrew H, Greek G) whose lexicon entry answers it. A hit counts if a lexicon result is one of them. Run with: python3 scripts/eval_study_index.py INDEX URL MODEL --questions scripts/study_index_lexicon_questions.json",
   "questions": [
-    {"q": "What does Christ mean?", "refs": ["H4899"]},
-    {"q": "What does the word Messiah mean?", "refs": ["H4899"]},
-    {"q": "What is the Hebrew word for Sabbath and what does it mean?", "refs": ["H7676", "H7673"]},
-    {"q": "What does Immanuel mean?", "refs": ["H6005"]},
-    {"q": "What does the name Israel mean?", "refs": ["H3478"]},
-    {"q": "What does Jehovah mean?", "refs": ["H3068"]},
-    {"q": "What is Sheol?", "refs": ["H7585"]},
-    {"q": "What are cherubim?", "refs": ["H3742"]},
-    {"q": "What are seraphim?", "refs": ["H8314"]},
-    {"q": "What does Eden mean?", "refs": ["H5731", "H5729"]},
-    {"q": "What does the name Adam mean?", "refs": ["H120", "H121"]},
-    {"q": "What does the name Eve mean?", "refs": ["H2332"]},
-    {"q": "What does Abraham's name mean?", "refs": ["H85"]},
-    {"q": "What does shalom mean?", "refs": ["H7965"]},
-    {"q": "What does the word amen mean?", "refs": ["H543", "H539"]},
-    {"q": "Where does the word jubilee come from?", "refs": ["H3104"]},
-    {"q": "What does Selah mean in the Psalms?", "refs": ["H5542"]},
-    {"q": "What is manna?", "refs": ["H4478"]},
-    {"q": "What does Passover mean?", "refs": ["H6453"]},
-    {"q": "What does Elohim mean?", "refs": ["H430"]},
-    {"q": "What does hallelujah mean?", "refs": ["H1984", "H3050"]},
-    {"q": "What does the word Zion mean?", "refs": ["H6726"]},
-    {"q": "What does Bethlehem mean?", "refs": ["H1035"]},
-    {"q": "What is the Hebrew word for covenant?", "refs": ["H1285"]},
-    {"q": "What does the name Joshua mean?", "refs": ["H3091"]}
+    {
+      "q": "What does Christ mean?",
+      "refs": [
+        "G5547",
+        "H4899"
+      ]
+    },
+    {
+      "q": "What does the word Messiah mean?",
+      "refs": [
+        "H4899",
+        "G3323"
+      ]
+    },
+    {
+      "q": "What is the Hebrew word for Sabbath and what does it mean?",
+      "refs": [
+        "H7676",
+        "H7673"
+      ]
+    },
+    {
+      "q": "What does Immanuel mean?",
+      "refs": [
+        "H6005"
+      ]
+    },
+    {
+      "q": "What does the name Israel mean?",
+      "refs": [
+        "H3478"
+      ]
+    },
+    {
+      "q": "What does Jehovah mean?",
+      "refs": [
+        "H3068"
+      ]
+    },
+    {
+      "q": "What is Sheol?",
+      "refs": [
+        "H7585"
+      ]
+    },
+    {
+      "q": "What are cherubim?",
+      "refs": [
+        "H3742"
+      ]
+    },
+    {
+      "q": "What are seraphim?",
+      "refs": [
+        "H8314"
+      ]
+    },
+    {
+      "q": "What does Eden mean?",
+      "refs": [
+        "H5731",
+        "H5729"
+      ]
+    },
+    {
+      "q": "What does the name Adam mean?",
+      "refs": [
+        "H120",
+        "H121"
+      ]
+    },
+    {
+      "q": "What does the name Eve mean?",
+      "refs": [
+        "H2332"
+      ]
+    },
+    {
+      "q": "What does Abraham's name mean?",
+      "refs": [
+        "H85"
+      ]
+    },
+    {
+      "q": "What does shalom mean?",
+      "refs": [
+        "H7965"
+      ]
+    },
+    {
+      "q": "What does the word amen mean?",
+      "refs": [
+        "H543",
+        "H539"
+      ]
+    },
+    {
+      "q": "Where does the word jubilee come from?",
+      "refs": [
+        "H3104"
+      ]
+    },
+    {
+      "q": "What does Selah mean in the Psalms?",
+      "refs": [
+        "H5542"
+      ]
+    },
+    {
+      "q": "What is manna?",
+      "refs": [
+        "H4478"
+      ]
+    },
+    {
+      "q": "What does Passover mean?",
+      "refs": [
+        "H6453"
+      ]
+    },
+    {
+      "q": "What does Elohim mean?",
+      "refs": [
+        "H430"
+      ]
+    },
+    {
+      "q": "What does hallelujah mean?",
+      "refs": [
+        "H1984",
+        "H3050"
+      ]
+    },
+    {
+      "q": "What does the word Zion mean?",
+      "refs": [
+        "H6726"
+      ]
+    },
+    {
+      "q": "What does Bethlehem mean?",
+      "refs": [
+        "H1035"
+      ]
+    },
+    {
+      "q": "What is the Hebrew word for covenant?",
+      "refs": [
+        "H1285"
+      ]
+    },
+    {
+      "q": "What does the name Joshua mean?",
+      "refs": [
+        "H3091"
+      ]
+    },
+    {
+      "q": "What does hosanna mean?",
+      "refs": [
+        "G5614"
+      ]
+    },
+    {
+      "q": "What does Capernaum mean?",
+      "refs": [
+        "G2584"
+      ]
+    },
+    {
+      "q": "What does the word gospel mean?",
+      "refs": [
+        "G2098"
+      ]
+    },
+    {
+      "q": "What does apostle mean?",
+      "refs": [
+        "G652"
+      ]
+    },
+    {
+      "q": "What is the Greek word for church?",
+      "refs": [
+        "G1577"
+      ]
+    },
+    {
+      "q": "What does the Greek word for charity mean?",
+      "refs": [
+        "G26"
+      ]
+    },
+    {
+      "q": "What does repentance mean in Greek?",
+      "refs": [
+        "G3341",
+        "G3340"
+      ]
+    },
+    {
+      "q": "What does disciple mean?",
+      "refs": [
+        "G3101"
+      ]
+    },
+    {
+      "q": "What does Golgotha mean?",
+      "refs": [
+        "G1115"
+      ]
+    },
+    {
+      "q": "What does Gethsemane mean?",
+      "refs": [
+        "G1068"
+      ]
+    },
+    {
+      "q": "What does Alpha and Omega mean?",
+      "refs": [
+        "G1",
+        "G5598"
+      ]
+    },
+    {
+      "q": "Where does the word Pentecost come from?",
+      "refs": [
+        "G4005"
+      ]
+    },
+    {
+      "q": "What does baptize mean in Greek?",
+      "refs": [
+        "G907"
+      ]
+    },
+    {
+      "q": "What does the word grace mean in the New Testament?",
+      "refs": [
+        "G5485"
+      ]
+    },
+    {
+      "q": "What is the Greek word for Comforter?",
+      "refs": [
+        "G3875"
+      ]
+    }
   ]
 }

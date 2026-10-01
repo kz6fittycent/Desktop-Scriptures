@@ -1,7 +1,8 @@
-"""A Hebrew/Aramaic lexicon entry, in full (see lexicon_entries in
-schema.sql and scripts/import_hebrew_lexicon.py): the word in Hebrew,
-its transliteration and pronunciation, meaning, Strong's definition,
-derivation, and how the King James Version translates it.
+"""A Hebrew, Aramaic, or Greek lexicon entry, in full (see
+lexicon_entries in schema.sql and scripts/import_lexicon.py): the word
+in its original script, its transliteration and (Hebrew) pronunciation,
+meaning, Strong's definition, derivation, and how the King James Version
+translates it.
 
 LexiconEntryView is the reusable part - shown in the reading view's Word
 Study tab (word_study_panel.py) and in LexiconDialog (opened from search
@@ -25,12 +26,13 @@ from scriptures.data_access import LexiconEntry, get_lexicon_entry
 OPEN_SCRIPTURES_URL = "https://github.com/openscriptures/strongs"
 STEPBIBLE_URL = "https://www.STEPBible.org"
 LEXICON_CREDIT = (
-    f'Definitions: Strong\'s Hebrew dictionary (1894), <a href="{OPEN_SCRIPTURES_URL}">Open '
+    f'Definitions: Strong\'s Hebrew and Greek dictionaries, <a href="{OPEN_SCRIPTURES_URL}">Open '
     f'Scriptures</a> edition, CC BY-SA. Short meanings: <a href="{STEPBIBLE_URL}">STEP Bible</a>, '
     "CC BY."
 )
 
-_STRONGS_RE = re.compile(r"\b(H\d{1,4})\b")
+# Another entry named in a definition or derivation: "H4886", "G5548".
+_STRONGS_RE = re.compile(r"\b([HG]\d{1,4})\b")
 
 
 def _linked(text: str) -> str:
@@ -39,7 +41,7 @@ def _linked(text: str) -> str:
 
 
 def language_name(entry: LexiconEntry) -> str:
-    return "Aramaic" if entry.language == "aramaic" else "Hebrew"
+    return {"aramaic": "Aramaic", "greek": "Greek"}.get(entry.language, "Hebrew")
 
 
 class LexiconEntryView(QWidget):
@@ -59,12 +61,11 @@ class LexiconEntryView(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(8)
 
-        self._hebrew = QLabel()
-        self._hebrew.setObjectName("lexiconHebrew")
-        self._hebrew.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # Hebrew reads right to left.
-        self._hebrew.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-        layout.addWidget(self._hebrew)
+        # The word in its original script, large.
+        self._word = QLabel()
+        self._word.setObjectName("lexiconHebrew")
+        self._word.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self._word)
 
         self._heading = QLabel()
         self._heading.setObjectName("resultPrimary")
@@ -101,7 +102,7 @@ class LexiconEntryView(QWidget):
             self._history.clear()
         entry = get_lexicon_entry(self._conn, strongs)
         if entry is None:
-            self._hebrew.clear()
+            self._word.clear()
             self._heading.setText(f"{strongs} isn't in the lexicon.")
             self._body.clear()
         else:
@@ -111,7 +112,11 @@ class LexiconEntryView(QWidget):
 
     def _render(self, entry: LexiconEntry) -> None:
         language = language_name(entry)
-        self._hebrew.setText(entry.lemma)
+        self._word.setText(entry.lemma)
+        # Hebrew and Aramaic read right to left; Greek left to right.
+        self._word.setLayoutDirection(
+            Qt.LayoutDirection.LeftToRight if entry.language == "greek" else Qt.LayoutDirection.RightToLeft
+        )
         pronunciation = f" · pronounced {entry.pronunciation}" if entry.pronunciation else ""
         self._heading.setText(
             f"{entry.transliteration}{pronunciation}\n{language} · Strong's {entry.strongs}"

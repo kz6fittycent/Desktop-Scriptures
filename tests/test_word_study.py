@@ -22,6 +22,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from scriptures import data_access as da  # noqa: E402
@@ -52,11 +53,15 @@ def test_look_up_shows_matches_and_the_best_entry() -> None:
         assert not panel._buttons[0].isChecked()
         # A new lookup replaces the old matches.
         panel.look_up("Messiah")
-        assert [b.strongs for b in panel._buttons] == ["H4899"]
+        assert {b.strongs for b in panel._buttons} == {"H4899", "G3323"}  # Hebrew and Greek
         panel.look_up("qwertyuiop")
-        assert not panel._buttons and "No Hebrew or Aramaic word" in panel._status.text()
+        assert not panel._buttons and "No Hebrew, Aramaic, or Greek word" in panel._status.text()
         panel.look_up("")
         assert panel._status.text() == INTRO
+        # Reading the New Testament, Greek words are listed first.
+        greek_panel = WordStudyPanel(panel._conn, "greek")
+        greek_panel.look_up("love")
+        assert greek_panel._buttons[0].strongs.startswith("G"), [b.strongs for b in greek_panel._buttons]
         print("test_look_up_shows_matches_and_the_best_entry: PASSED")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -80,6 +85,12 @@ def test_derivation_links_and_back() -> None:
         assert not view._back.isVisibleTo(view)
         dialog = LexiconDialog(conn, "H6005")
         assert dialog.windowTitle() == "Hebrew word - Strong's H6005"
+        # Greek: left to right, and its Hebrew-origin links work.
+        view.show_entry("G2584")
+        assert view._word.layoutDirection() == Qt.LayoutDirection.LeftToRight
+        assert 'href="H3723"' in view._body.text() and 'href="H5151"' in view._body.text()
+        view._follow("H5151")
+        assert view._current == "H5151" and view._word.layoutDirection() == Qt.LayoutDirection.RightToLeft
         print("test_derivation_links_and_back: PASSED")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

@@ -252,8 +252,9 @@ class SearchView(QWidget):
         chapter_rows = [
             ResultRow(m.chapter_id, m.label) for m in search_chapters(self.conn, query)
         ]
-        # A word ("Messiah") or Strong's number ("H4899") - the Hebrew/
-        # Aramaic words it means or translates (see search_lexicon).
+        # A word ("Messiah") or Strong's number ("H4899", "G5547") - the
+        # Hebrew, Aramaic, and Greek words it means or translates (see
+        # search_lexicon).
         lexicon_entries = search_lexicon(self.conn, query)
         seen_verse_ids: set[int] = set()
         verse_rows = []
@@ -277,7 +278,7 @@ class SearchView(QWidget):
         self._add_journal_section(journal_rows)
         self._add_section("Chapters", chapter_rows)
         if lexicon_entries:
-            header = QLabel("Hebrew Words")
+            header = QLabel("Hebrew & Greek Words")
             header.setObjectName("searchSectionHeader")
             self._results_layout.addWidget(header)
             for entry in lexicon_entries:

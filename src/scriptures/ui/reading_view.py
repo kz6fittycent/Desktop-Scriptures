@@ -70,6 +70,7 @@ from scriptures.data_access import (
     add_highlight,
     clear_highlight_range,
     get_annotated_verse_ids,
+    get_chapter_location,
     get_highlights,
     get_note,
     get_tags,
@@ -304,6 +305,18 @@ class _VerseTextEdit(QTextEdit):
         menu.exec(event.globalPos())
 
 
+def _original_language(conn: sqlite3.Connection, chapter_id: int) -> str | None:
+    """Which original language's words Word Study lists first for this
+    chapter: Greek in the New Testament, Hebrew in the Old (the JST shares
+    the Bible's testaments). Other volumes get no preference - the Book of
+    Mormon quotes both Isaiah and the Sermon on the Mount."""
+    location = get_chapter_location(conn, chapter_id)
+    testament = location[1] if location else None
+    if testament is None:
+        return None
+    return "greek" if testament.name == "New Testament" else "hebrew"
+
+
 class ReadingView(QWidget):
     zoom_in_requested = Signal()
     zoom_out_requested = Signal()
@@ -497,7 +510,7 @@ class ReadingView(QWidget):
             self._cross_references_tab_label(self._cross_references_panel),
         )
 
-        self._word_study_panel = WordStudyPanel(conn)
+        self._word_study_panel = WordStudyPanel(conn, _original_language(conn, chapter_id))
         self._side_tabs.addTab(self._word_study_panel, "Word Study")
         self._side_tabs.setTabToolTip(
             self._side_tabs.indexOf(self._cross_references_panel),

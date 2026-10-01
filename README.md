@@ -76,7 +76,7 @@ Strong's Hebrew dictionary (1894, public domain) in
 edition, licensed CC BY-SA (that license applies to the lexicon data,
 not to this app's MIT-licensed code), with short word meanings from
 [STEP Bible](https://www.STEPBible.org) (Tyndale House, Cambridge),
-licensed CC BY 4.0; see `scripts/import_hebrew_lexicon.py`.
+licensed CC BY 4.0; see `scripts/import_lexicon.py`.
 
 ## Screenshots
 

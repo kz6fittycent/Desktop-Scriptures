@@ -127,7 +127,7 @@ _KIND_LABELS = {
     "cross_reference": "Cross-reference",
     "user_cross_reference": "Your cross-reference",
     "note": "Your note",
-    "lexicon": "Hebrew/Aramaic word",
+    "lexicon": "Original-language word",
 }
 
 SELECTION_PROMPT = (

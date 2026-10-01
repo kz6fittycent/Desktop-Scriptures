@@ -144,12 +144,12 @@ CREATE TABLE IF NOT EXISTS topic_key_verses (
 CREATE INDEX IF NOT EXISTS idx_topic_key_verses_topic ON topic_key_verses(topic_id);
 
 -- Original-language word lexicon, one row per Strong's number ("H4899").
--- Developer-authored by scripts/import_hebrew_lexicon.py (see its
--- docstring for sources and licenses - the definitions are Strong's 1894
--- dictionary in Open Scriptures' CC BY-SA edition, the glosses STEPBible's
--- CC BY ones), synced forward like the Topical Guide (see db.py's
--- _sync_bundled_lexicon). `language` is 'hebrew' or 'aramaic' (the
--- Aramaic portions of Daniel and Ezra); Greek is planned the same way.
+-- Developer-authored by scripts/import_lexicon.py (see its docstring for
+-- sources and licenses - the definitions are Strong's Hebrew and Greek
+-- dictionaries in Open Scriptures' CC BY-SA editions, the glosses
+-- STEPBible's CC BY ones), synced forward like the Topical Guide (see
+-- db.py's _sync_bundled_lexicon). `language` is 'hebrew', 'aramaic' (the
+-- Aramaic portions of Daniel and Ezra), or 'greek' (Strong's "G" numbers).
 CREATE TABLE IF NOT EXISTS lexicon_entries (
     id              INTEGER PRIMARY KEY,
     strongs         TEXT NOT NULL UNIQUE,

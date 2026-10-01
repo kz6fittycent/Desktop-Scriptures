@@ -1,12 +1,14 @@
 """Word Study tab: the original-language words behind the English you're
-reading - first step of the v3.0 linguistics roadmap (see the README).
+reading - the v3.0 linguistics roadmap's first layers (see the README):
+Hebrew and Aramaic for the Old Testament, Greek for the New.
 
 Look up a word by typing it at the top, or by right-clicking it in the
 reading view ("Look Up Original Word" - see reading_view.py). The matches
-are the Hebrew/Aramaic words whose King James renderings or meanings
-include it (data_access.search_lexicon): "anointed" finds mashiach and
-mashach. Picking one shows the full entry below (lexicon_dialog's
-LexiconEntryView).
+are the words whose King James renderings or meanings include it
+(data_access.search_lexicon): "anointed" finds Hebrew mashiach and Greek
+chriō. Reading the New Testament, Greek matches are listed first; the Old
+Testament, Hebrew/Aramaic. Picking one shows the full entry below
+(lexicon_dialog's LexiconEntryView).
 
 These are the words the KJV translates that way in general, not
 necessarily the exact word behind one particular verse - pinning that
@@ -33,8 +35,8 @@ from scriptures.data_access import LexiconEntry, search_lexicon
 from scriptures.ui.lexicon_dialog import LexiconEntryView, language_name
 
 INTRO = (
-    "Look up the Hebrew or Aramaic words behind an English word - type it above, "
-    "or right-click a word in the text and choose Look Up Original Word."
+    "Look up the Hebrew, Aramaic, or Greek words behind an English word - type it "
+    "above, or right-click a word in the text and choose Look Up Original Word."
 )
 
 
@@ -53,9 +55,17 @@ class _MatchButton(QPushButton):
 
 
 class WordStudyPanel(QWidget):
-    def __init__(self, conn: sqlite3.Connection, parent: QWidget | None = None):
+    def __init__(
+        self,
+        conn: sqlite3.Connection,
+        preferred_language: str | None = None,
+        parent: QWidget | None = None,
+    ):
+        """`preferred_language` ("hebrew" or "greek") lists that language's
+        matches first - the chapter being read decides it."""
         super().__init__(parent)
         self._conn = conn
+        self._preferred = preferred_language
         self._buttons: list[_MatchButton] = []
 
         outer = QVBoxLayout(self)
@@ -108,16 +118,16 @@ class WordStudyPanel(QWidget):
         if not word:
             self._status.setText(INTRO)
             return
-        entries = search_lexicon(self._conn, word)
+        entries = search_lexicon(self._conn, word, preferred_language=self._preferred)
         if not entries:
             self._status.setText(
-                f'No Hebrew or Aramaic word found for "{word}". Try a single word, its '
+                f'No Hebrew, Aramaic, or Greek word found for "{word}". Try a single word, its '
                 'root form ("anoint" rather than "anointing"), or a Strong\'s number like H4899.'
             )
             return
         self._status.setText(
-            f'Hebrew/Aramaic words the King James Version translates as "{word}":'
-            if len(entries) > 1 else f'The Hebrew/Aramaic word for "{word}":'
+            f'Words the King James Version translates as "{word}":'
+            if len(entries) > 1 else f'The original word for "{word}":'
         )
         for entry in entries:
             button = _MatchButton(entry)
