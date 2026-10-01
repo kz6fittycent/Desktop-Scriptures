@@ -397,9 +397,43 @@ def retrieval_query(questions: list[str]) -> str:
     return " ".join(parts)
 
 
-def _snippet(text: str, limit: int = SNIPPET_CHARS) -> str:
+# How much of a snippet comes before the first word it's centered on.
+SNIPPET_LEAD_CHARS = 80
+
+
+def snippet_keywords(question: str) -> list[str]:
+    """The question's significant words, as matched against passage text
+    ("Nephi's" -> "nephi")."""
+    return [re.sub(r"'s$", "", w) for w in extract_keywords(question, limit=12)]
+
+
+def _snippet(text: str, limit: int = SNIPPET_CHARS, keywords: list[str] = ()) -> str:
+    """`limit` characters of `text` - starting a little before the first
+    of `keywords` it contains, when it contains any, rather than always at
+    the start. A passage's opening can be about something else entirely:
+    2 Nephi 5:5-7 is the one passage that mentions Nephi's sisters, but
+    "my sisters" is past the first 220 characters, so the chat model -
+    shown only those - skipped it for a less relevant passage."""
     text = " ".join(text.split())
-    return text if len(text) <= limit else text[:limit].rsplit(" ", 1)[0] + "..."
+    if len(text) <= limit:
+        return text
+    start = 0
+    lowered = text.lower()
+    visible = lowered[:limit]
+    # Words of the question the opening doesn't show but the rest does -
+    # center on the earliest of those. ("Nephi" is already in 2 Nephi
+    # 5:5-7's opening; "sisters" isn't, so that's what to show.)
+    hidden = [
+        m.start() for k in keywords if k and not re.search(rf"\b{re.escape(k)}", visible)
+        for m in [re.search(rf"\b{re.escape(k)}", lowered)] if m
+    ]
+    if hidden:
+        start = max(0, min(hidden) - SNIPPET_LEAD_CHARS)
+        start = text.find(" ", start) + 1 if start else 0
+    piece = text[start:start + limit]
+    if start + limit < len(text):
+        piece = piece.rsplit(" ", 1)[0] + "..."
+    return ("..." if start else "") + piece
 
 
 def selection_messages(questions: list[str], hits: list[study_index.SearchHit]) -> list[dict]:
@@ -409,6 +443,7 @@ def selection_messages(questions: list[str], hits: list[study_index.SearchHit]) 
         ask = f"Original question: {questions[0]}\n" + "\n".join(
             f"Refinement: {q}" for q in questions[1:]
         )
+    keywords = snippet_keywords(" ".join(questions))
     lines = []
     for number, hit in enumerate(hits, start=1):
         heading, _, body = hit.text.partition("\n")
@@ -419,7 +454,7 @@ def selection_messages(questions: list[str], hits: list[study_index.SearchHit]) 
                 label = f"Scripture - a key passage on {hit.meta['key_topic']}"
         line = f"[{number}] ({label}) {heading}"
         if body:
-            line += f" - {_snippet(body)}"
+            line += f" - {_snippet(body, keywords=keywords)}"
         lines.append(line)
     return [
         {"role": "system", "content": SELECTION_PROMPT},
@@ -470,10 +505,14 @@ def _chapter_for(conn: sqlite3.Connection, volume_slug: str | None, reference: s
     return row[0] if row else None
 
 
-def to_result(conn: sqlite3.Connection, hit: study_index.SearchHit) -> StudyResult | None:
+def to_result(
+    conn: sqlite3.Connection, hit: study_index.SearchHit, question: str = ""
+) -> StudyResult | None:
     """A search hit as something to show - text re-read from the main
-    database where there is one. None if it no longer resolves (e.g. a
-    chapter this database doesn't have)."""
+    database where there is one, its snippet centered on the question's
+    words where it contains them (see _snippet). None if it no longer
+    resolves (e.g. a chapter this database doesn't have)."""
+    keywords = snippet_keywords(question) if question else []
     heading, _, body = hit.text.partition("\n")
     meta = hit.meta
     if hit.kind == "scripture":
@@ -487,23 +526,29 @@ def to_result(conn: sqlite3.Connection, hit: study_index.SearchHit) -> StudyResu
         return StudyResult(
             kind="scripture",
             title=meta["reference"],
-            detail=_snippet(" ".join(r[1] for r in rows), 400),
+            detail=_snippet(" ".join(r[1] for r in rows), 400, keywords),
             chapter_id=hit.chapter_id,
             citations=citations_for([r[2] for r in rows]),
         )
     if hit.kind in ("talk", "article"):
         return StudyResult(kind=hit.kind, title=heading, url=meta.get("url"))
     if hit.kind == "topic":
-        return StudyResult(kind="topic", title=heading, detail=_snippet(body), topic_id=meta.get("topic_id"))
+        return StudyResult(
+            kind="topic", title=heading, detail=_snippet(body, keywords=keywords), topic_id=meta.get("topic_id")
+        )
     if hit.kind in ("cross_reference", "user_cross_reference"):
         chapter_id = _chapter_for(conn, hit.volume_slug, meta.get("reference", ""))
         if chapter_id is None:
             return None
-        return StudyResult(kind=hit.kind, title=heading, detail=_snippet(body), chapter_id=chapter_id)
+        return StudyResult(
+            kind=hit.kind, title=heading, detail=_snippet(body, keywords=keywords), chapter_id=chapter_id
+        )
     if hit.chapter_id is None:
         return None
     # discourse, note
-    return StudyResult(kind=hit.kind, title=heading, detail=_snippet(body), chapter_id=hit.chapter_id)
+    return StudyResult(
+        kind=hit.kind, title=heading, detail=_snippet(body, keywords=keywords), chapter_id=hit.chapter_id
+    )
 
 
 @dataclass
@@ -652,7 +697,8 @@ class StudyQuestionAsker(QObject):
         self._reply.finished.connect(self._on_selected)
 
     def _results(self, hits: list[study_index.SearchHit]) -> list[StudyResult]:
-        return [r for r in (to_result(self.conn, h) for h in hits) if r is not None]
+        question = " ".join(self._questions)
+        return [r for r in (to_result(self.conn, h, question) for h in hits) if r is not None]
 
     def _fallback(self, why: str) -> None:
         self.succeeded.emit(

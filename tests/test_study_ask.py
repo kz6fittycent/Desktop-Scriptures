@@ -275,6 +275,31 @@ def test_candidates_cover_every_group_and_results_follow_tier_order() -> None:
         env.close()
 
 
+def test_snippets_show_the_question_words_the_opening_hides() -> None:
+    text = (
+        "And it came to pass that the Lord did warn me, that I, Nephi, should depart from them "
+        "and flee into the wilderness, and all those who would go with me. Wherefore, it came "
+        "to pass that I, Nephi, did take my family, and also Zoram and his family, and Sam, "
+        "mine elder brother and his family, and Jacob and Joseph, my younger brethren, and also "
+        "my sisters, and all those who would go with me."
+    )
+    keywords = study_ask.snippet_keywords("Where are Nephi's sisters mentioned?")
+    assert keywords[:2] == ["nephi", "sisters"], keywords
+    plain = study_ask._snippet(text, 220)
+    assert "sisters" not in plain and plain.startswith("And it came")
+    centered = study_ask._snippet(text, 220, keywords)
+    assert "my sisters" in centered and centered.startswith("..."), centered
+    # Nothing hidden (or nothing matching): the opening, as before.
+    assert study_ask._snippet(text, 220, ["nephi"]) == plain
+    assert study_ask._snippet(text, 220, ["zarahemla"]) == plain
+    # The prompt uses the centered form.
+    hit = si.SearchHit(1, "k", "scripture", f"2 Nephi 5:5-7\n{text}", "book-of-mormon", 3,
+                       {"reference": "2 Nephi 5:5-7"}, 1.0, 1, 1)
+    prompt = study_ask.selection_messages(["Where are Nephi's sisters mentioned?"], [hit])[1]["content"]
+    assert "my sisters" in prompt
+    print("test_snippets_show_the_question_words_the_opening_hides: PASSED")
+
+
 def test_parse_topic_choice() -> None:
     topics = [(10, "Faith"), (20, "Hope"), (30, "Charity"), (40, "Prayer")]
     assert study_ask.parse_topic_choice("[3]", topics) == [30]
@@ -335,6 +360,7 @@ if __name__ == "__main__":
     test_parse_selection()
     test_follow_up_filters()
     test_parse_topic_choice()
+    test_snippets_show_the_question_words_the_opening_hides()
     test_retrieval_query_and_prompt()
     test_model_choice_orders_results_and_text_comes_from_the_database()
     test_falls_back_to_index_order_when_the_model_reply_is_unusable()
