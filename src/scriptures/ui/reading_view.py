@@ -40,10 +40,16 @@ sibling widgets Qt wouldn't otherwise let it cross. Right-clicking
 directly on a highlighted word or phrase offers a quick "Remove
 Highlight" instead, without needing to arm "Clear Highlight" and
 re-drag over it.
+
+In Book of Mormon chapters, every proper name (data_access.
+get_bom_name_links) is shown in the verse-number color as a link: hovering
+shows its meaning, and a plain click - not a drag - opens its card in the
+Word Study tab.
 """
 
 from __future__ import annotations
 
+import re
 import sqlite3
 
 from PySide6.QtCore import QEvent, Qt, QPoint, QTimer, Signal
@@ -70,6 +76,7 @@ from scriptures.data_access import (
     add_highlight,
     clear_highlight_range,
     get_annotated_verse_ids,
+    get_bom_name_links,
     get_chapter_location,
     get_highlights,
     get_note,
@@ -123,8 +130,9 @@ class _VerseTextEdit(QTextEdit):
     So letting a highlight drag span several verses in one continuous
     gesture works the other way around: this widget only announces that
     a drag has begun (`drag_started`, from mousePressEvent) and otherwise
-    stays out of it entirely - no mouseMoveEvent/mouseReleaseEvent
-    overrides here at all. ReadingView, the only thing that ever needs
+    stays out of the drag entirely - its mouseMoveEvent ignores held-button
+    moves, and mouseReleaseEvent only notices a plain click on a Book of
+    Mormon name. ReadingView, the only thing that ever needs
     to know about a drag crossing a verse boundary, installs its own
     temporary QApplication-wide event filter for the duration (see its
     own eventFilter and _on_verse_drag_started/_extended/_finished) -
@@ -138,6 +146,7 @@ class _VerseTextEdit(QTextEdit):
     highlight_color_requested = Signal(str)
     cross_reference_requested = Signal()
     word_lookup_requested = Signal(str)
+    name_clicked = Signal(str)
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -150,6 +159,15 @@ class _VerseTextEdit(QTextEdit):
         self.document().setDocumentMargin(0)
         self.viewport().setAutoFillBackground(False)
         self._current_highlights: list[Highlight] = []
+        # Book of Mormon names in this verse: (start, end, name, meaning).
+        self._name_spans: list[tuple[int, int, str, str]] = []
+        self._press_offset: int | None = None
+
+    def set_name_spans(self, spans: list[tuple[int, int, str, str]]) -> None:
+        self._name_spans = spans
+
+    def _name_at(self, offset: int) -> tuple[int, int, str, str] | None:
+        return next((s for s in self._name_spans if s[0] <= offset < s[1]), None)
 
     def resizeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         super().resizeEvent(event)
@@ -170,7 +188,12 @@ class _VerseTextEdit(QTextEdit):
             self.setFixedHeight(height)
 
     def render_text(
-        self, text: str, font: QFont, normal_color: str, highlights: list[Highlight]
+        self,
+        text: str,
+        font: QFont,
+        normal_color: str,
+        highlights: list[Highlight],
+        link_color: str | None = None,
     ) -> None:
         """Fully (re)render from the given source of truth - always a
         complete overwrite, never an incremental patch, so this can't drift
@@ -195,6 +218,16 @@ class _VerseTextEdit(QTextEdit):
         whole_doc = QTextCursor(self.document())
         whole_doc.select(QTextCursor.SelectionType.Document)
         whole_doc.setCharFormat(normal_format)
+
+        # Names first, so a highlight over one still shows its own colors.
+        if link_color:
+            name_format = QTextCharFormat(normal_format)
+            name_format.setForeground(QColor(link_color))
+            for start, end, _name, _meaning in self._name_spans:
+                span = QTextCursor(self.document())
+                span.setPosition(start)
+                span.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
+                span.setCharFormat(name_format)
 
         for hl in highlights:
             colors = HIGHLIGHT_COLORS[hl.color]
@@ -229,7 +262,21 @@ class _VerseTextEdit(QTextEdit):
     def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         super().mousePressEvent(event)
         if event.button() == Qt.MouseButton.LeftButton:
+            self._press_offset = self.cursorForPosition(event.pos()).position()
             self.drag_started.emit()
+
+    def mouseReleaseEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        # Only a plain click on a name - pressed and released on the same
+        # spot, nothing selected - opens it; any drag stays a selection
+        # (ReadingView's event filter handles drags, as described above).
+        super().mouseReleaseEvent(event)
+        press_offset, self._press_offset = self._press_offset, None
+        if event.button() != Qt.MouseButton.LeftButton or self.textCursor().hasSelection():
+            return
+        offset = self.cursorForPosition(event.pos()).position()
+        hit = self._name_at(offset)
+        if hit is not None and press_offset is not None and hit[0] <= press_offset < hit[1]:
+            self.name_clicked.emit(hit[2])
 
     def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         # Left deliberately unhandled while dragging: ReadingView's
@@ -245,6 +292,16 @@ class _VerseTextEdit(QTextEdit):
         if event.buttons() & Qt.MouseButton.LeftButton:
             return
         super().mouseMoveEvent(event)
+        if self._name_spans:
+            hit = self._name_at(self.cursorForPosition(event.pos()).position())
+            self.viewport().setCursor(
+                Qt.CursorShape.PointingHandCursor if hit else Qt.CursorShape.IBeamCursor
+            )
+            if hit is None:
+                self.setToolTip("")
+            else:
+                meaning = f": {hit[3]}" if hit[3] else ""
+                self.setToolTip(f"{hit[2]}{meaning}\nClick to open it in Word Study")
 
     def contextMenuEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         offset = self.cursorForPosition(event.pos()).position()
@@ -315,6 +372,27 @@ def _original_language(conn: sqlite3.Connection, chapter_id: int) -> str | None:
     if testament is None:
         return None
     return "greek" if testament.name == "New Testament" else "hebrew"
+
+
+def _bom_name_spans(
+    conn: sqlite3.Connection, chapter_id: int, verses: list[Verse]
+) -> dict[int, list[tuple[int, int, str, str]]]:
+    """Each verse's Book of Mormon names, in Book of Mormon chapters only -
+    in the Bible these same biblical names would just be noise."""
+    location = get_chapter_location(conn, chapter_id)
+    if location is None or location[0].slug != "book-of-mormon":
+        return {}
+    links = get_bom_name_links(conn)
+    if not links:
+        return {}
+    # Longest first, so "Anti-Nephi-Lehi" wins over "Nephi"; a hyphen counts
+    # as part of a word, so "Lehi-Nephi" isn't split.
+    alternatives = "|".join(re.escape(s) for s in sorted(links, key=len, reverse=True))
+    pattern = re.compile(rf"(?<![\w-])(?:{alternatives})(?![\w-])")
+    return {
+        verse.id: [(m.start(), m.end(), *links[m.group()]) for m in pattern.finditer(verse.text)]
+        for verse in verses
+    }
 
 
 class ReadingView(QWidget):
@@ -428,6 +506,7 @@ class ReadingView(QWidget):
         # _on_verse_drag_started/eventFilter below.
         self._drag_anchor_verse: Verse | None = None
         self._drag_anchor_offset: int = 0
+        name_spans = _bom_name_spans(conn, chapter_id, verses)
         for verse in verses:
             row = QHBoxLayout()
             row.setSpacing(10)
@@ -459,6 +538,8 @@ class ReadingView(QWidget):
                 lambda v=verse: self._on_cross_reference_requested(v)
             )
             body.word_lookup_requested.connect(self._on_word_lookup_requested)
+            body.set_name_spans(name_spans.get(verse.id, []))
+            body.name_clicked.connect(self._on_word_lookup_requested)
             row.addWidget(body, 1)
             self._body_widgets[verse.id] = body
 
@@ -609,7 +690,11 @@ class ReadingView(QWidget):
 
         body = self._body_widgets[verse.id]
         body.render_text(
-            verse.text, self._font, self._palette.text, self._verse_highlights.get(verse.id, [])
+            verse.text,
+            self._font,
+            self._palette.text,
+            self._verse_highlights.get(verse.id, []),
+            link_color=self._palette.verse_number,
         )
 
     def _open_verse_note(self, verse: Verse) -> None:

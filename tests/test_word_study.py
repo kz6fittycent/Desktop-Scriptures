@@ -173,10 +173,53 @@ def test_right_click_lookup_opens_the_tab() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_names_in_book_of_mormon_text_are_links() -> None:
+    from PySide6.QtTest import QTest
+
+    from scriptures.ui.reading_view import ReadingView, _bom_name_spans
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-word-study-"))
+    try:
+        conn = _conn(tmp)
+
+        def chapter(book: str, number: int) -> int:
+            return conn.execute(
+                "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id "
+                "WHERE b.name = ? AND c.chapter_number = ?", (book, number)
+            ).fetchone()[0]
+
+        helaman = chapter("Helaman", 1)
+        verses = da.get_verses(conn, helaman)
+        spans = _bom_name_spans(conn, helaman, verses)
+        verse3 = next(v for v in verses if v.verse_number == 3)
+        assert [s[2] for s in spans[verse3.id]] == ["Pahoran", "Paanchi", "Pacumeni"]
+        # Group forms resolve to their name; the Bible gets no links.
+        assert ("Nephi" in [s[2] for s in spans[verses[0].id]])
+        judges = chapter("Judges", 15)
+        assert not any(_bom_name_spans(conn, judges, da.get_verses(conn, judges)).values())
+
+        view = ReadingView(conn, helaman, "Helaman 1", verses, theme.get_reading_palette("day"), "Serif", 14)
+        view.resize(1200, 800)
+        view.show()
+        QApplication.processEvents()
+        body = view._body_widgets[verse3.id]
+        paanchi = next(s for s in body._name_spans if s[2] == "Paanchi")
+        cursor = body.textCursor()
+        cursor.setPosition(paanchi[0] + 2)
+        QTest.mouseClick(body.viewport(), Qt.MouseButton.LeftButton, pos=body.cursorRect(cursor).center())
+        assert view._side_tabs.currentWidget() is view._word_study_panel
+        assert view._word_study_panel._name_card is not None
+        assert view._word_study_panel._input.text() == "Paanchi"
+        print("test_names_in_book_of_mormon_text_are_links: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_look_up_shows_matches_and_the_best_entry()
     test_derivation_links_and_back()
     test_book_of_mormon_name_card()
     test_right_click_lookup_opens_the_tab()
+    test_names_in_book_of_mormon_text_are_links()
     print("All Word Study tests passed.")

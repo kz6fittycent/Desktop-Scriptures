@@ -121,7 +121,7 @@ The goal: ask about a word, a name, or a place and get a clear, sourced answer -
 
 - [x] Hebrew and Greek word meanings - Strong's and STEP Bible, in the Word Study tab
 - [x] Book of Mormon names (e.g. what "Zarahemla" means) - all 307, each labeled by confidence, with proposals summarized in our own words from BYU's Book of Mormon Onomasticon and linked, never copied
-- [ ] Names highlighted in the text - click "Zarahemla" in a verse to open its Word Study card
+- [x] Names highlighted in the text - in Book of Mormon chapters, hover a name for its meaning, click it for its Word Study card
 - [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse rather than every word the KJV translates that way
 - [ ] Short, cited answers - a sentence or two drawn only from the sources found, every statement cited, rather than the AI only choosing among results as it does today; also the basis for the Talk prep helper
 - [ ] Geography for all the Standard Works - Bible places and maps (e.g. OpenBible.info's openly licensed geocoding), and the Book of Mormon geography models (Heartland, Mesoamerican, Baja California, and others) shown side by side as their proponents' theories, since the Church takes no official position on Book of Mormon geography

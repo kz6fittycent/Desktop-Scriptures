@@ -1034,6 +1034,17 @@ def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
     )
 
 
+def get_bom_name_links(conn: sqlite3.Connection) -> dict[str, tuple[str, str]]:
+    """Every spelling of a Book of Mormon name as it appears in the text
+    ("Zarahemla", "Nephites", "deseret") -> (the name, its short meaning),
+    for marking names as links in the reading view."""
+    links: dict[str, tuple[str, str]] = {}
+    for name, meaning, forms in conn.execute("SELECT name, meaning, forms FROM bom_names"):
+        for spelling in [name, *[f for f in forms.split(",") if f]]:
+            links[spelling] = (name, meaning)
+    return links
+
+
 def _kjv_roots(word: str) -> list[str]:
     """Likely roots of an inflected KJV word, most likely first:
     "anointed" -> "anoint"; "loveth" -> "love"; "blessings" -> "blessing",
