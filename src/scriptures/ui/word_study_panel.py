@@ -16,7 +16,10 @@ down needs a word-by-word tagged text, planned separately.
 
 A Book of Mormon name (data_access.get_bom_name, built by
 scripts/build_bom_names.py) gets a card above any matches: its meaning,
-labeled by confidence, with the scholars' proposals and sources.
+labeled by confidence, with the scholars' proposals and sources. A date
+("the first month", clicked in the text or typed here) gets a Hebrew
+calendar card instead: the month's names, holy days, and the Book of
+Mormon's events in it (hebrew_calendar.py).
 """
 
 from __future__ import annotations
@@ -36,6 +39,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from scriptures import hebrew_calendar
 from scriptures.data_access import BomName, LexiconEntry, get_bom_name, search_lexicon
 from scriptures.ui.lexicon_dialog import LexiconEntryView, language_name, linked
 
@@ -172,6 +176,85 @@ class _BomNameCard(QFrame):
             layout.addWidget(sources)
 
 
+class _MonthCard(QFrame):
+    """A month of Israel's calendar (hebrew_calendar.py): its names,
+    season, holy days, and the Book of Mormon's events in it - with the
+    clicked day placed among the holy days. Links: Strong's numbers, and
+    "month:N:0" to step to the neighboring months."""
+
+    def __init__(self, number: int, day: int | None, on_link, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setObjectName("nameCard")
+        month = hebrew_calendar.month(number)
+        ordinal = hebrew_calendar.ORDINALS[number - 1]
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 10, 12, 10)
+        layout.setSpacing(6)
+
+        title = QLabel(f"The {ordinal.capitalize()} Month")
+        title.setObjectName("lexiconHebrew")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title.setWordWrap(True)
+        layout.addWidget(title)
+        header = QLabel(f"Hebrew calendar · {month.season}")
+        header.setObjectName("resultPrimary")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setWordWrap(True)
+        layout.addWidget(header)
+
+        parts = []
+        if day is not None:
+            context = hebrew_calendar.day_context(number, day)
+            parts.append(
+                f"<p><b>The {hebrew_calendar.ORDINALS[day - 1]} day of the month.</b> {html.escape(context)}</p>"
+            )
+        if month.early_name:
+            parts.append(f"<p><b>Name before the exile:</b> {linked(month.early_name)}</p>")
+        parts.append(f"<p><b>Name after the exile:</b> {linked(month.later_name)}</p>")
+
+        def holy_items(after_lehi: bool) -> str:
+            items = []
+            for holy in month.days:
+                if holy.after_lehi != after_lehi:
+                    continue
+                when = f"<b>{html.escape(holy.days)}</b> - " if holy.days else ""
+                items.append(f"<li>{when}<b>{linked(holy.name)}</b>: {linked(holy.about)}</li>")
+            return "".join(items)
+
+        known = holy_items(False)
+        parts.append(
+            f"<p><b>In the law of Moses</b> (known to Lehi):</p><ul>{known}</ul>" if known
+            else "<p><b>In the law of Moses:</b> no holy day falls in this month.</p>"
+        )
+        later = holy_items(True)
+        if later:
+            parts.append(f"<p><b>Later</b> - after Lehi left Jerusalem:</p><ul>{later}</ul>")
+        events = [d for d in hebrew_calendar.BOM_DATES if d.month == number]
+        if events:
+            items = "".join(
+                f"<li><b>{html.escape(e.reference)}</b>"
+                f"{f' (day {e.day})' if e.day else ''}: {html.escape(e.event)}</li>"
+                for e in events
+            )
+            parts.append(f"<p><b>In the Book of Mormon:</b></p><ul>{items}</ul>")
+        previous = 12 if number == 1 else number - 1
+        following = 1 if number == 12 else number + 1
+        parts.append(
+            f'<p><a href="month:{previous}:0">← The {hebrew_calendar.ORDINALS[previous - 1]} month</a>'
+            f' · <a href="month:{following}:0">The {hebrew_calendar.ORDINALS[following - 1]} month →</a></p>'
+        )
+        body = QLabel("".join(parts))
+        body.setWordWrap(True)
+        body.setTextFormat(Qt.TextFormat.RichText)
+        body.linkActivated.connect(on_link)
+        layout.addWidget(body)
+
+        note = QLabel(hebrew_calendar.CALENDAR_NOTE)
+        note.setObjectName("resultSecondary")
+        note.setWordWrap(True)
+        layout.addWidget(note)
+
+
 class WordStudyPanel(QWidget):
     def __init__(
         self,
@@ -217,7 +300,7 @@ class WordStudyPanel(QWidget):
 
         self._name_slot = QVBoxLayout()
         layout.addLayout(self._name_slot)
-        self._name_card: _BomNameCard | None = None
+        self._name_card: _BomNameCard | _MonthCard | None = None
 
         self._matches = QVBoxLayout()
         self._matches.setSpacing(6)
@@ -230,7 +313,27 @@ class WordStudyPanel(QWidget):
 
     def look_up(self, word: str) -> None:
         word = " ".join(word.split())
-        self._input.setText(word)
+        dates = hebrew_calendar.find_dates(word)
+        if dates and dates[0][0] <= 4 and dates[0][1] == len(word):  # the whole entry is a date
+            self.show_month(dates[0][2], dates[0][3], text=word)
+            return
+        self._clear(word)
+        if not word:
+            self._status.setText(INTRO)
+            return
+        self._look_up_word(word)
+
+    def show_month(self, number: int, day: int | None = None, *, text: str | None = None) -> None:
+        """The calendar card for a month (and day) of Israel's calendar."""
+        ordinal = hebrew_calendar.ORDINALS
+        self._clear(text or (f"{ordinal[day - 1]} day of the {ordinal[number - 1]} month" if day
+                             else f"{ordinal[number - 1]} month"))
+        self._status.hide()
+        self._name_card = _MonthCard(number, day, self._follow_card_link)
+        self._name_slot.addWidget(self._name_card)
+
+    def _clear(self, text: str) -> None:
+        self._input.setText(text)
         for button in self._buttons:
             self._matches.removeWidget(button)
             button.hide()
@@ -243,9 +346,8 @@ class WordStudyPanel(QWidget):
             self._name_card.hide()
             self._name_card.deleteLater()
             self._name_card = None
-        if not word:
-            self._status.setText(INTRO)
-            return
+
+    def _look_up_word(self, word: str) -> None:
         name = get_bom_name(self._conn, word)
         if name is not None:
             self._name_card = _BomNameCard(name, self._follow_card_link)
@@ -280,6 +382,9 @@ class WordStudyPanel(QWidget):
         number shows that entry below."""
         if target.startswith("name:"):
             self.look_up(target.removeprefix("name:"))
+        elif target.startswith("month:"):
+            month, _, day = target.removeprefix("month:").partition(":")
+            self.show_month(int(month), int(day) or None)
         else:
             self._show_strongs(target)
 

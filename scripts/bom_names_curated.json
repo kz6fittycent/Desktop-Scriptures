@@ -1,6 +1,13 @@
 {
   "_note": "Curated Book of Mormon names - see scripts/build_bom_names.py's docstring for the tiers and rules. Meanings and proposals are this project's own summaries; the build links each name's Onomasticon page. Add \"people\": \"jaredite\" for a Jaredite name. \"notes\" are study notes (wordplay, titles, nicknames). \"families\" group names sharing consonants or an element; each member's card links the others.",
   "names": {
+    "Aaron": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "Moses' brother, the first high priest. In the Book of Mormon, a son of King Mosiah who preached to the Lamanites (Alma 21-22), and a Nephite city (Alma 8:13)."
+      ]
+    },
     "Abinadi": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps \"my father is praised\"",
@@ -186,6 +193,13 @@
         }
       ]
     },
+    "Amalekite": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "In the Book of Mormon, the Amalekites are Nephite dissenters who joined the Lamanites (Alma 21:2-3) - bearing the name of Israel's old enemy Amalek (H6002)."
+      ]
+    },
     "Amalickiah": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps \"the Lord is king\"",
@@ -235,6 +249,13 @@
           "meaning": "people of fortune",
           "origin": "Semitic ʿam, people or kinsman (H5971) + gad, fortune (H1409)"
         }
+      ]
+    },
+    "Aminadab": {
+      "tier": "biblical",
+      "meaning": "my kinsman is noble",
+      "notes": [
+        "The Bible's Amminadab, \"people of liberality\" (H5992), was Aaron's father-in-law and an ancestor of David and of Jesus (Exodus 6:23; Matthew 1:4). The Book of Mormon's Aminadab was a Nephite dissenter who told the Lamanites to repent (Helaman 5:39-41)."
       ]
     },
     "Aminadi": {
@@ -300,6 +321,13 @@
           "origin": "Hebrew ʿam + ʾărôn (H727)",
           "proponent": "Jo Ann Hackett"
         }
+      ]
+    },
+    "Ammon": {
+      "tier": "biblical",
+      "meaning": "tribal, people",
+      "notes": [
+        "In the Bible, Ammon is a people east of the Jordan, from Lot's son Ben-ammi (Genesis 19:38) - built on ʿam, people (H5983, H5971). In the Book of Mormon it is a man's name (Mosiah 7:3; Mosiah's son), and the Lamanite converts were \"called by the Nephites the people of Ammon\" (Alma 27:26) - the same phrase the Bible uses for the Ammonites."
       ]
     },
     "Ammonihah": {
@@ -419,6 +447,13 @@
           "meaning": "he of Moron - like the Maya naming pattern \"he of\" a place",
           "origin": "Moron"
         }
+      ]
+    },
+    "Amos": {
+      "tier": "biblical",
+      "meaning": "burden, burdensome",
+      "notes": [
+        "\"Burdensome\" (H5986) - the prophet Amos. In the Book of Mormon, a father and son who kept the records after Christ's visit (4 Nephi 1:19-21)."
       ]
     },
     "Amulek": {
@@ -586,6 +621,13 @@
         }
       ]
     },
+    "Antipas": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "A Greek name, borne by a martyr in Revelation 2:13. In the Book of Mormon, a mount where the Lamanites gathered (Alma 47:7); compare Antipus."
+      ]
+    },
     "Antipus": {
       "tier": "proposed",
       "meaning": "uncertain",
@@ -622,6 +664,34 @@
           "meaning": "chief magistrate, or ruler - Greek titles spread through the eastern Mediterranean with traders and mercenaries",
           "origin": "Greek archōn, ruler; archē, dominion"
         }
+      ]
+    },
+    "Benjamin": {
+      "tier": "biblical",
+      "meaning": "son of the right hand",
+      "notes": [
+        "\"Son of the right hand\" (H1144; Genesis 35:18) - fitting a righteous king whose people took Christ's name and were found \"on the right hand of God\" (Mosiah 5:9)."
+      ]
+    },
+    "Bethabara": {
+      "tier": "biblical",
+      "meaning": "house of the ford",
+      "notes": [
+        "Lehi foretold that John would baptize \"in Bethabara, beyond Jordan\" (1 Nephi 10:9) - the place named in John 1:28 (King James Version)."
+      ]
+    },
+    "Boaz": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "Ruth's husband, and one of the two bronze pillars of Solomon's temple (1 Kings 7:21; H1162). In the Book of Mormon, a city where the Nephites made a stand (Mormon 4:20)."
+      ]
+    },
+    "Cain": {
+      "tier": "biblical",
+      "meaning": "acquired",
+      "notes": [
+        "The Book of Mormon traces the Gadianton robbers' secret oaths back to the devil's plot with Cain (Helaman 6:26-27)."
       ]
     },
     "Cezoram": {
@@ -846,6 +916,13 @@
       "meaning": "honey bee",
       "reference": "Ether 2:3"
     },
+    "Egypt": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "Nephi wrote in \"the learning of the Jews and the language of the Egyptians\" (1 Nephi 1:2), and Moroni calls the plates' script \"reformed Egyptian\" (Mormon 9:32) - one reason scholars look for Egyptian names (Paanchi, Pahoran) in the Book of Mormon."
+      ]
+    },
     "Emer": {
       "tier": "proposed",
       "people": "jaredite",
@@ -882,6 +959,20 @@
         }
       ]
     },
+    "Enos": {
+      "tier": "biblical",
+      "meaning": "man, mortal",
+      "notes": [
+        "The Bible's Enos (Enosh, H583) is Seth's son, \"then began men to call upon the name of the LORD\" (Genesis 4:26). The Book of Mormon's Enos is known for his day-long prayer (Enos 1:4)."
+      ]
+    },
+    "Esrom": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "In the Bible, an ancestor of Jesus (Matthew 1:3); in the Book of Mormon, a son of the Jaredite king Omer (Ether 8:4)."
+      ]
+    },
     "Ethem": {
       "tier": "unknown",
       "people": "jaredite",
@@ -893,6 +984,13 @@
           "origin": "Hebrew ʾĒṯām, H864",
           "proponent": "John A. Tvedtnes"
         }
+      ]
+    },
+    "Ether": {
+      "tier": "biblical",
+      "meaning": "abundance",
+      "notes": [
+        "\"Abundance\" (H6281) - in the Bible a town of Judah (Joshua 15:42; 19:7). In the Book of Mormon, the last Jaredite prophet, whose record Moroni abridged."
       ]
     },
     "Ezias": {
@@ -1026,6 +1124,13 @@
         }
       ]
     },
+    "Gideon": {
+      "tier": "biblical",
+      "meaning": "feller, warrior",
+      "notes": [
+        "\"Feller\" (H1439) - like the judge who cut down Baal's grove (Judges 6:25-27). The Nephite Gideon drew his sword against wicked King Noah (Mosiah 19:4) and was later slain by Nehor (Alma 1:9); a valley and a city were named after him (Alma 2:20; 6:7)."
+      ]
+    },
     "Gidgiddonah": {
       "tier": "proposed",
       "meaning": "uncertain - a known Assyrian name",
@@ -1068,6 +1173,13 @@
         }
       ]
     },
+    "Gilead": {
+      "tier": "biblical",
+      "meaning": "heap of witness",
+      "notes": [
+        "The Bible's land east of the Jordan, named for the \"heap of witness\" Jacob and Laban raised (Genesis 31:47-48; H1568). In the Book of Mormon, the brother of Shared, a Jaredite rebel (Ether 14:8)."
+      ]
+    },
     "Gilgah": {
       "tier": "unknown",
       "people": "jaredite",
@@ -1078,6 +1190,13 @@
           "meaning": "perhaps related to Gilgal, also a Jaredite place name (compare H1537)",
           "origin": "uncertain"
         }
+      ]
+    },
+    "Gilgal": {
+      "tier": "biblical",
+      "meaning": "circle, wheel",
+      "notes": [
+        "Israel's first camp in Canaan, where the Lord \"rolled away\" Egypt's reproach (Joshua 5:9) - \"wheel, circle\" (H1537). In the Book of Mormon, a Jaredite valley of battle (Ether 13:27) and a Nephite city sunk at Christ's death (3 Nephi 9:6)."
       ]
     },
     "Gimgimno": {
@@ -1125,6 +1244,13 @@
         }
       ]
     },
+    "Helam": {
+      "tier": "biblical",
+      "meaning": "fortress",
+      "notes": [
+        "In the Bible, a place where David defeated the Syrians (2 Samuel 10:16-17), \"fortress\" (H2431). In the Book of Mormon, one of the first Alma baptized (Mosiah 18:12), and the land his people settled (Mosiah 23:19)."
+      ]
+    },
     "Helaman": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps \"seer\" or \"dreamer\"",
@@ -1145,6 +1271,13 @@
           "origin": "Egyptian ḥr-imn",
           "proponent": "Hugh Nibley"
         }
+      ]
+    },
+    "Helem": {
+      "tier": "biblical",
+      "meaning": "smiter",
+      "notes": [
+        "One of the men Ammon took to find Limhi's people (Mosiah 7:6); a biblical name, \"smiter\" (H1987; 1 Chronicles 7:35)."
       ]
     },
     "Helorum": {
@@ -1194,6 +1327,13 @@
         }
       ]
     },
+    "Heth": {
+      "tier": "biblical",
+      "meaning": "terror",
+      "notes": [
+        "The Bible's Heth is the ancestor of the Hittites (Genesis 10:15; H2845); in the Book of Mormon, two Jaredite kings (Ether 1:25-26; 9:25-26)."
+      ]
+    },
     "Himni": {
       "tier": "proposed",
       "meaning": "uncertain",
@@ -1229,6 +1369,20 @@
         "Corianton's harlot (Alma 39:3) bears Jezebel's name - Israel's emblem of seduction and idolatry (2 Kings 9:22; Revelation 2:20). Alma may be using it as a title, \"a Jezebel,\" rather than her birth name."
       ]
     },
+    "Ishmael": {
+      "tier": "biblical",
+      "meaning": "God will hear",
+      "notes": [
+        "\"God will hear\" (H3458) - like Abraham's son Ishmael (Genesis 16:11). Lehi's Ishmael died in the wilderness and was buried at Nahom (1 Nephi 16:34)."
+      ]
+    },
+    "Jacob": {
+      "tier": "biblical",
+      "meaning": "heel-catcher, supplanter",
+      "notes": [
+        "Lehi's \"firstborn in the days of my tribulation in the wilderness\" (2 Nephi 2:1) bears the name of Israel himself, \"heel-catcher\" (H3290; Genesis 25:26)."
+      ]
+    },
     "Jacobugath": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps \"Jacob and Gath\"",
@@ -1250,6 +1404,13 @@
           "meaning": "may (the Lord) arise",
           "origin": "Hebrew qûm, to arise (H6965), as a wish"
         }
+      ]
+    },
+    "Jared": {
+      "tier": "biblical",
+      "meaning": "descent",
+      "notes": [
+        "\"A descent\" (H3382; Genesis 5:15) - also the name of the man who led the Jaredites from the tower."
       ]
     },
     "Jarom": {
@@ -1293,6 +1454,13 @@
         }
       ]
     },
+    "Jeremiah": {
+      "tier": "biblical",
+      "meaning": "Jehovah will rise",
+      "notes": [
+        "Lehi's contemporary. The brass plates held \"many prophecies ... spoken by the mouth of Jeremiah\" (1 Nephi 5:13), and Nephi notes that Jerusalem had cast him into prison (1 Nephi 7:14; Jeremiah 37:15)."
+      ]
+    },
     "Jershon": {
       "tier": "hebrew_root",
       "meaning": "place of inheritance",
@@ -1313,6 +1481,41 @@
         "The text itself plays on the name: \"this land Jershon is the land which we will give unto our brethren for an inheritance\" (Alma 27:22)."
       ]
     },
+    "Jerusalem": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "The Lamanites, Amalekites, and people of Amulon built a city they called Jerusalem, \"calling it after the land of their fathers' nativity\" (Alma 21:1-2); it was covered by waters at Christ's death (3 Nephi 9:7)."
+      ]
+    },
+    "Jesus": {
+      "tier": "biblical",
+      "meaning": "Jehovah is salvation",
+      "notes": [
+        "Jesus is the Greek form of the Hebrew Joshua, Yehoshua, \"Jehovah is salvation\" (G2424, H3091). The Book of Mormon gives the name in prophecy six centuries early: \"he shall be called Jesus Christ\" (Mosiah 3:8; 2 Nephi 25:19)."
+      ]
+    },
+    "Jonas": {
+      "tier": "biblical",
+      "meaning": "dove",
+      "notes": [
+        "Nephi's son, one of the twelve (3 Nephi 19:4) - the Greek form of Jonah, \"dove,\" the name of Peter's father (John 1:42)."
+      ]
+    },
+    "Jordan": {
+      "tier": "biblical",
+      "meaning": "descender",
+      "notes": [
+        "\"Descender\" (H3383) - the river. In the Book of Mormon, a Nephite city of the last wars (Mormon 5:3)."
+      ]
+    },
+    "Joseph": {
+      "tier": "biblical",
+      "meaning": "may he add",
+      "notes": [
+        "\"Let him add\" (H3130; Genesis 30:24). Lehi's last-born carries the name of the ancestor Lehi traced himself to: \"I am a descendant of Joseph who was carried captive into Egypt\" (2 Nephi 3:4); Lehi's line was through Manasseh (Alma 10:3)."
+      ]
+    },
     "Josh": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps short for Josiah",
@@ -1326,6 +1529,13 @@
           "meaning": "like Yaush, a name in the Lachish letters of Lehi's day",
           "origin": "Hebrew inscription"
         }
+      ]
+    },
+    "Joshua": {
+      "tier": "biblical",
+      "meaning": "Jehovah is salvation",
+      "notes": [
+        "\"Jehovah-saved\" (H3091) - the same name as Jesus. In the Book of Mormon, a land \"in the borders west by the seashore\" (Mormon 2:6)."
       ]
     },
     "Kib": {
@@ -1352,6 +1562,13 @@
       "people": "jaredite",
       "meaning": "unknown",
       "reference": "Ether 8:10"
+    },
+    "Kish": {
+      "tier": "biblical",
+      "meaning": "a bow",
+      "notes": [
+        "\"A bow\" (H7027) - Saul's father (1 Samuel 9:1); in the Book of Mormon, a Jaredite king (Ether 1:18), and part of the names Kishkumen, Akish, and Riplakish."
+      ]
     },
     "Kishkumen": {
       "tier": "proposed",
@@ -1427,6 +1644,13 @@
         }
       ]
     },
+    "Laban": {
+      "tier": "biblical",
+      "meaning": "white",
+      "notes": [
+        "\"White\" (H3837). The Bible's Laban was Rebekah's brother and Jacob's father-in-law (Genesis 24:29; 29-31)."
+      ]
+    },
     "Lachoneus": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps \"Spartan\" (Greek)",
@@ -1499,6 +1723,14 @@
         }
       ]
     },
+    "Lehi": {
+      "tier": "biblical",
+      "meaning": "jawbone",
+      "notes": [
+        "In the Bible Lehi is only a place - \"jawbone\" (H3895, H3896), where Samson slew the Philistines with a jawbone and God opened a spring for him (Judges 15:9-19). The Book of Mormon is the first to give it as a man's name.",
+        "The Nephites later named a city Lehi \"by the borders of the seashore\" (Alma 50:15); see also Lehi-Nephi."
+      ]
+    },
     "Lehi-Nephi": {
       "tier": "proposed",
       "meaning": "the names Lehi and Nephi joined",
@@ -1519,6 +1751,20 @@
           "meaning": "ripen, embalm - unlikely",
           "origin": "Hebrew ḥnṭ"
         }
+      ]
+    },
+    "Lemuel": {
+      "tier": "biblical",
+      "meaning": "(belonging) to God",
+      "notes": [
+        "\"(Belonging) to God\" (H3927) - the king of Proverbs 31:1. Lehi named a valley after him and a river after Laman, hoping each would be \"like unto\" them (1 Nephi 2:8-10)."
+      ]
+    },
+    "Levi": {
+      "tier": "biblical",
+      "meaning": "attached",
+      "notes": [
+        "\"Attached\" (H3878; Genesis 29:34); in the Book of Mormon, a Jaredite king (Ether 1:20; 10:14-16)."
       ]
     },
     "Liahona": {
@@ -1638,6 +1884,13 @@
         }
       ]
     },
+    "Mary": {
+      "tier": "biblical",
+      "meaning": "",
+      "notes": [
+        "The Book of Mormon names Christ's mother more than a century before His birth: \"his mother shall be called Mary\" (Mosiah 3:8; Alma 7:10)."
+      ]
+    },
     "Mathoni": {
       "tier": "hebrew_root",
       "meaning": "(my) gift",
@@ -1659,6 +1912,13 @@
           "meaning": "Mathoni (\"gift\") with the -hah ending of Nephite names - compare Mattaniah, \"gift of Jehovah\" (H4983)",
           "origin": "see Mathoni"
         }
+      ]
+    },
+    "Melchizedek": {
+      "tier": "biblical",
+      "meaning": "king of righteousness",
+      "notes": [
+        "\"King of right\" (H4442) and king of Salem, \"peaceful\" (H8004). Alma tells more of him than the Bible does: his people \"waxed strong in iniquity,\" but he preached repentance and they repented (Alma 13:17-18)."
       ]
     },
     "Melek": {
@@ -2019,6 +2279,20 @@
         }
       ]
     },
+    "Nimrod": {
+      "tier": "biblical",
+      "meaning": "the mighty hunter",
+      "notes": [
+        "The text itself makes the link: the valley of Nimrod was \"called after the mighty hunter\" (Ether 2:1; Genesis 10:8-9, H5248)."
+      ]
+    },
+    "Noah": {
+      "tier": "biblical",
+      "meaning": "rest",
+      "notes": [
+        "\"Rest\" (H5146; Genesis 5:29, \"this same shall comfort us\"). Wicked King Noah's name could hardly fit him less; he died by fire (Mosiah 19:20), as Abinadi prophesied."
+      ]
+    },
     "Ogath": {
       "tier": "unknown",
       "people": "jaredite",
@@ -2204,6 +2478,13 @@
       "meaning": "powerful or great king",
       "reference": "Alma 18:13"
     },
+    "Ramah": {
+      "tier": "biblical",
+      "meaning": "height, high place",
+      "notes": [
+        "The Jaredite name for the hill the Nephites called Cumorah, \"where my father Mormon did hide up the records\" (Ether 15:11) - Hebrew \"height\" (H7414, H7413)."
+      ]
+    },
     "Rameumptom": {
       "tier": "defined",
       "meaning": "the holy stand",
@@ -2268,6 +2549,13 @@
         }
       ]
     },
+    "Samuel": {
+      "tier": "biblical",
+      "meaning": "heard of God",
+      "notes": [
+        "\"Heard of God\" (H8050) - like the boy prophet Samuel, whose mother asked him of the Lord (1 Samuel 1:20). Samuel the Lamanite prophesied from Zarahemla's wall (Helaman 13-15)."
+      ]
+    },
     "Sariah": {
       "tier": "hebrew_root",
       "meaning": "prince of Jehovah, or Jehovah is prince",
@@ -2327,6 +2615,13 @@
           "meaning": "he of Zoram - like Cezoram and Zenephi, \"he of Nephi\"",
           "origin": "Hebrew zeh, this one, he of + Zoram"
         }
+      ]
+    },
+    "Seth": {
+      "tier": "biblical",
+      "meaning": "put, substituted",
+      "notes": [
+        "Adam's son \"appointed ... instead of Abel\" (Genesis 4:25; H8352); in the Book of Mormon, a Jaredite king's son who lived out his days in captivity (Ether 11:9)."
       ]
     },
     "Shared": {
@@ -2402,6 +2697,13 @@
       ],
       "notes": [
         "The text explains the name itself: \"because of its exceeding height\" (Ether 3:1)."
+      ]
+    },
+    "Shem": {
+      "tier": "biblical",
+      "meaning": "name",
+      "notes": [
+        "\"Name\" (H8035); Noah's son. In the Book of Mormon, a land the Nephites were driven to (Mormon 2:20). Compare Sam and Shim."
       ]
     },
     "Shemlon": {
@@ -2629,6 +2931,13 @@
         }
       ]
     },
+    "Sidon": {
+      "tier": "biblical",
+      "meaning": "fishery",
+      "notes": [
+        "In the Bible, Sidon is a Phoenician port, named for Canaan's firstborn (Genesis 10:15) - \"fishery,\" from a root meaning to catch fish (H6721). In the Book of Mormon it is the great river by Zarahemla (Alma 2:15) - perhaps a name the Mulekites brought, if they sailed with Phoenicians."
+      ]
+    },
     "Siron": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps Sirion (Mount Hermon)",
@@ -2681,6 +2990,13 @@
         }
       ]
     },
+    "Timothy": {
+      "tier": "biblical",
+      "meaning": "honoring God",
+      "notes": [
+        "A Greek name, \"honoring God\" (G5095) - Nephi's brother, whom he raised from the dead, and one of the twelve Christ chose (3 Nephi 19:4)."
+      ]
+    },
     "Tubaloth": {
       "tier": "proposed",
       "meaning": "uncertain - perhaps \"gift\" or \"skilled\"",
@@ -2728,6 +3044,13 @@
           "origin": "Hebrew zĕrōaʿ, arm",
           "proponent": "John A. Tvedtnes"
         }
+      ]
+    },
+    "Zedekiah": {
+      "tier": "biblical",
+      "meaning": "righteousness of Jehovah",
+      "notes": [
+        "\"Right of Jah\" (H6667) - king of Judah when Lehi left Jerusalem, \"in the commencement of the first year of the reign of Zedekiah\" (1 Nephi 1:4). His son Mulek also escaped Babylon's conquest (Helaman 8:21)."
       ]
     },
     "Zeezrom": {

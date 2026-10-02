@@ -42,9 +42,10 @@ Highlight" instead, without needing to arm "Clear Highlight" and
 re-drag over it.
 
 In Book of Mormon chapters, every proper name (data_access.
-get_bom_name_links) is shown in the verse-number color as a link: hovering
-shows its meaning, and a plain click - not a drag - opens its card in the
-Word Study tab.
+get_bom_name_links) and every date ("the fourth day of the first month" -
+hebrew_calendar.py) is shown in the verse-number color as a link: hovering
+shows its meaning or its month's holy days, and a plain click - not a drag
+- opens its card in the Word Study tab.
 """
 
 from __future__ import annotations
@@ -69,7 +70,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from scriptures import tts
+from scriptures import hebrew_calendar, tts
 from scriptures.data_access import (
     Highlight,
     Verse,
@@ -146,7 +147,7 @@ class _VerseTextEdit(QTextEdit):
     highlight_color_requested = Signal(str)
     cross_reference_requested = Signal()
     word_lookup_requested = Signal(str)
-    name_clicked = Signal(str)
+    link_clicked = Signal(str)  # "name:Zarahemla" or "month:1:4" (day 0 = none)
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -159,15 +160,16 @@ class _VerseTextEdit(QTextEdit):
         self.document().setDocumentMargin(0)
         self.viewport().setAutoFillBackground(False)
         self._current_highlights: list[Highlight] = []
-        # Book of Mormon names in this verse: (start, end, name, meaning).
-        self._name_spans: list[tuple[int, int, str, str]] = []
+        # Links in this verse - Book of Mormon names and dates:
+        # (start, end, target, tooltip); see link_clicked for targets.
+        self._link_spans: list[tuple[int, int, str, str]] = []
         self._press_offset: int | None = None
 
-    def set_name_spans(self, spans: list[tuple[int, int, str, str]]) -> None:
-        self._name_spans = spans
+    def set_link_spans(self, spans: list[tuple[int, int, str, str]]) -> None:
+        self._link_spans = spans
 
-    def _name_at(self, offset: int) -> tuple[int, int, str, str] | None:
-        return next((s for s in self._name_spans if s[0] <= offset < s[1]), None)
+    def _link_at(self, offset: int) -> tuple[int, int, str, str] | None:
+        return next((s for s in self._link_spans if s[0] <= offset < s[1]), None)
 
     def resizeEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         super().resizeEvent(event)
@@ -223,7 +225,7 @@ class _VerseTextEdit(QTextEdit):
         if link_color:
             name_format = QTextCharFormat(normal_format)
             name_format.setForeground(QColor(link_color))
-            for start, end, _name, _meaning in self._name_spans:
+            for start, end, _target, _tooltip in self._link_spans:
                 span = QTextCursor(self.document())
                 span.setPosition(start)
                 span.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
@@ -274,9 +276,9 @@ class _VerseTextEdit(QTextEdit):
         if event.button() != Qt.MouseButton.LeftButton or self.textCursor().hasSelection():
             return
         offset = self.cursorForPosition(event.pos()).position()
-        hit = self._name_at(offset)
+        hit = self._link_at(offset)
         if hit is not None and press_offset is not None and hit[0] <= press_offset < hit[1]:
-            self.name_clicked.emit(hit[2])
+            self.link_clicked.emit(hit[2])
 
     def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         # Left deliberately unhandled while dragging: ReadingView's
@@ -292,16 +294,12 @@ class _VerseTextEdit(QTextEdit):
         if event.buttons() & Qt.MouseButton.LeftButton:
             return
         super().mouseMoveEvent(event)
-        if self._name_spans:
-            hit = self._name_at(self.cursorForPosition(event.pos()).position())
+        if self._link_spans:
+            hit = self._link_at(self.cursorForPosition(event.pos()).position())
             self.viewport().setCursor(
                 Qt.CursorShape.PointingHandCursor if hit else Qt.CursorShape.IBeamCursor
             )
-            if hit is None:
-                self.setToolTip("")
-            else:
-                meaning = f": {hit[3]}" if hit[3] else ""
-                self.setToolTip(f"{hit[2]}{meaning}\nClick to open it in Word Study")
+            self.setToolTip(hit[3] if hit else "")
 
     def contextMenuEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         offset = self.cursorForPosition(event.pos()).position()
@@ -374,25 +372,31 @@ def _original_language(conn: sqlite3.Connection, chapter_id: int) -> str | None:
     return "greek" if testament.name == "New Testament" else "hebrew"
 
 
-def _bom_name_spans(
+def _bom_link_spans(
     conn: sqlite3.Connection, chapter_id: int, verses: list[Verse]
 ) -> dict[int, list[tuple[int, int, str, str]]]:
-    """Each verse's Book of Mormon names, in Book of Mormon chapters only -
-    in the Bible these same biblical names would just be noise."""
+    """Each verse's Book of Mormon names and dates, as (start, end, target,
+    tooltip) - in Book of Mormon chapters only; in the Bible these same
+    biblical names would just be noise."""
     location = get_chapter_location(conn, chapter_id)
     if location is None or location[0].slug != "book-of-mormon":
         return {}
     links = get_bom_name_links(conn)
-    if not links:
-        return {}
     # Longest first, so "Anti-Nephi-Lehi" wins over "Nephi"; a hyphen counts
     # as part of a word, so "Lehi-Nephi" isn't split.
     alternatives = "|".join(re.escape(s) for s in sorted(links, key=len, reverse=True))
-    pattern = re.compile(rf"(?<![\w-])(?:{alternatives})(?![\w-])")
-    return {
-        verse.id: [(m.start(), m.end(), *links[m.group()]) for m in pattern.finditer(verse.text)]
-        for verse in verses
-    }
+    pattern = re.compile(rf"(?<![\w-])(?:{alternatives})(?![\w-])") if links else None
+    spans: dict[int, list[tuple[int, int, str, str]]] = {}
+    for verse in verses:
+        found = []
+        for match in pattern.finditer(verse.text) if pattern else ():
+            name, meaning = links[match.group()]
+            tooltip = f"{name}: {meaning}" if meaning else name
+            found.append((match.start(), match.end(), f"name:{name}", f"{tooltip}\nClick to open it in Word Study"))
+        for start, end, month, day in hebrew_calendar.find_dates(verse.text):
+            found.append((start, end, f"month:{month}:{day or 0}", hebrew_calendar.tooltip(month, day)))
+        spans[verse.id] = sorted(found)
+    return spans
 
 
 class ReadingView(QWidget):
@@ -506,7 +510,7 @@ class ReadingView(QWidget):
         # _on_verse_drag_started/eventFilter below.
         self._drag_anchor_verse: Verse | None = None
         self._drag_anchor_offset: int = 0
-        name_spans = _bom_name_spans(conn, chapter_id, verses)
+        link_spans = _bom_link_spans(conn, chapter_id, verses)
         for verse in verses:
             row = QHBoxLayout()
             row.setSpacing(10)
@@ -538,8 +542,8 @@ class ReadingView(QWidget):
                 lambda v=verse: self._on_cross_reference_requested(v)
             )
             body.word_lookup_requested.connect(self._on_word_lookup_requested)
-            body.set_name_spans(name_spans.get(verse.id, []))
-            body.name_clicked.connect(self._on_word_lookup_requested)
+            body.set_link_spans(link_spans.get(verse.id, []))
+            body.link_clicked.connect(self._on_text_link_clicked)
             row.addWidget(body, 1)
             self._body_widgets[verse.id] = body
 
@@ -722,6 +726,17 @@ class ReadingView(QWidget):
     def _on_word_lookup_requested(self, word: str) -> None:
         self._side_tabs.setCurrentWidget(self._word_study_panel)
         self._word_study_panel.look_up(word)
+
+    def _on_text_link_clicked(self, target: str) -> None:
+        """A Book of Mormon name or date clicked in the text - its card in
+        Word Study."""
+        kind, _, value = target.partition(":")
+        if kind == "name":
+            self._on_word_lookup_requested(value)
+        elif kind == "month":
+            month, _, day = value.partition(":")
+            self._side_tabs.setCurrentWidget(self._word_study_panel)
+            self._word_study_panel.show_month(int(month), int(day) or None)
 
     def _on_cross_reference_requested(self, verse: Verse) -> None:
         """A verse's own right-click "Add Cross-reference..." - pre-fills

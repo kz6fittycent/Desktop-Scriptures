@@ -176,7 +176,7 @@ def test_right_click_lookup_opens_the_tab() -> None:
 def test_names_in_book_of_mormon_text_are_links() -> None:
     from PySide6.QtTest import QTest
 
-    from scriptures.ui.reading_view import ReadingView, _bom_name_spans
+    from scriptures.ui.reading_view import ReadingView, _bom_link_spans
 
     tmp = Path(tempfile.mkdtemp(prefix="scriptures-word-study-"))
     try:
@@ -190,20 +190,20 @@ def test_names_in_book_of_mormon_text_are_links() -> None:
 
         helaman = chapter("Helaman", 1)
         verses = da.get_verses(conn, helaman)
-        spans = _bom_name_spans(conn, helaman, verses)
+        spans = _bom_link_spans(conn, helaman, verses)
         verse3 = next(v for v in verses if v.verse_number == 3)
-        assert [s[2] for s in spans[verse3.id]] == ["Pahoran", "Paanchi", "Pacumeni"]
+        assert [s[2] for s in spans[verse3.id]] == ["name:Pahoran", "name:Paanchi", "name:Pacumeni"]
         # Group forms resolve to their name; the Bible gets no links.
-        assert ("Nephi" in [s[2] for s in spans[verses[0].id]])
+        assert "name:Nephi" in [s[2] for s in spans[verses[0].id]]
         judges = chapter("Judges", 15)
-        assert not any(_bom_name_spans(conn, judges, da.get_verses(conn, judges)).values())
+        assert not any(_bom_link_spans(conn, judges, da.get_verses(conn, judges)).values())
 
         view = ReadingView(conn, helaman, "Helaman 1", verses, theme.get_reading_palette("day"), "Serif", 14)
         view.resize(1200, 800)
         view.show()
         QApplication.processEvents()
         body = view._body_widgets[verse3.id]
-        paanchi = next(s for s in body._name_spans if s[2] == "Paanchi")
+        paanchi = next(s for s in body._link_spans if s[2] == "name:Paanchi")
         cursor = body.textCursor()
         cursor.setPosition(paanchi[0] + 2)
         QTest.mouseClick(body.viewport(), Qt.MouseButton.LeftButton, pos=body.cursorRect(cursor).center())
@@ -215,6 +215,44 @@ def test_names_in_book_of_mormon_text_are_links() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_hebrew_calendar() -> None:
+    from scriptures import hebrew_calendar as hc
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-word-study-"))
+    try:
+        conn = _conn(tmp)
+        # Every dated event in the Book of Mormon is found, and listed.
+        found = set()
+        for (text,) in conn.execute(
+            "SELECT v.text FROM verses v JOIN chapters c ON c.id = v.chapter_id JOIN books b ON b.id = c.book_id "
+            "JOIN volumes vol ON vol.id = b.volume_id WHERE vol.slug = 'book-of-mormon'"
+        ):
+            found.update((month, day) for _s, _e, month, day in hc.find_dates(text))
+        assert found == {(d.month, d.day) for d in hc.BOM_DATES}, found
+        assert hc.find_dates("in the first month, on the fourth day of the month")[0][2:] == (1, 4)
+        assert hc.find_dates("the twelfth day, in the tenth month")[0][2:] == (10, 12)
+        assert "Passover falls 10 days later, on the 14th" in hc.day_context(1, 4)
+        assert "This is the day of the Day of Atonement" in hc.day_context(7, 10)
+        # Holy days after Lehi (Purim, Hanukkah) are kept apart.
+        assert all(h.after_lehi for h in hc.month(12).days if "Purim" in h.name)
+
+        panel = WordStudyPanel(conn)
+        panel.show_month(1, 4)
+        text = " ".join(label.text() for label in panel._name_card.findChildren(QLabel))
+        assert "Passover" in text and "3 Nephi 8:5" in text and 'href="H5212"' in text and 'href="month:2:0"' in text
+        panel._follow_card_link("month:7:0")
+        text = " ".join(label.text() for label in panel._name_card.findChildren(QLabel))
+        assert "Day of Atonement" in text and "Rosh Hashanah" in text and "Alma 10:6" in text
+        panel.look_up("the seventh month")
+        assert type(panel._name_card).__name__ == "_MonthCard"
+        # Biblical names carry their own notes (Lehi: "jawbone", Judges 15).
+        lehi = da.get_bom_name(conn, "Lehi")
+        assert lehi.meaning == "jawbone" and "Judges 15" in lehi.notes[0]
+        print("test_hebrew_calendar: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_look_up_shows_matches_and_the_best_entry()
@@ -222,4 +260,5 @@ if __name__ == "__main__":
     test_book_of_mormon_name_card()
     test_right_click_lookup_opens_the_tab()
     test_names_in_book_of_mormon_text_are_links()
+    test_hebrew_calendar()
     print("All Word Study tests passed.")

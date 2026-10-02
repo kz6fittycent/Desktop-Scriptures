@@ -84,7 +84,11 @@ biblical name, a Hebrew root, a proposed meaning, or unknown - with each
 scholarly proposal summarized in this project's own words and its
 source, chiefly BYU's [Book of Mormon
 Onomasticon](https://onoma.lib.byu.edu), linked rather than copied; see
-`scripts/build_bom_names.py`.
+`scripts/build_bom_names.py`. In Book of Mormon chapters, names and dates
+are links: hover a name for its meaning, or a date ("the fourth day of the
+first month") for where it falls in Israel's calendar - its month's names
+and the holy days of the law of Moses, which the Nephites kept; click for
+the full card (see `src/scriptures/hebrew_calendar.py`).
 
 ## Screenshots
 
@@ -122,6 +126,7 @@ The goal: ask about a word, a name, or a place and get a clear, sourced answer -
 - [x] Hebrew and Greek word meanings - Strong's and STEP Bible, in the Word Study tab
 - [x] Book of Mormon names (e.g. what "Zarahemla" means) - all 307, each labeled by confidence, with proposals summarized in our own words from BYU's Book of Mormon Onomasticon and linked, never copied
 - [x] Names highlighted in the text - in Book of Mormon chapters, hover a name for its meaning, click it for its Word Study card
+- [x] Book of Mormon dates in Israel's calendar - "the first month" and the rest link to a card with the month's names, the holy days of the law of Moses (Passover, the Day of Atonement, Tabernacles...), and the Book of Mormon's events in that month
 - [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse rather than every word the KJV translates that way
 - [ ] Short, cited answers - a sentence or two drawn only from the sources found, every statement cited, rather than the AI only choosing among results as it does today; also the basis for the Talk prep helper
 - [ ] Geography for all the Standard Works - Bible places and maps (e.g. OpenBible.info's openly licensed geocoding), and the Book of Mormon geography models (Heartland, Mesoamerican, Baja California, and others) shown side by side as their proponents' theories, since the Church takes no official position on Book of Mormon geography
