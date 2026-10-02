@@ -680,7 +680,7 @@ class MainWindow(QMainWindow):
         # fine, unlike QMenuBar itself (see the comment below on the
         # corner-widget workaround for that).
         about_menu = self.menuBar().addMenu("A&bout")
-        about_menu.addAction(self._help_menu_label(f"<b>{__version__}</b>"))
+        about_menu.addAction(self._help_menu_label(f"<b>Version:</b> {__version__}"))
         about_menu.addAction(
             self._help_menu_label(
                 "This is an unofficial application, not produced by or "
@@ -720,15 +720,14 @@ class MainWindow(QMainWindow):
             )
         )
 
-        # Help: the wiki, which walks through every feature.
+        # Help: the wiki, which walks through every feature. (The AI Setup
+        # Guide lives under AI Integration, beside the wizard; the wiki
+        # dialog links the same page.)
         help_menu = self.menuBar().addMenu("&Help")
         wiki_action = QAction("Desktop Scriptures Help (Wiki)...", self)
         wiki_action.setShortcut(QKeySequence.StandardKey.HelpContents)
         wiki_action.triggered.connect(lambda: HelpDialog(self).exec())
         help_menu.addAction(wiki_action)
-        help_ai_guide_action = QAction("AI Setup Guide...", self)
-        help_ai_guide_action.triggered.connect(self._show_ai_setup_guide)
-        help_menu.addAction(help_ai_guide_action)
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
