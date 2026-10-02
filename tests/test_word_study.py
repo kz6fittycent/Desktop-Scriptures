@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from PySide6.QtCore import Qt  # noqa: E402
-from PySide6.QtWidgets import QApplication  # noqa: E402
+from PySide6.QtWidgets import QApplication, QLabel  # noqa: E402
 
 from scriptures import data_access as da  # noqa: E402
 from scriptures.db import connect  # noqa: E402
@@ -96,6 +96,43 @@ def test_derivation_links_and_back() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_book_of_mormon_name_card() -> None:
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-word-study-"))
+    try:
+        conn = _conn(tmp)
+        # The data: each tier, group forms, and ordinary words aren't names.
+        shazer = da.get_bom_name(conn, "shazer")
+        assert shazer.tier == "hebrew_root" and shazer.strongs == ["H7806"] and len(shazer.proposals) == 3
+        assert shazer.sources[0][1].startswith("https://onoma.lib.byu.edu/")
+        assert da.get_bom_name(conn, "Irreantum").meaning == "many waters"
+        assert da.get_bom_name(conn, "Deseret").tier == "defined"  # lowercase in Ether 2:3
+        assert da.get_bom_name(conn, "Nephites").name == "Nephi"
+        assert da.get_bom_name(conn, "Lehi").tier == "biblical"
+        assert da.get_bom_name(conn, "Zarahemla").tier == "proposed"
+        assert da.get_bom_name(conn, "faith") is None
+
+        panel = WordStudyPanel(conn)
+        panel.look_up("Shazer")
+        card = panel._name_card
+        assert card is not None and not panel._buttons  # no letter-alike lexicon matches
+        text = " ".join(label.text() for label in card.findChildren(QLabel))
+        assert "Hebrew root" in text and "Mormon 9:32-34" in text and 'href="H7806"' in text
+        panel._show_strongs("H7806")
+        assert panel._entry._current == "H7806" and panel._entry.isVisibleTo(panel)
+        # Defined in the text itself: no "proposed" reminder.
+        panel.look_up("Liahona")
+        text = " ".join(label.text() for label in panel._name_card.findChildren(QLabel))
+        assert "Defined in the Book of Mormon" in text and "Mormon 9:32-34" not in text
+        # A biblical name keeps its lexicon matches; an ordinary word gets no card.
+        panel.look_up("Lehi")
+        assert panel._name_card is not None and panel._buttons[0].strongs == "H3895"
+        panel.look_up("anointed")
+        assert panel._name_card is None and panel._buttons
+        print("test_book_of_mormon_name_card: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def test_right_click_lookup_opens_the_tab() -> None:
     from scriptures.ui.reading_view import ReadingView
 
@@ -122,5 +159,6 @@ if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_look_up_shows_matches_and_the_best_entry()
     test_derivation_links_and_back()
+    test_book_of_mormon_name_card()
     test_right_click_lookup_opens_the_tab()
     print("All Word Study tests passed.")

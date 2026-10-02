@@ -35,7 +35,7 @@ LEXICON_CREDIT = (
 _STRONGS_RE = re.compile(r"\b([HG]\d{1,4})\b")
 
 
-def _linked(text: str) -> str:
+def linked(text: str) -> str:
     """HTML-escaped text with every Strong's number turned into a link."""
     return _STRONGS_RE.sub(r'<a href="\1">\1</a>', html.escape(text))
 
@@ -125,12 +125,12 @@ class LexiconEntryView(QWidget):
         if entry.gloss:
             parts.append(f"<p><b>Meaning:</b> {html.escape(entry.gloss)}</p>")
         if entry.definition:
-            parts.append(f"<p><b>Definition:</b> {_linked(entry.definition)}</p>")
+            parts.append(f"<p><b>Definition:</b> {linked(entry.definition)}</p>")
         if entry.derivation:
-            parts.append(f"<p><b>Derivation:</b> {_linked(entry.derivation)}</p>")
+            parts.append(f"<p><b>Derivation:</b> {linked(entry.derivation)}</p>")
         if entry.kjv_renderings:
             parts.append(
-                f"<p><b>The King James Version translates it:</b> {_linked(entry.kjv_renderings)}</p>"
+                f"<p><b>The King James Version translates it:</b> {linked(entry.kjv_renderings)}</p>"
             )
         self._body.setText("".join(parts))
         self.entry_shown.emit(entry.strongs, f"{language} word - Strong's {entry.strongs}")

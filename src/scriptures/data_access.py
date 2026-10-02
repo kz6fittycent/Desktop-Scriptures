@@ -7,6 +7,7 @@ independent of the schema.
 
 from __future__ import annotations
 
+import json
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -993,6 +994,40 @@ def get_lexicon_entry(conn: sqlite3.Connection, strongs: str) -> LexiconEntry | 
         f"SELECT {_LEXICON_COLUMNS} FROM lexicon_entries WHERE strongs = ?", (strongs.upper(),)
     ).fetchone()
     return LexiconEntry(*row) if row else None
+
+
+@dataclass(frozen=True)
+class BomName:
+    """A Book of Mormon proper name and what's known of its meaning (see
+    bom_names in schema.sql and scripts/build_bom_names.py). `tier` is
+    "" for a name not yet researched."""
+
+    name: str
+    tier: str
+    meaning: str
+    reference: str
+    strongs: list[str]
+    proposals: list[dict]
+    sources: list[list[str]]
+
+
+def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
+    """The Book of Mormon name a word is, matched case-insensitively
+    against names and their other forms ("Nephites" -> Nephi)."""
+    word = word.strip()
+    if not word:
+        return None
+    row = conn.execute(
+        "SELECT name, tier, meaning, reference, strongs, proposals, sources FROM bom_names "
+        "WHERE LOWER(name) = LOWER(?) OR (',' || LOWER(forms) || ',') LIKE ?",
+        (word, f"%,{word.lower()},%"),
+    ).fetchone()
+    if row is None:
+        return None
+    return BomName(
+        row[0], row[1], row[2], row[3], [s for s in row[4].split(",") if s],
+        json.loads(row[5] or "[]"), json.loads(row[6] or "[]"),
+    )
 
 
 def _kjv_roots(word: str) -> list[str]:

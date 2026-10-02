@@ -163,6 +163,25 @@ CREATE TABLE IF NOT EXISTS lexicon_entries (
     gloss           TEXT NOT NULL DEFAULT ''
 );
 
+-- Book of Mormon proper names and what's known of their meaning, labeled
+-- by confidence (`tier`: defined / biblical / hebrew_root / proposed /
+-- unknown; '' = not yet researched) - see scripts/build_bom_names.py,
+-- which builds it (meanings in this project's own words, sources linked).
+-- `strongs` lists related lexicon entries ("H7806"); `proposals` and
+-- `sources` are JSON lists; `forms` are other spellings that mean this
+-- name ("Nephites" -> Nephi). Synced like the lexicon.
+CREATE TABLE IF NOT EXISTS bom_names (
+    id         INTEGER PRIMARY KEY,
+    name       TEXT NOT NULL UNIQUE,
+    tier       TEXT NOT NULL DEFAULT '',
+    meaning    TEXT NOT NULL DEFAULT '',
+    reference  TEXT NOT NULL DEFAULT '',
+    strongs    TEXT NOT NULL DEFAULT '',
+    proposals  TEXT NOT NULL DEFAULT '[]',
+    sources    TEXT NOT NULL DEFAULT '[]',
+    forms      TEXT NOT NULL DEFAULT ''
+);
+
 -- Cross-references: passages that quote, closely paraphrase, or are a JST/
 -- Moses-style translation-revision of another passage elsewhere in the
 -- corpus - developer-curated like the Topical Guide above, and synced

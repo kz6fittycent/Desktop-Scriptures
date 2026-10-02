@@ -78,6 +78,13 @@ corrected editions, licensed CC BY-SA (that license applies to the
 lexicon data, not to this app's MIT-licensed code), with short word
 meanings from [STEP Bible](https://www.STEPBible.org) (Tyndale House,
 Cambridge), licensed CC BY 4.0; see `scripts/import_lexicon.py`.
+Book of Mormon names in the Word Study tab ("Shazer", "Zarahemla") are
+labeled by how sure their meaning is - defined in the text itself, a
+biblical name, a Hebrew root, a proposed meaning, or unknown - with each
+scholarly proposal summarized in this project's own words and its
+source, chiefly BYU's [Book of Mormon
+Onomasticon](https://onoma.lib.byu.edu), linked rather than copied; see
+`scripts/build_bom_names.py`.
 
 ## Screenshots
 
@@ -112,7 +119,10 @@ sudo snap install desktop-scriptures
 
 The goal: ask about a word, a name, or a place and get a clear, sourced answer - what "Christ" or "Zarahemla" means, where a place was - even with a small AI model running on your own computer. Each item below is a new layer of the study index (see the Talk prep helper item above), so AI search finds it by meaning alongside the scriptures, and each is measured against the benchmark questions before it ships.
 
-- [ ] Linguistics references - Hebrew, Greek, and Latin word meanings, and Book of Mormon names (e.g. what "Zarahemla" means). Openly licensed sources first (Strong's Concordance, public-domain lexicons such as Brown-Driver-Briggs and Thayer's, STEPBible, Open Scriptures); Book of Mormon name scholarship such as BYU's Book of Mormon Onomasticon only with permission
+- [x] Hebrew and Greek word meanings - Strong's and STEP Bible, in the Word Study tab
+- [ ] Book of Mormon names (e.g. what "Zarahemla" means) - started: every name is listed with its confidence label, but most still await research. Proposals are summarized in our own words with sources such as BYU's Book of Mormon Onomasticon linked, never copied
+- [ ] Names highlighted in the text - click "Zarahemla" in a verse to open its Word Study card
+- [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse rather than every word the KJV translates that way
 - [ ] Short, cited answers - a sentence or two drawn only from the sources found, every statement cited, rather than the AI only choosing among results as it does today; also the basis for the Talk prep helper
 - [ ] Geography for all the Standard Works - Bible places and maps (e.g. OpenBible.info's openly licensed geocoding), and the Book of Mormon geography models (Heartland, Mesoamerican, Baja California, and others) shown side by side as their proponents' theories, since the Church takes no official position on Book of Mormon geography
 - [ ] Archaeological references

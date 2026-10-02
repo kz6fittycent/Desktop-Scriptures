@@ -370,6 +370,15 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.card_bg};
             border: 1px solid {p.primary};
         }}
+        /* A Book of Mormon name in the Word Study tab (word_study_panel.py). */
+        QFrame#nameCard {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: {BUTTON_RADIUS}px;
+        }}
+        QFrame#nameCard QLabel {{
+            background: transparent;
+        }}
         QLabel#resultPrimary {{
             font-weight: bold;
             background: transparent;

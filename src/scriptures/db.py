@@ -419,6 +419,7 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
         _sync_bundled_topics(conn)
         _sync_bundled_topic_key_verses(conn)
         _sync_bundled_lexicon(conn)
+        _sync_bundled_bom_names(conn)
         _sync_bundled_cross_references(conn)
         conn.commit()
     finally:
@@ -525,6 +526,20 @@ def _sync_bundled_lexicon(conn: sqlite3.Connection) -> None:
         "derivation, definition, kjv_renderings, gloss) "
         "SELECT strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
         "kjv_renderings, gloss FROM bundled.lexicon_entries"
+    )
+
+
+def _sync_bundled_bom_names(conn: sqlite3.Connection) -> None:
+    """Mirrored from the bundled copy, like the lexicon."""
+    has_table = conn.execute(
+        "SELECT 1 FROM bundled.sqlite_master WHERE type = 'table' AND name = 'bom_names'"
+    ).fetchone()
+    if not has_table:
+        return
+    conn.execute("DELETE FROM bom_names")
+    conn.execute(
+        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms) "
+        "SELECT name, tier, meaning, reference, strongs, proposals, sources, forms FROM bundled.bom_names"
     )
 
 
