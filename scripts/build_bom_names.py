@@ -26,11 +26,13 @@ speech", so proposed meanings are suggestions, not certainties.
 SOURCES: meanings are written here in this project's own short words,
 with every source linked - never copied text (the same practice as for
 General Conference talks). The principal source is BYU's Book of Mormon
-Onomasticon (onoma.lib.byu.edu), which gathers the scholarly proposals.
+Onomasticon (onoma.lib.byu.edu), which gathers the scholarly proposals;
+every name, researched here or not, links to its Onomasticon page.
 
 NAME EXTRACTION: capitalized words in the Book of Mormon that never
 appear as ordinary lowercase words in the Book of Mormon or Bible (a
-hyphenated compound like "Ramath-lehi" doesn't count as lowercase use),
+hyphenated compound like "Ramath-lehi" doesn't count as lowercase use,
+and a hyphenated name keeps its lowercase parts - "Maher-shalal-hash-baz"),
 with group forms ("Nephites", "Lamanitish") folded into their base name
 and a few non-names excluded.
 """
@@ -51,7 +53,10 @@ from scriptures.data_access import search_lexicon  # noqa: E402
 from scriptures.db import compact, connect  # noqa: E402
 
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "scriptures.db"
-ONOMASTICON = "https://onoma.lib.byu.edu/onoma/index.php/"
+ONOMASTICON = "https://onoma.lib.byu.edu/index.php/"
+# Names whose Onomasticon page has another title. Every other name's page
+# is its name in capitals (all checked to exist, October 2026).
+ONOMASTICON_PAGES = {"Amalekite": "AMALEKITES"}
 
 # Capitalized words that aren't names of people or places.
 NOT_NAMES = {
@@ -96,7 +101,6 @@ CURATED: dict[str, dict] = {
             {"meaning": "young gazelle - fitting the hunting there", "origin": "pre-Islamic Hismaic šṣr",
              "proponent": "Matthew L. Bowen"},
         ],
-        "sources": [["Book of Mormon Onomasticon: SHAZER", ONOMASTICON + "SHAZER"]],
     },
     "Zarahemla": {
         "tier": "proposed",
@@ -105,7 +109,6 @@ CURATED: dict[str, dict] = {
         "proposals": [
             {"meaning": "seed of compassion (or pity)", "origin": "Hebrew zeraʿ, seed (H2233) + ḥemlâ, compassion (H2551)"},
         ],
-        "sources": [["Book of Mormon Onomasticon: ZARAHEMLA", ONOMASTICON + "ZARAHEMLA"]],
     },
     "Alma": {
         "tier": "hebrew_root",
@@ -115,7 +118,6 @@ CURATED: dict[str, dict] = {
             {"meaning": "young man, youth", "origin": "Hebrew ʿelem, H5958 - attested as a man's name "
              "(\"Alma son of Judah\") in a 2nd-century Judean desert document", "proponent": "Hugh Nibley"},
         ],
-        "sources": [["Book of Mormon Onomasticon: ALMA", ONOMASTICON + "ALMA"]],
     },
     "Mosiah": {
         "tier": "hebrew_root",
@@ -124,7 +126,6 @@ CURATED: dict[str, dict] = {
         "proposals": [
             {"meaning": "one who saves, a deliverer", "origin": "Hebrew môšîaʿ, from yāšaʿ (to save, H3467)"},
         ],
-        "sources": [["Book of Mormon Onomasticon: MOSIAH", ONOMASTICON + "MOSIAH"]],
     },
     "Sariah": {
         "tier": "hebrew_root",
@@ -134,7 +135,6 @@ CURATED: dict[str, dict] = {
             {"meaning": "Jehovah is prince (or has prevailed)", "origin": "Hebrew Śerāyāh - the Bible's "
              "Seraiah, H8304 - found as a woman's name in the Elephantine papyri", "proponent": "Jeffrey R. Chadwick"},
         ],
-        "sources": [["Book of Mormon Onomasticon: SARIAH", ONOMASTICON + "SARIAH"]],
     },
     "Jershon": {
         "tier": "hebrew_root",
@@ -144,7 +144,43 @@ CURATED: dict[str, dict] = {
             {"meaning": "a place of inheritance - the text gives Jershon \"for an inheritance\" (Alma 27:22)",
              "origin": "Hebrew yāraš, to inherit or possess, H3423"},
         ],
-        "sources": [["Book of Mormon Onomasticon: JERSHON", ONOMASTICON + "JERSHON"]],
+    },
+    "Pahoran": {
+        "tier": "proposed",
+        "meaning": "uncertain - perhaps \"the Syrian\" (Egyptian)",
+        "reference": "Alma 50:40",
+        "proposals": [
+            {"meaning": "the Syrian (Hurrian)", "origin": "Egyptian p3-ḥry; compare the Bible's Horites, H2752",
+             "proponent": "Hugh Nibley"},
+            {"meaning": "the name of Egyptian officials in Canaan", "origin": "Canaanite paḥura, in the Amarna letters"},
+            {"meaning": "governor", "origin": "Hebrew peḥâ, H6346"},
+            {"meaning": "assembly, or potter", "origin": "Aramaic pḥr", "proponent": "Pedro Olavarria"},
+        ],
+    },
+    "Paanchi": {
+        "tier": "proposed",
+        "meaning": "the living one (Egyptian)",
+        "reference": "Helaman 1:3",
+        "proposals": [
+            {"meaning": "the living one", "origin": "Egyptian p3-ʿnḫ, a common Egyptian name for over a thousand years",
+             "proponent": "John Gee"},
+            {"meaning": "the same name as the Egyptian pharaoh Piankhi", "origin": "Egyptian", "proponent": "Hugh Nibley"},
+            {"meaning": "the \"paaneah\" in Joseph's Egyptian name Zaphnath-paaneah (Genesis 41:45)",
+             "origin": "Egyptian, as written in Hebrew, H6847", "proponent": "Robert F. Smith"},
+        ],
+    },
+    "Pacumeni": {
+        "tier": "proposed",
+        "meaning": "uncertain - perhaps \"the Egyptian\"",
+        "reference": "Helaman 1:3",
+        "proposals": [
+            {"meaning": "the Egyptian", "origin": "Egyptian p3-kmt, with the same \"the\" prefix (pa-) as Pahoran and Paanchi"},
+            {"meaning": "like the names of Egypt's last priest-governors (Pa-menech, Pamenches)", "origin": "Egyptian",
+             "proponent": "Hugh Nibley"},
+            {"meaning": "blind man", "origin": "Egyptian p3-kmn", "proponent": "Hugh Nibley"},
+            {"meaning": "-cumeni may be the Jaredite name element kumen (as in Kishkumen), which would make "
+             "an Egyptian origin doubtful", "origin": "Jaredite"},
+        ],
     },
     "Nephi": {
         "tier": "proposed",
@@ -154,7 +190,6 @@ CURATED: dict[str, dict] = {
             {"meaning": "good, fair, fine - echoed in \"born of goodly parents\" (1 Nephi 1:1)",
              "origin": "Egyptian nfr"},
         ],
-        "sources": [["Book of Mormon Onomasticon: NEPHI", ONOMASTICON + "NEPHI"]],
     },
 }
 
@@ -182,7 +217,7 @@ def extract_names(conn: sqlite3.Connection) -> dict[str, dict]:
         lowercase.update(re.findall(r"(?<![A-Za-z-])[a-z][a-z]+\b", text))
     found: dict[str, dict] = {}
     for reference, text in bom:
-        for match in re.finditer(r"\b[A-Z][a-z]+(?:-[A-Z][a-z]+)*\b", text):
+        for match in re.finditer(r"\b[A-Z][a-z]+(?:-[A-Za-z][a-z]+)*\b", text):
             word = match.group(0)
             if word.lower() in lowercase or word in NOT_NAMES:
                 continue
@@ -241,6 +276,8 @@ def build(conn: sqlite3.Connection) -> Counter:
     for name in sorted(names):
         info = names[name]
         curated = CURATED.get(name)
+        page = ONOMASTICON_PAGES.get(name, name.upper())
+        onomasticon = [f"Book of Mormon Onomasticon: {page}", ONOMASTICON + page]
         strongs = biblical_strongs(conn, name)
         if curated:
             tier = curated["tier"]
@@ -250,15 +287,16 @@ def build(conn: sqlite3.Connection) -> Counter:
             rows.append((
                 name, tier, curated.get("meaning", ""), curated.get("reference", info["first"]),
                 ",".join(linked), json.dumps(curated.get("proposals", []), ensure_ascii=False),
-                json.dumps(curated.get("sources", []), ensure_ascii=False),
+                json.dumps(curated.get("sources", []) + [onomasticon], ensure_ascii=False),
                 ",".join(sorted(info["forms"] - {name})),
             ))
         elif strongs or in_bible(conn, name):
-            rows.append((name, "biblical", "", info["first"], ",".join(strongs), "[]", "[]",
+            rows.append((name, "biblical", "", info["first"], ",".join(strongs), "[]", json.dumps([onomasticon]),
                          ",".join(sorted(info["forms"] - {name}))))
         else:
             # Not yet researched: kept so its forms resolve, with no tier.
-            rows.append((name, "", "", info["first"], "", "[]", "[]", ",".join(sorted(info["forms"] - {name}))))
+            rows.append((name, "", "", info["first"], "", "[]", json.dumps([onomasticon]),
+                         ",".join(sorted(info["forms"] - {name}))))
     conn.execute("DELETE FROM bom_names")
     conn.executemany(
         "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms) "

@@ -118,7 +118,10 @@ class _BomNameCard(QFrame):
                 )
             parts.append("<p><b>Proposals</b> (most likely first):</p><ul>" + "".join(items) + "</ul>")
         if not name.tier:
-            parts.append("<p>No meaning has been recorded for this name yet.</p>")
+            parts.append(
+                "<p>No meaning has been recorded here for this name yet - the Onomasticon "
+                "link below gathers what scholars have proposed.</p>"
+            )
         body = QLabel("".join(parts))
         body.setWordWrap(True)
         body.setTextFormat(Qt.TextFormat.RichText)
