@@ -78,7 +78,7 @@ from scriptures.temple_recommend import should_show_reminder as should_show_temp
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
-from scriptures.ui.about_help import LICENSE_URL, HelpDialog, LicenseDialog
+from scriptures.ui.about_help import HelpDialog, LicenseDialog
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
@@ -111,9 +111,6 @@ BEANDOG_REPO_URL = "https://github.com/beandog/lds-scriptures"
 BYU_CITATION_INDEX_URL = "https://scriptures.byu.edu"
 CHURCH_SCRIPTURES_URL = "https://www.churchofjesuschrist.org/study/scriptures"
 ONOMASTICON_URL = "https://onoma.lib.byu.edu"
-PIPER_URL = "https://github.com/OHF-Voice/piper1-gpl"
-PIPER_VOICES_URL = "https://huggingface.co/rhasspy/piper-voices"
-PYSIDE_URL = "https://doc.qt.io/qtforpython-6/"
 
 # Caps how wide the About menu's word-wrapped labels (see _help_menu_label)
 # can get, so the dropdown stays comfortably narrower than the window
@@ -675,15 +672,15 @@ class MainWindow(QMainWindow):
 
         # About: who made this and under what terms. The dropdown itself
         # carries the text a popup would (version, the unofficial-app
-        # disclaimer required by the project's own stated policy, licenses,
-        # and credits). Plain QAction text doesn't word-wrap (menu width just
+        # disclaimer required by the project's own stated policy, the
+        # license, and credits) - kept short on purpose. Plain QAction text doesn't word-wrap (menu width just
         # grows to fit the longest line, which overflowed past the window
         # edge here), so each line is a QWidgetAction hosting a
         # word-wrapped, width-capped QLabel instead - QMenu supports that
         # fine, unlike QMenuBar itself (see the comment below on the
         # corner-widget workaround for that).
         about_menu = self.menuBar().addMenu("A&bout")
-        about_menu.addAction(self._help_menu_label(f"<b>Desktop Scriptures</b> — version {__version__}"))
+        about_menu.addAction(self._help_menu_label(f"<b>{__version__}</b>"))
         about_menu.addAction(
             self._help_menu_label(
                 "This is an unofficial application, not produced by or "
@@ -691,12 +688,7 @@ class MainWindow(QMainWindow):
             )
         )
         about_menu.addSeparator()
-        about_menu.addAction(
-            self._help_menu_label(
-                "<b>License:</b> free, open-source software under the "
-                f'<a href="{LICENSE_URL}">MIT License</a>.'
-            )
-        )
+        about_menu.addAction(self._help_menu_label("<b>License:</b> MIT"))
         license_action = QAction("View License...", self)
         license_action.triggered.connect(lambda: LicenseDialog(self).exec())
         about_menu.addAction(license_action)
@@ -706,17 +698,6 @@ class MainWindow(QMainWindow):
             self._help_menu_label(
                 "Book of Mormon name meanings: this project's own summaries, with each "
                 f'name linked to BYU\'s <a href="{ONOMASTICON_URL}">Book of Mormon Onomasticon</a>.'
-            )
-        )
-        about_menu.addAction(
-            self._help_menu_label(
-                f'Listen: <a href="{PIPER_URL}">Piper</a> text-to-speech, GPL-3.0, with '
-                f'<a href="{PIPER_VOICES_URL}">Piper voices</a> under their own licenses.'
-            )
-        )
-        about_menu.addAction(
-            self._help_menu_label(
-                f'Built with <a href="{PYSIDE_URL}">Qt for Python (PySide6)</a>, LGPL-3.0.'
             )
         )
         about_menu.addSeparator()

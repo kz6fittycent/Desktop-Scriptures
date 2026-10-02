@@ -63,9 +63,8 @@ class LicenseDialog(QDialog):
         self.resize(560, 520)
         layout = QVBoxLayout(self)
         layout.addWidget(_link_label(
-            "Desktop Scriptures is free, open-source software under the MIT License. The "
-            "lexicon data and other bundled content carry their own licenses - see the "
-            f'About menu. Source: <a href="{REPO_URL}">{REPO_URL}</a>'
+            "Desktop Scriptures is released under the MIT License. The lexicon data carries "
+            "its own licenses - see the About menu."
         ))
         try:
             text = LICENSE_PATH.read_text(encoding="utf-8")

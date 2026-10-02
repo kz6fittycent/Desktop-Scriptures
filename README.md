@@ -92,7 +92,7 @@ the full card (see `src/scriptures/hebrew_calendar.py`).
 
 ## Help and About
 
-The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Help → Desktop Scriptures Help (Wiki)...** links to each page. **About** shows the version, the license (MIT - **View License...** shows it in full, offline), and the credits and licenses for bundled data and libraries.
+The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Help → Desktop Scriptures Help (Wiki)...** links to each page. **About** shows the version, the license (MIT - **View License...** shows it in full, offline), and credits.
 
 ## Screenshots
 
