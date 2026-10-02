@@ -1,0 +1,1141 @@
+{
+  "_note": "Curated Book of Mormon names - see scripts/build_bom_names.py's docstring for the tiers and rules. Meanings and proposals are this project's own summaries; the build links each name's Onomasticon page. Add \"people\": \"jaredite\" for a Jaredite name.",
+  "names": {
+    "Abinadi": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"my father is praised\"",
+      "reference": "Mosiah 11:20",
+      "proposals": [
+        {
+          "meaning": "my father is cast down",
+          "origin": "Hebrew ʾāḇ, father (H1) + a root meaning to cast down - though that root isn't found in West Semitic names"
+        },
+        {
+          "meaning": "my father be praised",
+          "origin": "father (H1) + nʾd, to praise, found in Akkadian and Amorite names"
+        },
+        {
+          "meaning": "the rock is my father",
+          "origin": "Hebrew ʾeḇen, stone (H68) + ʾad, father (as in Ugaritic names)"
+        },
+        {
+          "meaning": "compare the Old Akkadian name a-ba-na-da, the closest known ancient name",
+          "origin": "Akkadian"
+        }
+      ]
+    },
+    "Abinadom": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"my father is a wanderer\"",
+      "reference": "Omni 1:10",
+      "proposals": [
+        {
+          "meaning": "my father is a wanderer, or father of their wandering - fitting Jacob's \"wanderers, cast out from Jerusalem\" (Jacob 7:26), as John W. Welch notes",
+          "origin": "Hebrew ʾāḇ, father (H1) + nûḏ, to wander (H5110)",
+          "proponent": "John A. Tvedtnes"
+        },
+        {
+          "meaning": "my father is grieved",
+          "origin": "the same root nûḏ, to show grief",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "my father repented",
+          "origin": "Arabic nadam, remorse",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Abish": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"my father is a man\"",
+      "reference": "Alma 19:16",
+      "proposals": [
+        {
+          "meaning": "father is a man, or father of man - women's names with \"father\" (Abigail, Abishag) are biblical",
+          "origin": "Hebrew ʾāḇ, father (H1) + ʾîš, man (H376)"
+        },
+        {
+          "meaning": "the same as a name ʾbšʾ on a seal from before 587 BC, whose meaning is unknown",
+          "origin": "Hebrew inscription; compare the Bible's Abishai"
+        }
+      ]
+    },
+    "Ablom": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"meadow\"",
+      "reference": "Ether 9:3",
+      "proposals": [
+        {
+          "meaning": "meadow, pasture - as in the Bible's Abel place names and the Ugaritic \"city of the meadows\"",
+          "origin": "Hebrew ʾāḇēl, meadow (H58)",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "green meadows",
+          "origin": "the same root",
+          "proponent": "George Reynolds"
+        },
+        {
+          "meaning": "mourning - less likely, since the vowels don't fit",
+          "origin": "Hebrew ʾēḇel"
+        }
+      ]
+    },
+    "Agosh": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain",
+      "reference": "Ether 14:15",
+      "proposals": [
+        {
+          "meaning": "compare the Aramean place Bit Agush (Arpad, in Syria)",
+          "origin": "Aramean"
+        },
+        {
+          "meaning": "toil, labor",
+          "origin": "Sumerian akuš"
+        },
+        {
+          "meaning": "crooked, perverse - a fitting name for a wilderness of bitter battles",
+          "origin": "Hebrew ʿiqqēš, as in the Bible's Ikkesh (H6142)",
+          "proponent": "Robert F. Smith and John A. Tvedtnes"
+        },
+        {
+          "meaning": "perhaps another form of the same root as Akish, named nearby",
+          "origin": "Jaredite",
+          "proponent": "Paul Y. Hoskisson"
+        }
+      ]
+    },
+    "Ahah": {
+      "tier": "unknown",
+      "people": "jaredite",
+      "meaning": "unknown",
+      "reference": "Ether 1:9",
+      "proposals": [
+        {
+          "meaning": "brother - tempting, but only a guess for a Jaredite name",
+          "origin": "Semitic ʾāḥ, brother (H251)"
+        }
+      ]
+    },
+    "Akish": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain",
+      "reference": "Ether 8:10",
+      "proposals": [
+        {
+          "meaning": "contains Kish, a Jaredite name - also a major city near Babylon",
+          "origin": "Jaredite",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "like the Philistine king Achish of Gath (1 Samuel 21:10), whose name is Aegean",
+          "origin": "Hebrew ʾĀḵîš, H397"
+        },
+        {
+          "meaning": "crooked, perverse",
+          "origin": "Hebrew ʿiqqēš (the Bible's Ikkesh, H6142)",
+          "proponent": "Robert F. Smith and John A. Tvedtnes"
+        },
+        {
+          "meaning": "the Egyptian-Hittite name for Cyprus",
+          "origin": "Egyptian",
+          "proponent": "Hugh Nibley"
+        }
+      ]
+    },
+    "Alma": {
+      "tier": "hebrew_root",
+      "meaning": "young man (of God)",
+      "reference": "Mosiah 17:2",
+      "proposals": [
+        {
+          "meaning": "young man, or young man of God - the first Alma is introduced as \"a young man\" (Mosiah 17:2); \"Alma son of Judah\" appears in a 2nd-century Judean desert document",
+          "origin": "Hebrew ʿelem, youth (H5958), with a short ending for God's name"
+        },
+        {
+          "meaning": "lad of God - the same epithet given the hero of the Ugaritic Kirta epic",
+          "origin": "Ugaritic ǵlm ʾl"
+        },
+        {
+          "meaning": "a possible play on \"hidden\" when Alma hides by the waters of Mormon (Mosiah 18:5)",
+          "origin": "Hebrew ʿālam, to conceal, H5956"
+        }
+      ]
+    },
+    "Amaleki": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"(one from) Malek\" or \"king\"",
+      "reference": "Omni 1:12",
+      "proposals": [
+        {
+          "meaning": "the one from Malek, or kingly",
+          "origin": "Semitic mlk, to rule; king (H4428), with a place prefix and the -i ending meaning \"of\""
+        },
+        {
+          "meaning": "the Amalekite - though it's hard to see why Nephites would name a son after a hated enemy",
+          "origin": "Hebrew ʿĂmālēq, H6002",
+          "proponent": "John A. Tvedtnes"
+        }
+      ]
+    },
+    "Amalickiah": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the Lord is king\"",
+      "reference": "Alma 46:3",
+      "proposals": [
+        {
+          "meaning": "built on mlk, \"king\" (H4428), with -iah, a short form of Jehovah - which would make it the only such Nephite name",
+          "origin": "Hebrew"
+        },
+        {
+          "meaning": "related to Amalek (H6002) - unlikely unless it was a name his enemies gave him",
+          "origin": "Hebrew",
+          "proponent": "Jo Ann Hackett"
+        }
+      ]
+    },
+    "Amaron": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the command\"",
+      "reference": "Omni 1:3",
+      "proposals": [
+        {
+          "meaning": "the command, or word - perhaps short for Amariah, \"command of Jehovah\"",
+          "origin": "Hebrew ʾāmar, to say or command (H559), with the name ending -on"
+        },
+        {
+          "meaning": "commander, overseer - with wordplays in Omni 1 and Jarom",
+          "origin": "Arabic ʾamîr; Egyptian imy-r3",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "worshipper",
+          "origin": "Semitic ʿmr, to live or honor, as in the name Omri"
+        }
+      ]
+    },
+    "Amgid": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"people of fortune\"",
+      "reference": "Ether 10:32",
+      "proposals": [
+        {
+          "meaning": "people of fortune",
+          "origin": "Semitic ʿam, people or kinsman (H5971) + gad, fortune (H1409)"
+        }
+      ]
+    },
+    "Aminadi": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"my (divine) kinsman is praised\"",
+      "reference": "Alma 10:2",
+      "proposals": [
+        {
+          "meaning": "my people, or my (divine) kinsman, is praised - Abinadi with \"people\" in place of \"father\"",
+          "origin": "Hebrew ʿam, people or kinsman (H5971) + a root meaning to praise"
+        },
+        {
+          "meaning": "people of my wandering",
+          "origin": "Hebrew nûḏ, to wander (H5110)",
+          "proponent": "John A. Tvedtnes"
+        },
+        {
+          "meaning": "my paternal uncle is a nomad, or a preacher",
+          "origin": "Semitic",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "contains the Egyptian god's name Amon",
+          "origin": "Egyptian imn"
+        }
+      ]
+    },
+    "Amlici": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"I will reign\" or \"my kingship\"",
+      "reference": "Alma 2:1",
+      "proposals": [
+        {
+          "meaning": "I will reign, or I have made a king - fitting a man who sought to be king (Alma 2:2)",
+          "origin": "Hebrew mālaḵ, to reign (H4427), as a verb form"
+        },
+        {
+          "meaning": "my kingship",
+          "origin": "the same root as a noun",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "my messenger - a distant possibility",
+          "origin": "Hebrew malʾāḵ, messenger (H4397)"
+        }
+      ]
+    },
+    "Ammaron": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"speaker, wordsmith\"",
+      "reference": "4 Nephi 1:47",
+      "proposals": [
+        {
+          "meaning": "perhaps a spelling of Amaron - \"the command\"",
+          "origin": "see Amaron"
+        },
+        {
+          "meaning": "speaker, wordsmith - a profession name, fitting for a record keeper",
+          "origin": "Hebrew ʾāmar, to say (H559)"
+        },
+        {
+          "meaning": "people of the ark - less likely",
+          "origin": "Hebrew ʿam + ʾărôn (H727)",
+          "proponent": "Jo Ann Hackett"
+        }
+      ]
+    },
+    "Ammonihah": {
+      "tier": "proposed",
+      "meaning": "uncertain - built on Ammon",
+      "reference": "Alma 8:6",
+      "proposals": [
+        {
+          "meaning": "the name Ammon with the -hah ending of names like Nephihah - the city was named after its founder (Alma 8:7)",
+          "origin": "see Ammon"
+        },
+        {
+          "meaning": "Jehovah is my faithfulness - if -ihah is God's name",
+          "origin": "Hebrew ʾāman, faithful (H539)",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "Amon of battle - possible but unlikely",
+          "origin": "Egyptian imn + ʿḥ3, fight",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Ammoron": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"people of our lord\"",
+      "reference": "Alma 52:3",
+      "proposals": [
+        {
+          "meaning": "people of our lord, or the (divine) kinsman is our lord",
+          "origin": "Hebrew ʿam, people or kinsman (H5971) + West Semitic mrʾ, lord",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "(God's) word or command",
+          "origin": "Hebrew ʾāmar, to say (H559), with the name ending -on"
+        },
+        {
+          "meaning": "people of the ark - possible but unlikely",
+          "origin": "Hebrew ʾărôn, ark, H727",
+          "proponent": "Jo Ann Hackett"
+        }
+      ]
+    },
+    "Amnigaddah": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"my maker is fortune\"",
+      "reference": "Ether 1:14",
+      "proposals": [
+        {
+          "meaning": "my maker is fortune (or fate)",
+          "origin": "Semitic ʾmn, craftsman (H539) + gad, fortune (H1409)"
+        }
+      ]
+    },
+    "Amnihu": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"his faithfulness\"",
+      "reference": "Alma 2:15",
+      "proposals": [
+        {
+          "meaning": "his faithfulness, or he is faithfulness - likely first a person's name, as places were named after people",
+          "origin": "Hebrew ʾēmûn, faithful (H529) + hû, he",
+          "proponent": "Robert F. Smith and John A. Tvedtnes"
+        },
+        {
+          "meaning": "contains the Egyptian god's name Amon - unlikely",
+          "origin": "Egyptian imn",
+          "proponent": "Hugh Nibley"
+        }
+      ]
+    },
+    "Amoron": {
+      "tier": "proposed",
+      "meaning": "uncertain - a later form of Amaron or Ammoron",
+      "reference": "Moroni 9:7",
+      "proposals": [
+        {
+          "meaning": "a late form of Amaron or Ammoron",
+          "origin": "see those names"
+        },
+        {
+          "meaning": "he of Moron - like the Maya naming pattern \"he of\" a place",
+          "origin": "Moron"
+        }
+      ]
+    },
+    "Amulek": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the Mulek\"",
+      "reference": "Alma 8:21",
+      "proposals": [
+        {
+          "meaning": "the Mulek - Mulek with a remnant of the article \"the\"",
+          "origin": "see Mulek"
+        }
+      ]
+    },
+    "Amulon": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"(little) toil\"",
+      "reference": "Mosiah 23:31",
+      "proposals": [
+        {
+          "meaning": "trouble, toil - the Bible's Amal with a name ending",
+          "origin": "Hebrew ʿāmāl, toil (H5999); compare Amal, H6000",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "people of the lodging place - unlikely",
+          "origin": "Hebrew ʿam mālôn",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "people of the circumcision - unlikely, though apt for a priest who claimed strict keeping of the law",
+          "origin": "Hebrew mûl, to circumcise",
+          "proponent": "Robert F. Smith and John A. Tvedtnes"
+        }
+      ]
+    },
+    "Angola": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"rock spring\"",
+      "reference": "Mormon 2:4",
+      "proposals": [
+        {
+          "meaning": "revealed spring, or rock spring",
+          "origin": "Hebrew ʿayin, spring (H5869) + gālâ, to reveal (H1540) or gālal, to roll away a stone (H1556)",
+          "proponent": "Paul Y. Hoskisson"
+        },
+        {
+          "meaning": "the printer's manuscript spells it Angolah; the 1830 edition, Angelah",
+          "origin": "manuscripts",
+          "proponent": "Royal Skousen"
+        }
+      ]
+    },
+    "Ani-Anti": {
+      "tier": "proposed",
+      "meaning": "uncertain",
+      "reference": "Alma 21:11",
+      "proposals": [
+        {
+          "meaning": "perhaps a native place name, or Egyptian (compare names with ʿn.tj)",
+          "origin": "uncertain"
+        },
+        {
+          "meaning": "The element anti- appears in many Book of Mormon names; it may be Egyptian nty, \"he of, the one who,\" or the Greek anti, \"facing, against\"",
+          "origin": "Egyptian or Greek",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Anti-Nephi-Lehi": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"those of Nephi-Lehi\"",
+      "reference": "Alma 23:17",
+      "proposals": [
+        {
+          "meaning": "those who are (or are of) Nephi-Lehi",
+          "origin": "Egyptian nty, \"which is, the one of\""
+        },
+        {
+          "meaning": "facing (toward) Nephi and Lehi",
+          "origin": "Hebrew neḡeḏ, before or facing (H5048) - the word behind \"help meet\" in Genesis 2:18",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "those who imitate the teachings of the descendants of Nephi and Lehi",
+          "origin": "English \"anti\" in its sense of \"in place of, representing\"",
+          "proponent": "Daniel H. Ludlow"
+        }
+      ]
+    },
+    "Antiomno": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"one faithful to him\"",
+      "reference": "Alma 20:4",
+      "proposals": [
+        {
+          "meaning": "he of his faithfulness, one faithful to him",
+          "origin": "Egyptian nty, he of + Semitic ʾmn, faithfulness (H539)"
+        },
+        {
+          "meaning": "facing his faithfulness",
+          "origin": "Greek anti, facing + the same ʾmn"
+        }
+      ]
+    },
+    "Antionah": {
+      "tier": "proposed",
+      "meaning": "uncertain",
+      "reference": "Alma 12:20",
+      "proposals": [
+        {
+          "meaning": "one having a priestly office",
+          "origin": "Egyptian nty, the one having + wnh, a kind of priest"
+        },
+        {
+          "meaning": "one possessed of humility",
+          "origin": "Semitic ʿnh, humility"
+        },
+        {
+          "meaning": "a play on the antion, the gold coin (Alma 11:19) - \"Mr. Gold Nugget,\" ruler of wealthy Ammonihah, alongside Zeezrom, \"Mr. Moneybags\"",
+          "origin": "Book of Mormon wordplay"
+        }
+      ]
+    },
+    "Antionum": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"place of the antion (gold)\"",
+      "reference": "Alma 31:3",
+      "proposals": [
+        {
+          "meaning": "place of gold - the antion was the most valuable Nephite coin, fitting the proud, wealthy Zoramite city",
+          "origin": "antion + the old Semitic place ending -um, \"at, in\""
+        },
+        {
+          "meaning": "he who is there (in heaven) - for the general who fell at Cumorah",
+          "origin": "Egyptian ntywnm",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Antiparah": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"opposite the heifer\"",
+      "reference": "Alma 56:14",
+      "proposals": [
+        {
+          "meaning": "opposite the heifer - compare the biblical town Parah (Joshua 18:23)",
+          "origin": "anti- + Hebrew pārâ, heifer (H6510)",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "who is Pharaoh, or which is the sun (Ra)",
+          "origin": "Egyptian, compare Pharaoh, H6547",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "opposite side - much less likely",
+          "origin": "Greek antipara",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Antipus": {
+      "tier": "proposed",
+      "meaning": "uncertain",
+      "reference": "Alma 56:9",
+      "proposals": [
+        {
+          "meaning": "the same name as Antipas (Revelation 2:13) - see the Onomasticon's ANTIPAS entry",
+          "origin": "Greek"
+        }
+      ]
+    },
+    "Antum": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"many waters\"",
+      "reference": "Mormon 1:3",
+      "proposals": [
+        {
+          "meaning": "many waters, 10,000 waters - compare Irreantum, \"many waters\" (1 Nephi 17:5)",
+          "origin": "Egyptian ʿn.tm(w)",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "north of the narrow neck, so perhaps Jaredite or native",
+          "origin": "uncertain"
+        }
+      ]
+    },
+    "Archeantus": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"chief, ruler\" (Greek)",
+      "reference": "Moroni 9:2",
+      "proposals": [
+        {
+          "meaning": "chief magistrate, or ruler - Greek titles spread through the eastern Mediterranean with traders and mercenaries",
+          "origin": "Greek archōn, ruler; archē, dominion"
+        }
+      ]
+    },
+    "Cezoram": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"he of Zoram\"",
+      "reference": "Helaman 5:1",
+      "proposals": [
+        {
+          "meaning": "he of Zoram - like \"he of Sinai\" (Judges 5:5) and Zenephi, \"he of Nephi\"",
+          "origin": "Hebrew zeh, this one, he of + Zoram"
+        }
+      ]
+    },
+    "Chemish": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps the god-name Chemosh, or \"five\"",
+      "reference": "Omni 1:8",
+      "proposals": [
+        {
+          "meaning": "the same as Chemosh, the Moabite god (1 Kings 11:7), also found as a personal name on a seal - one of many Book of Mormon names linked to the land east of the Jordan",
+          "origin": "Hebrew Kəmôš, H3645"
+        },
+        {
+          "meaning": "five - perhaps as the fifth generation from Lehi",
+          "origin": "Hebrew ḥāmēš, five (H2568)",
+          "proponent": "Jo Ann Hackett"
+        }
+      ]
+    },
+    "Cohor": {
+      "tier": "unknown",
+      "people": "jaredite",
+      "meaning": "unknown",
+      "reference": "Ether 7:15"
+    },
+    "Com": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"arise\" or \"height\"",
+      "reference": "Ether 1:12",
+      "proposals": [
+        {
+          "meaning": "to arise, stand up - which can describe a hill or height",
+          "origin": "Semitic qûm, to arise (H6965); Hebrew qômâ, height (H6967)",
+          "proponent": "George Reynolds and Janne M. Sjodahl"
+        },
+        {
+          "meaning": "to crush",
+          "origin": "Sumerian gum"
+        }
+      ]
+    },
+    "Comnor": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - probably spelled Comron",
+      "reference": "Ether 14:28",
+      "proposals": [
+        {
+          "meaning": "the printer's manuscript spells it Comron; the 1830 typesetter swapped two letters. A hill, perhaps the masculine form of the same name as Cumorah",
+          "origin": "manuscripts"
+        },
+        {
+          "meaning": "heap up (including heaps of the slain)",
+          "origin": "Akkadian kamāru"
+        }
+      ]
+    },
+    "Corianton": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"lion cub\"",
+      "reference": "Alma 31:7",
+      "proposals": [
+        {
+          "meaning": "lion cub - matching his brother Shiblon's name (Arabic šibl, lion cub)",
+          "origin": "Hebrew gûr, whelp (H1482)"
+        },
+        {
+          "meaning": "opponent, enemy",
+          "origin": "Old Akkadian gārium",
+          "proponent": "John A. Tvedtnes"
+        },
+        {
+          "meaning": "perhaps related to the Jaredite names Coriantum, Coriantor, and Coriantumr",
+          "origin": "Jaredite"
+        }
+      ]
+    },
+    "Coriantor": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"child of the heavenly mountain\"",
+      "reference": "Ether 1:6",
+      "proposals": [
+        {
+          "meaning": "heavenly-mountain child, or child of the east wind of heaven - only if Sumerian can explain Jaredite names",
+          "origin": "Sumerian kur, mountain or east + an, heaven + tur, child"
+        },
+        {
+          "meaning": "young lord, or young priest, as an alternative ending",
+          "origin": "Sumerian en tur"
+        }
+      ]
+    },
+    "Coriantum": {
+      "tier": "unknown",
+      "people": "jaredite",
+      "meaning": "unknown",
+      "reference": "Ether 1:13",
+      "proposals": [
+        {
+          "meaning": "something to do with a lion or cat - suggested for several Jaredite names, unconfirmed",
+          "origin": "uncertain"
+        }
+      ]
+    },
+    "Coriantumr": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"the heavenly mountain of god\"",
+      "reference": "Omni 1:21",
+      "proposals": [
+        {
+          "meaning": "the heavenly mountain of god - only if Sumerian can explain Jaredite names",
+          "origin": "Sumerian kur, mountain + an, heaven + dingir, god",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "something to do with a lion or cat - suggested for several Jaredite names, unconfirmed",
+          "origin": "uncertain"
+        }
+      ]
+    },
+    "Corihor": {
+      "tier": "unknown",
+      "people": "jaredite",
+      "meaning": "unknown",
+      "reference": "Ether 7:3",
+      "proposals": [
+        {
+          "meaning": "a plant, or a hole or mine - highly doubtful",
+          "origin": "Old Akkadian ḫuriānum, ḫurrum",
+          "proponent": "John A. Tvedtnes"
+        }
+      ]
+    },
+    "Corom": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"judge\"",
+      "reference": "Ether 1:19",
+      "proposals": [
+        {
+          "meaning": "the same as Kurum, a Sumerian king of Uruk - judge, inspector",
+          "origin": "Sumerian kurum",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Cumeni": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"hidden away\"",
+      "reference": "Alma 56:14",
+      "proposals": [
+        {
+          "meaning": "hidden away",
+          "origin": "Hebrew kmn, to hide"
+        },
+        {
+          "meaning": "(place of) cumin - less likely",
+          "origin": "Hebrew kammōn, cumin (H3646)"
+        },
+        {
+          "meaning": "the Jaredite element kumen, or Egyptian, as in Pacumeni",
+          "origin": "Jaredite or Egyptian"
+        },
+        {
+          "meaning": "holy place, sanctuary",
+          "origin": "Akkadian kummu",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Cumenihah": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the Lord is hidden\"",
+      "reference": "Mormon 6:14",
+      "proposals": [
+        {
+          "meaning": "the Lord is hidden - an unlikely name for a child unless born at a hard time",
+          "origin": "Hebrew kmn, to hide (in Aramaic, to lie in ambush) + -hah",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "compare Khamunira, a name in the Amarna letters",
+          "origin": "Canaanite",
+          "proponent": "Hugh Nibley"
+        }
+      ]
+    },
+    "Cumorah": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"arise, O light\"",
+      "reference": "Mormon 6:2",
+      "proposals": [
+        {
+          "meaning": "arise, O light (of the Lord) - the hill where Mormon hid the records that would come forth",
+          "origin": "Hebrew qûm, arise (H6965) + ʾôr, light (H216)",
+          "proponent": "David A. Palmer and Robert F. Smith"
+        },
+        {
+          "meaning": "the Jaredites called the same hill Ramah (Ether 15:11) - Hebrew for a high place",
+          "origin": "Hebrew rāmâ, H7413"
+        }
+      ]
+    },
+    "Deseret": {
+      "tier": "defined",
+      "meaning": "honey bee",
+      "reference": "Ether 2:3"
+    },
+    "Irreantum": {
+      "tier": "defined",
+      "meaning": "many waters",
+      "reference": "1 Nephi 17:5"
+    },
+    "Jershon": {
+      "tier": "hebrew_root",
+      "meaning": "place of inheritance",
+      "reference": "Alma 27:22",
+      "proposals": [
+        {
+          "meaning": "place of inheritance - the text plays on it: \"this land Jershon is the land which we will give unto our brethren for an inheritance\" (Alma 27:22)",
+          "origin": "Hebrew yāraš, to inherit or possess (H3423), with the place ending -ōn",
+          "proponent": "John A. Tvedtnes and Jo Ann Hackett"
+        },
+        {
+          "meaning": "land of the expelled, or of strangers - offered without a derivation",
+          "origin": "perhaps Hebrew gāraš, to drive out",
+          "proponent": "George Reynolds"
+        }
+      ]
+    },
+    "Kishkumen": {
+      "tier": "proposed",
+      "meaning": "uncertain",
+      "reference": "Helaman 1:9",
+      "proposals": [
+        {
+          "meaning": "Kish, a biblical name (Saul's father), + kumen, an element shared with the Nephite names Kumen, Kumenonhi, Cumeni, and Cumenihah - so likely a Nephite name, not Jaredite",
+          "origin": "Hebrew Qîš, H7027 + unknown kumen"
+        },
+        {
+          "meaning": "compare the Egyptian-Hittite city Kumani",
+          "origin": "Egyptian/Hittite",
+          "proponent": "Hugh Nibley"
+        }
+      ]
+    },
+    "Laman": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"mender\"",
+      "reference": "1 Nephi 2:5",
+      "proposals": [
+        {
+          "meaning": "a name from the Semitic root lmn - found as a personal name once, in an inscription from northwest Arabia (Lihyanite, mid-first millennium BC)",
+          "origin": "Semitic"
+        },
+        {
+          "meaning": "mender",
+          "origin": "Safaitic (ancient North Arabian) Lʾmn"
+        },
+        {
+          "meaning": "evil, or scoundrel - less persuasive",
+          "origin": "Akkadian lemnu; Arabic laman"
+        },
+        {
+          "meaning": "surely he is faithful - intriguing, but doesn't fit the language",
+          "origin": "Hebrew lu ʾaman"
+        }
+      ]
+    },
+    "Liahona": {
+      "tier": "defined",
+      "meaning": "a compass (a ball, or director)",
+      "reference": "Alma 37:38"
+    },
+    "Moron": {
+      "tier": "proposed",
+      "people": "jaredite",
+      "meaning": "uncertain - perhaps \"lord\"",
+      "reference": "Ether 1:7",
+      "proposals": [
+        {
+          "meaning": "lord, or our lord",
+          "origin": "West Semitic mrʾ (as in mrn, \"our lord,\" in ancient Hatra)"
+        },
+        {
+          "meaning": "like the Galilean town Meron and the biblical place behind \"Meronothite\" (1 Chronicles 27:30)",
+          "origin": "Hebrew place names"
+        },
+        {
+          "meaning": "myrrh, the incense of South Arabia",
+          "origin": "Hebrew mōr, H4753"
+        },
+        {
+          "meaning": "rebellion - less likely",
+          "origin": "Mishnaic Hebrew marōn"
+        }
+      ]
+    },
+    "Moroni": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"of Moron\"",
+      "reference": "Words of Mormon 1:1",
+      "proposals": [
+        {
+          "meaning": "of Moron, belonging to Moron - named after the Jaredite land",
+          "origin": "Moron + the -i ending that means \"of\"",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "lord, or our lord",
+          "origin": "West Semitic mrʾ"
+        },
+        {
+          "meaning": "my beloved, or I was beloved",
+          "origin": "Egyptian mrny / mr.n.i",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "(my) lord - less likely",
+          "origin": "Aramaic marōn",
+          "proponent": "Jo Ann Hackett"
+        }
+      ]
+    },
+    "Moronihah": {
+      "tier": "proposed",
+      "meaning": "uncertain - built on Moron/Moroni",
+      "reference": "Alma 62:43",
+      "proposals": [
+        {
+          "meaning": "the same root as Moron and Moroni, with the -hah ending common in Nephite names",
+          "origin": "see Moroni"
+        },
+        {
+          "meaning": "Jehovah is (my) lord - less likely, since it would need an Aramaic word and a form of God's name not otherwise known that early",
+          "origin": "Aramaic marōnīyah",
+          "proponent": "Jo Ann Hackett"
+        }
+      ]
+    },
+    "Mosiah": {
+      "tier": "hebrew_root",
+      "meaning": "the Lord delivers",
+      "reference": "Omni 1:12",
+      "proposals": [
+        {
+          "meaning": "the Lord delivers, or saves - compare Isaiah, \"the Lord is salvation\"",
+          "origin": "Hebrew môšīʿyāhū, from yāšaʿ, to save (H3467) + the short form of God's name (H3050)"
+        },
+        {
+          "meaning": "deliverer - though this doesn't explain the final h",
+          "origin": "Hebrew môšîaʿ, as in Judges 3:9"
+        },
+        {
+          "meaning": "Messiah - though this doesn't give the o vowel",
+          "origin": "Hebrew māšîaḥ, H4899"
+        }
+      ]
+    },
+    "Nephi": {
+      "tier": "proposed",
+      "meaning": "good, fair (Egyptian)",
+      "reference": "1 Nephi 1:1",
+      "proposals": [
+        {
+          "meaning": "good, beautiful - perhaps echoed in \"born of goodly parents\" (1 Nephi 1:1); the name is attested in Egypt in Lehi's time",
+          "origin": "Egyptian nfr (a final r is often dropped in late Egyptian)"
+        },
+        {
+          "meaning": "the name of an Egyptian captain",
+          "origin": "Egyptian nfy",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "to breathe, blow",
+          "origin": "Hebrew nāp̄aḥ, H5301",
+          "proponent": "John A. Tvedtnes and Jo Ann Hackett"
+        }
+      ]
+    },
+    "Paanchi": {
+      "tier": "proposed",
+      "meaning": "the living one (Egyptian)",
+      "reference": "Helaman 1:3",
+      "proposals": [
+        {
+          "meaning": "the living one",
+          "origin": "Egyptian p3-ʿnḫ, a common Egyptian name for over a thousand years",
+          "proponent": "John Gee"
+        },
+        {
+          "meaning": "the same name as the Egyptian pharaoh Piankhi",
+          "origin": "Egyptian",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "the \"paaneah\" in Joseph's Egyptian name Zaphnath-paaneah (Genesis 41:45)",
+          "origin": "Egyptian, as written in Hebrew, H6847",
+          "proponent": "Robert F. Smith"
+        }
+      ]
+    },
+    "Pacumeni": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the Egyptian\"",
+      "reference": "Helaman 1:3",
+      "proposals": [
+        {
+          "meaning": "the Egyptian",
+          "origin": "Egyptian p3-kmt, with the same \"the\" prefix (pa-) as Pahoran and Paanchi"
+        },
+        {
+          "meaning": "like the names of Egypt's last priest-governors (Pa-menech, Pamenches)",
+          "origin": "Egyptian",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "blind man",
+          "origin": "Egyptian p3-kmn",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "-cumeni may be the Jaredite name element kumen (as in Kishkumen), which would make an Egyptian origin doubtful",
+          "origin": "Jaredite"
+        }
+      ]
+    },
+    "Pahoran": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the Syrian\" (Egyptian)",
+      "reference": "Alma 50:40",
+      "proposals": [
+        {
+          "meaning": "the Syrian (Hurrian)",
+          "origin": "Egyptian p3-ḥry; compare the Bible's Horites, H2752",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "the name of Egyptian officials in Canaan",
+          "origin": "Canaanite paḥura, in the Amarna letters"
+        },
+        {
+          "meaning": "governor",
+          "origin": "Hebrew peḥâ, H6346"
+        },
+        {
+          "meaning": "assembly, or potter",
+          "origin": "Aramaic pḥr",
+          "proponent": "Pedro Olavarria"
+        }
+      ]
+    },
+    "Rabbanah": {
+      "tier": "defined",
+      "meaning": "powerful or great king",
+      "reference": "Alma 18:13"
+    },
+    "Rameumptom": {
+      "tier": "defined",
+      "meaning": "the holy stand",
+      "reference": "Alma 31:21"
+    },
+    "Ripliancum": {
+      "tier": "defined",
+      "meaning": "large, or to exceed all",
+      "reference": "Ether 15:8"
+    },
+    "Sariah": {
+      "tier": "hebrew_root",
+      "meaning": "prince of Jehovah, or Jehovah is prince",
+      "reference": "1 Nephi 2:5",
+      "proposals": [
+        {
+          "meaning": "prince (or commander) of Jehovah, or the prince is Jehovah - the feminine of the Bible's Seraiah, found as a Jewish woman's name in the Elephantine papyri of Egypt",
+          "origin": "Hebrew śar, prince (H8269) + yāh, the short form of God's name (H3050); compare Seraiah, H8304",
+          "proponent": "Paul Y. Hoskisson and Stephen D. Ricks"
+        }
+      ]
+    },
+    "Shazer": {
+      "tier": "hebrew_root",
+      "meaning": "twisting, intertwining - perhaps the twisted acacia trees of an oasis campsite",
+      "reference": "1 Nephi 16:13",
+      "proposals": [
+        {
+          "meaning": "to twist, to intertwine",
+          "origin": "Hebrew šāzar, H7806",
+          "proponent": "Sidney B. Sperry"
+        },
+        {
+          "meaning": "pass of the trees - a common Palestinian place name",
+          "origin": "Arabic šajr, trees",
+          "proponent": "Hugh Nibley"
+        },
+        {
+          "meaning": "young gazelle - fitting the hunting there",
+          "origin": "pre-Islamic Hismaic šṣr",
+          "proponent": "Matthew L. Bowen"
+        }
+      ]
+    },
+    "Tubaloth": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"gift\" or \"skilled\"",
+      "reference": "Helaman 1:16",
+      "proposals": [
+        {
+          "meaning": "gift, presentation",
+          "origin": "like the Bible's Tubal (H8422), from yāḇal, to bring (H2986), with the Hebrew noun ending -oth"
+        },
+        {
+          "meaning": "\"curses are good\" - a fitting slur for the family of an apostate king who started a long war",
+          "origin": "Hebrew ṭôḇ, good (H2895) + ʾālôt, curses (H423)"
+        },
+        {
+          "meaning": "skilled (as a metalworker), after Tubal-cain, \"instructor of every artificer in brass and iron\"",
+          "origin": "Hebrew Tubal-cain, H8423"
+        }
+      ]
+    },
+    "Zarahemla": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"seed of compassion\"",
+      "reference": "Omni 1:12",
+      "proposals": [
+        {
+          "meaning": "seed of compassion, or merciful scattering",
+          "origin": "Hebrew zeraʿ, seed (H2233) + ḥemlâ, compassion (H2551)",
+          "proponent": "Jo Ann Hackett and John A. Tvedtnes"
+        },
+        {
+          "meaning": "merciful scion (descendant) - shaped like Hebrew \"royal seed\" and the name Zerubbabel",
+          "origin": "the same Hebrew words, read as a noun and participle",
+          "proponent": "Paul Y. Hoskisson"
+        },
+        {
+          "meaning": "named like the Bible's Zerah, \"(the Lord) has risen like the dawn\"",
+          "origin": "Hebrew Zeraḥ, H2226",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "arm of mercy - less likely, but perhaps a play on the name when Jesus says \"arm of mercy\" (3 Nephi 9:14) just after naming Zarahemla's destruction",
+          "origin": "Hebrew zĕrōaʿ, arm",
+          "proponent": "John A. Tvedtnes"
+        }
+      ]
+    }
+  }
+}

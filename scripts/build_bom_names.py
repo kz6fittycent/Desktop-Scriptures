@@ -79,119 +79,15 @@ FORMS = {
     "Anti-Nephi-Lehies": "Anti-Nephi-Lehi",
 }
 
-# Hand-curated entries. "reference" is where the text defines it (defined)
-# or a representative occurrence. Proposals: most likely first, in our own
-# words; a Strong's number in "origin" links to that lexicon entry. A
-# proponent is named only where the attribution is certain.
-CURATED: dict[str, dict] = {
-    "Irreantum": {"tier": "defined", "meaning": "many waters", "reference": "1 Nephi 17:5"},
-    "Rabbanah": {"tier": "defined", "meaning": "powerful or great king", "reference": "Alma 18:13"},
-    "Rameumptom": {"tier": "defined", "meaning": "the holy stand", "reference": "Alma 31:21"},
-    "Liahona": {"tier": "defined", "meaning": "a compass (a ball, or director)", "reference": "Alma 37:38"},
-    "Deseret": {"tier": "defined", "meaning": "honey bee", "reference": "Ether 2:3"},
-    "Ripliancum": {"tier": "defined", "meaning": "large, or to exceed all", "reference": "Ether 15:8"},
-    "Shazer": {
-        "tier": "hebrew_root",
-        "meaning": "twisting, intertwining - perhaps the twisted trees of an oasis campsite",
-        "reference": "1 Nephi 16:13",
-        "proposals": [
-            {"meaning": "to twist, to intertwine", "origin": "Hebrew šāzar, H7806",
-             "proponent": "Sidney B. Sperry"},
-            {"meaning": "pass of the trees", "origin": "Arabic šajr (trees)", "proponent": "Hugh Nibley"},
-            {"meaning": "young gazelle - fitting the hunting there", "origin": "pre-Islamic Hismaic šṣr",
-             "proponent": "Matthew L. Bowen"},
-        ],
-    },
-    "Zarahemla": {
-        "tier": "proposed",
-        "meaning": "seed of compassion",
-        "reference": "Omni 1:12",
-        "proposals": [
-            {"meaning": "seed of compassion (or pity)", "origin": "Hebrew zeraʿ, seed (H2233) + ḥemlâ, compassion (H2551)"},
-        ],
-    },
-    "Alma": {
-        "tier": "hebrew_root",
-        "meaning": "young man",
-        "reference": "Mosiah 17:2",
-        "proposals": [
-            {"meaning": "young man, youth", "origin": "Hebrew ʿelem, H5958 - attested as a man's name "
-             "(\"Alma son of Judah\") in a 2nd-century Judean desert document", "proponent": "Hugh Nibley"},
-        ],
-    },
-    "Mosiah": {
-        "tier": "hebrew_root",
-        "meaning": "savior, deliverer",
-        "reference": "Omni 1:12",
-        "proposals": [
-            {"meaning": "one who saves, a deliverer", "origin": "Hebrew môšîaʿ, from yāšaʿ (to save, H3467)"},
-        ],
-    },
-    "Sariah": {
-        "tier": "hebrew_root",
-        "meaning": "Jehovah is prince",
-        "reference": "1 Nephi 2:5",
-        "proposals": [
-            {"meaning": "Jehovah is prince (or has prevailed)", "origin": "Hebrew Śerāyāh - the Bible's "
-             "Seraiah, H8304 - found as a woman's name in the Elephantine papyri", "proponent": "Jeffrey R. Chadwick"},
-        ],
-    },
-    "Jershon": {
-        "tier": "hebrew_root",
-        "meaning": "place of inheritance",
-        "reference": "Alma 27:22",
-        "proposals": [
-            {"meaning": "a place of inheritance - the text gives Jershon \"for an inheritance\" (Alma 27:22)",
-             "origin": "Hebrew yāraš, to inherit or possess, H3423"},
-        ],
-    },
-    "Pahoran": {
-        "tier": "proposed",
-        "meaning": "uncertain - perhaps \"the Syrian\" (Egyptian)",
-        "reference": "Alma 50:40",
-        "proposals": [
-            {"meaning": "the Syrian (Hurrian)", "origin": "Egyptian p3-ḥry; compare the Bible's Horites, H2752",
-             "proponent": "Hugh Nibley"},
-            {"meaning": "the name of Egyptian officials in Canaan", "origin": "Canaanite paḥura, in the Amarna letters"},
-            {"meaning": "governor", "origin": "Hebrew peḥâ, H6346"},
-            {"meaning": "assembly, or potter", "origin": "Aramaic pḥr", "proponent": "Pedro Olavarria"},
-        ],
-    },
-    "Paanchi": {
-        "tier": "proposed",
-        "meaning": "the living one (Egyptian)",
-        "reference": "Helaman 1:3",
-        "proposals": [
-            {"meaning": "the living one", "origin": "Egyptian p3-ʿnḫ, a common Egyptian name for over a thousand years",
-             "proponent": "John Gee"},
-            {"meaning": "the same name as the Egyptian pharaoh Piankhi", "origin": "Egyptian", "proponent": "Hugh Nibley"},
-            {"meaning": "the \"paaneah\" in Joseph's Egyptian name Zaphnath-paaneah (Genesis 41:45)",
-             "origin": "Egyptian, as written in Hebrew, H6847", "proponent": "Robert F. Smith"},
-        ],
-    },
-    "Pacumeni": {
-        "tier": "proposed",
-        "meaning": "uncertain - perhaps \"the Egyptian\"",
-        "reference": "Helaman 1:3",
-        "proposals": [
-            {"meaning": "the Egyptian", "origin": "Egyptian p3-kmt, with the same \"the\" prefix (pa-) as Pahoran and Paanchi"},
-            {"meaning": "like the names of Egypt's last priest-governors (Pa-menech, Pamenches)", "origin": "Egyptian",
-             "proponent": "Hugh Nibley"},
-            {"meaning": "blind man", "origin": "Egyptian p3-kmn", "proponent": "Hugh Nibley"},
-            {"meaning": "-cumeni may be the Jaredite name element kumen (as in Kishkumen), which would make "
-             "an Egyptian origin doubtful", "origin": "Jaredite"},
-        ],
-    },
-    "Nephi": {
-        "tier": "proposed",
-        "meaning": "good, fair",
-        "reference": "1 Nephi 1:1",
-        "proposals": [
-            {"meaning": "good, fair, fine - echoed in \"born of goodly parents\" (1 Nephi 1:1)",
-             "origin": "Egyptian nfr"},
-        ],
-    },
-}
+# Hand-curated entries (scripts/bom_names_curated.json). "reference" is
+# where the text defines it (defined) or a representative occurrence.
+# Proposals: most likely first, in our own words; a Strong's number in
+# "origin" links to that lexicon entry. A proponent is named only where
+# the source names them (the Onomasticon's initials - JH, JAT, RFS... -
+# are spelled out from its Scholars page).
+CURATED: dict[str, dict] = json.loads(
+    (PROJECT_ROOT / "scripts" / "bom_names_curated.json").read_text(encoding="utf-8")
+)["names"]
 
 STRONGS_RE = re.compile(r"\b[HG]\d{1,4}\b")
 TIERS = ("defined", "biblical", "hebrew_root", "proposed", "unknown")
@@ -283,24 +179,27 @@ def build(conn: sqlite3.Connection) -> Counter:
             tier = curated["tier"]
             assert tier in TIERS, (name, tier)
             linked = [n for p in curated.get("proposals", []) for n in STRONGS_RE.findall(p.get("origin", ""))]
-            linked = linked or strongs
+            for number in linked:
+                if not conn.execute("SELECT 1 FROM lexicon_entries WHERE strongs = ?", (number,)).fetchone():
+                    raise SystemExit(f"{name}: {number} isn't in the lexicon")
+            linked = list(dict.fromkeys(linked)) or strongs
             rows.append((
                 name, tier, curated.get("meaning", ""), curated.get("reference", info["first"]),
                 ",".join(linked), json.dumps(curated.get("proposals", []), ensure_ascii=False),
                 json.dumps(curated.get("sources", []) + [onomasticon], ensure_ascii=False),
-                ",".join(sorted(info["forms"] - {name})),
+                ",".join(sorted(info["forms"] - {name})), curated.get("people", ""),
             ))
         elif strongs or in_bible(conn, name):
             rows.append((name, "biblical", "", info["first"], ",".join(strongs), "[]", json.dumps([onomasticon]),
-                         ",".join(sorted(info["forms"] - {name}))))
+                         ",".join(sorted(info["forms"] - {name})), ""))
         else:
             # Not yet researched: kept so its forms resolve, with no tier.
             rows.append((name, "", "", info["first"], "", "[]", json.dumps([onomasticon]),
-                         ",".join(sorted(info["forms"] - {name}))))
+                         ",".join(sorted(info["forms"] - {name})), ""))
     conn.execute("DELETE FROM bom_names")
     conn.executemany(
-        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms, people) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rows,
     )
     conn.commit()

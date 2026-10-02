@@ -33,6 +33,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     _migrate_add_cross_reference_topic_slugs(conn)
     _migrate_cross_references_typology_relationship(conn)
     _migrate_cross_references_tradition_relationship(conn)
+    _migrate_add_bom_name_people(conn)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     _backfill_migrated_highlights(conn)
@@ -143,6 +144,14 @@ def _migrate_add_chapter_metadata_columns(conn: sqlite3.Connection) -> None:
     conn.execute("ALTER TABLE chapters ADD COLUMN title TEXT")
     conn.execute("ALTER TABLE chapters ADD COLUMN speaker TEXT")
     conn.execute("ALTER TABLE chapters ADD COLUMN discourse_date TEXT")
+
+
+def _migrate_add_bom_name_people(conn: sqlite3.Connection) -> None:
+    """bom_names.people ("jaredite") came after the table did - add it if
+    missing, like the chapter metadata columns above."""
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(bom_names)")}
+    if columns and "people" not in columns:
+        conn.execute("ALTER TABLE bom_names ADD COLUMN people TEXT NOT NULL DEFAULT ''")
 
 
 def _migrate_add_sync_columns(conn: sqlite3.Connection) -> None:
@@ -538,8 +547,8 @@ def _sync_bundled_bom_names(conn: sqlite3.Connection) -> None:
         return
     conn.execute("DELETE FROM bom_names")
     conn.execute(
-        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms) "
-        "SELECT name, tier, meaning, reference, strongs, proposals, sources, forms FROM bundled.bom_names"
+        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms, people) "
+        "SELECT name, tier, meaning, reference, strongs, proposals, sources, forms, people FROM bundled.bom_names"
     )
 
 

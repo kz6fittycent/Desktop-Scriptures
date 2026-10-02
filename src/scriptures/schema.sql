@@ -169,7 +169,8 @@ CREATE TABLE IF NOT EXISTS lexicon_entries (
 -- which builds it (meanings in this project's own words, sources linked).
 -- `strongs` lists related lexicon entries ("H7806"); `proposals` and
 -- `sources` are JSON lists; `forms` are other spellings that mean this
--- name ("Nephites" -> Nephi). Synced like the lexicon.
+-- name ("Nephites" -> Nephi); `people` is "jaredite" for a Jaredite name
+-- (from Ether - an older, unknown language). Synced like the lexicon.
 CREATE TABLE IF NOT EXISTS bom_names (
     id         INTEGER PRIMARY KEY,
     name       TEXT NOT NULL UNIQUE,
@@ -179,7 +180,8 @@ CREATE TABLE IF NOT EXISTS bom_names (
     strongs    TEXT NOT NULL DEFAULT '',
     proposals  TEXT NOT NULL DEFAULT '[]',
     sources    TEXT NOT NULL DEFAULT '[]',
-    forms      TEXT NOT NULL DEFAULT ''
+    forms      TEXT NOT NULL DEFAULT '',
+    people     TEXT NOT NULL DEFAULT ''
 );
 
 -- Cross-references: passages that quote, closely paraphrase, or are a JST/

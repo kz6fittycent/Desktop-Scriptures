@@ -1009,6 +1009,7 @@ class BomName:
     strongs: list[str]
     proposals: list[dict]
     sources: list[list[str]]
+    people: str = ""  # "jaredite", or "" for a Nephite/Lehite or biblical name
 
 
 def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
@@ -1018,7 +1019,7 @@ def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
     if not word:
         return None
     row = conn.execute(
-        "SELECT name, tier, meaning, reference, strongs, proposals, sources FROM bom_names "
+        "SELECT name, tier, meaning, reference, strongs, proposals, sources, people FROM bom_names "
         "WHERE LOWER(name) = LOWER(?) OR (',' || LOWER(forms) || ',') LIKE ?",
         (word, f"%,{word.lower()},%"),
     ).fetchone()
@@ -1026,7 +1027,7 @@ def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
         return None
     return BomName(
         row[0], row[1], row[2], row[3], [s for s in row[4].split(",") if s],
-        json.loads(row[5] or "[]"), json.loads(row[6] or "[]"),
+        json.loads(row[5] or "[]"), json.loads(row[6] or "[]"), row[7],
     )
 
 

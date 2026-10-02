@@ -74,6 +74,10 @@ LANGUAGE_NOTE = (
     'speech" (Mormon 9:32-34), so meanings proposed for Book of Mormon names are '
     "suggestions, not certainties."
 )
+JAREDITE_NOTE = (
+    "This is a Jaredite name. The Jaredites' language is older than the Nephites' and "
+    "unknown today (Ether 1:33-35), so any meaning proposed for it is speculative."
+)
 
 
 class _BomNameCard(QFrame):
@@ -95,7 +99,8 @@ class _BomNameCard(QFrame):
 
         label = TIER_LABELS.get(name.tier, "Not yet researched")
         where = f" · first mentioned in {name.reference}" if name.reference else ""
-        header = QLabel(f"Book of Mormon name · {label}{where}")
+        kind = "Jaredite name" if name.people == "jaredite" else "Book of Mormon name"
+        header = QLabel(f"{kind} · {label}{where}")
         header.setObjectName("resultPrimary")
         header.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header.setWordWrap(True)
@@ -129,7 +134,7 @@ class _BomNameCard(QFrame):
         layout.addWidget(body)
 
         if name.tier in ("hebrew_root", "proposed", "unknown"):
-            note = QLabel(LANGUAGE_NOTE)
+            note = QLabel(JAREDITE_NOTE if name.people == "jaredite" else LANGUAGE_NOTE)
             note.setObjectName("resultSecondary")
             note.setWordWrap(True)
             layout.addWidget(note)
