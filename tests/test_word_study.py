@@ -123,6 +123,13 @@ def test_book_of_mormon_name_card() -> None:
         panel.look_up("Liahona")
         text = " ".join(label.text() for label in panel._name_card.findChildren(QLabel))
         assert "Defined in the Book of Mormon" in text and "Mormon 9:32-34" not in text
+        # A Jaredite name gets the Ether note instead of Mormon 9's.
+        panel.look_up("Coriantumr")
+        text = " ".join(label.text() for label in panel._name_card.findChildren(QLabel))
+        assert "Jaredite name" in text and "Ether 1:33-35" in text and "Mormon 9:32-34" not in text
+        # Every name has been researched, and links its Onomasticon page.
+        assert not conn.execute("SELECT 1 FROM bom_names WHERE tier = ''").fetchone()
+        assert not conn.execute("SELECT 1 FROM bom_names WHERE sources NOT LIKE '%onoma.lib.byu.edu%'").fetchone()
         # A biblical name keeps its lexicon matches; an ordinary word gets no card.
         panel.look_up("Lehi")
         assert panel._name_card is not None and panel._buttons[0].strongs == "H3895"

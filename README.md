@@ -120,7 +120,7 @@ sudo snap install desktop-scriptures
 The goal: ask about a word, a name, or a place and get a clear, sourced answer - what "Christ" or "Zarahemla" means, where a place was - even with a small AI model running on your own computer. Each item below is a new layer of the study index (see the Talk prep helper item above), so AI search finds it by meaning alongside the scriptures, and each is measured against the benchmark questions before it ships.
 
 - [x] Hebrew and Greek word meanings - Strong's and STEP Bible, in the Word Study tab
-- [ ] Book of Mormon names (e.g. what "Zarahemla" means) - started: every name is listed with its confidence label, but most still await research. Proposals are summarized in our own words with sources such as BYU's Book of Mormon Onomasticon linked, never copied
+- [x] Book of Mormon names (e.g. what "Zarahemla" means) - all 307, each labeled by confidence, with proposals summarized in our own words from BYU's Book of Mormon Onomasticon and linked, never copied
 - [ ] Names highlighted in the text - click "Zarahemla" in a verse to open its Word Study card
 - [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse rather than every word the KJV translates that way
 - [ ] Short, cited answers - a sentence or two drawn only from the sources found, every statement cited, rather than the AI only choosing among results as it does today; also the basis for the Talk prep helper

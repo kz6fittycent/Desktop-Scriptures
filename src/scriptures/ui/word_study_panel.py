@@ -117,7 +117,7 @@ class _BomNameCard(QFrame):
                 origin = linked(proposal.get("origin", ""))
                 who = proposal.get("proponent")
                 items.append(
-                    f"<li>\u201c{html.escape(proposal['meaning'])}\u201d - {origin}"
+                    f"<li>{html.escape(proposal['meaning'])} - <i>{origin}</i>"
                     + (f" - proposed by {html.escape(who)}" if who else "")
                     + "</li>"
                 )
