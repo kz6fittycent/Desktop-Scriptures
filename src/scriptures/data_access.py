@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import re
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 
@@ -1010,6 +1010,8 @@ class BomName:
     proposals: list[dict]
     sources: list[list[str]]
     people: str = ""  # "jaredite", or "" for a Nephite/Lehite or biblical name
+    notes: list[str] = field(default_factory=list)  # study notes: wordplay, titles
+    related: list[list] = field(default_factory=list)  # [element, gloss, [names]]
 
 
 def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
@@ -1019,7 +1021,7 @@ def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
     if not word:
         return None
     row = conn.execute(
-        "SELECT name, tier, meaning, reference, strongs, proposals, sources, people FROM bom_names "
+        "SELECT name, tier, meaning, reference, strongs, proposals, sources, people, notes, related FROM bom_names "
         "WHERE LOWER(name) = LOWER(?) OR (',' || LOWER(forms) || ',') LIKE ?",
         (word, f"%,{word.lower()},%"),
     ).fetchone()
@@ -1028,6 +1030,7 @@ def get_bom_name(conn: sqlite3.Connection, word: str) -> BomName | None:
     return BomName(
         row[0], row[1], row[2], row[3], [s for s in row[4].split(",") if s],
         json.loads(row[5] or "[]"), json.loads(row[6] or "[]"), row[7],
+        json.loads(row[8] or "[]"), json.loads(row[9] or "[]"),
     )
 
 

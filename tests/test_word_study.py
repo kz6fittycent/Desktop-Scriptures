@@ -130,6 +130,17 @@ def test_book_of_mormon_name_card() -> None:
         # Every name has been researched, and links its Onomasticon page.
         assert not conn.execute("SELECT 1 FROM bom_names WHERE tier = ''").fetchone()
         assert not conn.execute("SELECT 1 FROM bom_names WHERE sources NOT LIKE '%onoma.lib.byu.edu%'").fetchone()
+        # Study notes (Sidom's burning, Alma 15:3) and related names, which open
+        # each other's cards.
+        panel.look_up("Sidom")
+        text = " ".join(label.text() for label in panel._name_card.findChildren(QLabel))
+        assert "Alma 15:3" in text and 'href="H5467"' in text and 'href="name:Sidon"' in text
+        assert "without vowels" in text
+        panel._follow_card_link("name:Sidon")
+        assert panel._input.text() == "Sidon" and panel._name_card is not None
+        # Names that are also money words (Alma 11) are still names.
+        assert da.get_bom_name(conn, "Shiblon").tier == "proposed"
+        assert "Mulek" in da.get_bom_name(conn, "Melek").related[0][2]
         # A biblical name keeps its lexicon matches; an ordinary word gets no card.
         panel.look_up("Lehi")
         assert panel._name_card is not None and panel._buttons[0].strongs == "H3895"

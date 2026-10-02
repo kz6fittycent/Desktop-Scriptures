@@ -147,11 +147,14 @@ def _migrate_add_chapter_metadata_columns(conn: sqlite3.Connection) -> None:
 
 
 def _migrate_add_bom_name_people(conn: sqlite3.Connection) -> None:
-    """bom_names.people ("jaredite") came after the table did - add it if
-    missing, like the chapter metadata columns above."""
+    """bom_names.people ("jaredite"), notes, and related came after the
+    table did - add any missing, like the chapter metadata columns above."""
     columns = {row["name"] for row in conn.execute("PRAGMA table_info(bom_names)")}
-    if columns and "people" not in columns:
-        conn.execute("ALTER TABLE bom_names ADD COLUMN people TEXT NOT NULL DEFAULT ''")
+    if not columns:
+        return
+    for column, default in (("people", "''"), ("notes", "'[]'"), ("related", "'[]'")):
+        if column not in columns:
+            conn.execute(f"ALTER TABLE bom_names ADD COLUMN {column} TEXT NOT NULL DEFAULT {default}")
 
 
 def _migrate_add_sync_columns(conn: sqlite3.Connection) -> None:
@@ -547,8 +550,9 @@ def _sync_bundled_bom_names(conn: sqlite3.Connection) -> None:
         return
     conn.execute("DELETE FROM bom_names")
     conn.execute(
-        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms, people) "
-        "SELECT name, tier, meaning, reference, strongs, proposals, sources, forms, people FROM bundled.bom_names"
+        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms, people, notes, related) "
+        "SELECT name, tier, meaning, reference, strongs, proposals, sources, forms, people, notes, related "
+        "FROM bundled.bom_names"
     )
 
 

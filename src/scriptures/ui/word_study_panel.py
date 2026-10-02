@@ -72,7 +72,9 @@ TIER_LABELS = {
 LANGUAGE_NOTE = (
     'Moroni wrote that the Nephites altered their language "according to our manner of '
     'speech" (Mormon 9:32-34), so meanings proposed for Book of Mormon names are '
-    "suggestions, not certainties."
+    "suggestions, not certainties. Hebrew in Lehi's day was also written without vowels - "
+    "the vowel marks came only with the Masoretes, about AD 600-1000 - so a name's "
+    "consonants are a surer guide than its vowels."
 )
 JAREDITE_NOTE = (
     "This is a Jaredite name. The Jaredites' language is older than the Nephites' and "
@@ -85,7 +87,8 @@ class _BomNameCard(QFrame):
     with their proponents (Strong's numbers link to the lexicon entry),
     and sources."""
 
-    def __init__(self, name: BomName, on_strongs, parent: QWidget | None = None):
+    def __init__(self, name: BomName, on_link, parent: QWidget | None = None):
+        """`on_link` gets a Strong's number ("H7806") or "name:Mulek"."""
         super().__init__(parent)
         self.setObjectName("nameCard")
         layout = QVBoxLayout(self)
@@ -111,6 +114,9 @@ class _BomNameCard(QFrame):
             parts.append(f"<p><b>Meaning:</b> {html.escape(name.meaning)}</p>")
         if name.tier == "biblical":
             parts.append("<p>The same name appears in the Bible - its Hebrew or Greek entry is below.</p>")
+        if name.notes:
+            notes = "".join(f"<li>{linked(note)}</li>" for note in name.notes)
+            parts.append(f"<p><b>Study notes</b></p><ul>{notes}</ul>")
         if name.proposals:
             items = []
             for proposal in name.proposals:
@@ -130,8 +136,24 @@ class _BomNameCard(QFrame):
         body = QLabel("".join(parts))
         body.setWordWrap(True)
         body.setTextFormat(Qt.TextFormat.RichText)
-        body.linkActivated.connect(on_strongs)
+        body.linkActivated.connect(on_link)
         layout.addWidget(body)
+
+        if name.related:
+            groups = []
+            for element, gloss, others in name.related:
+                links = ", ".join(
+                    f'<a href="name:{html.escape(other)}">{html.escape(other)}</a>' for other in others
+                )
+                groups.append(f"<li><i>{html.escape(element)}</i> ({linked(gloss)}): {links}</li>")
+            related = QLabel(
+                "<p><b>Related names</b> - sharing consonants or an element, which may mean a "
+                f"shared root:</p><ul>{''.join(groups)}</ul>"
+            )
+            related.setWordWrap(True)
+            related.setTextFormat(Qt.TextFormat.RichText)
+            related.linkActivated.connect(on_link)
+            layout.addWidget(related)
 
         if name.tier in ("hebrew_root", "proposed", "unknown"):
             note = QLabel(JAREDITE_NOTE if name.people == "jaredite" else LANGUAGE_NOTE)
@@ -226,7 +248,7 @@ class WordStudyPanel(QWidget):
             return
         name = get_bom_name(self._conn, word)
         if name is not None:
-            self._name_card = _BomNameCard(name, self._show_strongs)
+            self._name_card = _BomNameCard(name, self._follow_card_link)
             self._name_slot.addWidget(self._name_card)
         entries = search_lexicon(self._conn, word, preferred_language=self._preferred)
         if name is not None and name.tier != "biblical":
@@ -252,6 +274,14 @@ class WordStudyPanel(QWidget):
             self._matches.addWidget(button)
             self._buttons.append(button)
         self._select(entries[0].strongs)
+
+    def _follow_card_link(self, target: str) -> None:
+        """A name card link: a related name opens its own card; a Strong's
+        number shows that entry below."""
+        if target.startswith("name:"):
+            self.look_up(target.removeprefix("name:"))
+        else:
+            self._show_strongs(target)
 
     def _show_strongs(self, strongs: str) -> None:
         """A Strong's link in a name card: show that entry below."""

@@ -1,5 +1,5 @@
 {
-  "_note": "Curated Book of Mormon names - see scripts/build_bom_names.py's docstring for the tiers and rules. Meanings and proposals are this project's own summaries; the build links each name's Onomasticon page. Add \"people\": \"jaredite\" for a Jaredite name.",
+  "_note": "Curated Book of Mormon names - see scripts/build_bom_names.py's docstring for the tiers and rules. Meanings and proposals are this project's own summaries; the build links each name's Onomasticon page. Add \"people\": \"jaredite\" for a Jaredite name. \"notes\" are study notes (wordplay, titles, nicknames). \"families\" group names sharing consonants or an element; each member's card links the others.",
   "names": {
     "Abinadi": {
       "tier": "proposed",
@@ -78,7 +78,7 @@
           "proponent": "George Reynolds"
         },
         {
-          "meaning": "mourning - less likely, since the vowels don't fit",
+          "meaning": "mourning - the later Masoretic vowels (ʾēḇel) differ, but the consonants ʾ-b-l match",
           "origin": "Hebrew ʾēḇel"
         }
       ]
@@ -165,6 +165,9 @@
           "meaning": "a possible play on \"hidden\" when Alma hides by the waters of Mormon (Mosiah 18:5)",
           "origin": "Hebrew ʿālam, to conceal, H5956"
         }
+      ],
+      "notes": [
+        "Mosiah 17:2 introduces Alma as \"a young man\" - the very meaning proposed for his name."
       ]
     },
     "Amaleki": {
@@ -197,6 +200,9 @@
           "origin": "Hebrew",
           "proponent": "Jo Ann Hackett"
         }
+      ],
+      "notes": [
+        "If the name echoes Amalek, Israel's archenemy (Exodus 17:14-16; H6002), it may be what his Nephite enemies called him rather than his birth name."
       ]
     },
     "Amaron": {
@@ -315,6 +321,9 @@
           "origin": "Egyptian imn + ʿḥ3, fight",
           "proponent": "Robert F. Smith"
         }
+      ],
+      "notes": [
+        "Nephite cities were named after their first settler (Alma 8:7)."
       ]
     },
     "Ammoron": {
@@ -362,6 +371,36 @@
         },
         {
           "meaning": "contains the Egyptian god's name Amon - unlikely",
+          "origin": "Egyptian imn",
+          "proponent": "Hugh Nibley"
+        }
+      ]
+    },
+    "Amnor": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"the (divine) kinsman is light\"",
+      "reference": "Alma 2:22",
+      "notes": [
+        "Also a Nephite silver measure (Alma 11:6) - perhaps named after a person."
+      ],
+      "proposals": [
+        {
+          "meaning": "people of light",
+          "origin": "Hebrew ʿam, people (H5971) + nûr, light",
+          "proponent": "John A. Tvedtnes"
+        },
+        {
+          "meaning": "(my divine) kinsman is light - like Abner (H74) and Neriah, \"the Lord is light\" (H5374)",
+          "origin": "Hebrew ʿam + nûr",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "faithfulness is light",
+          "origin": "Hebrew ʾmn, faithful (H539) + ʾôr, light (H216)",
+          "proponent": "Robert F. Smith"
+        },
+        {
+          "meaning": "contains the Egyptian god's name Amon",
           "origin": "Egyptian imn",
           "proponent": "Hugh Nibley"
         }
@@ -501,6 +540,9 @@
           "meaning": "a play on the antion, the gold coin (Alma 11:19) - \"Mr. Gold Nugget,\" ruler of wealthy Ammonihah, alongside Zeezrom, \"Mr. Moneybags\"",
           "origin": "Book of Mormon wordplay"
         }
+      ],
+      "notes": [
+        "Antionah rules Ammonihah alongside Zeezrom, \"he of the ezrom (silver)\" - the two names, gold and silver, may be how the record characterizes them rather than what they were born with."
       ]
     },
     "Antionum": {
@@ -517,6 +559,9 @@
           "origin": "Egyptian ntywnm",
           "proponent": "Robert F. Smith"
         }
+      ],
+      "notes": [
+        "The city of the Zoramites, whose costly apparel and pride Alma describes (Alma 31:28) - a city named for gold suits them."
       ]
     },
     "Antiparah": {
@@ -791,6 +836,9 @@
           "meaning": "the Jaredites called the same hill Ramah (Ether 15:11) - Hebrew for a high place",
           "origin": "Hebrew rāmâ, H7413"
         }
+      ],
+      "notes": [
+        "The Jaredites called the same hill Ramah (Ether 15:11). Isaiah 10:33 (2 Nephi 20:33) pairs rāmâ, \"high,\" with qômâ, \"stature\" (H6967) - the roots behind both names."
       ]
     },
     "Deseret": {
@@ -894,6 +942,9 @@
           "origin": "Hebrew gaḏ, fortune (H1410) + other roots",
           "proponent": "Robert F. Smith"
         }
+      ],
+      "notes": [
+        "\"Band of robbers\" fits so well that it may be an epithet - the record names the whole band after him (Helaman 2:4, 13)."
       ]
     },
     "Gadiomnah": {
@@ -1173,6 +1224,9 @@
           "meaning": "where is the prince? - another spelling of Jezebel (the King James spelling follows the Greek)",
           "origin": "Hebrew ʾÎzeḇel, H348"
         }
+      ],
+      "notes": [
+        "Corianton's harlot (Alma 39:3) bears Jezebel's name - Israel's emblem of seduction and idolatry (2 Kings 9:22; Revelation 2:20). Alma may be using it as a title, \"a Jezebel,\" rather than her birth name."
       ]
     },
     "Jacobugath": {
@@ -1254,6 +1308,9 @@
           "origin": "perhaps Hebrew gāraš, to drive out",
           "proponent": "George Reynolds"
         }
+      ],
+      "notes": [
+        "The text itself plays on the name: \"this land Jershon is the land which we will give unto our brethren for an inheritance\" (Alma 27:22)."
       ]
     },
     "Josh": {
@@ -1327,6 +1384,9 @@
           "origin": "Egyptian ḥry-ḥr",
           "proponent": "Hugh Nibley"
         }
+      ],
+      "notes": [
+        "Nibley saw in this name the first sign of names fitting their bearers in the Book of Mormon - Korihor is tried before a high priest, as Herihor was a high priest who seized a throne."
       ]
     },
     "Kumen": {
@@ -1652,7 +1712,7 @@
       "reference": "3 Nephi 9:7",
       "proposals": [
         {
-          "meaning": "place, town, holy site - though the vowels change a lot",
+          "meaning": "place, town, holy site - the consonants m-q-m nearly match (q and k are close); only the later vowel marks differ much",
           "origin": "Hebrew māqôm, place (H4725)"
         },
         {
@@ -1730,6 +1790,9 @@
           "meaning": "a place first (Mosiah 18:4) - so perhaps a word for its beauty, fountain, or wild beasts",
           "origin": "Book of Mormon usage"
         }
+      ],
+      "notes": [
+        "Mormon was first a place, named \"from the king\" (Mosiah 18:4); the prophet was named after the land (3 Nephi 5:12)."
       ]
     },
     "Moron": {
@@ -1812,9 +1875,12 @@
           "origin": "Hebrew môšîaʿ, as in Judges 3:9"
         },
         {
-          "meaning": "Messiah - though this doesn't give the o vowel",
+          "meaning": "Messiah - the o vowel doesn't match the later vowel marks, but the consonants are close",
           "origin": "Hebrew māšîaḥ, H4899"
         }
+      ],
+      "notes": [
+        "The first Mosiah led those who would hearken out of the land of Nephi to safety (Omni 1:12-13) - \"deliverer\" is as much a title as a name."
       ]
     },
     "Mulek": {
@@ -1840,6 +1906,9 @@
           "origin": "manuscripts",
           "proponent": "Royal Skousen"
         }
+      ],
+      "notes": [
+        "A son of King Zedekiah (Helaman 8:21) - \"little king,\" a prince, may be how he was known rather than his given name."
       ]
     },
     "Muloki": {
@@ -1877,6 +1946,9 @@
           "meaning": "to groan - fitting the mourning of Ishmael's daughters there",
           "origin": "Hebrew nāham, to groan (H5098)"
         }
+      ],
+      "notes": [
+        "Ishmael died and was buried at Nahom, where his daughters \"did mourn exceedingly\" (1 Nephi 16:34-35) - matching both \"comfort\" and \"groan.\""
       ]
     },
     "Nehor": {
@@ -2327,6 +2399,9 @@
           "meaning": "peace, or peace offering - but these don't fit \"exceeding height\"",
           "origin": "Hebrew šelem (H8002)"
         }
+      ],
+      "notes": [
+        "The text explains the name itself: \"because of its exceeding height\" (Ether 3:1)."
       ]
     },
     "Shemlon": {
@@ -2414,6 +2489,29 @@
         {
           "meaning": "ear of grain, or path",
           "origin": "Hebrew šibbōlet (H7641); šəḇîl, path"
+        }
+      ]
+    },
+    "Shiblon": {
+      "tier": "proposed",
+      "meaning": "uncertain - perhaps \"ear of grain\" or \"path (of God)\"",
+      "reference": "Alma 31:7",
+      "notes": [
+        "Also the name of a Jaredite king (Ether 1:11, called Shiblom in Ether 11:4) and of a Nephite silver measure (Alma 11:15)."
+      ],
+      "proposals": [
+        {
+          "meaning": "path of (God), or skirt (protection) of (God) - a short form of a longer name",
+          "origin": "Hebrew šəḇîl, path; *šōḇel, flowing skirt",
+          "proponent": "Jo Ann Hackett"
+        },
+        {
+          "meaning": "ear of grain - fitting for the silver measure",
+          "origin": "Hebrew šibbōlet (H7641)"
+        },
+        {
+          "meaning": "lion (jaguar) cub - paired with his brother Corianton, \"lion cub\" - less likely",
+          "origin": "Arabic šibl, cub"
         }
       ]
     },
@@ -2515,11 +2613,14 @@
     },
     "Sidom": {
       "tier": "proposed",
-      "meaning": "uncertain - perhaps Sodom",
+      "meaning": "perhaps \"burnt place\", as Sodom",
       "reference": "Alma 15:1",
+      "notes": [
+        "At Sidom, Zeezrom lay \"with a burning fever\" and \"began to be scorched with a burning heat\" (Alma 15:3) - the very idea Strong's gives for Sodom, \"from an unused root meaning to scorch; burnt\" (H5467). Whether the text plays on the name or the place was named for it, the two belong together."
+      ],
       "proposals": [
         {
-          "meaning": "the same as Sodom - the Hebrew Bible's vowels (Sedom) could easily give Sidom",
+          "meaning": "burnt place - Sidom has Sodom's consonants, s-d-m; the Masoretic vowels give Sedom, and the Hebrew Bible's spelling could easily be read Sidom",
           "origin": "Hebrew Səḏōm, H5467"
         },
         {
@@ -2597,6 +2698,9 @@
           "meaning": "skilled (as a metalworker), after Tubal-cain, \"instructor of every artificer in brass and iron\"",
           "origin": "Hebrew Tubal-cain, H8423"
         }
+      ],
+      "notes": [
+        "If the name means \"curses are good,\" it is probably the Nephite record's label for an enemy, not what his family called him."
       ]
     },
     "Zarahemla": {
@@ -2644,6 +2748,9 @@
           "origin": "Egyptian ḏsr",
           "proponent": "Hugh Nibley"
         }
+      ],
+      "notes": [
+        "Perhaps a nickname rather than a birth name: \"he of the ezrom\" (a measure of silver, Alma 11:6) for the lawyer who offered Amulek six onties of silver to deny God (Alma 11:22). Antionah - \"he of the antion\" (gold, Alma 11:19) - is chief ruler in the same city."
       ]
     },
     "Zemnarihah": {
@@ -2817,5 +2924,279 @@
         }
       ]
     }
-  }
+  },
+  "families": [
+    {
+      "element": "m-l-k",
+      "gloss": "king, to reign (H4428)",
+      "names": [
+        "Melek",
+        "Mulek",
+        "Muloki",
+        "Amulek",
+        "Amlici",
+        "Amaleki",
+        "Amalickiah"
+      ]
+    },
+    {
+      "element": "š-l-m",
+      "gloss": "whole, peace (H7965)",
+      "names": [
+        "Shilom",
+        "Shelem"
+      ]
+    },
+    {
+      "element": "š-m",
+      "gloss": "name (H8034)",
+      "names": [
+        "Sam",
+        "Shem",
+        "Shim",
+        "Shimnilom"
+      ]
+    },
+    {
+      "element": "š-m-n",
+      "gloss": "oil, fatness (H8081)",
+      "names": [
+        "Shemnon",
+        "Shimnilom"
+      ]
+    },
+    {
+      "element": "ʾ-m-n",
+      "gloss": "faithful (H539)",
+      "names": [
+        "Omni",
+        "Amnihu",
+        "Amnigaddah",
+        "Antiomno",
+        "Amnor"
+      ]
+    },
+    {
+      "element": "m-r-n",
+      "gloss": "perhaps lord",
+      "names": [
+        "Moron",
+        "Moroni",
+        "Moronihah",
+        "Ammoron",
+        "Amoron"
+      ]
+    },
+    {
+      "element": "ʾ-m-r",
+      "gloss": "word, command (H559)",
+      "names": [
+        "Amaron",
+        "Ammaron",
+        "Emer",
+        "Emron"
+      ]
+    },
+    {
+      "element": "k-m-n",
+      "gloss": "perhaps hidden",
+      "names": [
+        "Kumen",
+        "Kumenonhi",
+        "Cumeni",
+        "Cumenihah",
+        "Kishkumen",
+        "Pacumeni"
+      ]
+    },
+    {
+      "element": "g-d",
+      "gloss": "fortune (H1410), or band (H1416)",
+      "names": [
+        "Gadianton",
+        "Gadiandi",
+        "Gadiomnah",
+        "Gid",
+        "Giddianhi",
+        "Giddonah",
+        "Gidgiddoni",
+        "Gidgiddonah"
+      ]
+    },
+    {
+      "element": "z-r-ʿ",
+      "gloss": "seed (H2233)",
+      "names": [
+        "Zarahemla",
+        "Zerahemnah",
+        "Zeram"
+      ]
+    },
+    {
+      "element": "q-m",
+      "gloss": "arise, height (H6965)",
+      "names": [
+        "Com",
+        "Jacom",
+        "Cumorah",
+        "Comnor"
+      ]
+    },
+    {
+      "element": "s-d-m / s-d-n",
+      "gloss": "Sodom, burnt (H5467); Sidon (H6721)",
+      "names": [
+        "Sidom",
+        "Sidon"
+      ]
+    },
+    {
+      "element": "l-m-n",
+      "gloss": "Laman",
+      "names": [
+        "Laman",
+        "Lamoni"
+      ]
+    },
+    {
+      "element": "lim-",
+      "gloss": "perhaps people (H3816), or a divine name",
+      "names": [
+        "Limhi",
+        "Limhah",
+        "Limher"
+      ]
+    },
+    {
+      "element": "m-t-n",
+      "gloss": "gift (H4979)",
+      "names": [
+        "Mathoni",
+        "Mathonihah"
+      ]
+    },
+    {
+      "element": "Zoram",
+      "gloss": "perhaps \"the Rock is kinsman\" (H6697)",
+      "names": [
+        "Zoram",
+        "Cezoram",
+        "Seezoram"
+      ]
+    },
+    {
+      "element": "Nephi",
+      "gloss": "perhaps good (Egyptian nfr)",
+      "names": [
+        "Nephi",
+        "Nephihah",
+        "Zenephi",
+        "Lehi-Nephi",
+        "Anti-Nephi-Lehi"
+      ]
+    },
+    {
+      "element": "ze-",
+      "gloss": "he of, the one of",
+      "names": [
+        "Zeezrom",
+        "Cezoram",
+        "Seezoram",
+        "Zenephi",
+        "Teomner",
+        "Teancum"
+      ]
+    },
+    {
+      "element": "pa-",
+      "gloss": "the (Egyptian p3)",
+      "names": [
+        "Pahoran",
+        "Paanchi",
+        "Pacumeni",
+        "Pachus"
+      ]
+    },
+    {
+      "element": "anti-",
+      "gloss": "perhaps Egyptian \"he of\", or Greek \"facing\"; also the antion, a gold coin",
+      "names": [
+        "Ani-Anti",
+        "Anti-Nephi-Lehi",
+        "Antiomno",
+        "Antionah",
+        "Antionum",
+        "Antiparah",
+        "Antipus",
+        "Antum"
+      ]
+    },
+    {
+      "element": "-ihah / -hah",
+      "gloss": "a name ending, perhaps a short form of Jehovah (H3050)",
+      "names": [
+        "Nephihah",
+        "Moronihah",
+        "Cumenihah",
+        "Mathonihah",
+        "Ammonihah",
+        "Onihah",
+        "Orihah",
+        "Zemnarihah",
+        "Limhah"
+      ]
+    },
+    {
+      "element": "cor- / kor-",
+      "gloss": "a mostly Jaredite element",
+      "names": [
+        "Corianton",
+        "Coriantor",
+        "Coriantum",
+        "Coriantumr",
+        "Corihor",
+        "Korihor",
+        "Corom"
+      ]
+    },
+    {
+      "element": "ripl-",
+      "gloss": "a Jaredite element",
+      "names": [
+        "Riplah",
+        "Riplakish",
+        "Ripliancum"
+      ]
+    },
+    {
+      "element": "kish",
+      "gloss": "a Jaredite name, also biblical (H7027)",
+      "names": [
+        "Kish",
+        "Kishkumen",
+        "Akish",
+        "Riplakish"
+      ]
+    },
+    {
+      "element": "shibl-",
+      "gloss": "perhaps ear of grain (H7641), or path",
+      "names": [
+        "Shiblon",
+        "Shiblom"
+      ]
+    },
+    {
+      "element": "ʿ-m (am-)",
+      "gloss": "people, (divine) kinsman (H5971)",
+      "names": [
+        "Ammoron",
+        "Amgid",
+        "Aminadi",
+        "Omner",
+        "Amnor",
+        "Teomner"
+      ]
+    }
+  ]
 }

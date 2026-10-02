@@ -67,6 +67,10 @@ NOT_NAMES = {
     "Associate", "Deniest", "Imagining",
 }
 
+# Names that are also Nephite money words (lowercase in Alma 11), kept
+# even though the lowercase-word rule would drop them.
+ALSO_WORDS = {"Shiblon", "Amnor"}
+
 # Group/adjective forms -> the name they come from.
 FORMS = {
     "Nephites": "Nephi", "Nephite": "Nephi", "Lamanites": "Laman", "Lamanite": "Laman",
@@ -85,9 +89,12 @@ FORMS = {
 # "origin" links to that lexicon entry. A proponent is named only where
 # the source names them (the Onomasticon's initials - JH, JAT, RFS... -
 # are spelled out from its Scholars page).
-CURATED: dict[str, dict] = json.loads(
-    (PROJECT_ROOT / "scripts" / "bom_names_curated.json").read_text(encoding="utf-8")
-)["names"]
+_CURATED_FILE = json.loads((PROJECT_ROOT / "scripts" / "bom_names_curated.json").read_text(encoding="utf-8"))
+CURATED: dict[str, dict] = _CURATED_FILE["names"]
+# Names sharing consonants or an element ("m-l-k", "ze-"): Hebrew of Lehi's
+# day was written without vowels, so shared consonants may mean a shared
+# root. Each member's card lists the others.
+FAMILIES: list[dict] = _CURATED_FILE["families"]
 
 STRONGS_RE = re.compile(r"\b[HG]\d{1,4}\b")
 TIERS = ("defined", "biblical", "hebrew_root", "proposed", "unknown")
@@ -115,7 +122,7 @@ def extract_names(conn: sqlite3.Connection) -> dict[str, dict]:
     for reference, text in bom:
         for match in re.finditer(r"\b[A-Z][a-z]+(?:-[A-Za-z][a-z]+)*\b", text):
             word = match.group(0)
-            if word.lower() in lowercase or word in NOT_NAMES:
+            if (word.lower() in lowercase and word not in ALSO_WORDS) or word in NOT_NAMES:
                 continue
             # Sentence-initial capitals of ordinary words were filtered by
             # the lowercase check; names stay.
@@ -168,8 +175,16 @@ def build(conn: sqlite3.Connection) -> Counter:
         if not hits:
             raise SystemExit(f"Curated name {name!r} wasn't found in the Book of Mormon text")
         names[name] = {"forms": {name.lower()}, "first": hits[0], "count": len(hits)}
+    related: dict[str, list] = {}
+    for family in FAMILIES:
+        for member in family["names"]:
+            if member not in names:
+                raise SystemExit(f"Family {family['element']}: {member!r} isn't a Book of Mormon name")
+            others = [n for n in family["names"] if n != member]
+            related.setdefault(member, []).append([family["element"], family["gloss"], others])
     rows = []
     for name in sorted(names):
+        family_json = json.dumps(related.get(name, []), ensure_ascii=False)
         info = names[name]
         curated = CURATED.get(name)
         page = ONOMASTICON_PAGES.get(name, name.upper())
@@ -179,7 +194,9 @@ def build(conn: sqlite3.Connection) -> Counter:
             tier = curated["tier"]
             assert tier in TIERS, (name, tier)
             linked = [n for p in curated.get("proposals", []) for n in STRONGS_RE.findall(p.get("origin", ""))]
-            for number in linked:
+            cited = linked + [n for text in curated.get("notes", []) for n in STRONGS_RE.findall(text)]
+            cited += [n for _element, gloss, _others in related.get(name, []) for n in STRONGS_RE.findall(gloss)]
+            for number in cited:
                 if not conn.execute("SELECT 1 FROM lexicon_entries WHERE strongs = ?", (number,)).fetchone():
                     raise SystemExit(f"{name}: {number} isn't in the lexicon")
             linked = list(dict.fromkeys(linked)) or strongs
@@ -188,18 +205,19 @@ def build(conn: sqlite3.Connection) -> Counter:
                 ",".join(linked), json.dumps(curated.get("proposals", []), ensure_ascii=False),
                 json.dumps(curated.get("sources", []) + [onomasticon], ensure_ascii=False),
                 ",".join(sorted(info["forms"] - {name})), curated.get("people", ""),
+                json.dumps(curated.get("notes", []), ensure_ascii=False), family_json,
             ))
         elif strongs or in_bible(conn, name):
             rows.append((name, "biblical", "", info["first"], ",".join(strongs), "[]", json.dumps([onomasticon]),
-                         ",".join(sorted(info["forms"] - {name})), ""))
+                         ",".join(sorted(info["forms"] - {name})), "", "[]", family_json))
         else:
             # Not yet researched: kept so its forms resolve, with no tier.
             rows.append((name, "", "", info["first"], "", "[]", json.dumps([onomasticon]),
-                         ",".join(sorted(info["forms"] - {name})), ""))
+                         ",".join(sorted(info["forms"] - {name})), "", "[]", family_json))
     conn.execute("DELETE FROM bom_names")
     conn.executemany(
-        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms, people) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO bom_names (name, tier, meaning, reference, strongs, proposals, sources, forms, people, notes, "
+        "related) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rows,
     )
     conn.commit()
