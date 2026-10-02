@@ -2419,17 +2419,21 @@
     },
     "Shilom": {
       "tier": "proposed",
-      "meaning": "uncertain - perhaps \"recompense\"",
+      "meaning": "uncertain - perhaps \"peace\" or \"recompense\"",
       "reference": "Mosiah 7:5",
       "proposals": [
+        {
+          "meaning": "peace - a Nephite form of shalom, if its spelling and sound drifted as Mormon says the Nephites' Hebrew was \"altered by us\" (Mormon 9:33)",
+          "origin": "Hebrew šālôm, H7965"
+        },
         {
           "meaning": "reward, recompense",
           "origin": "Hebrew šillûm, recompense (H7966), from šālam, to be whole"
         },
         {
-          "meaning": "a spelling of shalom, \"peace\" - less likely, given how often Shilom appears",
+          "meaning": "a scribal misspelling of shalom - unlikely, since Shilom recurs so consistently",
           "origin": "Hebrew šālôm",
-          "proponent": "Jo Ann Hackett"
+          "proponent": "Jo Ann Hackett and John A. Tvedtnes"
         }
       ]
     },
