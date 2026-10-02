@@ -78,6 +78,7 @@ from scriptures.temple_recommend import should_show_reminder as should_show_temp
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
+from scriptures.ui.about_help import LICENSE_URL, HelpDialog, LicenseDialog
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
@@ -109,8 +110,12 @@ BOOK_OF_MORMON_SHARE_URL = "https://go.churchofjesuschrist.org/x/n1Ic"
 BEANDOG_REPO_URL = "https://github.com/beandog/lds-scriptures"
 BYU_CITATION_INDEX_URL = "https://scriptures.byu.edu"
 CHURCH_SCRIPTURES_URL = "https://www.churchofjesuschrist.org/study/scriptures"
+ONOMASTICON_URL = "https://onoma.lib.byu.edu"
+PIPER_URL = "https://github.com/OHF-Voice/piper1-gpl"
+PIPER_VOICES_URL = "https://huggingface.co/rhasspy/piper-voices"
+PYSIDE_URL = "https://doc.qt.io/qtforpython-6/"
 
-# Caps how wide the Help menu's word-wrapped labels (see _help_menu_label)
+# Caps how wide the About menu's word-wrapped labels (see _help_menu_label)
 # can get, so the dropdown stays comfortably narrower than the window
 # instead of growing to fit its longest line.
 HELP_MENU_TEXT_WIDTH = 280
@@ -390,7 +395,7 @@ class MainWindow(QMainWindow):
         focus_search.triggered.connect(self._focus_search_bar)
         self.addAction(focus_search)
 
-        # Menu order left-to-right: Menu, View, Highlighter, Help.
+        # Menu order left-to-right: Menu, View, Highlighter, ..., About, Help.
         file_menu = self.menuBar().addMenu("&Menu")
 
         export_notes_action = QAction("Export Notes", self)
@@ -668,47 +673,81 @@ class MainWindow(QMainWindow):
         ai_guide_action.triggered.connect(self._show_ai_setup_guide)
         ai_menu.addAction(ai_guide_action)
 
-        # No "About" dialog - the dropdown itself carries the same
-        # verbiage a popup would have (version, the unofficial-app
-        # disclaimer required by the project's own stated policy, and
-        # credits). Plain QAction text doesn't word-wrap (menu width just
-        # grows to fit the longest line, which overflowed past the
-        # window edge here), so each line is a QWidgetAction hosting a
+        # About: who made this and under what terms. The dropdown itself
+        # carries the text a popup would (version, the unofficial-app
+        # disclaimer required by the project's own stated policy, licenses,
+        # and credits). Plain QAction text doesn't word-wrap (menu width just
+        # grows to fit the longest line, which overflowed past the window
+        # edge here), so each line is a QWidgetAction hosting a
         # word-wrapped, width-capped QLabel instead - QMenu supports that
         # fine, unlike QMenuBar itself (see the comment below on the
         # corner-widget workaround for that).
-        help_menu = self.menuBar().addMenu("&Help")
-
-        help_menu.addAction(
-            self._help_menu_label(f"Desktop Scriptures — version {__version__}")
-        )
-        help_menu.addSeparator()
-        help_menu.addAction(
+        about_menu = self.menuBar().addMenu("A&bout")
+        about_menu.addAction(self._help_menu_label(f"<b>Desktop Scriptures</b> — version {__version__}"))
+        about_menu.addAction(
             self._help_menu_label(
                 "This is an unofficial application, not produced by or "
                 "affiliated with The Church of Jesus Christ of Latter-day Saints."
             )
         )
-        help_menu.addSeparator()
-        help_menu.addAction(
+        about_menu.addSeparator()
+        about_menu.addAction(
+            self._help_menu_label(
+                "<b>License:</b> free, open-source software under the "
+                f'<a href="{LICENSE_URL}">MIT License</a>.'
+            )
+        )
+        license_action = QAction("View License...", self)
+        license_action.triggered.connect(lambda: LicenseDialog(self).exec())
+        about_menu.addAction(license_action)
+        about_menu.addSeparator()
+        about_menu.addAction(self._help_menu_label(LEXICON_CREDIT))
+        about_menu.addAction(
+            self._help_menu_label(
+                "Book of Mormon name meanings: this project's own summaries, with each "
+                f'name linked to BYU\'s <a href="{ONOMASTICON_URL}">Book of Mormon Onomasticon</a>.'
+            )
+        )
+        about_menu.addAction(
+            self._help_menu_label(
+                f'Listen: <a href="{PIPER_URL}">Piper</a> text-to-speech, GPL-3.0, with '
+                f'<a href="{PIPER_VOICES_URL}">Piper voices</a> under their own licenses.'
+            )
+        )
+        about_menu.addAction(
+            self._help_menu_label(
+                f'Built with <a href="{PYSIDE_URL}">Qt for Python (PySide6)</a>, LGPL-3.0.'
+            )
+        )
+        about_menu.addSeparator()
+        about_menu.addAction(
             self._help_menu_label(
                 f'Special thanks to <a href="{BEANDOG_REPO_URL}">Beandog</a> for '
                 "the scripture text this app is built on."
             )
         )
-        help_menu.addAction(
+        about_menu.addAction(
             self._help_menu_label(
                 f'Special thanks to <a href="{BYU_CITATION_INDEX_URL}">BYU\'s '
                 "Scripture Citation Index</a> for General Conference citation data."
             )
         )
-        help_menu.addAction(self._help_menu_label(LEXICON_CREDIT))
-        help_menu.addAction(
+        about_menu.addAction(
             self._help_menu_label(
                 "Read the scriptures officially at "
                 f'<a href="{CHURCH_SCRIPTURES_URL}">churchofjesuschrist.org</a>.'
             )
         )
+
+        # Help: the wiki, which walks through every feature.
+        help_menu = self.menuBar().addMenu("&Help")
+        wiki_action = QAction("Desktop Scriptures Help (Wiki)...", self)
+        wiki_action.setShortcut(QKeySequence.StandardKey.HelpContents)
+        wiki_action.triggered.connect(lambda: HelpDialog(self).exec())
+        help_menu.addAction(wiki_action)
+        help_ai_guide_action = QAction("AI Setup Guide...", self)
+        help_ai_guide_action.triggered.connect(self._show_ai_setup_guide)
+        help_menu.addAction(help_ai_guide_action)
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
@@ -1210,9 +1249,9 @@ class MainWindow(QMainWindow):
         return QIcon(pixmap)
 
     def _help_menu_label(self, html: str) -> QWidgetAction:
-        """One line of the Help menu, as a word-wrapped QLabel hosted in a
+        """One line of the About menu, as a word-wrapped QLabel hosted in a
         QWidgetAction rather than a plain QAction - see the comment where
-        the Help menu is built for why. Any <a href> in `html` is left
+        the About menu is built for why. Any <a href> in `html` is left
         clickable (opens in the browser) via setOpenExternalLinks; a line
         with no link is just inert text, same as a disabled QAction."""
         label = QLabel(html)

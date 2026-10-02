@@ -90,6 +90,10 @@ first month") for where it falls in Israel's calendar - its month's names
 and the holy days of the law of Moses, which the Nephites kept; click for
 the full card (see `src/scriptures/hebrew_calendar.py`).
 
+## Help and About
+
+The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Help → Desktop Scriptures Help (Wiki)...** links to each page. **About** shows the version, the license (MIT - **View License...** shows it in full, offline), and the credits and licenses for bundled data and libraries.
+
 ## Screenshots
 
 ![Landing page with the Inspirational Message, Come Follow Me, Scripture of the Day, and Church News boxes](docs/screenshots/landing.png)
