@@ -84,7 +84,11 @@ class EmbeddingRequest(QObject):
     """One POST .../embeddings for a list of texts.
 
     `succeeded(vectors)` or `failed(message, kind, retry_after)` fires
-    exactly once. `kind` is "retry" (transient - worth trying again),
+    exactly once. Pass a shared `manager` when making many requests (an
+    index build): each QNetworkAccessManager holds its own connection and
+    a thread, so one per request leaked ~2 file descriptors and a thread
+    per batch until the snap hit its 1024 open-files limit mid-build.
+    Whoever owns a finished request should deleteLater() it. `kind` is "retry" (transient - worth trying again),
     "too_large" (HTTP 400/413/422 - possibly too much input in one
     request), "auth" (missing/wrong API key), or "fatal". `retry_after`
     is the server's Retry-After in seconds, or -1 if it gave none."""
@@ -99,10 +103,11 @@ class EmbeddingRequest(QObject):
         texts: list[str],
         dimensions: int | None = None,
         parent: QObject | None = None,
+        manager: QNetworkAccessManager | None = None,
     ):
         super().__init__(parent)
         self._expected = len(texts)
-        self._manager = QNetworkAccessManager(self)
+        self._manager = manager if manager is not None else QNetworkAccessManager(self)
         request = build_request(config, "/embeddings")
         request.setTransferTimeout(REQUEST_TIMEOUT_MS)
         self._reply = self._manager.post(request, build_payload(model, texts, dimensions))
@@ -259,6 +264,9 @@ class IndexBuilder(QObject):
         self._dimensions = dimensions
         self._batch_size = batch_size
         self._request: EmbeddingRequest | None = None
+        # One manager - one kept-alive connection - for the whole build;
+        # see EmbeddingRequest.
+        self._manager = QNetworkAccessManager(self)
         self._pending: list[str] = []
         self._total = 0
         self._embedded = 0
@@ -285,8 +293,16 @@ class IndexBuilder(QObject):
         self._cancelled = True
         if self._request is not None:
             self._request.abort()
-            self._request = None
+            self._release_request()
         self._finish(False, "")
+
+    def _release_request(self) -> None:
+        """Frees the finished (or aborted) request - it's parented to this
+        builder, so dropping the Python reference alone would keep it alive
+        until the whole build ends."""
+        if self._request is not None:
+            self._request.deleteLater()
+            self._request = None
 
     def _on_prepared(self, result: object) -> None:
         if self._cancelled:
@@ -313,13 +329,13 @@ class IndexBuilder(QObject):
     def _send(self) -> None:
         self._request = EmbeddingRequest(
             self._config, self._model, [text for _hash, text in self._batch], self._dimensions,
-            self,
+            self, manager=self._manager,
         )
         self._request.succeeded.connect(self._on_succeeded)
         self._request.failed.connect(self._on_failed)
 
     def _on_succeeded(self, vectors: list) -> None:
-        self._request = None
+        self._release_request()
         if self._cancelled:
             return
         try:
@@ -336,7 +352,7 @@ class IndexBuilder(QObject):
         self._next_batch()
 
     def _on_failed(self, message: str, kind: str, retry_after: float) -> None:
-        self._request = None
+        self._release_request()
         if self._cancelled:
             return
         if kind == "auth":

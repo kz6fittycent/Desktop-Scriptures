@@ -38,7 +38,7 @@ from scriptures import study_index as si  # noqa: E402
 from scriptures.ai_client import AiConfig, embeddings_config  # noqa: E402
 from scriptures.citations import CitingWork  # noqa: E402
 from scriptures.db import connect  # noqa: E402
-from scriptures.embeddings import IndexBuilder  # noqa: E402
+from scriptures.embeddings import EmbeddingRequest, IndexBuilder  # noqa: E402
 
 DIMS = 64
 
@@ -234,6 +234,34 @@ def _with_fake_works(fn):
             si.iter_citing_works = original
     wrapper.__name__ = fn.__name__
     return wrapper
+
+
+def _open_files_and_threads() -> tuple[int, int]:
+    return len(os.listdir("/proc/self/fd")), len(os.listdir("/proc/self/task"))
+
+
+@_with_fake_works
+def test_build_does_not_leak_connections() -> None:
+    """Each batch used to leave its own network manager - an open
+    connection and a thread - alive until the build ended; the snap's
+    1024 open-files limit stopped a full build at 60,096 of ~80,000
+    pieces. One piece per batch makes any per-request leak obvious."""
+    env = _Env(batch_size=1)
+    try:
+        env.build()  # warm up: Qt's own one-time threads and sockets
+        env.index_conn.execute("DELETE FROM vectors")
+        env.index_conn.commit()
+        before = _open_files_and_threads()
+        result = env.build()
+        QCoreApplication.processEvents()  # run the deleteLater()s
+        after = _open_files_and_threads()
+        requests = len(result["progress"]) - 1
+        assert result["ok"] and requests >= 10, result
+        assert after[0] - before[0] < 6 and after[1] - before[1] < 4, (requests, before, after)
+        assert len(result["builder"].findChildren(EmbeddingRequest)) <= 1
+        print("test_build_does_not_leak_connections: PASSED")
+    finally:
+        env.close()
 
 
 @_with_fake_works
@@ -559,6 +587,7 @@ if __name__ == "__main__":
     test_embeddings_config_never_leaks_the_chat_key()
     test_collect_pieces_covers_every_source_but_the_journal()
     test_build_embeds_everything_and_search_ranks_by_meaning()
+    test_build_does_not_leak_connections()
     test_retry_after_and_backoff_recover()
     test_too_large_batches_are_halved()
     test_auth_failure_stops_and_flags_api_key()

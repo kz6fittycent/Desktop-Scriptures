@@ -216,6 +216,14 @@ class AiConversationSection(QWidget):
         )
         self._asker.failed.connect(self._on_failed)
 
+    def _release_asker(self) -> None:
+        """Frees a finished question's asker and its network connections -
+        it's parented to this conversation, so dropping the reference alone
+        kept every follow-up's connection (and thread) alive."""
+        if self._asker is not None:
+            self._asker.deleteLater()
+            self._asker = None
+
     def _clear_placeholder(self) -> None:
         if self._pending_placeholder is not None:
             self._pending_placeholder.hide()
@@ -229,7 +237,7 @@ class AiConversationSection(QWidget):
         raw_content: str,
         unresolved: list[str],
     ) -> None:
-        self._asker = None
+        self._release_asker()
         self._clear_placeholder()
         self._set_busy(False)
         self._history.append((question, [ref.reference for ref in references]))
@@ -273,7 +281,7 @@ class AiConversationSection(QWidget):
             self._thread_layout.addWidget(missed_label)
 
     def _on_study_succeeded(self, results: list[StudyResult], note: str) -> None:
-        self._asker = None
+        self._release_asker()
         self._clear_placeholder()
         self._set_busy(False)
         if not results:
@@ -332,7 +340,7 @@ class AiConversationSection(QWidget):
             self._thread_layout.addWidget(cited)
 
     def _on_failed(self, message: str, needs_api_key: bool) -> None:
-        self._asker = None
+        self._release_asker()
         self._clear_placeholder()
         self._set_busy(False)
         if needs_api_key:
