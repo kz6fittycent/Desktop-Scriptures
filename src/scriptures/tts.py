@@ -23,11 +23,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from scriptures.paths import DATA_DIR
+
 if TYPE_CHECKING:
     from piper.voice import PiperVoice
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-VOICES_DIR = _PROJECT_ROOT / "data" / "tts_voices"
+VOICES_DIR = DATA_DIR / "tts_voices"
 
 
 @dataclass(frozen=True)

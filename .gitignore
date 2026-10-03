@@ -25,3 +25,9 @@ data/tts_voices/
 # through the user's own AI endpoint, 100MB+, never shipped. Running from
 # a source checkout puts it next to data/scriptures.db.
 data/study_index.db
+
+# PyInstaller (packaging/desktop-scriptures.spec)
+/build/
+/dist/
+/dmg/
+packaging/windows/desktop-scriptures.ico

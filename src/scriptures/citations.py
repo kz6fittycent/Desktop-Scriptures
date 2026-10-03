@@ -19,7 +19,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-_DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+from scriptures.paths import DATA_DIR
+
+_DATA_DIR = DATA_DIR
 GENERAL_CONFERENCE_CITATIONS_PATH = _DATA_DIR / "verse_citations.json"
 LIAHONA_CITATIONS_PATH = _DATA_DIR / "liahona_citations.json"
 

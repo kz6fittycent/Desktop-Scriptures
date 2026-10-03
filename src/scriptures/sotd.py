@@ -16,8 +16,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from scriptures.data_access import get_verse_by_reference
+from scriptures.paths import DATA_DIR
 
-POOL_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "scripture_of_the_day_pool.json"
+POOL_PATH = DATA_DIR / "scripture_of_the_day_pool.json"
 
 # Per the pool file's _format_note: book names match this project's
 # volumes.json / import_scriptures.py naming exactly, except "D&C" - the

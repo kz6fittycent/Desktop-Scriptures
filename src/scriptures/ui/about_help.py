@@ -27,10 +27,11 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures.ai_setup import WIKI_URL
+from scriptures.paths import APP_ROOT
 
 REPO_URL = "https://github.com/kz6fittycent/Desktop-Scriptures"
 ISSUES_URL = f"{REPO_URL}/issues"
-_ROOT = Path(__file__).resolve().parents[3]
+_ROOT = APP_ROOT
 # (tab title, file, its URL for when the file is missing)
 LICENSE_FILES = (
     ("GNU GPL v3", _ROOT / "LICENSE", f"{REPO_URL}/blob/main/LICENSE"),
