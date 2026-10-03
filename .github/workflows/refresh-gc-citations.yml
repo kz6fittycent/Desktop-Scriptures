@@ -6,13 +6,14 @@ name: 📖 Refresh GC Citations
 # refreshes every verse already in data/verse_citations.json (the
 # Scripture of the Day pool and the Topical Guide's verses - about 1,250,
 # roughly 45 minutes) and merges, so no verse's citations are dropped.
-# Monthly rather than twice a year to match Conference itself: cheap
-# either way (~144 requests, a few minutes total), and this way there's
-# no need to guess exactly when scriptures.byu.edu's own index has
-# caught up with a Conference that just happened.
+# Weekly, so a Conference's talks reach the app within days of
+# scriptures.byu.edu's index catching up. Each run publishes the result to
+# the "citations-data" release, which the app downloads (content_updates.py)
+# - no app update needed - and opens a pull request so the next release
+# bundles it too.
 on:
   schedule:
-    - cron: "0 6 1 * *"
+    - cron: "0 6 * * 1"  # weekly, Mondays
   workflow_dispatch: {}
 
 permissions:
@@ -32,14 +33,43 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Start from the published data, if it's newer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The weekly publish (below) can run ahead of the repo while its
+          # pull request waits to be merged - start from whichever is newer
+          # so nothing published is ever dropped.
+          if gh release download citations-data --pattern "verse_citations.json.gz" --dir /tmp/published 2>/dev/null; then
+            gunzip -f /tmp/published/verse_citations.json.gz
+            newer="$(python3 -c "import sys; sys.path.insert(0, 'src'); from scriptures.citation_files import harvested_date as h; from pathlib import Path; print(h(Path('/tmp/published/verse_citations.json')) > h(Path('data/verse_citations.json')))")"
+            if [[ "$newer" == "True" ]]; then
+              cp /tmp/published/verse_citations.json data/verse_citations.json
+              echo "Starting from the published copy"
+            fi
+          fi
+          cp data/verse_citations.json /tmp/baseline.json
+
       - name: Re-harvest citation metadata
         run: python3 scripts/harvest_citations.py
+
+      - name: Check and publish for the app
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Refuses (and fails this run) if the harvest lost entries.
+          python3 scripts/publish_citations.py verse_citations.json --baseline /tmp/baseline.json --out dist
+          gh release view citations-data >/dev/null 2>&1 || gh release create citations-data \
+            --prerelease --title "Citation data (updated weekly)" \
+            --notes "General Conference and Liahona citation lists, refreshed weekly by the refresh-*-citations workflows and downloaded by the app (src/scriptures/content_updates.py). Not an app release." \
+            || gh release view citations-data >/dev/null  # created meanwhile by the other refresh
+          gh release upload citations-data dist/verse_citations.json.gz dist/verse_citations.json.gz.sha256 --clobber
 
       # Opens a PR only if the harvest actually produced a different
       # data/verse_citations.json (create-pull-request no-ops otherwise)
       # - a human still reviews and merges it, same as any other change;
       # this just removes the need to remember to run the harvester by
-      # hand every few months.
+      # hand.
       - name: Open a PR if the citation data changed
         uses: peter-evans/create-pull-request@v8
         with:
@@ -54,6 +84,6 @@ jobs:
             `scripts/harvest_citations.py`) - metadata only (talk title,
             speaker, date, churchofjesuschrist.org URL), never talk text.
 
-            Review the diff, then merge to ship the update in the next release.
+            Review the diff, then merge to bundle it in the next release. The app already has it: this run published it to the `citations-data` release, which the app checks daily.
           branch: automated/refresh-gc-citations
           delete-branch: true

@@ -10,6 +10,7 @@ exact level without re-deriving state from scratch.
 from __future__ import annotations
 
 import sqlite3
+import time
 from datetime import date
 from html import escape
 from pathlib import Path
@@ -34,7 +35,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
-from scriptures import ai_setup, study_index
+from scriptures import ai_setup, citations, content_updates, study_index
 from scriptures.study_ask import StudySearch
 from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
@@ -198,6 +199,10 @@ TTS_VOICE_SETTING = "tts_voice"
 LISTEN_ENABLED_SETTING = "listen_enabled"
 # "true" once the user switches on "Don't show this at startup again".
 WELCOME_DONT_SHOW_SETTING = "welcome_dont_show"
+# Weekly-refreshed General Conference and Liahona citations, downloaded
+# about once a day - see content_updates.py. On unless set to "false".
+CITATION_UPDATES_SETTING = "citation_updates"
+CITATION_UPDATES_CHECKED_SETTING = "citation_updates_checked"  # Unix time of the last check
 
 # The highlighter's armed color (or "clear"), so it stays selected across
 # launches instead of resetting to Off every time - a standing tool
@@ -505,6 +510,14 @@ class MainWindow(QMainWindow):
         menu.addAction(zoom_reset)
 
         menu.addSeparator()
+        self._citation_updates_action = QAction("Download New Talks and Articles", self, checkable=True)
+        self._citation_updates_action.setToolTip(
+            "Keep General Conference and Liahona citations current - checked about once a day"
+        )
+        self._citation_updates_action.setChecked(self._citation_updates_enabled())
+        self._citation_updates_action.triggered.connect(self._set_citation_updates)
+        menu.addAction(self._citation_updates_action)
+
         self._church_news_action = QAction("Show Church News Headline", self, checkable=True)
         self._church_news_action.setChecked(
             get_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING) == "true"
@@ -935,6 +948,35 @@ class MainWindow(QMainWindow):
         dialog = VoicesDialog(self)
         dialog.voices_changed.connect(self._update_voice_labels)
         dialog.exec()
+
+    def _citation_updates_enabled(self) -> bool:
+        return get_setting(self.conn, CITATION_UPDATES_SETTING, "true") != "false"
+
+    def _set_citation_updates(self, enabled: bool) -> None:
+        set_setting(self.conn, CITATION_UPDATES_SETTING, "true" if enabled else "false")
+        if enabled:
+            self.check_for_citation_updates(force=True)
+
+    def check_for_citation_updates(self, force: bool = False) -> None:
+        """Called a few seconds after startup (app.py) - see
+        content_updates.py. At most about once a day, unless `force`."""
+        if not self._citation_updates_enabled() or getattr(self, "_citation_updater", None) is not None:
+            return
+        last = float(get_setting(self.conn, CITATION_UPDATES_CHECKED_SETTING, "0") or 0)
+        if not force and time.time() - last < content_updates.CHECK_INTERVAL_HOURS * 3600:
+            return
+        self._citation_updater = content_updates.CitationUpdater(self)
+        self._citation_updater.finished.connect(self._on_citation_updates_checked)
+        self._citation_updater.check()
+
+    def _on_citation_updates_checked(self, updated: list, problems: list) -> None:
+        self._citation_updater.deleteLater()
+        self._citation_updater = None
+        if not problems:  # retry sooner after a network problem
+            set_setting(self.conn, CITATION_UPDATES_CHECKED_SETTING, str(int(time.time())))
+        if updated:
+            # New lookups read the new files; chapters opened from here on show them.
+            citations.reload()
 
     def _set_listen_enabled(self, enabled: bool) -> None:
         self._listen_enabled = enabled

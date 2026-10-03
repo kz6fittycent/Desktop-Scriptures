@@ -30,6 +30,7 @@ DATA_FILES = [
     "volumes.json",
     "scripture_of_the_day_pool.json",
     "verse_citations.json",
+    "liahona_citations.json",
 ]
 datas = [(str(ROOT / "data" / name), "data") for name in DATA_FILES]
 datas += [(str(ROOT / "LICENSE"), "."), (str(ROOT / "THIRD_PARTY_LICENSES.md"), ".")]

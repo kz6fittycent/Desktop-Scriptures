@@ -164,6 +164,8 @@ def main() -> None:
         _screenshots(window, screenshot_dir)
     else:
         QTimer.singleShot(0, window.maybe_show_welcome)
+        # New talks/articles (content_updates.py) - after startup has settled.
+        QTimer.singleShot(10_000, window.check_for_citation_updates)
     sys.exit(app.exec())
 
 

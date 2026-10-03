@@ -19,9 +19,12 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from scriptures.content_updates import citation_path
 from scriptures.paths import DATA_DIR
 
 _DATA_DIR = DATA_DIR
+# The copies bundled with the app. What's actually loaded may be a newer
+# downloaded copy - see content_updates.citation_path.
 GENERAL_CONFERENCE_CITATIONS_PATH = _DATA_DIR / "verse_citations.json"
 LIAHONA_CITATIONS_PATH = _DATA_DIR / "liahona_citations.json"
 
@@ -62,7 +65,7 @@ def _load(path: Path) -> dict[str, list[dict]]:
 def _load_gc() -> dict[str, list[dict]]:
     global _gc_cache
     if _gc_cache is None:
-        _gc_cache = _load(GENERAL_CONFERENCE_CITATIONS_PATH)
+        _gc_cache = _load(citation_path(GENERAL_CONFERENCE_CITATIONS_PATH.name))
     return _gc_cache
 
 
@@ -73,13 +76,22 @@ def _load_liahona() -> dict[str, list[dict]]:
     global _liahona_cache
     if _liahona_cache is None:
         _liahona_cache = {}
-        if LIAHONA_CITATIONS_PATH.exists():
-            data = json.loads(LIAHONA_CITATIONS_PATH.read_text(encoding="utf-8"))
+        path = citation_path(LIAHONA_CITATIONS_PATH.name)
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
             for article in data["articles"]:
                 citation = {k: article[k] for k in ("talk_title", "speaker", "date", "url")}
                 for reference in article["references"]:
                     _liahona_cache.setdefault(reference, []).append(citation)
     return _liahona_cache
+
+
+def reload() -> None:
+    """Forget the loaded citations, so the next lookup reads the files
+    again - after content_updates downloads newer ones."""
+    global _gc_cache, _liahona_cache
+    _gc_cache = None
+    _liahona_cache = None
 
 
 def _date_sort_key(display_date: str) -> tuple[int, int]:

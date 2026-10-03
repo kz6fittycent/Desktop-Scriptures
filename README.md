@@ -23,8 +23,15 @@ opt-in download of about 63 MB (Menu → Voice → Download Voices...),
 offline from then on. A Welcome window on first launch offers to set up
 Listen and AI-assisted search, and can be told not to show again.
 
-A handful of landing-page extras are opt-in and off by default, only
-reaching the network once you turn them on: AI-assisted search (ask a
+General Conference and Liahona citations keep themselves current: about
+once a day the app checks this project's GitHub for the weekly refresh of
+those citation lists and downloads any new ones - only GitHub is
+contacted, never the Church's or BYU's sites. Switch it off under Menu →
+View → Download New Talks and Articles.
+
+Everything else that uses the network is opt-in and off by default - a
+handful of landing-page extras that only reach the network once you turn
+them on: AI-assisted search (ask a
 question in your own words - and refine it conversationally with
 follow-ups - to get pointed at real, matching scripture, using your own
 AI endpoint, plus an optional study index built through that same endpoint
