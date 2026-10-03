@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -165,7 +165,7 @@ jobs:
           done
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-scriptures-${{ runner.os }}
           path: |
@@ -175,7 +175,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots-${{ runner.os }}
           path: screenshots/*.png
@@ -191,7 +191,7 @@ jobs:
       issues: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Read the version
         id: version
@@ -201,14 +201,14 @@ jobs:
           echo "tag=test-v$version-build$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Download the builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: desktop-scriptures-*
           path: builds
           merge-multiple: true
 
       - name: Download the screenshots
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: screenshots-*
           path: screenshots
@@ -343,7 +343,7 @@ jobs:
       contents: write
     steps:
       - name: Download builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: release
           merge-multiple: true

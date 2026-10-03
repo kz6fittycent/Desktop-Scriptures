@@ -134,8 +134,9 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 - [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (Menu → AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
 - [ ] Apocrypha?
-- [ ] Menu bar consolidation - fold the top-level menus into submenus under "Menu"
-- [ ] Automatic security rebuilds - a scheduled check of the published snap (the Snap Store's own `snap-check-notices`), rebuilding from the last release tag when Ubuntu security fixes are available
+- [x] Menu bar consolidation - every menu is now a submenu under "Menu"
+- [x] Listen voices as opt-in downloads, Listen controls off until switched on, and a first-run Welcome window
+- [x] Automatic security rebuilds - a daily check of the published snap with the Snap Store's own `snap-check-notices`. When Ubuntu security fixes are available, it rebuilds from the release commit, uploads to candidate, and opens a call-for-testing issue (`.github/workflows/security-rebuild.yml`)
 - [ ] Windows and macOS - out of testing into regular releases; code signing if there's demand
 
 ### v3.0 roadmap
