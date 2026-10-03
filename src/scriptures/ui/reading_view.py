@@ -89,6 +89,7 @@ from scriptures.ui.cross_references_panel import CrossReferencesPanel
 from scriptures.ui.word_study_panel import WordStudyPanel
 from scriptures.ui.theme import HIGHLIGHT_COLORS, PANEL_RADIUS, ReadingPalette
 from scriptures.ui.tts_playback import ReadableVerse, TtsController
+from scriptures.ui.voices_dialog import VoicesDialog
 
 VERSE_NUMBER_WIDTH = 32
 
@@ -962,13 +963,21 @@ class ReadingView(QWidget):
             return
 
         if not tts.is_voice_installed(self._tts_voice):
-            QMessageBox.warning(
+            # Voices are opt-in downloads (see tts.py) - offer this one.
+            voice = tts.get_voice(self._tts_voice)
+            answer = QMessageBox.question(
                 self,
                 "Listen",
-                "This voice isn't installed. Pick a different one under "
-                "Menu → Voice, or reinstall the app.",
+                f"Listen needs a voice, downloaded once (about "
+                f"{voice.model_size // 1_000_000} MB). After that it works offline.\n\n"
+                f"Download {voice.label} now? You can choose another voice under "
+                "Menu → Voice → Manage Voices...",
             )
-            return
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+            VoicesDialog(self, start_key=self._tts_voice).exec()
+            if not tts.is_voice_installed(self._tts_voice):
+                return
 
         controller = self._ensure_tts()
         readable = [ReadableVerse(v.id, v.text) for v in self._verses]

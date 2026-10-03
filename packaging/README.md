@@ -43,7 +43,6 @@ Uninstalling keeps that folder.
 
 ```
 pip install -r requirements.txt pyinstaller pillow
-python scripts/download_tts_voices.py
 pyinstaller packaging/desktop-scriptures.spec --noconfirm
 "dist/Desktop Scriptures/Desktop Scriptures" --smoke-test
 ```

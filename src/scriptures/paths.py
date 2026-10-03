@@ -56,3 +56,22 @@ def user_data_dir() -> Path | None:
         return Path.home() / "Library" / "Application Support" / APP_NAME
     base = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share")
     return base / "desktop-scriptures"
+
+
+def voices_dir() -> Path:
+    """Where downloaded Listen voices go (see tts.py) - per user, since
+    the app runs as the user and can't write anywhere system-wide (in a
+    snap, $SNAP_COMMON under /var/snap is root-only):
+      snap     $SNAP_USER_COMMON/voices (~/snap/desktop-scriptures/common)
+      Windows  %LOCALAPPDATA%\\Desktop Scriptures\\voices - local, not
+               roaming: ~60 MB files shouldn't follow a roaming profile
+      macOS    ~/Library/Application Support/Desktop Scriptures/voices
+      source   data/tts_voices (where scripts/download_tts_voices.py puts them)
+    """
+    if is_frozen() and sys.platform == "win32":
+        base = Path(os.environ.get("LOCALAPPDATA") or Path.home() / "AppData" / "Local")
+        return base / APP_NAME / "voices"
+    user_dir = user_data_dir()
+    if user_dir is None:
+        return DATA_DIR / "tts_voices"
+    return user_dir / "voices"

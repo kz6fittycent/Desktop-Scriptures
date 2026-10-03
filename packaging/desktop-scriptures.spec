@@ -2,8 +2,10 @@
 # .github/workflows/desktop-builds.yml and packaging/README.md.
 #
 #   pip install -r requirements.txt pyinstaller pillow
-#   python scripts/download_tts_voices.py
 #   pyinstaller packaging/desktop-scriptures.spec --noconfirm
+#
+# Listen voices aren't bundled - users download them on request (see
+# src/scriptures/tts.py).
 #
 # Produces dist/Desktop Scriptures/ (Windows: Desktop Scriptures.exe inside;
 # macOS: also dist/Desktop Scriptures.app). The bundled files land in the
@@ -29,12 +31,7 @@ DATA_FILES = [
     "scripture_of_the_day_pool.json",
     "verse_citations.json",
 ]
-voices = ROOT / "data" / "tts_voices"
-if not any(voices.glob("*.onnx")):
-    sys.exit("No voices in data/tts_voices - run scripts/download_tts_voices.py first.")
-
 datas = [(str(ROOT / "data" / name), "data") for name in DATA_FILES]
-datas += [(str(path), "data/tts_voices") for path in sorted(voices.glob("*.onnx*"))]
 datas += [(str(ROOT / "LICENSE"), "."), (str(ROOT / "THIRD_PARTY_LICENSES.md"), ".")]
 datas += collect_data_files("piper")  # espeak-ng's pronunciation data
 # Non-Python files inside the scriptures package itself (schema.sql).

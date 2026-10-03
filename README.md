@@ -17,8 +17,9 @@ client - Nextcloud, OneDrive, Google Drive, or similar - already keeps
 a folder synced on your machine, so the app itself never talks to the
 network for this), and Listen controls to have any chapter read aloud -
 verse by verse, with the current verse highlighted as it goes - in a
-choice of four bundled offline voices (American or British English,
-male or female).
+choice of four voices (American or British English, male or female) -
+each an opt-in download of about 63 MB the first time you use it
+(Menu → Voice → Manage Voices...), offline from then on.
 
 A handful of landing-page extras are opt-in and off by default, only
 reaching the network once you turn them on: AI-assisted search (ask a
@@ -92,7 +93,7 @@ the full card (see `src/scriptures/hebrew_calendar.py`).
 
 ## Help and About
 
-The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Menu → Help (Wiki)...** links to each page. **Menu → About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software, voices, and data the app includes), and credits.
+The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Menu → Help (Wiki)...** links to each page. **Menu → About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software and data the app includes, and of the downloadable voices), and credits.
 
 ## Screenshots
 
@@ -162,5 +163,6 @@ later version. It is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; see [`LICENSE`](LICENSE) for details.
 
 Versions up to and including 2.2.8 were released under the MIT License.
-The software, voices, and data the app includes carry their own licenses -
+The software and data the app includes, and the voices it can download,
+carry their own licenses -
 see [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md).

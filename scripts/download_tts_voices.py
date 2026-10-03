@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Download the 4 bundled Piper TTS voice models into data/tts_voices/
-for local development (see src/scriptures/tts.py's module docstring).
+"""Download all 4 Piper TTS voice models into data/tts_voices/ for local
+development (see src/scriptures/tts.py's module docstring).
 
-Not run automatically, and its output is never committed to this repo -
-each model is ~60MB, too large to check in. snapcraft.yaml's
-"tts-voices" part fetches the same files at build time via the same
-MODEL_SOURCES below, so this script and that part are the two places
-that ever need updating if a voice choice changes.
+Optional: the app itself downloads voices on request (Menu → Voice →
+Manage Voices...), and a source checkout keeps them in this same folder.
+This script just fetches all four at once. Never committed to the repo -
+each model is ~60MB. If a voice choice changes, update tts.VOICES (with
+its pinned checksums) and MODEL_SOURCES below.
 
 Usage:
     python3 scripts/download_tts_voices.py

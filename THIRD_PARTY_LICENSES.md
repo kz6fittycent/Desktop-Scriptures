@@ -20,8 +20,10 @@ they are ordinary shared libraries alongside the app.
 
 ## Voices (Listen)
 
-Voices come from https://huggingface.co/rhasspy/piper-voices (MIT, as a
-collection). Each voice was trained on a dataset with its own terms:
+Voices aren't included with the app. Listen downloads the ones you choose
+(Menu → Voice → Manage Voices...) directly from
+https://huggingface.co/rhasspy/piper-voices (MIT, as a collection). Each
+voice was trained on a dataset with its own terms:
 
 | Voice | Dataset | Dataset license |
 |---|---|---|

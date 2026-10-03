@@ -63,15 +63,6 @@ jobs:
             exit 1
           fi
 
-      - name: Cache voices
-        uses: actions/cache@v4
-        with:
-          path: data/tts_voices
-          key: tts-voices-${{ hashFiles('scripts/download_tts_voices.py') }}
-
-      - name: Download voices
-        run: python scripts/download_tts_voices.py
-
       - name: Build with PyInstaller
         run: pyinstaller packaging/desktop-scriptures.spec --noconfirm
 
@@ -313,7 +304,7 @@ jobs:
           - [ ] Open a chapter (e.g. the Book of Mormon → Helaman → 1) and read a little
           - [ ] Hover over a blue name in a Book of Mormon chapter, then click it - a card opens in the Word Study tab
           - [ ] Search for a word (the search box at the top right)
-          - [ ] **Listen** (top of a chapter) reads it aloud
+          - [ ] **Listen** (top of a chapter) offers to download a voice (about 63 MB) the first time, then reads the chapter aloud
           - [ ] Add a note or a highlight, quit the app, reopen it - it's still there
           - [ ] Anything that looks wrong, or text that doesn't fit
 

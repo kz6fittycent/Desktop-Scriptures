@@ -79,6 +79,7 @@ from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
 from scriptures.ui.about_help import HelpDialog, LicenseDialog
+from scriptures.ui.voices_dialog import VoicesDialog
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
@@ -406,19 +407,27 @@ class MainWindow(QMainWindow):
         share_bom_action.triggered.connect(self._share_book_of_mormon)
 
         # Which of tts.VOICES the reading view's Listen controls use -
-        # see reading_view.py. Voices not actually installed (see
-        # tts.is_voice_installed) still show up here so the menu doesn't
-        # look different across builds - _on_listen_clicked is what
-        # actually catches and reports a missing one.
+        # see reading_view.py. Voices are opt-in downloads (tts.py), so
+        # each is labeled with whether it's downloaded - refreshed every
+        # time the menu opens - and choosing a missing one is fine:
+        # Listen offers to download it (reading_view._on_listen_clicked).
         voice_menu = QMenu("&Voice", self)
         voice_group = QActionGroup(self)
         voice_group.setExclusive(True)
+        self._voice_actions: dict[str, QAction] = {}
         for voice in tts.VOICES:
             action = QAction(voice.label, self, checkable=True)
             action.setChecked(voice.key == self._tts_voice)
             action.triggered.connect(lambda checked=False, k=voice.key: self._set_tts_voice(k))
             voice_group.addAction(action)
             voice_menu.addAction(action)
+            self._voice_actions[voice.key] = action
+        voice_menu.addSeparator()
+        manage_voices_action = QAction("Manage Voices...", self)
+        manage_voices_action.triggered.connect(self._show_voices_dialog)
+        voice_menu.addAction(manage_voices_action)
+        voice_menu.aboutToShow.connect(self._update_voice_labels)
+        self._update_voice_labels()
 
         menu = view_menu = QMenu("&View", self)
 
@@ -901,6 +910,16 @@ class MainWindow(QMainWindow):
         self._font_family = name
         set_setting(self.conn, "font_family", name)
         self._apply_reading_theme()
+
+    def _update_voice_labels(self) -> None:
+        for voice in tts.VOICES:
+            missing = "" if tts.is_voice_installed(voice.key) else "  (not downloaded)"
+            self._voice_actions[voice.key].setText(voice.label + missing)
+
+    def _show_voices_dialog(self) -> None:
+        dialog = VoicesDialog(self)
+        dialog.voices_changed.connect(self._update_voice_labels)
+        dialog.exec()
 
     def _set_tts_voice(self, key: str) -> None:
         self._tts_voice = key

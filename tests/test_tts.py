@@ -41,8 +41,27 @@ def test_get_voice_returns_none_for_unknown_key() -> None:
 
 
 def test_model_path_matches_voices_dir_and_key() -> None:
-    path = tts.model_path("en_US-lessac-medium")
-    assert path == tts.VOICES_DIR / "en_US-lessac-medium.onnx"
+    import os
+    import tempfile
+
+    from scriptures import paths
+
+    # A voice that isn't downloaded points at where its download would go.
+    path = tts.model_path("not-downloaded-voice")
+    assert path == paths.voices_dir() / "not-downloaded-voice.onnx", path
+    # In the snap, voices go per user under $SNAP_USER_COMMON.
+    saved = os.environ.get("SNAP_USER_COMMON")
+    os.environ["SNAP_USER_COMMON"] = tempfile.gettempdir()
+    try:
+        assert paths.voices_dir() == Path(tempfile.gettempdir()) / "voices"
+        assert tts.download_path("en_US-lessac-medium").parent == paths.voices_dir()
+    finally:
+        if saved is None:
+            os.environ.pop("SNAP_USER_COMMON")
+        else:
+            os.environ["SNAP_USER_COMMON"] = saved
+    # Every voice's download URL is in Piper's repository.
+    assert all(v.url(".onnx").startswith(tts.VOICE_BASE_URL) for v in tts.VOICES)
     print("test_model_path_matches_voices_dir_and_key: PASSED")
 
 
