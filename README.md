@@ -75,7 +75,7 @@ means, searchable by its English meaning ("Messiah" finds *mashiach*,
 Study tab - combine Strong's Hebrew and Greek dictionaries (public
 domain) in [Open Scriptures](https://github.com/openscriptures/strongs)'
 corrected editions, licensed CC BY-SA (that license applies to the
-lexicon data, not to this app's MIT-licensed code), with short word
+lexicon data, not to this app's GPL-licensed code), with short word
 meanings from [STEP Bible](https://www.STEPBible.org) (Tyndale House,
 Cambridge), licensed CC BY 4.0; see `scripts/import_lexicon.py`.
 Book of Mormon names in the Word Study tab ("Shazer", "Zarahemla") are
@@ -92,7 +92,7 @@ the full card (see `src/scriptures/hebrew_calendar.py`).
 
 ## Help and About
 
-The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Help → Desktop Scriptures Help (Wiki)...** links to each page. **About** shows the version, the license (MIT - **View License...** shows it in full, offline), and credits.
+The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Help → Desktop Scriptures Help (Wiki)...** links to each page. **About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software, voices, and data the app includes), and credits.
 
 ## Screenshots
 
@@ -138,3 +138,17 @@ The goal: ask about a word, a name, or a place and get a clear, sourced answer -
 - [ ] Optional content packs - these sources are large, so they'd download on demand (like the study index is built on demand) rather than ship inside the snap
 
 Every source's license is checked before anything is imported - as with General Conference talks today, copyrighted works are linked and summarized, not copied.
+
+## License
+
+Copyright (C) 2026 kz6fittycent
+
+Desktop Scriptures is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. It is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; see [`LICENSE`](LICENSE) for details.
+
+Versions up to and including 2.2.8 were released under the MIT License.
+The software, voices, and data the app includes carry their own licenses -
+see [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md).

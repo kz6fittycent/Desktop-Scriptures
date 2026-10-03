@@ -69,7 +69,7 @@ description: |
   credits and licenses; Help links to the user guide (the wiki).
 
 adopt-info: desktop-scriptures
-license: MIT
+license: GPL-3.0-or-later
 contact: https://github.com/kz6fittycent/Desktop-Scriptures
 issues: https://github.com/kz6fittycent/Desktop-Scriptures/issues
 source-code: https://github.com/kz6fittycent/Desktop-Scriptures
@@ -137,7 +137,8 @@ parts:
       chmod +x "$CRAFT_PART_INSTALL/src/scriptures/ui/app.py"
 
       mkdir -p "$CRAFT_PART_INSTALL/data"
-      cp "$CRAFT_PART_SRC/LICENSE.md" "$CRAFT_PART_INSTALL/LICENSE.md"
+      cp "$CRAFT_PART_SRC/LICENSE" "$CRAFT_PART_INSTALL/LICENSE"
+      cp "$CRAFT_PART_SRC/THIRD_PARTY_LICENSES.md" "$CRAFT_PART_INSTALL/THIRD_PARTY_LICENSES.md"
       cp "$CRAFT_PART_SRC/data/scriptures.db" "$CRAFT_PART_INSTALL/data/scriptures.db"
       cp "$CRAFT_PART_SRC/data/volumes.json" "$CRAFT_PART_INSTALL/data/volumes.json"
       cp "$CRAFT_PART_SRC/data/scripture_of_the_day_pool.json" "$CRAFT_PART_INSTALL/data/scripture_of_the_day_pool.json"

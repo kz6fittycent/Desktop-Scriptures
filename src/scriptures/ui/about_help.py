@@ -5,9 +5,10 @@ than opening a browser directly - QDesktopServices.openUrl() has reported
 success without anything visibly opening in this app (see the Family
 History reminder's history in main_window.py).
 
-The License dialog shows the full MIT License text from LICENSE.md, which
-ships with the app (snapcraft.yaml copies it in), so it works offline;
-if the file is ever missing it falls back to a link.
+The License dialog shows the full GPL-3.0 text (LICENSE) and the
+third-party notices (THIRD_PARTY_LICENSES.md) - both ship with the app
+(snapcraft.yaml copies them in), so it works offline; if a file is ever
+missing it falls back to a link.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
     QLabel,
     QPlainTextEdit,
+    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -27,9 +29,13 @@ from PySide6.QtWidgets import (
 from scriptures.ai_setup import WIKI_URL
 
 REPO_URL = "https://github.com/kz6fittycent/Desktop-Scriptures"
-LICENSE_URL = f"{REPO_URL}/blob/main/LICENSE.md"
 ISSUES_URL = f"{REPO_URL}/issues"
-LICENSE_PATH = Path(__file__).resolve().parents[3] / "LICENSE.md"
+_ROOT = Path(__file__).resolve().parents[3]
+# (tab title, file, its URL for when the file is missing)
+LICENSE_FILES = (
+    ("GNU GPL v3", _ROOT / "LICENSE", f"{REPO_URL}/blob/main/LICENSE"),
+    ("Third-party licenses", _ROOT / "THIRD_PARTY_LICENSES.md", f"{REPO_URL}/blob/main/THIRD_PARTY_LICENSES.md"),
+)
 
 # Wiki pages, in the wiki sidebar's order.
 WIKI_PAGES = (
@@ -63,19 +69,24 @@ class LicenseDialog(QDialog):
         self.resize(560, 520)
         layout = QVBoxLayout(self)
         layout.addWidget(_link_label(
-            "Desktop Scriptures is released under the MIT License. The lexicon data carries "
-            "its own licenses - see the About menu."
+            "Desktop Scriptures is free software: you can redistribute it and/or modify it under "
+            "the terms of the GNU General Public License, version 3 or (at your option) any later "
+            "version. It comes with ABSOLUTELY NO WARRANTY. The software, voices, and data it "
+            "includes carry their own licenses, listed in the second tab."
         ))
-        try:
-            text = LICENSE_PATH.read_text(encoding="utf-8")
-        except OSError:
-            text = ""
-        if text:
-            view = QPlainTextEdit(text)
-            view.setReadOnly(True)
-            layout.addWidget(view, 1)
-        else:
-            layout.addWidget(_link_label(f'Read it at <a href="{LICENSE_URL}">{LICENSE_URL}</a>.'))
+        tabs = QTabWidget()
+        for title, path, url in LICENSE_FILES:
+            try:
+                text = path.read_text(encoding="utf-8")
+            except OSError:
+                text = ""
+            if text:
+                view = QPlainTextEdit(text)
+                view.setReadOnly(True)
+                tabs.addTab(view, title)
+            else:
+                tabs.addTab(_link_label(f'Read it at <a href="{url}">{url}</a>.'), title)
+        layout.addWidget(tabs, 1)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)

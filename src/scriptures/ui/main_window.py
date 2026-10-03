@@ -688,7 +688,7 @@ class MainWindow(QMainWindow):
             )
         )
         about_menu.addSeparator()
-        about_menu.addAction(self._help_menu_label("<b>License:</b> MIT"))
+        about_menu.addAction(self._help_menu_label("<b>License:</b> GPL-3.0"))
         license_action = QAction("View License...", self)
         license_action.triggered.connect(lambda: LicenseDialog(self).exec())
         about_menu.addAction(license_action)
