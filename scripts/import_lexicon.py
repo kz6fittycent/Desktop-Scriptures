@@ -17,7 +17,7 @@ app's Help menu, and every lexicon entry the app shows:
   public domain), in Open Scriptures' corrected JSON editions -
   github.com/openscriptures/strongs - which are CC BY-SA (Copyright
   2009/2010 Open Scriptures). The share-alike applies to this lexicon
-  data and anything adapted from it, not to the app's own MIT-licensed
+  data and anything adapted from it, not to the app's own GPL-licensed
   code. Supplies each entry's original word, transliteration,
   pronunciation (Hebrew only), derivation, definition, and KJV renderings.
 - STEPBible's "Translators Brief lexicon of Extended Strongs" - TBESH
