@@ -19,7 +19,7 @@ network for this), and Listen controls to have any chapter read aloud -
 verse by verse, with the current verse highlighted as it goes - in a
 choice of four voices (American or British English, male or female) -
 switched on in Menu → Voice → Show Listen Controls, with each voice an
-opt-in download of about 63 MB (Menu → Voice → Download Voices...),
+opt-in download of about 63 MB (Menu → Voice → Download or Remove Voices...),
 offline from then on. A Welcome window on first launch offers to set up
 Listen and AI-assisted search, and can be told not to show again.
 

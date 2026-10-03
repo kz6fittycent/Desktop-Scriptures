@@ -974,7 +974,7 @@ class ReadingView(QWidget):
                 f"Listen needs a voice, downloaded once (about "
                 f"{voice.model_size // 1_000_000} MB). After that it works offline.\n\n"
                 f"Download {voice.label} now? You can choose another voice under "
-                "Menu → Voice → Download Voices...",
+                "Menu → Voice → Download or Remove Voices...",
             )
             if answer != QMessageBox.StandardButton.Yes:
                 return

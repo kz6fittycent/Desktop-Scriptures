@@ -7,7 +7,7 @@ time from Menu → Welcome.... Four steps:
 1. Welcome - the app works offline; everything here is optional.
 2. Listen - switch on the Listen controls (the same setting as Menu →
    Voice → Show Listen Controls) and download a voice (opens the same
-   Download Voices dialog as the menu).
+   Download or Remove Voices dialog as the menu).
 3. AI - opens the existing AI Setup Wizard (still in Menu → AI
    Integration too).
 4. Done - where to find all of it later.
@@ -139,7 +139,7 @@ class WelcomeDialog(QDialog):
             "<h2>You're all set</h2>"
             "<p>You can change any of this later:</p>"
             "<ul>"
-            "<li><b>Menu → Voice</b> - Listen controls, your voice, and Download Voices...</li>"
+            "<li><b>Menu → Voice</b> - Listen controls, your voice, and Download or Remove Voices...</li>"
             "<li><b>Menu → AI Integration</b> - the AI Setup Wizard and AI Settings</li>"
             "<li><b>Menu → Welcome...</b> - this window</li>"
             "<li><b>Menu → Help (Wiki)...</b> - a guide to every feature</li>"

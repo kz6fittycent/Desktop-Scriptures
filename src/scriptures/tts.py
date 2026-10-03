@@ -7,7 +7,7 @@ Uses Piper (https://github.com/OHF-Voice/piper1-gpl) - a small, fast,
 fully offline neural TTS engine: synthesis is entirely local.
 
 Voices are opt-in downloads, not part of the app (each is ~60 MB): the
-user picks which to fetch in Menu → Voice → Download Voices... (see
+user picks which to fetch in Menu → Voice → Download or Remove Voices... (see
 ui/voices_dialog.py and voice_download.py). They come straight from
 Piper's own model repository on Hugging Face and are checked against the
 SHA-256 pinned below, then stored per user (paths.voices_dir()). A voice

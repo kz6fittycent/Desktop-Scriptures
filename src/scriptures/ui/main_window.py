@@ -440,7 +440,7 @@ class MainWindow(QMainWindow):
             voice_menu.addAction(action)
             self._voice_actions[voice.key] = action
         voice_menu.addSeparator()
-        manage_voices_action = QAction("Download Voices...", self)
+        manage_voices_action = QAction("Download or Remove Voices...", self)
         manage_voices_action.triggered.connect(self._show_voices_dialog)
         voice_menu.addAction(manage_voices_action)
         voice_menu.aboutToShow.connect(self._update_voice_labels)

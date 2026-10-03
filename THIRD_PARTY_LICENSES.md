@@ -21,7 +21,7 @@ they are ordinary shared libraries alongside the app.
 ## Voices (Listen)
 
 Voices aren't included with the app. Listen downloads the ones you choose
-(Menu → Voice → Download Voices...) directly from
+(Menu → Voice → Download or Remove Voices...) directly from
 https://huggingface.co/rhasspy/piper-voices (MIT, as a collection). Each
 voice was trained on a dataset with its own terms:
 
