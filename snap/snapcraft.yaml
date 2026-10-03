@@ -3,8 +3,8 @@ title: Desktop Scriptures
 summary: Offline LDS scripture reader with notes, tags, search, sync, and opt-in AI
 description: |
   A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
-  Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
-  Joseph Smith Translation. The core reading and study experience works
+  Pearl of Great Price, Journal of Discourses, Lectures on Faith, the
+  Joseph Smith Translation, and the KJV Apocrypha. The core reading and study experience works
   fully offline - personal notes, tags, verse highlighting, keyword
   search, a Topical Guide, General Conference and Ensign/Liahona citations,
   a Cross-references tab pointing out known parallel passages elsewhere in
@@ -45,7 +45,8 @@ description: |
   Christ. Scripture text courtesy of the beandog/lds-scriptures project;
   Journal of Discourses and Joseph Smith Translation (published as the
   "Inspired Version") text courtesy of their public-domain scans on
-  archive.org; General Conference citation data courtesy of BYU's
+  archive.org; the KJV Apocrypha courtesy of CrossWire and eBible.org;
+  General Conference citation data courtesy of BYU's
   Scripture Citation Index; Ensign/Liahona citation data (English issues,
   1971-present) detected directly from each article's own scripture
   hyperlinks on churchofjesuschrist.org, since no outside citation index
@@ -53,12 +54,11 @@ description: |
   correlation of its local scripture text and that same citation index -
   not a copy of the Church's own, separately-copyrighted Topical Guide.
   Cross-references are hand-curated the same way: an accuracy-first list
-  of 600 well-documented parallel passages - quotations, paraphrases,
+  of 608 well-documented parallel passages - quotations, paraphrases,
   JST/Moses-style revisions, and typology scripture itself explicitly
   states, plus a smaller, distinctly-labeled "traditionally linked to"
   tier for associations scripture doesn't explicitly state - each
-  verified directly against this app's own imported text rather than
-  copied from any outside source, and each tagged with the Topical Guide
+  verified against this app's own text and tagged with the Topical Guide
   topic it's actually teaching.
 
   Lexicons: Strong's dictionaries from Open Scriptures (CC BY-SA) and STEP

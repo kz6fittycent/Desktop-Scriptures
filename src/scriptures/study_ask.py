@@ -73,6 +73,9 @@ CANDIDATE_GROUPS = (
     # alone missed it) - their own slots, not shared with the rest below.
     ("cross_references", {"cross_reference", "user_cross_reference"}, None, 3),
     ("lectures_on_faith", {"scripture"}, {"lectures-on-faith"}, 1),
+    # The Apocrypha (KJV) - its own small share, so a question it speaks to
+    # can find it without crowding out the Standard Works.
+    ("apocrypha", {"scripture"}, {"apocrypha"}, 2),
     ("other", {"discourse", "topic", "note"}, None, 3),
     # A question about what a word means ("What does Christ mean?") is
     # answered by a lexicon entry ("anointed... the Messiah") the
@@ -176,6 +179,7 @@ _VOLUME_PHRASES = (
     (r"\bbible\b|\bold testament\b|\bnew testament\b", {"holy-bible", "inspired-version"}),
     (r"\bjournal of discourses\b", {"journal-of-discourses"}),
     (r"\blectures on faith\b", {"lectures-on-faith"}),
+    (r"\bapocrypha\b|\bapocryphal\b", {"apocrypha"}),
 )
 _KIND_PHRASES = (
     (r"\bgeneral conference\b|\bconference talks?\b|\btalks\b", {"talk"}),
@@ -226,7 +230,8 @@ def detect_filters(questions: list[str]) -> tuple[set[str] | None, set[str] | No
 def tier(hit: study_index.SearchHit) -> int:
     """Display order, by source (the user's chosen ranking): the Standard
     Works, then General Conference talks, then Ensign/Liahona articles,
-    then everything else - Journal of Discourses, Lectures on Faith,
+    then everything else - Journal of Discourses, Lectures on Faith, the
+    Apocrypha (D&C 91: "many things contained therein that are true"),
     Topical Guide, cross-references, notes. Within a tier, the chat
     model's (or the index's) order is kept."""
     if hit.kind == "scripture" and hit.volume_slug in STANDARD_WORKS:

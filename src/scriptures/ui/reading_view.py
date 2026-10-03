@@ -363,10 +363,12 @@ class _VerseTextEdit(QTextEdit):
 
 def _original_language(conn: sqlite3.Connection, chapter_id: int) -> str | None:
     """Which original language's words Word Study lists first for this
-    chapter: Greek in the New Testament, Hebrew in the Old (the JST shares
-    the Bible's testaments). Other volumes get no preference - the Book of
+    chapter: Greek in the New Testament and the Apocrypha, Hebrew in the
+    Old (the JST shares the Bible's testaments). Other volumes get no preference - the Book of
     Mormon quotes both Isaiah and the Sermon on the Mount."""
     location = get_chapter_location(conn, chapter_id)
+    if location is not None and location[0].slug == "apocrypha":
+        return "greek"  # the Apocrypha survives mainly in the Greek Septuagint
     testament = location[1] if location else None
     if testament is None:
         return None

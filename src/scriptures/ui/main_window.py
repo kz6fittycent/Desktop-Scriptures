@@ -1316,13 +1316,19 @@ class MainWindow(QMainWindow):
             return f"{chapter.speaker} - {chapter.title}"
         if volume.slug == "lectures-on-faith":
             return "Preface" if chapter.chapter_number == 0 else f"Lecture {chapter.chapter_number}"
+        if volume.slug == "apocrypha" and chapter.chapter_number == 0:
+            return "Prologue"  # Ecclesiasticus' (see scripts/import_apocrypha.py)
         unit = "Section" if volume.slug == "doctrine-and-covenants" else "Chapter"
         return f"{unit} {chapter.chapter_number}"
 
     @staticmethod
-    def _chapter_subtitle(chapter: Chapter) -> str | None:
-        """Speaker/title/date line for the reading view header - only
-        Journal of Discourses chapters have this context to show."""
+    def _chapter_subtitle(chapter: Chapter, volume: Volume | None = None) -> str | None:
+        """The line under the reading view's title: a Journal of
+        Discourses chapter's title, speaker and date, or an Apocrypha
+        chapter's heading ("The Epistle of Jeremy", "Placed in the Greek
+        after chap. 3.13 of the Hebrew")."""
+        if volume is not None and volume.slug == "apocrypha":
+            return chapter.title or None
         if not chapter.speaker:
             return None
         date_label = MainWindow._format_discourse_date(chapter.discourse_date)
@@ -1759,9 +1765,30 @@ class MainWindow(QMainWindow):
             grid.card_clicked.connect(lambda tid: self._on_testament_clicked(volume, tid))
         else:
             books = get_books(self.conn, volume_id)
-            grid = CardGridWidget(volume.name, [(b.id, b.name) for b in books])
+            banner = self._apocrypha_banner() if volume.slug == "apocrypha" else None
+            grid = CardGridWidget(volume.name, [(b.id, b.name) for b in books], banner=banner)
             grid.card_clicked.connect(lambda bid: self._on_book_clicked(volume, None, bid))
         self._set_content(grid)
+
+    def _apocrypha_banner(self) -> QLabel:
+        """The Lord's counsel on reading the Apocrypha, quoted from the
+        app's own text of Doctrine and Covenants 91."""
+        verses = []
+        for number in (1, 2, 4, 5):
+            row = self.conn.execute(
+                "SELECT text FROM verses WHERE reference = ?", (f"Doctrine and Covenants 91:{number}",)
+            ).fetchone()
+            if row:
+                verses.append(row[0].replace("--", "—"))
+        label = QLabel(
+            f"<i>“{escape(' '.join(verses))}”</i><br><b>Doctrine and Covenants 91:1-2, 4-5</b>"
+            "<br><span style='font-size: small'>The Apocrypha of the King James Version (1769 text).</span>"
+        )
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setObjectName("sotdBanner")
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        return label
 
     def _on_testament_clicked(self, volume: Volume, testament_id: int) -> None:
         testament = get_testament(self.conn, testament_id)
@@ -1913,6 +1940,9 @@ class MainWindow(QMainWindow):
 
         verses = get_verses(self.conn, chapter_id)
         title = verses[0].reference.rsplit(":", 1)[0] if verses else book.name
+        if chapter.chapter_number == 0:
+            # A preface or prologue: "Ecclesiasticus - Prologue", not "Ecclesiasticus 0".
+            title = f"{book.name} - {self._chapter_label(volume, chapter)}"
         palette = theming.get_reading_palette(self._reading_scheme, self._app_accent)
         prev_target = self._adjacent_chapter(volume, testament, book, chapter, -1)
         next_target = self._adjacent_chapter(volume, testament, book, chapter, 1)
@@ -1929,7 +1959,7 @@ class MainWindow(QMainWindow):
             armed_highlight=self._armed_highlight,
             selected_side_tab=self._side_tab_index,
             panel_width=self._panel_width,
-            subtitle=self._chapter_subtitle(chapter),
+            subtitle=self._chapter_subtitle(chapter, volume),
             tts_voice=self._tts_voice,
             listen_enabled=self._listen_enabled,
         )

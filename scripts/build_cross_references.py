@@ -5406,6 +5406,91 @@ ENTRIES = [
         "beasts and fire, both accounts of God shielding the faithful "
         "from otherwise-certain harm.",
     ),
+    # --- The Apocrypha (KJV): passages the New Testament is widely
+    # recognized as echoing or referring to. None is quoted outright, so
+    # all are the "tradition" tier - D&C 91: "there are many things
+    # contained therein that are true."
+    (
+        "John", "Holy Bible", 10, 22, 22,
+        "1 Maccabees", "Apocrypha", 4, 52, 59,
+        "tradition", "temple",
+        "Jesus taught in the temple at \"the feast of the dedication\" - "
+        "the eight-day feast Judas Maccabeus ordained when the temple's "
+        "altar was rededicated after its desecration (1 Maccabees 4:56, "
+        "59), kept today as Hanukkah. John names the feast; 1 Maccabees "
+        "tells how it began.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 11, 35, 35,
+        "2 Maccabees", "Apocrypha", 7, 1, 41,
+        "tradition", "resurrection,trials-and-adversity",
+        "Faith in the resurrection that makes martyrdom bearable: \"others "
+        "were tortured, not accepting deliverance; that they might obtain "
+        "a better resurrection\" is widely read as recalling the mother "
+        "and seven sons of 2 Maccabees 7, who died declaring that \"the "
+        "King of the world shall raise us up\" (7:9). Hebrews doesn't "
+        "name them.",
+    ),
+    (
+        "Hebrews", "Holy Bible", 1, 3, 3,
+        "Wisdom of Solomon", "Apocrypha", 7, 26, 26,
+        "tradition", "jesus-christ,godhead",
+        "Christ as the radiance and image of God: Hebrews calls the Son "
+        "\"the brightness of his glory, and the express image of his "
+        "person\"; Wisdom of Solomon says Wisdom is \"the brightness of "
+        "the everlasting light... the image of his goodness.\" A close "
+        "echo in wording, though Wisdom speaks of wisdom, not of Christ.",
+    ),
+    (
+        "Matthew", "Holy Bible", 6, 14, 15,
+        "Ecclesiasticus", "Apocrypha", 28, 2, 2,
+        "tradition", "forgiveness,prayer",
+        "Forgiving others as the condition of being forgiven: \"if ye "
+        "forgive men their trespasses, your heavenly Father will also "
+        "forgive you,\" and Ecclesiasticus' \"forgive thy neighbour... so "
+        "shall thy sins also be forgiven when thou prayest.\" The same "
+        "teaching, in words close enough to be often compared.",
+    ),
+    (
+        "James", "Holy Bible", 1, 19, 19,
+        "Ecclesiasticus", "Apocrypha", 5, 11, 11,
+        "tradition", "wisdom,humility",
+        "Patience in speech: \"swift to hear, slow to speak, slow to "
+        "wrath,\" and Ecclesiasticus' \"be swift to hear... and with "
+        "patience give answer.\" James' letter shares much of this "
+        "wisdom literature's counsel.",
+    ),
+    (
+        "Romans", "Holy Bible", 1, 20, 20,
+        "Wisdom of Solomon", "Apocrypha", 13, 5, 5,
+        "tradition", "creation,testimony",
+        "God known through what He has made: \"the invisible things of "
+        "him from the creation of the world are clearly seen, being "
+        "understood by the things that are made,\" and Wisdom's \"by the "
+        "greatness and beauty of the creatures... the maker of them is "
+        "seen.\" Paul's argument in Romans 1 follows Wisdom 13 closely.",
+    ),
+    (
+        "1 Corinthians", "Holy Bible", 15, 29, 29,
+        "2 Maccabees", "Apocrypha", 12, 43, 45,
+        "tradition", "resurrection,salvation",
+        "Acting on behalf of the dead because they will rise: Paul argues "
+        "from those \"baptized for the dead\" to the resurrection, and "
+        "Judas Maccabeus' sin offering for his fallen soldiers is "
+        "explained the same way - \"if he had not hoped that they that "
+        "were slain should have risen again, it had been superfluous and "
+        "vain to pray for the dead.\" The ordinances differ; the hope is "
+        "the same.",
+    ),
+    (
+        "Matthew", "Holy Bible", 7, 12, 12,
+        "Tobit", "Apocrypha", 4, 15, 15,
+        "tradition", "love,kindness",
+        "The Golden Rule: Jesus' \"all things whatsoever ye would that "
+        "men should do to you, do ye even so to them,\" and Tobit's "
+        "counsel to his son, \"Do that to no man which thou hatest\" - "
+        "the same rule, which Jesus states in its positive form.",
+    ),
 ]
 
 

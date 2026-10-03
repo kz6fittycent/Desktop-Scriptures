@@ -40,6 +40,7 @@ voice was trained on a dataset with its own terms:
 | STEP Bible short word meanings (Tyndale House, Cambridge) | CC BY 4.0 | https://www.STEPBible.org |
 | Scripture text | Courtesy of the lds-scriptures project | https://github.com/beandog/lds-scriptures |
 | Journal of Discourses and the Inspired Version (JST) | Public domain scans | https://archive.org |
+| The Apocrypha (King James Version, 1769 text) | Public domain, courtesy of the CrossWire Bible Society and eBible.org | https://ebible.org/find/details.php?id=eng-kjv |
 | General Conference citation data | Courtesy of BYU's Scripture Citation Index | https://scriptures.byu.edu |
 | Book of Mormon name meanings | This project's own summaries, each linked to BYU's Book of Mormon Onomasticon | https://onoma.lib.byu.edu |
 

@@ -96,7 +96,9 @@ LOCAL_SUPPLEMENT_LIMIT = 3
 SYSTEM_PROMPT = (
     "You help locate passages in the LDS standard works (the Holy Bible, "
     "the Book of Mormon, the Doctrine and Covenants, the Pearl of Great "
-    "Price, and the Joseph Smith Translation) that are relevant to a "
+    "Price, and the Joseph Smith Translation) - and the Apocrypha of the "
+    "King James Bible (e.g. Ecclesiasticus, Wisdom of Solomon, 1 Maccabees) - "
+    "that are relevant to a "
     "reader's question. Reply with ONLY a JSON array of up to "
     f"{MAX_REFERENCES} scripture reference strings, most relevant first - "
     'no prose, no markdown, just e.g. ["3 Nephi 11:18-22", "3 Nephi 18:1-11"]. '
@@ -213,6 +215,21 @@ _BOOK_ALIASES: dict[str, str] = {
     "1 tim": "1 Timothy", "2 tim": "2 Timothy", "philem": "Philemon",
     "heb": "Hebrews", "jas": "James", "1 pet": "1 Peter", "2 pet": "2 Peter",
     "1 jn": "1 John", "2 jn": "2 John", "3 jn": "3 John", "rev": "Revelation",
+    # The Apocrypha (KJV): common abbreviations, and the names other
+    # editions use for the same books.
+    "1 esd": "1 Esdras", "2 esd": "2 Esdras", "tob": "Tobit", "jdt": "Judith", "jth": "Judith",
+    "add esth": "Rest of Esther", "additions to esther": "Rest of Esther",
+    "the rest of esther": "Rest of Esther", "esther (greek)": "Rest of Esther",
+    "wis": "Wisdom of Solomon", "wisdom": "Wisdom of Solomon",
+    "sir": "Ecclesiasticus", "sirach": "Ecclesiasticus", "ecclus": "Ecclesiasticus",
+    "wisdom of sirach": "Ecclesiasticus", "bar": "Baruch",
+    "song of the three holy children": "Song of the Three Children",
+    "song of three children": "Song of the Three Children",
+    "prayer of azariah": "Song of the Three Children", "sg three": "Song of the Three Children",
+    "sus": "Susanna", "bel": "Bel and the Dragon",
+    "pr man": "Prayer of Manasses", "prayer of manasseh": "Prayer of Manasses",
+    "1 macc": "1 Maccabees", "2 macc": "2 Maccabees", "1 mac": "1 Maccabees",
+    "2 mac": "2 Maccabees", "1 ma": "1 Maccabees", "2 ma": "2 Maccabees",
 }
 
 
