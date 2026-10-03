@@ -2,8 +2,10 @@ name: 📖 Refresh GC Citations
 
 # Automates *when* scripts/harvest_citations.py runs, not what it does -
 # it's still the same developer-scoped, rate-limited, metadata-only
-# harvest (never talk text) against the same 100-verse Scripture of the
-# Day pool it's always covered, just on a schedule instead of by hand.
+# harvest (never talk text), just on a schedule instead of by hand. It
+# refreshes every verse already in data/verse_citations.json (the
+# Scripture of the Day pool and the Topical Guide's verses - about 1,250,
+# roughly 45 minutes) and merges, so no verse's citations are dropped.
 # Monthly rather than twice a year to match Conference itself: cheap
 # either way (~144 requests, a few minutes total), and this way there's
 # no need to guess exactly when scriptures.byu.edu's own index has
@@ -20,6 +22,7 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -40,6 +43,9 @@ jobs:
       - name: Open a PR if the citation data changed
         uses: peter-evans/create-pull-request@v8
         with:
+          # Only the citation file: the harvest doesn't touch anything
+          # else, and nothing else should ride along.
+          add-paths: data/verse_citations.json
           commit-message: "Refresh General Conference citation metadata"
           title: "Refresh General Conference citation metadata"
           body: |

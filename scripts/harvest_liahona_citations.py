@@ -4,11 +4,21 @@
 data/liahona_citations.json.
 
 Usage:
-    python3 scripts/harvest_liahona_citations.py [output_path]
+    python3 scripts/harvest_liahona_citations.py [output_path] [--months N | --full]
 
-    output_path defaults to data/liahona_citations.json. Runs for a very
-    long time - see "Rate limiting" below - so it's meant to be started
-    once (e.g. overnight) and left running, not babysat.
+    output_path defaults to data/liahona_citations.json.
+
+    By default only the last RECENT_MONTHS issues are scanned (--months N
+    to change it) - new articles only appear in new issues, so a monthly
+    refresh (.github/workflows/refresh-liahona-citations.yml) takes a few
+    minutes. --full rescans every issue from 1971: many hours - see
+    "Rate limiting" below - so start it by hand and leave it running.
+
+    Why not always rescan everything and skip what's already harvested?
+    Only articles WITH scripture citations are stored, and about half of
+    all articles have none (news, stories, contents pages) - so a full
+    rescan re-downloads ~12,000 of them every time (5+ hours), which is
+    what made the monthly refresh time out.
 
 WHY THIS EXISTS SEPARATELY FROM harvest_citations.py: scriptures.byu.edu's
 Citation Index (which that script scrapes) has no corpus at all for the
@@ -92,6 +102,8 @@ HARVEST_START_MONTH = 1
 LIAHONA_START = (2021, 1)
 
 REQUEST_DELAY_SECONDS = 1.5
+# The default scan window: this month and the RECENT_MONTHS - 1 before it.
+RECENT_MONTHS = 3
 USER_AGENT = (
     "Desktop-Scriptures/1.0 (+https://github.com/kz6fittycent/Desktop-Scriptures; "
     "harvest of Ensign/Liahona citation metadata, English issues 1971-present)"
@@ -146,6 +158,8 @@ def fetch_issue_article_urls(year: int, month: int) -> list[str]:
         href = match.group(1)
         if "local-pages" in href:
             continue  # regional inserts, not the magazine's editorial content
+        if href.rstrip("/").endswith("/contents"):
+            continue  # the issue's table of contents, not an article
         hrefs.add(href)
     return sorted(hrefs)
 
@@ -265,11 +279,17 @@ def save(output_path: Path, articles: dict[str, dict]) -> None:
     output_path.write_text(text, encoding="utf-8")
 
 
-def harvest(conn, output_path: Path) -> None:
+def harvest(conn, output_path: Path, months: int | None = RECENT_MONTHS) -> None:
+    """months=None scans every issue since 1971 (--full)."""
     articles = load(output_path)
     seen_urls = set(articles)
 
     today = date.today()
+    start_year, start_month = HARVEST_START_YEAR, HARVEST_START_MONTH
+    if months is not None:
+        index = today.year * 12 + (today.month - 1) - (months - 1)
+        start_year, start_month = max((index // 12, index % 12 + 1), (HARVEST_START_YEAR, HARVEST_START_MONTH))
+    print(f"Scanning issues from {start_year}-{start_month:02d} to {today.year}-{today.month:02d}")
     stats = {
         "issues": 0,
         "articles": 0,
@@ -278,9 +298,7 @@ def harvest(conn, output_path: Path) -> None:
         "unresolved_references": 0,
     }
 
-    for year, month in month_range(
-        HARVEST_START_YEAR, HARVEST_START_MONTH, today.year, today.month
-    ):
+    for year, month in month_range(start_year, start_month, today.year, today.month):
         try:
             article_hrefs = fetch_issue_article_urls(year, month)
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
@@ -346,9 +364,19 @@ def harvest(conn, output_path: Path) -> None:
 
 
 def main() -> None:
-    output_path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_OUTPUT_PATH
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Harvest Ensign/Liahona citation metadata.")
+    parser.add_argument("output_path", nargs="?", type=Path, default=DEFAULT_OUTPUT_PATH)
+    window = parser.add_mutually_exclusive_group()
+    window.add_argument("--months", type=int, default=RECENT_MONTHS,
+                        help=f"scan this many most recent issues (default {RECENT_MONTHS})")
+    window.add_argument("--full", action="store_true", help="scan every issue since 1971 (many hours)")
+    args = parser.parse_args()
+    # Progress shows live even when output isn't a terminal (CI logs).
+    sys.stdout.reconfigure(line_buffering=True)
     conn = connect(DB_PATH)
-    harvest(conn, output_path)
+    harvest(conn, args.output_path, None if args.full else args.months)
 
 
 if __name__ == "__main__":

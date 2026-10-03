@@ -6,6 +6,10 @@ scriptures.byu.edu's public "Scripture Citation Index".
 Usage:
     python3 scripts/harvest_citations.py [output_path]
 
+    Re-run monthly by .github/workflows/refresh-gc-citations.yml. A run
+    refreshes every verse already in the output file, and the pool's, and
+    merges: verses it can't fetch keep their existing citations.
+
     output_path defaults to data/verse_citations.json.
 
 COPYRIGHT: General Conference talks are copyrighted by Intellectual
@@ -208,7 +212,17 @@ def parse_citations(html: str) -> list[dict]:
     return citations
 
 
-def harvest() -> tuple[dict[str, list[dict]], dict]:
+def _split_reference(reference: str) -> tuple[str, int, int]:
+    """"2 Nephi 9:28" -> ("2 Nephi", 9, 28)."""
+    book, _, chapter_verse = reference.rpartition(" ")
+    chapter, _, verse = chapter_verse.partition(":")
+    return book, int(chapter), int(verse)
+
+
+def harvest(extra_references: list[str] = ()) -> tuple[dict[str, list[dict]], dict]:
+    """The pool's verses, plus `extra_references` (every verse already in
+    the output file - e.g. the Topical Guide's, added by
+    build_topical_guide.py - so a refresh keeps them current too)."""
     pool = json.loads(POOL_PATH.read_text(encoding="utf-8"))["verses"]
     book_ids = build_book_id_map()
 
@@ -233,6 +247,15 @@ def harvest() -> tuple[dict[str, list[dict]], dict]:
         for entry in pool
         for verse in range(entry["verse"], entry.get("end_verse", entry["verse"]) + 1)
     ]
+    queued = {
+        f"{BOOK_NAME_ALIASES.get(entry['book'], entry['book'])} {entry['chapter']}:{verse}"
+        for entry, verse in work_items
+    }
+    for reference in extra_references:
+        if reference not in queued:
+            book, chapter, verse = _split_reference(reference)
+            work_items.append(({"book": book, "chapter": chapter}, verse))
+            queued.add(reference)
 
     for entry, verse in work_items:
         book_name = BOOK_NAME_ALIASES.get(entry["book"], entry["book"])
@@ -276,20 +299,34 @@ def harvest() -> tuple[dict[str, list[dict]], dict]:
 
 def main() -> None:
     output_path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_OUTPUT_PATH
+    # Progress shows live even when output isn't a terminal (CI logs).
+    sys.stdout.reconfigure(line_buffering=True)
 
-    print(f"Harvesting citations for the {POOL_PATH.name} pool from scriptures.byu.edu ...")
-    citations, summary = harvest()
+    # A refresh MERGES into the existing file rather than replacing it:
+    # every verse already there (the pool's, plus the Topical Guide's from
+    # build_topical_guide.py) is re-harvested, and a verse whose request
+    # fails - or that BYU's index briefly returns nothing for - keeps its
+    # existing citations. Replacing the file with just the pool's results
+    # would silently drop every other verse's citations.
+    existing: dict = {}
+    if output_path.exists():
+        existing = json.loads(output_path.read_text(encoding="utf-8"))
+    previous = existing.get("citations", {})
+
+    print(f"Harvesting citations for the {POOL_PATH.name} pool and {len(previous)} existing verses ...")
+    harvested, summary = harvest(list(previous))
+    citations = {**previous, **harvested}
 
     output = {
         "_source": "scriptures.byu.edu Citation Index (General Conference talks)",
         "_harvested": date.today().isoformat(),
-        "_note": (
+        "_note": existing.get("_note") or (
             "Metadata only (talk title, speaker, date, churchofjesuschrist.org URL) - "
             "never talk text, per copyright. See scripts/harvest_citations.py. Keyed by "
             "the exact verse reference string used in the imported database "
             "(e.g. 'Genesis 1:1')."
         ),
-        "citations": citations,
+        "citations": citations,  # existing order kept, so a refresh diffs cleanly
     }
     output_path.write_text(json.dumps(output, indent=2, ensure_ascii=False), encoding="utf-8")
 

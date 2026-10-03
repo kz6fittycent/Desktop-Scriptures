@@ -5,14 +5,13 @@ name: 📖 Refresh Liahona Citations
 # (never article text) it's always been, just on a schedule. Monthly to
 # match how often a new Ensign/Liahona issue actually appears.
 #
-# Unlike refresh-gc-citations.yml, a *first-ever* run of this harvester
-# would be genuinely slow (the full 1971-present archive, on the order
-# of ten thousand articles, many hours) - but data/liahona_citations.json
-# already carries that one-time backfill (run manually, not through this
-# workflow - see the harvester's own module docstring), so every run
-# through here only ever needs to fetch whatever's new in the latest
-# issue, since already-harvested article URLs are skipped (see
-# harvest_liahona_citations.py's own `seen_urls`).
+# Scans only the last 3 issues (the harvester's default - new articles
+# only appear in new issues), so a run takes a few minutes.
+# data/liahona_citations.json already carries the full 1971-present
+# backfill; a complete rescan (--full) takes many hours and is run by
+# hand. Scanning the whole archive here is what timed out before: about
+# half of all articles cite no scripture, so they're never stored, and
+# every full scan re-downloaded ~12,000 of them.
 on:
   schedule:
     - cron: "0 7 1 * *"
@@ -25,7 +24,7 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -46,6 +45,9 @@ jobs:
       - name: Open a PR if the citation data changed
         uses: peter-evans/create-pull-request@v8
         with:
+          # Only the citation file - the harvester opens data/scriptures.db
+          # to check references, which writes device settings into it.
+          add-paths: data/liahona_citations.json
           commit-message: "Refresh Liahona citation metadata"
           title: "Refresh Liahona citation metadata"
           body: |
