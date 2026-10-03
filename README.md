@@ -110,11 +110,20 @@ The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user 
 
 ## Install
 
-Desktop Scriptures is published on the Snap Store:
+**Linux:** Desktop Scriptures is published on the Snap Store:
 
 ```
 sudo snap install desktop-scriptures
 ```
+
+**Windows 11 and macOS (Apple Silicon):** in testing. Every change on
+`main` produces a test build - see the newest issue labeled
+[`desktop-testing`](https://github.com/kz6fittycent/Desktop-Scriptures/issues?q=label%3Adesktop-testing)
+for download links and how to open them. They aren't code-signed yet, so the
+first launch takes one extra click on each system. Releases (from a version
+tag) go on the [Releases page](https://github.com/kz6fittycent/Desktop-Scriptures/releases).
+Packagers are welcome: Homebrew, Winget, and Chocolatey packages would be
+maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 ## TODO
 
@@ -122,6 +131,9 @@ sudo snap install desktop-scriptures
 
 - [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
 - [ ] Apocrypha?
+- [ ] Menu bar consolidation - fold the top-level menus into submenus under "Menu"
+- [ ] Automatic security rebuilds - a scheduled check of the published snap (the Snap Store's own `snap-check-notices`), rebuilding from the last release tag when Ubuntu security fixes are available
+- [ ] Windows and macOS - out of testing into regular releases; code signing if there's demand
 
 ### v3.0 roadmap
 
