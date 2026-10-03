@@ -427,6 +427,7 @@ class ReadingView(QWidget):
         selected_side_tab: int = 0,
         subtitle: str | None = None,
         tts_voice: str = tts.DEFAULT_VOICE_KEY,
+        listen_enabled: bool = True,
         parent: QWidget | None = None,
     ):
         super().__init__(parent)
@@ -455,6 +456,8 @@ class ReadingView(QWidget):
         self._listen_btn.setToolTip("Read this chapter aloud")
         self._listen_btn.clicked.connect(self._on_listen_clicked)
         header.addWidget(self._listen_btn)
+        # Opt-in (Menu → Voice → Show Listen Controls) - see set_listen_enabled.
+        self._listen_btn.setVisible(listen_enabled)
 
         self._stop_listen_btn = QPushButton("⏹")
         self._stop_listen_btn.setObjectName("stopListenButton")
@@ -971,7 +974,7 @@ class ReadingView(QWidget):
                 f"Listen needs a voice, downloaded once (about "
                 f"{voice.model_size // 1_000_000} MB). After that it works offline.\n\n"
                 f"Download {voice.label} now? You can choose another voice under "
-                "Menu → Voice → Manage Voices...",
+                "Menu → Voice → Download Voices...",
             )
             if answer != QMessageBox.StandardButton.Yes:
                 return
@@ -1010,6 +1013,15 @@ class ReadingView(QWidget):
         # debugging via a future log, not surfaced as an error dialog for
         # what's most likely a one-off synthesis hiccup.
         self._reset_listen_controls()
+
+    def set_listen_enabled(self, enabled: bool) -> None:
+        """Shows or hides the Listen controls - Listen is opt-in (Menu →
+        Voice → Show Listen Controls). Hiding them stops any reading."""
+        if not enabled:
+            if self._tts is not None:
+                self._tts.stop()
+            self._reset_listen_controls()
+        self._listen_btn.setVisible(enabled)
 
     def _reset_listen_controls(self) -> None:
         self._listen_btn.setText("▶ Listen")

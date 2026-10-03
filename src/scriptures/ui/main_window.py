@@ -80,6 +80,7 @@ from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
 from scriptures.ui.about_help import HelpDialog, LicenseDialog
 from scriptures.ui.voices_dialog import VoicesDialog
+from scriptures.ui.welcome_dialog import WelcomeDialog
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
 from scriptures.ui.breadcrumb import BreadcrumbBar
 from scriptures.ui.card_grid import GRID_MARGIN, LANDING_CARD_SIZE, CardGridWidget
@@ -192,6 +193,11 @@ FAMILY_HISTORY_LAST_SHOWN_SETTING = "family_history_last_shown"  # ISO date of l
 # Which of tts.VOICES the Listen controls use - a standing tool
 # preference like HIGHLIGHT_MODE_SETTING below, not a one-off toggle.
 TTS_VOICE_SETTING = "tts_voice"
+# Listen is opt-in: its controls only appear once switched on (Menu →
+# Voice → Show Listen Controls, or the Welcome window).
+LISTEN_ENABLED_SETTING = "listen_enabled"
+# "true" once the user switches on "Don't show this at startup again".
+WELCOME_DONT_SHOW_SETTING = "welcome_dont_show"
 
 # The highlighter's armed color (or "clear"), so it stays selected across
 # launches instead of resetting to Off every time - a standing tool
@@ -310,6 +316,7 @@ class MainWindow(QMainWindow):
         self._tts_voice = get_setting(conn, TTS_VOICE_SETTING, tts.DEFAULT_VOICE_KEY)
         if tts.get_voice(self._tts_voice) is None:
             self._tts_voice = tts.DEFAULT_VOICE_KEY
+        self._listen_enabled = get_setting(conn, LISTEN_ENABLED_SETTING) == "true"
 
         self.setWindowTitle("Desktop Scriptures")
         # The menu bar's corner widget (Resume Reading + the streak badge
@@ -412,6 +419,11 @@ class MainWindow(QMainWindow):
         # time the menu opens - and choosing a missing one is fine:
         # Listen offers to download it (reading_view._on_listen_clicked).
         voice_menu = QMenu("&Voice", self)
+        self._listen_action = QAction("Show Listen Controls", self, checkable=True)
+        self._listen_action.setChecked(self._listen_enabled)
+        self._listen_action.triggered.connect(self._set_listen_enabled)
+        voice_menu.addAction(self._listen_action)
+        voice_menu.addSeparator()
         voice_group = QActionGroup(self)
         voice_group.setExclusive(True)
         self._voice_actions: dict[str, QAction] = {}
@@ -423,7 +435,7 @@ class MainWindow(QMainWindow):
             voice_menu.addAction(action)
             self._voice_actions[voice.key] = action
         voice_menu.addSeparator()
-        manage_voices_action = QAction("Manage Voices...", self)
+        manage_voices_action = QAction("Download Voices...", self)
         manage_voices_action.triggered.connect(self._show_voices_dialog)
         voice_menu.addAction(manage_voices_action)
         voice_menu.aboutToShow.connect(self._update_voice_labels)
@@ -751,6 +763,9 @@ class MainWindow(QMainWindow):
         root_menu.addAction(export_notes_action)
         root_menu.addAction(share_bom_action)
         root_menu.addSeparator()
+        welcome_action = QAction("Welcome...", self)
+        welcome_action.triggered.connect(self.show_welcome)
+        root_menu.addAction(welcome_action)
         root_menu.addAction(wiki_action)
         root_menu.addMenu(about_menu)
 
@@ -920,6 +935,32 @@ class MainWindow(QMainWindow):
         dialog = VoicesDialog(self)
         dialog.voices_changed.connect(self._update_voice_labels)
         dialog.exec()
+
+    def _set_listen_enabled(self, enabled: bool) -> None:
+        self._listen_enabled = enabled
+        set_setting(self.conn, LISTEN_ENABLED_SETTING, "true" if enabled else "false")
+        self._listen_action.setChecked(enabled)
+        if self._current_reading_view is not None:
+            self._current_reading_view.set_listen_enabled(enabled)
+
+    def maybe_show_welcome(self) -> None:
+        """At startup (see app.py): the Welcome window, unless the user
+        has asked not to see it again."""
+        if get_setting(self.conn, WELCOME_DONT_SHOW_SETTING) != "true":
+            self.show_welcome()
+
+    def show_welcome(self) -> None:
+        dialog = WelcomeDialog(
+            listen_enabled=self._listen_enabled,
+            set_listen_enabled=self._set_listen_enabled,
+            open_ai_wizard=self._show_ai_setup_wizard,
+            ai_configured=lambda: self._current_ai_config() is not None,
+            dont_show_again=get_setting(self.conn, WELCOME_DONT_SHOW_SETTING) == "true",
+            parent=self,
+        )
+        dialog.exec()
+        set_setting(self.conn, WELCOME_DONT_SHOW_SETTING, "true" if dialog.dont_show_again() else "false")
+        self._update_voice_labels()
 
     def _set_tts_voice(self, key: str) -> None:
         self._tts_voice = key
@@ -1848,6 +1889,7 @@ class MainWindow(QMainWindow):
             panel_width=self._panel_width,
             subtitle=self._chapter_subtitle(chapter),
             tts_voice=self._tts_voice,
+            listen_enabled=self._listen_enabled,
         )
         view.zoom_in_requested.connect(self._zoom_in)
         view.zoom_out_requested.connect(self._zoom_out)

@@ -1,4 +1,4 @@
-"""Menu → Voice → Manage Voices... - download or remove Listen voices.
+"""Menu → Voice → Download Voices... - download or remove Listen voices.
 
 Voices aren't part of the app (see tts.py): each row here shows a voice,
 whether it's downloaded, its size, and the terms of the recordings it was
@@ -38,7 +38,7 @@ class VoicesDialog(QDialog):
 
     def __init__(self, parent: QWidget | None = None, start_key: str | None = None):
         super().__init__(parent)
-        self.setWindowTitle("Manage Voices")
+        self.setWindowTitle("Download Voices")
         self.setMinimumWidth(560)
         self._downloader = VoiceDownloader(self)
         self._downloader.progress.connect(self._on_progress)

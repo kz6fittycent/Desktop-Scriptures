@@ -162,6 +162,8 @@ def main() -> None:
     elif screenshot_dir is not None:
         window.resize(1280, 800)
         _screenshots(window, screenshot_dir)
+    else:
+        QTimer.singleShot(0, window.maybe_show_welcome)
     sys.exit(app.exec())
 
 

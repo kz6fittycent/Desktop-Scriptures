@@ -184,9 +184,65 @@ def test_dialog_downloads_the_requested_voice() -> None:
         env.close()
 
 
+def test_listen_is_opt_in_and_the_welcome_window() -> None:
+    from scriptures import data_access as da
+    from scriptures.db import connect
+    from scriptures.ui import main_window as mw
+    from scriptures.ui.welcome_dialog import WelcomeDialog
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-welcome-test-"))
+    try:
+        shutil.copy(PROJECT_ROOT / "data" / "scriptures.db", tmp / "s.db")
+        conn = connect(tmp / "s.db")
+        window = mw.MainWindow(conn)
+        chapter_id = conn.execute(
+            "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id "
+            "WHERE b.name = 'Helaman' AND c.chapter_number = 1"
+        ).fetchone()[0]
+        volume, testament, book, _ = da.get_chapter_location(conn, chapter_id)
+        window._on_chapter_clicked(volume, testament, book, chapter_id)
+        view = window._current_reading_view
+        # Off until the user opts in.
+        assert view._listen_btn.isHidden() and not window._listen_action.isChecked()
+        window._listen_action.trigger()
+        assert not view._listen_btn.isHidden()
+        assert da.get_setting(conn, mw.LISTEN_ENABLED_SETTING) == "true"
+        window._listen_action.trigger()
+        assert view._listen_btn.isHidden()
+
+        # The Welcome window shows at startup until "don't show again".
+        shown = []
+        window.show_welcome = lambda: shown.append(True)
+        window.maybe_show_welcome()
+        assert shown == [True]
+        da.set_setting(conn, mw.WELCOME_DONT_SHOW_SETTING, "true")
+        window.maybe_show_welcome()
+        assert shown == [True]
+
+        # Its steps: the Listen switch drives the same setting; reaching
+        # the last step switches on "don't show again".
+        listen = []
+        dialog = WelcomeDialog(
+            listen_enabled=False, set_listen_enabled=listen.append,
+            open_ai_wizard=lambda: None, ai_configured=lambda: False, dont_show_again=False,
+        )
+        assert not dialog.dont_show_again() and not dialog._back.isEnabled()
+        dialog._on_next()
+        dialog._listen_toggle.setChecked(True)
+        assert listen == [True]
+        dialog._on_next()
+        assert dialog._ai_status.text() == "Not set up yet"
+        dialog._on_next()
+        assert dialog._next.text() == "Finish" and dialog.dont_show_again()
+        print("test_listen_is_opt_in_and_the_welcome_window: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_download_verify_and_remove()
     test_corrupt_missing_and_cancelled_downloads_leave_nothing()
     test_dialog_downloads_the_requested_voice()
+    test_listen_is_opt_in_and_the_welcome_window()
     print("All voice tests passed.")
