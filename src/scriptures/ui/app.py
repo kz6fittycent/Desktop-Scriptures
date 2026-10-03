@@ -4,6 +4,7 @@
 Usage:
     python3 app.py [path-to-scriptures.db]
     python3 app.py --smoke-test
+    python3 app.py --screenshots DIR
 
 Defaults to data/scriptures.db relative to the project root if no path
 is given - unless running as a snap or a packaged app, which use a
@@ -14,6 +15,11 @@ writable copy in the user's data folder (see scriptures/paths.py and
 sentence with a bundled voice if any are installed, prints "smoke test
 passed", and exits - used by the Windows/macOS build workflow to check a
 packaged build actually starts.
+
+--screenshots DIR saves PNGs of the app's own window (the home page, then
+Helaman 1 with a Book of Mormon name's Word Study card open) into DIR and
+exits - for the Windows/macOS call for testing issues. It grabs the window
+itself rather than the screen, so it needs no screen-recording permission.
 """
 
 from __future__ import annotations
@@ -80,9 +86,57 @@ def _smoke_test(window: MainWindow) -> None:
     QApplication.instance().exit(code)
 
 
+def _screenshots(window: MainWindow, folder: Path) -> None:
+    """Exits 0 once both screenshots are saved, 1 on any failure."""
+    from scriptures.data_access import get_chapter_location
+
+    def fail() -> None:
+        import traceback
+
+        traceback.print_exc()
+        print("screenshots FAILED", flush=True)
+        QApplication.instance().exit(1)
+
+    def save(name: str) -> None:
+        path = folder / name
+        if not window.grab().save(str(path)):
+            raise RuntimeError(f"couldn't save {path}")
+        print(f"saved {path}", flush=True)
+
+    def home() -> None:
+        try:
+            folder.mkdir(parents=True, exist_ok=True)
+            save("1-home.png")
+            chapter_id = window.conn.execute(
+                "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id "
+                "WHERE b.name = 'Helaman' AND c.chapter_number = 1"
+            ).fetchone()[0]
+            volume, testament, book, _chapter = get_chapter_location(window.conn, chapter_id)
+            window._on_chapter_clicked(volume, testament, book, chapter_id)
+            window._current_reading_view._on_text_link_clicked("name:Kishkumen")
+            QTimer.singleShot(2000, chapter)
+        except Exception:  # noqa: BLE001
+            fail()
+
+    def chapter() -> None:
+        try:
+            save("2-word-study.png")
+            QApplication.instance().exit(0)
+        except Exception:  # noqa: BLE001
+            fail()
+
+    QTimer.singleShot(3000, home)  # let the landing page settle first
+
+
 def main() -> None:
-    args = [a for a in sys.argv[1:] if a != "--smoke-test"]
-    smoke_test = len(args) != len(sys.argv) - 1
+    args = sys.argv[1:]
+    smoke_test = "--smoke-test" in args
+    screenshot_dir = None
+    if "--screenshots" in args:
+        i = args.index("--screenshots")
+        screenshot_dir = Path(args[i + 1])
+        del args[i : i + 2]
+    args = [a for a in args if a != "--smoke-test"]
     db_path = Path(args[0]) if args else _default_db_path()
 
     if not db_path.exists():
@@ -105,6 +159,9 @@ def main() -> None:
     window.show()
     if smoke_test:
         QTimer.singleShot(0, lambda: _smoke_test(window))
+    elif screenshot_dir is not None:
+        window.resize(1280, 800)
+        _screenshots(window, screenshot_dir)
     sys.exit(app.exec())
 
 
