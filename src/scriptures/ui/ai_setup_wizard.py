@@ -555,7 +555,7 @@ class _FinishPage(QWizardPage):
         )
         layout.addWidget(self._build_note)
         layout.addWidget(_label(
-            "You can change any of this later under AI Integration → AI Settings..., "
+            "You can change any of this later under Menu → AI Integration → AI Settings..., "
             f"or run this wizard again. Help: {guide_link_html()}", rich=True,
         ))
         layout.addStretch(1)

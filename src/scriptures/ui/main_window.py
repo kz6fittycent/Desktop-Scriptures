@@ -392,27 +392,25 @@ class MainWindow(QMainWindow):
         focus_search.triggered.connect(self._focus_search_bar)
         self.addAction(focus_search)
 
-        # Menu order left-to-right: Menu, View, Highlighter, ..., About, Help.
-        file_menu = self.menuBar().addMenu("&Menu")
+        # The menu bar holds a single drill-down "Menu"; every other menu
+        # (View, Highlighter, Sync, AI Integration, About...) is a submenu
+        # inside it, assembled in order at the end of this section - the
+        # bar itself had grown too busy with eight top-level entries. Each
+        # submenu is built standalone (QMenu(title, self)) first.
+        root_menu = self.menuBar().addMenu("&Menu")
 
         export_notes_action = QAction("Export Notes", self)
         export_notes_action.triggered.connect(lambda: export_notes(self.conn, self))
-        file_menu.addAction(export_notes_action)
-
-        file_menu.addSeparator()
 
         share_bom_action = QAction("Share the Book of Mormon", self)
         share_bom_action.triggered.connect(self._share_book_of_mormon)
-        file_menu.addAction(share_bom_action)
-
-        file_menu.addSeparator()
 
         # Which of tts.VOICES the reading view's Listen controls use -
         # see reading_view.py. Voices not actually installed (see
         # tts.is_voice_installed) still show up here so the menu doesn't
         # look different across builds - _on_listen_clicked is what
         # actually catches and reports a missing one.
-        voice_menu = file_menu.addMenu("Voice")
+        voice_menu = QMenu("&Voice", self)
         voice_group = QActionGroup(self)
         voice_group.setExclusive(True)
         for voice in tts.VOICES:
@@ -422,7 +420,7 @@ class MainWindow(QMainWindow):
             voice_group.addAction(action)
             voice_menu.addAction(action)
 
-        menu = self.menuBar().addMenu("&View")
+        menu = view_menu = QMenu("&View", self)
 
         theme_menu = menu.addMenu("App Theme")
         theme_group = QActionGroup(self)
@@ -532,11 +530,11 @@ class MainWindow(QMainWindow):
         self._family_history_action.triggered.connect(self._toggle_family_history_reminder)
         menu.addAction(self._family_history_action)
 
-        # Its own top-level menu, not a View submenu: it's a tool the user
-        # reaches for mid-read to quickly switch colors, not a one-time
-        # preference like the View menu's theme/font settings - burying it
-        # a level deep would cost an extra click every time.
-        highlight_menu = self.menuBar().addMenu("Hi&ghlighter")
+        # Its own submenu near the top of Menu, not inside View: it's a
+        # tool the user reaches for mid-read to quickly switch colors, not
+        # a one-time preference like View's theme/font settings. (Right-
+        # clicking selected text also offers the colors directly.)
+        highlight_menu = QMenu("Hi&ghlighter", self)
         highlight_group = QActionGroup(self)
         highlight_group.setExclusive(True)
 
@@ -567,6 +565,7 @@ class MainWindow(QMainWindow):
             row = _HighlightColorRow(label, theming.HIGHLIGHT_COLORS[color].background)
             row.clicked.connect(lambda c=color: self._set_highlight_mode(c))
             row.clicked.connect(highlight_menu.close)
+            row.clicked.connect(root_menu.close)  # close the whole drill-down
             row_action = QWidgetAction(self)
             row_action.setDefaultWidget(row)
             highlight_menu.addAction(row_action)
@@ -584,9 +583,9 @@ class MainWindow(QMainWindow):
 
         self._update_highlight_menu_labels()
 
-        # A plain top-level action, not addMenu() - there's only ever one
-        # thing to do here (open the Journal), so a dropdown with a
-        # single item would just be an extra click for nothing.
+        # A plain action, not a submenu - there's only ever one thing to
+        # do here (open the Journal), so a submenu with a single item
+        # would just be an extra click for nothing.
         journal_action = QAction("&Journal", self)
         # Not a direct connection to self._show_journal: QAction.triggered
         # emits a bool (its checked state), which would otherwise land in
@@ -594,9 +593,8 @@ class MainWindow(QMainWindow):
         # checked=False lambda guard used throughout this file wherever a
         # triggered signal connects to a slot that takes an argument.
         journal_action.triggered.connect(lambda checked=False: self._show_journal())
-        self.menuBar().addAction(journal_action)
 
-        sync_menu = self.menuBar().addMenu("Sy&nc")
+        sync_menu = QMenu("Sy&nc", self)
 
         # "Sync Options...", not "Choose Sync Folder...": what the user is
         # actually picking in the dialog this opens is a cloud syncing
@@ -651,7 +649,7 @@ class MainWindow(QMainWindow):
         # ai_client.py's module docstring for the full design. The
         # feature itself lives in the search bar (see search_view.py);
         # this menu only holds its configuration.
-        ai_menu = self.menuBar().addMenu("&AI Integration")
+        ai_menu = QMenu("&AI Integration", self)
 
         ai_wizard_action = QAction("AI Setup Wizard...", self)
         ai_wizard_action.triggered.connect(self._show_ai_setup_wizard)
@@ -679,7 +677,7 @@ class MainWindow(QMainWindow):
         # word-wrapped, width-capped QLabel instead - QMenu supports that
         # fine, unlike QMenuBar itself (see the comment below on the
         # corner-widget workaround for that).
-        about_menu = self.menuBar().addMenu("A&bout")
+        about_menu = QMenu("A&bout", self)
         about_menu.addAction(self._help_menu_label(f"<b>Version:</b> {__version__}"))
         about_menu.addAction(
             self._help_menu_label(
@@ -723,18 +721,36 @@ class MainWindow(QMainWindow):
         # Help: the wiki, which walks through every feature. (The AI Setup
         # Guide lives under AI Integration, beside the wizard; the wiki
         # dialog links the same page.)
-        help_menu = self.menuBar().addMenu("&Help")
-        wiki_action = QAction("Desktop Scriptures Help (Wiki)...", self)
+        wiki_action = QAction("&Help (Wiki)...", self)
         wiki_action.setShortcut(QKeySequence.StandardKey.HelpContents)
         wiki_action.triggered.connect(lambda: HelpDialog(self).exec())
-        help_menu.addAction(wiki_action)
+        # The shortcut has to live on the window too: an action only inside
+        # a closed submenu doesn't receive its key presses.
+        self.addAction(wiki_action)
+
+        # The drill-down, in order: everyday reading tools first, then
+        # settings, then housekeeping, then help.
+        root_menu.addAction(journal_action)
+        root_menu.addMenu(highlight_menu)
+        root_menu.addSeparator()
+        root_menu.addMenu(view_menu)
+        root_menu.addMenu(voice_menu)
+        root_menu.addSeparator()
+        root_menu.addMenu(sync_menu)
+        root_menu.addMenu(ai_menu)
+        root_menu.addSeparator()
+        root_menu.addAction(export_notes_action)
+        root_menu.addAction(share_bom_action)
+        root_menu.addSeparator()
+        root_menu.addAction(wiki_action)
+        root_menu.addMenu(about_menu)
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
         # QMenuBar's corner-widget slot is the mechanism that does work, so
         # both the "Resume Reading" button and the streak badge live there
         # together (only one widget per corner) in their own row, sitting
-        # right after Help since it's the last real menu.
+        # right after Menu since it's the only real one.
         # Stored on self, not a local - PySide/shiboken can garbage-collect
         # a widget (and cascade-delete its children) once its last Python
         # reference goes out of scope, even though Qt's C++ parent-child
@@ -1003,7 +1019,7 @@ class MainWindow(QMainWindow):
                 self,
                 "Sync",
                 f"The sync folder no longer exists:\n{folder}\n\n"
-                'Choose a new one under Sync → "Sync Options...".',
+                'Choose a new one under Menu → Sync → "Sync Options...".',
             )
             self._update_sync_status()
             return
@@ -1119,7 +1135,7 @@ class MainWindow(QMainWindow):
             "Which AI service to use, which models work well on which computers, and "
             "step-by-step setups for OpenAI, Ollama, and Ubuntu's inference snaps:<br><br>"
             f"{guide_link_html(ai_setup.AI_SETUP_GUIDE_URL)}<br><br>"
-            "Or let <b>AI Integration → AI Setup Wizard...</b> find what's already "
+            "Or let <b>Menu → AI Integration → AI Setup Wizard...</b> find what's already "
             "running on this computer and set it up for you."
         )
         box.exec()

@@ -214,7 +214,7 @@ class StudyIndexDialog(QDialog):
                     self,
                     "Study Index",
                     "The endpoint rejected the request as unauthorized. Check the API "
-                    "key under AI Integration → AI Settings.",
+                    "key under Menu → AI Integration → AI Settings.",
                 )
         else:
             self._status_label.setText("Stopped - everything so far is saved. Resume any time.")

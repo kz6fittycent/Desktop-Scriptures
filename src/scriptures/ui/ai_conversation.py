@@ -349,7 +349,7 @@ class AiConversationSection(QWidget):
                 "AI Search",
                 "The configured AI endpoint rejected the request for an "
                 "authentication reason - it likely requires an API key. "
-                "Add one under AI Integration → AI Settings..., or leave it "
+                "Add one under Menu → AI Integration → AI Settings..., or leave it "
                 "blank if you're using a local server that doesn't need "
                 "one.",
             )

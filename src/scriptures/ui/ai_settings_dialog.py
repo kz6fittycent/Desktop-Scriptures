@@ -118,7 +118,7 @@ class AiSettingsDialog(QDialog):
         heading.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(heading)
         heading_note = QLabel(
-            "Lets AI features find passages by meaning - see AI Integration → "
+            "Lets AI features find passages by meaning - see Menu → AI Integration → "
             "Build Study Index.... Needs an embeddings endpoint, which can differ "
             "from the chat one above."
         )
@@ -145,7 +145,7 @@ class AiSettingsDialog(QDialog):
             "e.g. text-embedding-3-small, or nomic-embed-text on Ollama"
         )
         self._embedding_model_edit.setToolTip(
-            "Used to build the study index (AI Integration → Build Study Index...). "
+            "Used to build the study index (Menu → AI Integration → Build Study Index...). "
             "Leave blank if your endpoint doesn't offer embeddings."
         )
         embeddings_form.addRow("Embedding model:", self._embedding_model_edit)

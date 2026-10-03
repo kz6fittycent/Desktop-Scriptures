@@ -92,7 +92,7 @@ the full card (see `src/scriptures/hebrew_calendar.py`).
 
 ## Help and About
 
-The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Help → Desktop Scriptures Help (Wiki)...** links to each page. **About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software, voices, and data the app includes), and credits.
+The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Menu → Help (Wiki)...** links to each page. **Menu → About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software, voices, and data the app includes), and credits.
 
 ## Screenshots
 
@@ -129,7 +129,7 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 ### v2.3 roadmap
 
-- [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
+- [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (Menu → AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
 - [ ] Apocrypha?
 - [ ] Menu bar consolidation - fold the top-level menus into submenus under "Menu"
 - [ ] Automatic security rebuilds - a scheduled check of the published snap (the Snap Store's own `snap-check-notices`), rebuilding from the last release tag when Ubuntu security fixes are available

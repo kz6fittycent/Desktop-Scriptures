@@ -966,7 +966,7 @@ class ReadingView(QWidget):
                 self,
                 "Listen",
                 "This voice isn't installed. Pick a different one under "
-                "View → Voice, or reinstall the app.",
+                "Menu → Voice, or reinstall the app.",
             )
             return
 
