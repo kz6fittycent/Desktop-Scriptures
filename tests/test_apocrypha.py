@@ -133,7 +133,7 @@ def test_ai_search_and_the_study_index() -> None:
 
 def test_other_ancient_texts() -> None:
     """1 Enoch and Jasher (scripts/import_other_texts.py): their own volume,
-    labeled not scripture, with the same reading and search features."""
+    labeled not part of the Standard Works, with the same reading and search features."""
     from scriptures import study_ask
     from scriptures.ask import parse_reference
     from scriptures.ui.main_window import MainWindow
@@ -154,10 +154,10 @@ def test_other_ancient_texts() -> None:
             "SELECT 1 FROM verses v JOIN chapters c ON c.id = v.chapter_id JOIN books b ON b.id = c.book_id "
             "WHERE b.volume_id = ? AND (v.text GLOB '*[〚⌜†{}|]*' OR v.text = '')", (volume.id,)
         ).fetchone()
-        # The volume page says they aren't scripture; Charles' headings show.
+        # The volume page says they aren't part of the Standard Works; Charles' headings show.
         window = MainWindow(conn)
         window._on_volume_clicked(volume.id)
-        assert "not scripture" in window._other_texts_banner().text()
+        assert "not considered part of the Standard Works" in window._other_texts_banner().text()
         chapter = da.get_chapter(conn, conn.execute(
             "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id WHERE b.name = '1 Enoch' "
             "AND c.chapter_number = 72").fetchone()[0])

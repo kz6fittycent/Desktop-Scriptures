@@ -6,7 +6,7 @@ A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
 Pearl of Great Price, Journal of Discourses, Lectures on Faith, the
 Joseph Smith Translation, and the Apocrypha of the King James Version -
 plus Other Ancient Texts (1 Enoch and the Book of Jasher), clearly
-labeled as not scripture. The core reading and study experience works
+labeled as not part of the Standard Works. The core reading and study experience works
 fully offline - personal notes, tags, verse highlighting, keyword
 search, a Topical Guide, General Conference and Ensign/Liahona citations,
 a Cross-references tab pointing out known parallel passages elsewhere in
@@ -149,7 +149,7 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 - [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (Menu → AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
 - [x] The Apocrypha - the KJV's 14 books as their own volume, with everything the Standard Works have: reading, notes, highlights, search, Listen, sync, the study index and AI search, Word Study (Greek first), and cross-references to the New Testament passages that echo it
-- [x] Other Ancient Texts - 1 Enoch (Charles, 1917) and the Book of Jasher (1840) as their own volume, labeled as not scripture, with the same reading, search, and AI features; Jude 1:14-15's quotation of 1 Enoch 1:9 as a cross-reference
+- [x] Other Ancient Texts - 1 Enoch (Charles, 1917) and the Book of Jasher (1840) as their own volume, labeled as not part of the Standard Works, with the same reading, search, and AI features; Jude 1:14-15's quotation of 1 Enoch 1:9 as a cross-reference
 - [x] Menu bar consolidation - every menu is now a submenu under "Menu"
 - [x] Listen voices as opt-in downloads, Listen controls off until switched on, and a first-run Welcome window
 - [x] Automatic security rebuilds - a daily check of the published snap with the Snap Store's own `snap-check-notices`. When Ubuntu security fixes are available, it rebuilds from the release commit, uploads to candidate, and opens a call-for-testing issue (`.github/workflows/security-rebuild.yml`)

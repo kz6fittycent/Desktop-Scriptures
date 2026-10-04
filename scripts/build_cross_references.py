@@ -5491,7 +5491,7 @@ ENTRIES = [
         "counsel to his son, \"Do that to no man which thou hatest\" - "
         "the same rule, which Jesus states in its positive form.",
     ),
-    # --- Other Ancient Texts (not scripture - scripts/import_other_texts.py).
+    # --- Other Ancient Texts (not part of the Standard Works - scripts/import_other_texts.py).
     (
         "Jude", "Holy Bible", 1, 14, 15,
         "1 Enoch", "Other Ancient Texts", 1, 9, 9,

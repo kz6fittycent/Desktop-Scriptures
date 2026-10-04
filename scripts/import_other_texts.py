@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import "Other Ancient Texts" - writings that are NOT scripture, but that
+"""Import "Other Ancient Texts" - writings that are NOT part of the Standard Works, but that
 Bible readers (early Latter-day Saints among them) have long found
 interesting - as their own volume, after the Apocrypha.
 

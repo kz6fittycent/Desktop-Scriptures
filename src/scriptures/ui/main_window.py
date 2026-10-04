@@ -1797,8 +1797,9 @@ class MainWindow(QMainWindow):
         """Says plainly what these books are, and aren't - see
         scripts/import_other_texts.py."""
         label = QLabel(
-            "<b>These writings are not scripture.</b> They are ancient and traditional texts that "
-            "Bible readers - early Latter-day Saints among them - have long found worth reading:"
+            "<b>These writings are not considered part of the Standard Works:</b> they are ancient "
+            "and traditional texts that Bible readers - early Latter-day Saints among them - have "
+            "long found worth reading."
             "<br><b>1 Enoch</b>, R. H. Charles' 1917 translation from the Ethiopic, which Jude "
             "1:14-15 quotes. The Lord's own account of Enoch is in Moses 6-7."
             "<br><b>Jasher</b>, the 1840 English translation of a Hebrew retelling of Genesis "

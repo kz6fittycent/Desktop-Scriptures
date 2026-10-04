@@ -230,7 +230,7 @@ _BOOK_ALIASES: dict[str, str] = {
     "pr man": "Prayer of Manasses", "prayer of manasseh": "Prayer of Manasses",
     "1 macc": "1 Maccabees", "2 macc": "2 Maccabees", "1 mac": "1 Maccabees",
     "2 mac": "2 Maccabees", "1 ma": "1 Maccabees", "2 ma": "2 Maccabees",
-    # Other Ancient Texts (not scripture - see scripts/import_other_texts.py).
+    # Other Ancient Texts (not part of the Standard Works - see scripts/import_other_texts.py).
     "1 en": "1 Enoch", "1 enoch": "1 Enoch", "book of enoch": "1 Enoch",
     "jash": "Jasher", "book of jasher": "Jasher",
 }

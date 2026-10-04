@@ -76,7 +76,7 @@ CANDIDATE_GROUPS = (
     # The Apocrypha (KJV) - its own small share, so a question it speaks to
     # can find it without crowding out the Standard Works.
     ("apocrypha", {"scripture"}, {"apocrypha"}, 2),
-    # 1 Enoch and Jasher - not scripture; one slot, in the last tier.
+    # 1 Enoch and Jasher - not part of the Standard Works; one slot, in the last tier.
     ("other_ancient_texts", {"scripture"}, {"other-ancient-texts"}, 1),
     ("other", {"discourse", "topic", "note"}, None, 3),
     # A question about what a word means ("What does Christ mean?") is
@@ -235,7 +235,7 @@ def tier(hit: study_index.SearchHit) -> int:
     Works, then General Conference talks, then Ensign/Liahona articles,
     then everything else - Journal of Discourses, Lectures on Faith, the
     Apocrypha (D&C 91: "many things contained therein that are true"),
-    Other Ancient Texts (1 Enoch, Jasher - not scripture),
+    Other Ancient Texts (1 Enoch, Jasher - not part of the Standard Works),
     Topical Guide, cross-references, notes. Within a tier, the chat
     model's (or the index's) order is kept."""
     if hit.kind == "scripture" and hit.volume_slug in STANDARD_WORKS:
