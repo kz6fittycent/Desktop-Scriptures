@@ -41,6 +41,8 @@ voice was trained on a dataset with its own terms:
 | Scripture text | Courtesy of the lds-scriptures project | https://github.com/beandog/lds-scriptures |
 | Journal of Discourses and the Inspired Version (JST) | Public domain scans | https://archive.org |
 | The Apocrypha (King James Version, 1769 text) | Public domain, courtesy of the CrossWire Bible Society and eBible.org | https://ebible.org/find/details.php?id=eng-kjv |
+| 1 Enoch (R. H. Charles' translation, 1917) | Public domain, courtesy of Project Gutenberg and Distributed Proofreaders | https://www.gutenberg.org/ebooks/77935 |
+| The Book of Jasher (New York: Noah and Gould, 1840) | Public domain, courtesy of Wikisource | https://en.wikisource.org/wiki/Sefer_Ha-yashar,_or,_the_Book_of_Jasher_(1840) |
 | General Conference citation data | Courtesy of BYU's Scripture Citation Index | https://scriptures.byu.edu |
 | Book of Mormon name meanings | This project's own summaries, each linked to BYU's Book of Mormon Onomasticon | https://onoma.lib.byu.edu |
 

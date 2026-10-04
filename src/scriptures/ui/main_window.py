@@ -1327,7 +1327,7 @@ class MainWindow(QMainWindow):
         Discourses chapter's title, speaker and date, or an Apocrypha
         chapter's heading ("The Epistle of Jeremy", "Placed in the Greek
         after chap. 3.13 of the Hebrew")."""
-        if volume is not None and volume.slug == "apocrypha":
+        if volume is not None and volume.slug in ("apocrypha", "other-ancient-texts"):
             return chapter.title or None
         if not chapter.speaker:
             return None
@@ -1765,7 +1765,10 @@ class MainWindow(QMainWindow):
             grid.card_clicked.connect(lambda tid: self._on_testament_clicked(volume, tid))
         else:
             books = get_books(self.conn, volume_id)
-            banner = self._apocrypha_banner() if volume.slug == "apocrypha" else None
+            banner = {
+                "apocrypha": self._apocrypha_banner,
+                "other-ancient-texts": self._other_texts_banner,
+            }.get(volume.slug, lambda: None)()
             grid = CardGridWidget(volume.name, [(b.id, b.name) for b in books], banner=banner)
             grid.card_clicked.connect(lambda bid: self._on_book_clicked(volume, None, bid))
         self._set_content(grid)
@@ -1783,6 +1786,26 @@ class MainWindow(QMainWindow):
         label = QLabel(
             f"<i>“{escape(' '.join(verses))}”</i><br><b>Doctrine and Covenants 91:1-2, 4-5</b>"
             "<br><span style='font-size: small'>The Apocrypha of the King James Version (1769 text).</span>"
+        )
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setObjectName("sotdBanner")
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        return label
+
+    def _other_texts_banner(self) -> QLabel:
+        """Says plainly what these books are, and aren't - see
+        scripts/import_other_texts.py."""
+        label = QLabel(
+            "<b>These writings are not scripture.</b> They are ancient and traditional texts that "
+            "Bible readers - early Latter-day Saints among them - have long found worth reading:"
+            "<br><b>1 Enoch</b>, R. H. Charles' 1917 translation from the Ethiopic, which Jude "
+            "1:14-15 quotes. The Lord's own account of Enoch is in Moses 6-7."
+            "<br><b>Jasher</b>, the 1840 English translation of a Hebrew retelling of Genesis "
+            "through Judges, printed in 1625 - not the lost \"book of Jasher\" named in Joshua "
+            "10:13 and 2 Samuel 1:18."
+            "<br><i>\"Whoso is enlightened by the Spirit shall obtain benefit therefrom\"</i> "
+            "(D&amp;C 91:5, of the Apocrypha)."
         )
         label.setTextFormat(Qt.TextFormat.RichText)
         label.setObjectName("sotdBanner")

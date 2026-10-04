@@ -4,7 +4,8 @@ summary: Offline LDS scripture reader with notes, tags, search, sync, and opt-in
 description: |
   A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
   Pearl of Great Price, Journal of Discourses, Lectures on Faith, the
-  Joseph Smith Translation, and the KJV Apocrypha. The core reading and study experience works
+  Joseph Smith Translation, and the KJV Apocrypha, plus 1 Enoch and the
+  Book of Jasher (labeled not scripture). The core reading and study experience works
   fully offline - personal notes, tags, verse highlighting, keyword
   search, a Topical Guide, General Conference and Ensign/Liahona citations,
   a Cross-references tab pointing out known parallel passages elsewhere in
@@ -43,18 +44,16 @@ description: |
   This is an unofficial application, not produced by or affiliated with
   The Church of Jesus Christ of Latter-day Saints, or with Community of
   Christ. Scripture text courtesy of the beandog/lds-scriptures project;
-  Journal of Discourses and Joseph Smith Translation (published as the
-  "Inspired Version") text courtesy of their public-domain scans on
-  archive.org; the KJV Apocrypha courtesy of CrossWire and eBible.org;
-  General Conference citation data courtesy of BYU's
-  Scripture Citation Index; Ensign/Liahona citation data (English issues,
-  1971-present) detected directly from each article's own scripture
-  hyperlinks on churchofjesuschrist.org, since no outside citation index
-  for it exists. The Topical Guide is Desktop Scriptures' own
+  Journal of Discourses and JST text from public-domain scans on
+  archive.org; the KJV Apocrypha from CrossWire and eBible.org; 1 Enoch
+  and Jasher from Project Gutenberg and Wikisource; General Conference
+  citation data from BYU's Scripture Citation Index; Ensign/Liahona
+  citations detected from each article's own scripture links on
+  churchofjesuschrist.org. The Topical Guide is Desktop Scriptures' own
   correlation of its local scripture text and that same citation index -
   not a copy of the Church's own, separately-copyrighted Topical Guide.
   Cross-references are hand-curated the same way: an accuracy-first list
-  of 608 well-documented parallel passages - quotations, paraphrases,
+  of 610 well-documented parallel passages - quotations, paraphrases,
   JST/Moses-style revisions, and typology scripture itself explicitly
   states, plus a smaller, distinctly-labeled "traditionally linked to"
   tier for associations scripture doesn't explicitly state - each

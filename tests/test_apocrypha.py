@@ -131,9 +131,54 @@ def test_ai_search_and_the_study_index() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_other_ancient_texts() -> None:
+    """1 Enoch and Jasher (scripts/import_other_texts.py): their own volume,
+    labeled not scripture, with the same reading and search features."""
+    from scriptures import study_ask
+    from scriptures.ask import parse_reference
+    from scriptures.ui.main_window import MainWindow
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-other-texts-"))
+    try:
+        conn = _conn(tmp)
+        volume = next(v for v in da.get_volumes(conn) if v.slug == "other-ancient-texts")
+        assert [b.name for b in da.get_books(conn, volume.id)] == ["1 Enoch", "Jasher"]
+        counts = dict(conn.execute(
+            "SELECT b.name, count(*) FROM verses v JOIN chapters c ON c.id = v.chapter_id "
+            "JOIN books b ON b.id = c.book_id WHERE b.volume_id = ? GROUP BY b.name", (volume.id,)
+        ).fetchall())
+        assert counts == {"1 Enoch": 1062, "Jasher": 3910}, counts
+        enoch_1_9 = conn.execute("SELECT text FROM verses WHERE reference = '1 Enoch 1:9'").fetchone()[0]
+        assert enoch_1_9.startswith("And behold! He cometh with ten thousands of His holy ones")
+        assert not conn.execute(
+            "SELECT 1 FROM verses v JOIN chapters c ON c.id = v.chapter_id JOIN books b ON b.id = c.book_id "
+            "WHERE b.volume_id = ? AND (v.text GLOB '*[〚⌜†{}|]*' OR v.text = '')", (volume.id,)
+        ).fetchone()
+        # The volume page says they aren't scripture; Charles' headings show.
+        window = MainWindow(conn)
+        window._on_volume_clicked(volume.id)
+        assert "not scripture" in window._other_texts_banner().text()
+        chapter = da.get_chapter(conn, conn.execute(
+            "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id WHERE b.name = '1 Enoch' "
+            "AND c.chapter_number = 72").fetchone()[0])
+        assert MainWindow._chapter_subtitle(chapter, volume) == "The Sun"
+        # Search, AI search, and the Jude quotation.
+        assert conn.execute("SELECT count(*) FROM verses_fts WHERE verses_fts MATCH 'Methuselah'").fetchone()[0] > 0
+        assert any(group[2] == {"other-ancient-texts"} for group in study_ask.CANDIDATE_GROUPS)
+        assert study_ask.detect_filters(["the flood", "just the Book of Enoch"])[1] == {"other-ancient-texts"}
+        assert parse_reference("Book of Jasher 88:64")[0] == "Jasher"
+        assert conn.execute(
+            "SELECT relationship FROM cross_references WHERE book_name = 'Jude' AND related_book_name = '1 Enoch'"
+        ).fetchone()[0] == "quotation"
+        print("test_other_ancient_texts: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_the_volume_and_its_text()
     test_reading_view_headings_prologue_and_cross_references()
     test_ai_search_and_the_study_index()
+    test_other_ancient_texts()
     print("All Apocrypha tests passed.")

@@ -4,8 +4,9 @@
 
 A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
 Pearl of Great Price, Journal of Discourses, Lectures on Faith, the
-Joseph Smith Translation, and the Apocrypha of the King James Version.
-The core reading and study experience works
+Joseph Smith Translation, and the Apocrypha of the King James Version -
+plus Other Ancient Texts (1 Enoch and the Book of Jasher), clearly
+labeled as not scripture. The core reading and study experience works
 fully offline - personal notes, tags, verse highlighting, keyword
 search, a Topical Guide, General Conference and Ensign/Liahona citations,
 a Cross-references tab pointing out known parallel passages elsewhere in
@@ -59,7 +60,11 @@ as the "Inspired Version") text courtesy of their public-domain scans on
 [archive.org](https://archive.org) (Journal of Discourses discourse
 metadata cross-referenced from FAIR's index); the Apocrypha (the KJV's
 1769 text, public domain) courtesy of the CrossWire Bible Society and
-[eBible.org](https://ebible.org/find/details.php?id=eng-kjv); General Conference
+[eBible.org](https://ebible.org/find/details.php?id=eng-kjv); 1 Enoch (R. H. Charles,
+1917) courtesy of [Project Gutenberg](https://www.gutenberg.org/ebooks/77935) and
+Distributed Proofreaders, and the Book of Jasher (1840) courtesy of
+[Wikisource](https://en.wikisource.org/wiki/Sefer_Ha-yashar,_or,_the_Book_of_Jasher_(1840)),
+both public domain; General Conference
 citation data courtesy of [BYU's Scripture Citation Index](https://scriptures.byu.edu);
 Ensign/Liahona citation data (English issues, 1971-present) detected directly
 from each article's own scripture hyperlinks on
@@ -73,7 +78,7 @@ scripture text and that same citation index (see
 `scripts/build_topical_guide.py`) - not a copy of the Church's own,
 separately-copyrighted Topical Guide. Cross-references are hand-curated
 the same way (see `scripts/build_cross_references.py`) - an
-accuracy-first list of 608 well-documented parallel passages (direct
+accuracy-first list of 610 well-documented parallel passages (direct
 quotations, paraphrases, Joseph Smith Translation/Moses-style revisions,
 and typology scripture itself explicitly states, plus a smaller,
 clearly-labeled "traditionally linked to" tier for widely-recognized
@@ -144,6 +149,7 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 - [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (Menu → AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
 - [x] The Apocrypha - the KJV's 14 books as their own volume, with everything the Standard Works have: reading, notes, highlights, search, Listen, sync, the study index and AI search, Word Study (Greek first), and cross-references to the New Testament passages that echo it
+- [x] Other Ancient Texts - 1 Enoch (Charles, 1917) and the Book of Jasher (1840) as their own volume, labeled as not scripture, with the same reading, search, and AI features; Jude 1:14-15's quotation of 1 Enoch 1:9 as a cross-reference
 - [x] Menu bar consolidation - every menu is now a submenu under "Menu"
 - [x] Listen voices as opt-in downloads, Listen controls off until switched on, and a first-run Welcome window
 - [x] Automatic security rebuilds - a daily check of the published snap with the Snap Store's own `snap-check-notices`. When Ubuntu security fixes are available, it rebuilds from the release commit, uploads to candidate, and opens a call-for-testing issue (`.github/workflows/security-rebuild.yml`)

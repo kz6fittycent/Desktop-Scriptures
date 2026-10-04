@@ -5491,6 +5491,27 @@ ENTRIES = [
         "counsel to his son, \"Do that to no man which thou hatest\" - "
         "the same rule, which Jesus states in its positive form.",
     ),
+    # --- Other Ancient Texts (not scripture - scripts/import_other_texts.py).
+    (
+        "Jude", "Holy Bible", 1, 14, 15,
+        "1 Enoch", "Other Ancient Texts", 1, 9, 9,
+        "quotation", "second-coming,judgment",
+        "The Lord coming with His holy ones to judge the ungodly: Jude "
+        "names \"Enoch also, the seventh from Adam\" and quotes him - \"the "
+        "Lord cometh with ten thousands of his saints, to execute judgment "
+        "upon all\" - in words that follow 1 Enoch 1:9 closely. 1 Enoch "
+        "isn't scripture; Jude's quotation of this verse is.",
+    ),
+    (
+        "Joshua", "Holy Bible", 10, 12, 13,
+        "Jasher", "Other Ancient Texts", 88, 63, 64,
+        "tradition", "faith,prayer",
+        "The Lord hearkening to Joshua and staying the sun: Joshua 10:13 "
+        "asks \"Is not this written in the book of Jasher?\" That book is "
+        "lost. This later Hebrew retelling, published in English in 1840 "
+        "as the Book of Jasher, tells the same event in the same words, "
+        "adding that the sun stood still \"six and thirty moments.\"",
+    ),
 ]
 
 
