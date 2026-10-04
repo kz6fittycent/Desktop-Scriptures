@@ -9,8 +9,8 @@ name: 📖 Refresh GC Citations
 # Weekly, so a Conference's talks reach the app within days of
 # scriptures.byu.edu's index catching up. Each run publishes the result to
 # the "citations-data" release, which the app downloads (content_updates.py)
-# - no app update needed - and opens a pull request so the next release
-# bundles it too.
+# - no app update needed - and opens and merges a pull request so the next
+# release bundles it too - unattended.
 on:
   schedule:
     - cron: "0 6 * * 1"  # weekly, Mondays
@@ -66,11 +66,14 @@ jobs:
           gh release upload citations-data dist/verse_citations.json.gz dist/verse_citations.json.gz.sha256 --clobber
 
       # Opens a PR only if the harvest actually produced a different
-      # data/verse_citations.json (create-pull-request no-ops otherwise)
-      # - a human still reviews and merges it, same as any other change;
-      # this just removes the need to remember to run the harvester by
-      # hand.
+      # data/verse_citations.json (create-pull-request no-ops otherwise),
+      # then merges it straight away - no one has to be around to do it.
+      # The data has already passed publish_citations.py's checks above (a
+      # harvest that lost entries fails the run before this). A merge made
+      # with GITHUB_TOKEN doesn't start other workflows, so it doesn't
+      # publish a snap candidate; the data ships with the next real release.
       - name: Open a PR if the citation data changed
+        id: pr
         uses: peter-evans/create-pull-request@v8
         with:
           # Only the citation file: the harvest doesn't touch anything
@@ -84,6 +87,13 @@ jobs:
             `scripts/harvest_citations.py`) - metadata only (talk title,
             speaker, date, churchofjesuschrist.org URL), never talk text.
 
-            Review the diff, then merge to bundle it in the next release. The app already has it: this run published it to the `citations-data` release, which the app checks daily.
+            Merged automatically by this workflow, so the next release bundles it. The app already has it: this run published it to the `citations-data` release, which the app checks daily.
           branch: automated/refresh-gc-citations
           delete-branch: true
+
+      - name: Merge the PR
+        if: steps.pr.outputs.pull-request-number && steps.pr.outputs.pull-request-operation != 'closed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh pr merge "${{ steps.pr.outputs.pull-request-number }}" --squash --delete-branch
