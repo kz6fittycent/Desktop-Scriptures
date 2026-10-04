@@ -1,6 +1,6 @@
 {
   "_source": "scriptures.byu.edu Citation Index (General Conference talks)",
-  "_harvested": "2026-09-24",
+  "_harvested": "2026-10-04",
   "_note": "Metadata only (talk title, speaker, date, churchofjesuschrist.org URL) - never talk text, per copyright. See scripts/harvest_citations.py. Keyed by the exact verse reference string used in the imported database (e.g. 'Genesis 1:1').",
   "citations": {
     "Moses 1:39": [
