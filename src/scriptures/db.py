@@ -310,8 +310,8 @@ def _ensure_device_id(conn: sqlite3.Connection) -> None:
 def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> None:
     """Copy any volumes/testaments/books/chapters/verses that exist in the
     bundled (packaged) database but not yet in `conn`, and take the bundled
-    text of any verse whose text was corrected upstream (its highlights
-    move with it - see _update_verse_text), leaving all other user data
+    text of any verse or chapter title corrected upstream (a verse's
+    highlights move with it - see _update_verse_text), leaving all other user data
     (notes/tags/reading streak/settings) untouched.
 
     Without this, a snap refresh only replaces the read-only bundled copy
@@ -390,9 +390,12 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                     (b_book["id"],),
                 ):
                     crow = conn.execute(
-                        "SELECT id FROM chapters WHERE book_id = ? AND chapter_number = ?",
+                        "SELECT id, title FROM chapters WHERE book_id = ? AND chapter_number = ?",
                         (book_id, b_chap["chapter_number"]),
                     ).fetchone()
+                    if crow is not None and crow["title"] != b_chap["title"]:
+                        # A corrected summary/heading (e.g. the JST's).
+                        conn.execute("UPDATE chapters SET title = ? WHERE id = ?", (b_chap["title"], crow["id"]))
                     if crow is None:
                         cur = conn.execute(
                             "INSERT INTO chapters "

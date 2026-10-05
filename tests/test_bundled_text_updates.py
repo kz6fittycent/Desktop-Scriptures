@@ -49,6 +49,10 @@ def test_corrected_text_reaches_an_existing_install() -> None:
         # on "Israel" and one on "Aaron".
         damaged = corrected.replace("children", "chil dren").replace("Lord;", "Lord ;")
         conn.execute("UPDATE verses SET text = ? WHERE id = ?", (damaged, verse_id))
+        chapter_id, title = conn.execute(
+            "SELECT c.id, c.title FROM chapters c JOIN verses v ON v.chapter_id = c.id WHERE v.id = ?", (verse_id,)
+        ).fetchone()
+        conn.execute("UPDATE chapters SET title = ? WHERE id = ?", ("T/ie " + (title or ""), chapter_id))
         for word in ("Israel", "Aaron"):
             start = damaged.index(word)
             conn.execute(
@@ -60,6 +64,7 @@ def test_corrected_text_reaches_an_existing_install() -> None:
         sync_bundled_content(conn, tmp / "bundled.db")
 
         assert conn.execute("SELECT text FROM verses WHERE id = ?", (verse_id,)).fetchone()[0] == corrected
+        assert conn.execute("SELECT title FROM chapters WHERE id = ?", (chapter_id,)).fetchone()[0] == title
         covered = [
             corrected[s:e] for s, e in conn.execute(
                 "SELECT start_offset, end_offset FROM highlights WHERE verse_id = ? AND deleted_at IS NULL "
