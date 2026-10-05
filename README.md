@@ -2,112 +2,40 @@
 
 [![desktop-scriptures](https://snapcraft.io/desktop-scriptures/badge.svg)](https://snapcraft.io/desktop-scriptures)
 
-A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
-Pearl of Great Price, Journal of Discourses, Lectures on Faith,
-and the Joseph Smith Translation - plus, once you switch them on under
-Menu → Additional Books, the Apocrypha of the King James Version and Other
-Ancient Texts (1 Enoch and the Book of Jasher), clearly labeled as not
-part of the Standard Works. The core reading and study experience works
-fully offline - personal notes, tags, verse highlighting, keyword
-search, a Topical Guide, General Conference and Ensign/Liahona citations,
-a Cross-references tab pointing out known parallel passages elsewhere in
-the corpus (an Isaiah chapter also quoted in the Book of Mormon, say)
-alongside any you add yourself, a Scripture of the Day banner, a reading streak, a Resume Reading history of your last
-5 chapters, a searchable Journal with one entry per day (optionally
-linked to a verse or chapter you're reflecting on), a choice of accent
-colors, cloud-folder sync across your own devices (via whatever cloud
-client - Nextcloud, OneDrive, Google Drive, or similar - already keeps
-a folder synced on your machine, so the app itself never talks to the
-network for this), and Listen controls to have any chapter read aloud -
-verse by verse, with the current verse highlighted as it goes - in a
-choice of four voices (American or British English, male or female) -
-switched on in Menu → Voice → Show Listen Controls, with each voice an
-opt-in download of about 63 MB (Menu → Voice → Download or Remove Voices...),
-offline from then on. A Welcome window on first launch offers to set up
-Listen and AI-assisted search, and can be told not to show again.
+An offline desktop reader for the Bible, Book of Mormon, Doctrine and
+Covenants, Pearl of Great Price, Journal of Discourses, Lectures on Faith,
+and the Joseph Smith Translation. The Apocrypha (KJV) and Other Ancient
+Texts (1 Enoch and the Book of Jasher), which aren't part of the Standard
+Works, can be switched on under **Menu → Additional Books**.
 
-General Conference and Liahona citations keep themselves current: about
-once a day the app checks this project's GitHub for the weekly refresh of
-those citation lists and downloads any new ones - only GitHub is
-contacted, never the Church's or BYU's sites. Switch it off under Menu →
-View → Download New Talks and Articles.
+## Features
 
-Everything else that uses the network is opt-in and off by default - a
-handful of landing-page extras that only reach the network once you turn
-them on: AI-assisted search (ask a
-question in your own words - and refine it conversationally with
-follow-ups - to get pointed at real, matching scripture, using your own
-AI endpoint, plus an optional study index built through that same endpoint
-so AI features can find passages by meaning), a Church News headline, a Come Follow Me helper showing
-this week's lesson, and an Inspirational Message featuring whatever's
-currently on churchofjesuschrist.org's own homepage. A General
-Conference reminder (also opt-in, also off by default) shows once a day
-in the roughly two weeks before Conference starts, using the real
-announced dates - dismissible for that Conference specifically, so it
-comes back fresh for the next one. A Temple Recommend renewal reminder
-works the same way, but entirely offline: enter your recommend's
-expiration date once, and it shows once a day starting about four weeks
-out (and every day past it, if it lapses) until you renew and update the
-date. A Family History reminder is opt-in too, but not on any fixed
-schedule at all - once turned on, it nudges you at random intervals (at
-least 4 days apart) so it stays noticeable instead of becoming background
-noise, with a link straight to FamilySearch.
+- **Study:** notes, tags, verse highlighting, keyword search, a Topical Guide, and a searchable Journal with one entry per day.
+- **Cross-references:** 610 hand-checked parallel passages, each tagged with the doctrine it teaches, plus any you add yourself.
+- **Word Study:** the Hebrew, Aramaic, and Greek words behind the English, and what Book of Mormon names may mean, each labeled by how sure that meaning is. In Book of Mormon chapters, names and dates are links; dates open a card placing them in Israel's calendar.
+- **Citations:** the General Conference talks and Liahona articles that cite each verse, kept current by a weekly update.
+- **Listen:** any chapter read aloud, verse by verse, in a choice of four voices you download once.
+- **Sync:** your study across your own devices, through a folder your cloud client already syncs.
+- **Opt-in extras:** AI-assisted search using an AI service you choose, Church News, Come Follow Me, an Inspirational Message, and reminders for General Conference, temple recommend renewal, and family history.
 
-This is an **unofficial** application, not produced by or affiliated
-with The Church of Jesus Christ of Latter-day Saints, or with Community
-of Christ. Scripture text courtesy of the [beandog/lds-scriptures](https://github.com/beandog/lds-scriptures)
-project; Journal of Discourses and Joseph Smith Translation (published
-as the "Inspired Version") text courtesy of their public-domain scans on
-[archive.org](https://archive.org) (Journal of Discourses discourse
-metadata cross-referenced from FAIR's index); the Apocrypha (the KJV's
-1769 text, public domain) courtesy of the CrossWire Bible Society and
-[eBible.org](https://ebible.org/find/details.php?id=eng-kjv); 1 Enoch (R. H. Charles,
-1917) courtesy of [Project Gutenberg](https://www.gutenberg.org/ebooks/77935) and
-Distributed Proofreaders, and the Book of Jasher (1840) courtesy of
-[Wikisource](https://en.wikisource.org/wiki/Sefer_Ha-yashar,_or,_the_Book_of_Jasher_(1840)),
-both public domain; General Conference
-citation data courtesy of [BYU's Scripture Citation Index](https://scriptures.byu.edu);
-Ensign/Liahona citation data (English issues, 1971-present) detected directly
-from each article's own scripture hyperlinks on
-[churchofjesuschrist.org](https://www.churchofjesuschrist.org), since no
-outside citation index for it exists. Both are metadata only - talk/
-article title, speaker/author, date, and URL - never the underlying
-talk or article text, which this app never stores or displays; it links
-out to the original source instead.
-The Topical Guide is Desktop Scriptures' own correlation of its local
-scripture text and that same citation index (see
-`scripts/build_topical_guide.py`) - not a copy of the Church's own,
-separately-copyrighted Topical Guide. Cross-references are hand-curated
-the same way (see `scripts/build_cross_references.py`) - an
-accuracy-first list of 610 well-documented parallel passages (direct
-quotations, paraphrases, Joseph Smith Translation/Moses-style revisions,
-and typology scripture itself explicitly states, plus a smaller,
-clearly-labeled "traditionally linked to" tier for widely-recognized
-associations scripture doesn't explicitly state), each verified directly
-against this app's own imported text rather than copied from any outside
-source, and each tagged with the Topical Guide topic it's actually
-teaching so it's clear what doctrine is at stake, not just which words
-changed.
-The Hebrew and Greek lexicons - what a Hebrew, Aramaic, or Greek word
-means, searchable by its English meaning ("Messiah" finds *mashiach*,
-"anointed"; "love" finds *agape*) and shown in the reading view's Word
-Study tab - combine Strong's Hebrew and Greek dictionaries (public
-domain) in [Open Scriptures](https://github.com/openscriptures/strongs)'
-corrected editions, licensed CC BY-SA (that license applies to the
-lexicon data, not to this app's GPL-licensed code), with short word
-meanings from [STEP Bible](https://www.STEPBible.org) (Tyndale House,
-Cambridge), licensed CC BY 4.0; see `scripts/import_lexicon.py`.
-Book of Mormon names in the Word Study tab ("Shazer", "Zarahemla") are
-labeled by how sure their meaning is - defined in the text itself, a
-biblical name, a Hebrew root, a proposed meaning, or unknown - with each
-scholarly proposal summarized in this project's own words and its
-source, chiefly BYU's [Book of Mormon
-Onomasticon](https://onoma.lib.byu.edu), linked rather than copied; see
-`scripts/build_bom_names.py`. In Book of Mormon chapters, names and dates
-are links: hover a name for its meaning, or a date ("the fourth day of the
-first month") for where it falls in Israel's calendar - its month's names
-and the holy days of the law of Moses, which the Nephites kept; click for
-the full card (see `src/scriptures/hebrew_calendar.py`).
+A Welcome window on first launch walks through the optional parts.
+
+## Privacy
+
+The app reads and studies fully offline. It contacts nothing until you switch a feature on, with one exception: about once a day it checks this project's GitHub for new talk and article citations (switch it off under **Menu → View → Download New Talks and Articles**).
+
+## Sources and credits
+
+This is an **unofficial** application, not produced by or affiliated with The Church of Jesus Christ of Latter-day Saints, or with Community of Christ.
+
+- Scripture text: [beandog/lds-scriptures](https://github.com/beandog/lds-scriptures).
+- Journal of Discourses and Joseph Smith Translation ("Inspired Version"): public-domain scans on [archive.org](https://archive.org); discourse details cross-checked with FAIR's index.
+- Apocrypha (KJV 1769 text, public domain): the CrossWire Bible Society and [eBible.org](https://ebible.org/find/details.php?id=eng-kjv).
+- 1 Enoch (R. H. Charles, 1917): [Project Gutenberg](https://www.gutenberg.org/ebooks/77935) and Distributed Proofreaders. Book of Jasher (1840): [Wikisource](https://en.wikisource.org/wiki/Sefer_Ha-yashar,_or,_the_Book_of_Jasher_(1840)). Both public domain.
+- General Conference citations: [BYU's Scripture Citation Index](https://scriptures.byu.edu). Liahona citations: each article's own scripture links on [churchofjesuschrist.org](https://www.churchofjesuschrist.org). Both are metadata only (title, speaker, date, link); the app links to talks and articles, never copies them.
+- The Topical Guide (`scripts/build_topical_guide.py`) and cross-references (`scripts/build_cross_references.py`) are this project's own work, checked against the app's text. The Topical Guide is not the Church's copyrighted one.
+- Lexicons: Strong's dictionaries in [Open Scriptures](https://github.com/openscriptures/strongs)' corrected editions (CC BY-SA, for the lexicon data only) and word meanings from [STEP Bible](https://www.STEPBible.org) (Tyndale House, Cambridge; CC BY 4.0).
+- Book of Mormon name meanings: this project's own summaries of the proposals in BYU's [Book of Mormon Onomasticon](https://onoma.lib.byu.edu), linked rather than copied.
 
 ## Help and About
 
@@ -144,34 +72,24 @@ tag) go on the [Releases page](https://github.com/kz6fittycent/Desktop-Scripture
 Packagers are welcome: Homebrew, Winget, and Chocolatey packages would be
 maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
-## TODO
+## Roadmap
 
-### v2.3 roadmap
+### Next
 
-- [ ] Talk prep helper - an AI-assisted chat for preparing a talk or lesson: suggests supporting scriptures, General Conference talks, and Ensign/Liahona articles for your subject, and helps narrow them down conversationally. Builds on the opt-in study index (Menu → AI Integration → Build Study Index...) and the source-ordered AI search results it already powers
-- [x] The Apocrypha - the KJV's 14 books as their own volume, with everything the Standard Works have: reading, notes, highlights, search, Listen, sync, the study index and AI search, Word Study (Greek first), and cross-references to the New Testament passages that echo it
-- [x] Other Ancient Texts - 1 Enoch (Charles, 1917) and the Book of Jasher (1840) as their own volume, labeled as not part of the Standard Works, with the same reading, search, and AI features; Jude 1:14-15's quotation of 1 Enoch 1:9 as a cross-reference
-- [x] Both are opt-in (2.3.1): hidden from the library, search, AI search, cross-references, and the study index until switched on under Menu → Additional Books or in the Welcome window - already in the database, so switching on is instant and needs no download
-- [x] Menu bar consolidation - every menu is now a submenu under "Menu"
-- [x] Listen voices as opt-in downloads, Listen controls off until switched on, and a first-run Welcome window
-- [x] Automatic security rebuilds - a daily check of the published snap with the Snap Store's own `snap-check-notices`. When Ubuntu security fixes are available, it rebuilds from the release commit, uploads to candidate, and opens a call-for-testing issue (`.github/workflows/security-rebuild.yml`)
-- [ ] Windows and macOS - out of testing into regular releases; code signing if there's demand
+- [ ] Talk prep helper: an AI-assisted chat that suggests scriptures, talks, and articles for a talk or lesson, built on the study index
+- [ ] Windows and macOS out of testing into regular releases, with code signing if there's demand
 
-### v3.0 roadmap
+### v3.0
 
-The goal: ask about a word, a name, or a place and get a clear, sourced answer - what "Christ" or "Zarahemla" means, where a place was - even with a small AI model running on your own computer. Each item below is a new layer of the study index (see the Talk prep helper item above), so AI search finds it by meaning alongside the scriptures, and each is measured against the benchmark questions before it ships.
+The goal: ask about a word, a name, or a place and get a clear, sourced answer, even with a small AI model on your own computer. Done so far: Hebrew and Greek word meanings, Book of Mormon names and their links in the text, and Book of Mormon dates in Israel's calendar.
 
-- [x] Hebrew and Greek word meanings - Strong's and STEP Bible, in the Word Study tab
-- [x] Book of Mormon names (e.g. what "Zarahemla" means) - all 307, each labeled by confidence, with proposals summarized in our own words from BYU's Book of Mormon Onomasticon and linked, never copied
-- [x] Names highlighted in the text - in Book of Mormon chapters, hover a name for its meaning, click it for its Word Study card
-- [x] Book of Mormon dates in Israel's calendar - "the first month" and the rest link to a card with the month's names, the holy days of the law of Moses (Passover, the Day of Atonement, Tabernacles...), and the Book of Mormon's events in that month
-- [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse rather than every word the KJV translates that way
-- [ ] Short, cited answers - a sentence or two drawn only from the sources found, every statement cited, rather than the AI only choosing among results as it does today; also the basis for the Talk prep helper
-- [ ] Geography for all the Standard Works - Bible places and maps (e.g. OpenBible.info's openly licensed geocoding), and the Book of Mormon geography models (Heartland, Mesoamerican, Baja California, and others) shown side by side as their proponents' theories, since the Church takes no official position on Book of Mormon geography
+- [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse
+- [ ] Short answers drawn only from the sources found, with every statement cited
+- [ ] Geography for all the Standard Works: Bible places and maps, and the Book of Mormon geography models shown side by side as their proponents' theories (the Church takes no official position)
 - [ ] Archaeological references
-- [ ] Optional content packs - these sources are large, so they'd download on demand (like the study index is built on demand) rather than ship inside the snap
+- [ ] Optional content packs, downloaded on demand
 
-Every source's license is checked before anything is imported - as with General Conference talks today, copyrighted works are linked and summarized, not copied.
+Every source's license is checked before anything is imported. Copyrighted works are linked and summarized, not copied.
 
 ## License
 

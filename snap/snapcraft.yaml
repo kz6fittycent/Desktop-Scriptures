@@ -2,69 +2,11 @@ name: desktop-scriptures
 title: Desktop Scriptures
 summary: Offline LDS scripture reader with notes, tags, search, sync, and opt-in AI
 description: |
-  A desktop reader for the Bible, Book of Mormon, Doctrine and Covenants,
-  Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the
-  Joseph Smith Translation - plus, if you switch them on, the KJV Apocrypha,
-  1 Enoch and the Book of Jasher (not part of the Standard Works). The core reading and study experience works
-  fully offline - personal notes, tags, verse highlighting, keyword
-  search, a Topical Guide, General Conference and Ensign/Liahona citations,
-  a Cross-references tab pointing out known parallel passages elsewhere in
-  the corpus alongside any you add yourself, a Word Study tab with the
-  Hebrew and Greek words behind the English, what every Book of Mormon name
-  may mean, and Book of Mormon dates in Israel's calendar (names and dates
-  are links in the text), a Scripture of the Day banner,
-  a reading streak, a Resume
-  Reading history of your last 5 chapters, a Journal with one searchable
-  entry per day (optionally
-  linked to a verse or chapter you're reflecting on), a choice of accent
-  colors, cloud-folder sync across your own devices (via whatever cloud
-  client - Nextcloud, OneDrive, Google Drive, or similar - already keeps
-  a folder synced on your machine, so the app itself never talks to the
-  network for this), an opt-in Temple Recommend renewal reminder (also
-  fully offline - it just checks the expiration date you enter against
-  today's date), an opt-in Family History reminder that nudges you at
-  random intervals so it stays noticeable, and Listen controls to have any
-  chapter read aloud - verse by verse, with the current verse
-  highlighted - in a choice of four voices (American or British English,
-  male or female), each downloaded once on request.
-
-  A handful of landing-page extras are opt-in and off by default, only
-  reaching the network once you turn them on: AI-assisted search (ask a
-  question in your own words - and refine it conversationally with
-  follow-ups - to get pointed at real, matching scripture, using your own
-  AI endpoint, plus an optional study index built through that same
-  endpoint so AI features can find passages by meaning, with a setup
-  wizard), a Church News headline, a Come Follow Me helper showing
-  this week's lesson, and an Inspirational Message featuring whatever's
-  currently on churchofjesuschrist.org's own homepage. A General
-  Conference reminder (also opt-in) shows once a day in the two weeks
-  before Conference. New Conference talks and Liahona articles arrive on
-  their own from this project's GitHub, weekly (switch off under View).
-
-  This is an unofficial application, not produced by or affiliated with
-  The Church of Jesus Christ of Latter-day Saints, or with Community of
-  Christ. Scripture text courtesy of the beandog/lds-scriptures project;
-  Journal of Discourses and JST text from public-domain scans on
-  archive.org; the KJV Apocrypha from CrossWire and eBible.org; 1 Enoch
-  and Jasher from Project Gutenberg and Wikisource; General Conference
-  citation data from BYU's Scripture Citation Index; Ensign/Liahona
-  citations detected from each article's own scripture links on
-  churchofjesuschrist.org. The Topical Guide is Desktop Scriptures' own
-  correlation of its local scripture text and that same citation index -
-  not a copy of the Church's own, separately-copyrighted Topical Guide.
-  Cross-references are hand-curated the same way: an accuracy-first list
-  of 610 well-documented parallel passages - quotations, paraphrases,
-  JST/Moses-style revisions, and typology scripture itself explicitly
-  states, plus a smaller, distinctly-labeled "traditionally linked to"
-  tier for associations scripture doesn't explicitly state - each
-  verified against this app's own text and tagged with the Topical Guide
-  topic it's actually teaching.
-
-  Lexicons: Strong's dictionaries from Open Scriptures (CC BY-SA) and STEP
-  Bible meanings (Tyndale House; CC BY 4.0). Book of Mormon name meanings
-  are this project's own summaries, linked to BYU's Book of Mormon
-  Onomasticon. Text-to-speech: Piper (GPL-3.0). The About menu has full
-  credits and licenses; Help links to the user guide (the wiki).
+  Desktop Scriptures is an offline reader for the Bible, Book of Mormon, Doctrine and Covenants, Pearl of Great Price, Journal of Discourses, Lectures on Faith, and the Joseph Smith Translation, with the KJV Apocrypha, 1 Enoch, and the Book of Jasher available as opt-in volumes that aren't part of the Standard Works.
+  Study with notes, tags, highlighting, keyword search, a Topical Guide, a daily Journal, hand-checked cross-references, General Conference and Liahona citations, and a Word Study tab showing the Hebrew and Greek behind the English and what Book of Mormon names may mean.
+  Optional extras include chapters read aloud in voices you download once, AI-assisted search through an AI service you choose, cloud-folder sync between your own devices, Church News and Come Follow Me, and reminders for General Conference, temple recommend renewal, and family history.
+  Nothing reaches the network until you switch it on, except a weekly update of new talk and article citations, which you can turn off under View.
+  This is an unofficial app, not produced by or affiliated with The Church of Jesus Christ of Latter-day Saints or Community of Christ; sources, credits, and licenses are in the About menu and at https://github.com/kz6fittycent/Desktop-Scriptures.
 
 adopt-info: desktop-scriptures
 license: GPL-3.0-or-later
