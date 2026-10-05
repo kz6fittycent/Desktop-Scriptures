@@ -54,7 +54,17 @@ import re
 import sqlite3
 
 from PySide6.QtCore import QEvent, Qt, QPoint, QTimer, Signal
-from PySide6.QtGui import QAction, QColor, QFont, QIcon, QPixmap, QTextCharFormat, QTextCursor
+from PySide6.QtGui import (
+    QAction,
+    QColor,
+    QFont,
+    QGuiApplication,
+    QIcon,
+    QKeySequence,
+    QPixmap,
+    QTextCharFormat,
+    QTextCursor,
+)
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
@@ -149,6 +159,9 @@ class _VerseTextEdit(QTextEdit):
     cross_reference_requested = Signal()
     word_lookup_requested = Signal(str)
     link_clicked = Signal(str)  # "name:Zarahemla" or "month:1:4" (day 0 = none)
+    # Copy (Ctrl+C or the context menu): ReadingView copies the selection
+    # across every verse it spans, not just this one's.
+    copy_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -302,6 +315,12 @@ class _VerseTextEdit(QTextEdit):
             )
             self.setToolTip(hit[3] if hit else "")
 
+    def keyPressEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
+        if event.matches(QKeySequence.StandardKey.Copy):
+            self.copy_requested.emit()
+            return
+        super().keyPressEvent(event)
+
     def contextMenuEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
         offset = self.cursorForPosition(event.pos()).position()
         hit = next(
@@ -310,6 +329,13 @@ class _VerseTextEdit(QTextEdit):
         has_selection = self.textCursor().hasSelection()
 
         menu = self.createStandardContextMenu()
+        # The standard Copy only knows this verse's own selection; a drag
+        # across several verses selects in each of them.
+        for action in menu.actions():
+            if action.objectName() == "edit-copy":
+                action.triggered.disconnect()
+                action.triggered.connect(self.copy_requested)
+                action.setEnabled(True)
         standard_actions = menu.actions()
         first_standard = standard_actions[0] if standard_actions else None
 
@@ -550,6 +576,7 @@ class ReadingView(QWidget):
             body.word_lookup_requested.connect(self._on_word_lookup_requested)
             body.set_link_spans(link_spans.get(verse.id, []))
             body.link_clicked.connect(self._on_text_link_clicked)
+            body.copy_requested.connect(self._copy_selection)
             row.addWidget(body, 1)
             self._body_widgets[verse.id] = body
 
@@ -773,8 +800,17 @@ class ReadingView(QWidget):
         accumulating duplicate filters."""
         if self._drag_anchor_verse is None:
             QApplication.instance().installEventFilter(self)
+        # A new press starts a new selection: drop any left in other verses
+        # by an earlier multi-verse drag.
+        for other in self._verses:
+            if other.id != verse.id:
+                self._body_widgets[other.id].clear_selection()
         self._drag_anchor_verse = verse
-        self._drag_anchor_offset = self._body_widgets[verse.id].textCursor().position()
+        # Where the press landed - not the text cursor, which a press inside
+        # an existing selection leaves where it was.
+        widget = self._body_widgets[verse.id]
+        press_offset = widget._press_offset
+        self._drag_anchor_offset = press_offset if press_offset is not None else widget.textCursor().position()
 
     def eventFilter(self, obj, event) -> bool:  # noqa: N802 (Qt naming convention)
         if self._drag_anchor_verse is None:
@@ -798,19 +834,16 @@ class ReadingView(QWidget):
     def _on_verse_drag_extended(self, global_pos: QPoint) -> None:
         """Fires on every mouse-move anywhere in the app for as long as a
         drag begun in _drag_anchor_verse's own widget is in progress,
-        however far the cursor has since wandered from it. With no
-        highlighter armed this is a no-op - dragging is just ordinary
-        text selection (e.g. to copy it) confined to whichever single
-        verse Qt's own selection already handles.
-
-        With a color (or "clear") armed, extends a fake selection across
-        every verse between the drag's start and wherever the cursor is
-        now, using the exact same setTextCursor mechanism a plain
+        however far the cursor has since wandered from it. This is the
+        only thing that updates the selection during a drag (the verse
+        widgets ignore their own held-button moves), highlighter armed or
+        not: it extends a selection across every verse between the drag's
+        start and wherever the cursor is now, using the exact same setTextCursor mechanism a plain
         same-widget drag already uses natively - the verses outside that
         range get their own selection cleared, so narrowing the drag back
-        un-highlights-preview verses it had covered a moment ago."""
-        if self._armed_highlight is None:
-            return
+        un-highlights-preview verses it had covered a moment ago. With
+        nothing armed it stays an ordinary selection, to copy (see
+        _copy_selection) or right-click for a color."""
         anchor_verse = self._drag_anchor_verse
         anchor_offset = self._drag_anchor_offset
 
@@ -874,6 +907,22 @@ class ReadingView(QWidget):
         if self._armed_highlight is None:
             return
         self._apply_to_current_selection(self._armed_highlight)
+
+    def _copy_selection(self) -> None:
+        """Copy what's selected: within one verse, just that text; across
+        several, each verse's part on its own line after its number."""
+        parts = []
+        for verse in self._verses:
+            cursor = self._body_widgets[verse.id].textCursor()
+            if cursor.hasSelection():
+                parts.append((verse, verse.text[cursor.selectionStart():cursor.selectionEnd()]))
+        if not parts:
+            return
+        if len(parts) == 1:
+            text = parts[0][1]
+        else:
+            text = "\n".join(f"{verse.verse_number} {part.strip()}" for verse, part in parts)
+        QGuiApplication.clipboard().setText(text)
 
     def _on_verse_highlight_color_requested(self, color: str) -> None:
         """The right-click context menu's own color choice - independent
