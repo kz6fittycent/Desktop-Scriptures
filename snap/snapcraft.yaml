@@ -38,21 +38,7 @@ apps:
       - wayland
       - x11
       - home
-      # For this app's several opt-in, off-by-default network features -
-      # AI-assisted search (see ai_client.py, talks only to whatever
-      # endpoint the user configures under AI Integration -> AI
-      # Settings...), the landing page's Church News, Come Follow Me,
-      # and Inspirational Message boxes (see church_news.py, cfm.py, and
-      # inspiration.py), and the General Conference reminder popup (see
-      # general_conference.py) - each fetches from a single fixed Church
-      # source only once turned on in the View menu. Never anywhere on
-      # its own otherwise.
       - network
-      # For the Listen (text-to-speech) controls in the reading view -
-      # see tts_playback.py. Synthesis itself is fully offline (Piper
-      # voices the user downloads once, into $SNAP_USER_COMMON/voices -
-      # see tts.py; that one download uses the network plug above); this
-      # plug is only for routing the resulting audio to the sound device.
       - audio-playback
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
