@@ -2,15 +2,18 @@
 
 Shown at startup (see app.py → MainWindow.maybe_show_welcome) until the
 user switches on "Don't show this at startup again", and reachable any
-time from Menu → Welcome.... Four steps:
+time from Menu → Welcome.... Five steps:
 
 1. Welcome - the app works offline; everything here is optional.
 2. Listen - switch on the Listen controls (the same setting as Menu →
    Voice → Show Listen Controls) and download a voice (opens the same
    Download or Remove Voices dialog as the menu).
-3. AI - opens the existing AI Setup Wizard (still in Menu → AI
+3. Additional books - switch on the Apocrypha and/or Other Ancient
+   Texts (the same settings as Menu → Additional Books; see
+   data_access.OPTIONAL_VOLUMES). Both start off.
+4. AI - opens the existing AI Setup Wizard (still in Menu → AI
    Integration too).
-4. Done - where to find all of it later.
+5. Done - where to find all of it later.
 
 Closing at any step is fine. Reaching the last step switches "Don't show
 this at startup again" on (the user can switch it back off); otherwise
@@ -33,6 +36,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import tts
+from scriptures.data_access import OPTIONAL_VOLUMES
 from scriptures.ui.toggle_row import ToggleRow
 from scriptures.ui.voices_dialog import VoicesDialog
 
@@ -52,6 +56,8 @@ class WelcomeDialog(QDialog):
         set_listen_enabled: Callable[[bool], None],
         open_ai_wizard: Callable[[], None],
         ai_configured: Callable[[], bool],
+        volume_shown: Callable[[str], bool],
+        set_volume_shown: Callable[[str, bool], None],
         dont_show_again: bool,
         parent: QWidget | None = None,
     ):
@@ -74,9 +80,9 @@ class WelcomeDialog(QDialog):
             "<p>Everything you need to read and study - the scriptures, notes, highlights, "
             "search, the Topical Guide, Word Study, and the Journal - is ready now and works "
             "offline.</p>"
-            "<p>The next two steps set up optional extras: having chapters read aloud, and "
-            "AI-assisted search. Skip either one, or close this window at any time; both are "
-            "always in the <b>Menu</b>.</p>"
+            "<p>The next steps set up optional extras: having chapters read aloud, more books "
+            "to read alongside the Standard Works, and AI-assisted search. Skip any of them, or "
+            "close this window at any time; they're always in the <b>Menu</b>.</p>"
         ))
         v.addStretch(1)
         self._pages.addWidget(page)
@@ -108,7 +114,30 @@ class WelcomeDialog(QDialog):
         v.addStretch(1)
         self._pages.addWidget(page)
 
-        # 3. AI
+        # 3. Additional books
+        page = QWidget()
+        v = QVBoxLayout(page)
+        v.addWidget(_text(
+            "<h2>Additional books</h2>"
+            "<p>Two more volumes are included, for reading alongside the Standard Works. They "
+            "aren't considered part of the Standard Works, so they're hidden until you switch "
+            "them on. Once on, they're in the library, search, and AI search like the rest.</p>"
+            "<p><b>The Apocrypha</b> - the fourteen books printed between the Old and New "
+            "Testaments in the 1611 King James Bible, of which the Lord said \"there are many "
+            "things contained therein that are true\" (D&amp;C 91:1).<br>"
+            "<b>Other Ancient Texts</b> - 1 Enoch, which Jude 1:14-15 quotes, and the Book "
+            "of Jasher.</p>"
+        ))
+        self._volume_toggles: dict[str, ToggleRow] = {}
+        for slug, (label, _key) in OPTIONAL_VOLUMES.items():
+            toggle = ToggleRow(f"Show {label}", checked=volume_shown(slug))
+            toggle.toggled.connect(lambda checked, s=slug: set_volume_shown(s, checked))
+            v.addWidget(toggle)
+            self._volume_toggles[slug] = toggle
+        v.addStretch(1)
+        self._pages.addWidget(page)
+
+        # 4. AI
         page = QWidget()
         v = QVBoxLayout(page)
         v.addWidget(_text(
@@ -132,7 +161,7 @@ class WelcomeDialog(QDialog):
         v.addStretch(1)
         self._pages.addWidget(page)
 
-        # 4. Done
+        # 5. Done
         page = QWidget()
         v = QVBoxLayout(page)
         v.addWidget(_text(
@@ -140,6 +169,7 @@ class WelcomeDialog(QDialog):
             "<p>You can change any of this later:</p>"
             "<ul>"
             "<li><b>Menu → Voice</b> - Listen controls, your voice, and Download or Remove Voices...</li>"
+            "<li><b>Menu → Additional Books</b> - the Apocrypha and Other Ancient Texts</li>"
             "<li><b>Menu → AI Integration</b> - the AI Setup Wizard and AI Settings</li>"
             "<li><b>Menu → Welcome...</b> - this window</li>"
             "<li><b>Menu → Help (Wiki)...</b> - a guide to every feature</li>"

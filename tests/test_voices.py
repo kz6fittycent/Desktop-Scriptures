@@ -221,15 +221,22 @@ def test_listen_is_opt_in_and_the_welcome_window() -> None:
 
         # Its steps: the Listen switch drives the same setting; reaching
         # the last step switches on "don't show again".
-        listen = []
+        listen, volumes = [], []
         dialog = WelcomeDialog(
             listen_enabled=False, set_listen_enabled=listen.append,
-            open_ai_wizard=lambda: None, ai_configured=lambda: False, dont_show_again=False,
+            open_ai_wizard=lambda: None, ai_configured=lambda: False,
+            volume_shown=lambda slug: False, set_volume_shown=lambda slug, shown: volumes.append((slug, shown)),
+            dont_show_again=False,
         )
         assert not dialog.dont_show_again() and not dialog._back.isEnabled()
         dialog._on_next()
         dialog._listen_toggle.setChecked(True)
         assert listen == [True]
+        # The additional books start off; each switch drives its own setting.
+        dialog._on_next()
+        assert not any(t.isChecked() for t in dialog._volume_toggles.values())
+        dialog._volume_toggles["apocrypha"].setChecked(True)
+        assert volumes == [("apocrypha", True)]
         dialog._on_next()
         assert dialog._ai_status.text() == "Not set up yet"
         dialog._on_next()

@@ -44,7 +44,7 @@ from scriptures import study_index
 from scriptures.ai_client import AUTH_ERRORS, AiConfig, build_request
 from scriptures.ask import citations_for, extract_keywords
 from scriptures.citations import Citation
-from scriptures.data_access import get_topic_key_passages
+from scriptures.data_access import get_topic_key_passages, hidden_volume_slugs
 from scriptures.embeddings import QueryEmbedder
 
 MAX_SELECTED = 10
@@ -341,15 +341,24 @@ def gather_candidates(
     best-matching Topical Guide topics' key passages, listed first; or,
     when a follow-up asked for one volume or kind of source
     (detect_filters), a single search restricted to it."""
+    # Volumes the reader hasn't switched on (data_access.OPTIONAL_VOLUMES)
+    # are left out even if an index built earlier still holds them.
+    hidden = hidden_volume_slugs(conn) if conn is not None else set()
     kinds, volumes = detect_filters(questions)
     if kinds:
-        return index.search(query, vector, kinds=kinds, volume_slugs=volumes, limit=CANDIDATES)
+        if volumes and volumes <= hidden:
+            return []
+        return index.search(
+            query, vector, kinds=kinds, volume_slugs=volumes, limit=CANDIDATES, exclude_volume_slugs=hidden
+        )
     hits: list[study_index.SearchHit] = []
     for _name, group_kinds, group_volumes, count in CANDIDATE_GROUPS:
+        if group_volumes and group_volumes <= hidden:
+            continue
         hits.extend(
             index.search(
                 query, vector, kinds=group_kinds, volume_slugs=group_volumes,
-                kind_limits=study_index.MIXED_KIND_LIMITS, limit=count,
+                kind_limits=study_index.MIXED_KIND_LIMITS, limit=count, exclude_volume_slugs=hidden,
             )
         )
     if conn is not None:

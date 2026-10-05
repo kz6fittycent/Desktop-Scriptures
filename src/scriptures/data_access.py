@@ -177,11 +177,58 @@ class ChapterMatch:
     label: str
 
 
-def get_volumes(conn: sqlite3.Connection) -> list[Volume]:
+# Volumes outside the Standard Works that are in every database but shown
+# only once the reader switches them on (Menu → Additional Books, or the
+# Welcome window): slug -> (menu label, settings key). Off by default -
+# also for anyone who had them showing in 2.3.0. While a volume is off it
+# is left out of the library, keyword search, reference lookups (so plain
+# AI search can't land there), cross-references, and the study index /
+# AI search (study_index.collect_pieces, study_ask.gather_candidates).
+# The text itself stays in the database, so switching one on is instant
+# and needs no download. Notes, highlights and history already made in a
+# volume are the reader's own and stay where they are.
+OPTIONAL_VOLUMES: dict[str, tuple[str, str]] = {
+    "apocrypha": ("Apocrypha", "show_apocrypha"),
+    "other-ancient-texts": ("Other Ancient Texts (1 Enoch, Jasher)", "show_other_ancient_texts"),
+}
+
+
+def is_volume_shown(conn: sqlite3.Connection, slug: str) -> bool:
+    if slug not in OPTIONAL_VOLUMES:
+        return True
+    return get_setting(conn, OPTIONAL_VOLUMES[slug][1]) == "true"
+
+
+def set_volume_shown(conn: sqlite3.Connection, slug: str, shown: bool) -> None:
+    set_setting(conn, OPTIONAL_VOLUMES[slug][1], "true" if shown else "false")
+
+
+def hidden_volume_slugs(conn: sqlite3.Connection) -> set[str]:
+    return {slug for slug in OPTIONAL_VOLUMES if not is_volume_shown(conn, slug)}
+
+
+def _hidden_chapters_clause(conn: sqlite3.Connection, chapter_column: str) -> tuple[str, list]:
+    """An " AND ..." SQL fragment (and its parameters) leaving out chapters
+    in hidden volumes - empty when nothing is hidden."""
+    hidden = sorted(hidden_volume_slugs(conn))
+    if not hidden:
+        return "", []
+    return (
+        f" AND {chapter_column} NOT IN (SELECT hc.id FROM chapters hc "
+        "JOIN books hb ON hb.id = hc.book_id JOIN volumes hv ON hv.id = hb.volume_id "
+        f"WHERE hv.slug IN ({','.join('?' * len(hidden))}))",
+        hidden,
+    )
+
+
+def get_volumes(conn: sqlite3.Connection, include_hidden: bool = False) -> list[Volume]:
+    """The library's volumes, in order - without the OPTIONAL_VOLUMES the
+    reader hasn't switched on, unless `include_hidden`."""
     rows = conn.execute(
         "SELECT id, name, slug FROM volumes ORDER BY sort_order"
     ).fetchall()
-    return [Volume(r["id"], r["name"], r["slug"]) for r in rows]
+    hidden = set() if include_hidden else hidden_volume_slugs(conn)
+    return [Volume(r["id"], r["name"], r["slug"]) for r in rows if r["slug"] not in hidden]
 
 
 def get_volume(conn: sqlite3.Connection, volume_id: int) -> Volume:
@@ -289,14 +336,17 @@ def get_verse_by_loose_reference(
     """Same lookup as get_verse_by_reference, but the book name is matched
     case-insensitively - for resolving a reference parsed out of free-form
     text (see ask.py) rather than one already known to be spelled exactly
-    as this database stores it (e.g. the Scripture of the Day pool)."""
+    as this database stores it (e.g. the Scripture of the Day pool). Hidden
+    volumes (OPTIONAL_VOLUMES) don't resolve."""
+    hidden_sql, hidden_params = _hidden_chapters_clause(conn, "c.id")
     r = conn.execute(
         "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
         "FROM verses v "
         "JOIN chapters c ON c.id = v.chapter_id "
         "JOIN books b ON b.id = c.book_id "
-        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ? AND v.verse_number = ?",
-        (book_name, chapter_number, verse_number),
+        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ? AND v.verse_number = ?"
+        + hidden_sql,
+        (book_name, chapter_number, verse_number, *hidden_params),
     ).fetchone()
     if not r:
         return None
@@ -308,12 +358,14 @@ def get_chapter_by_loose_reference(
 ) -> Chapter | None:
     """Look up a whole chapter by book name (matched case-insensitively,
     same reasoning as get_verse_by_loose_reference) + chapter number, for
-    a reference that names a chapter with no specific verse."""
+    a reference that names a chapter with no specific verse. Hidden volumes
+    don't resolve."""
+    hidden_sql, hidden_params = _hidden_chapters_clause(conn, "c.id")
     r = conn.execute(
         "SELECT c.id, c.chapter_number, c.title, c.speaker, c.discourse_date "
         "FROM chapters c JOIN books b ON b.id = c.book_id "
-        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ?",
-        (book_name, chapter_number),
+        "WHERE LOWER(b.name) = LOWER(?) AND c.chapter_number = ?" + hidden_sql,
+        (book_name, chapter_number, *hidden_params),
     ).fetchone()
     if not r:
         return None
@@ -678,15 +730,17 @@ def _fts_phrase(query: str) -> str:
 
 
 def search_verses(conn: sqlite3.Connection, query: str, limit: int = 40) -> list[Verse]:
-    """Keyword search over scripture text (FTS5)."""
+    """Keyword search over scripture text (FTS5), leaving out hidden
+    volumes (OPTIONAL_VOLUMES)."""
     query = query.strip()
     if not query:
         return []
+    hidden_sql, hidden_params = _hidden_chapters_clause(conn, "v.chapter_id")
     rows = conn.execute(
         "SELECT v.id, v.verse_number, v.text, v.reference, v.chapter_id "
         "FROM verses_fts JOIN verses v ON v.id = verses_fts.rowid "
-        "WHERE verses_fts MATCH ? ORDER BY rank LIMIT ?",
-        (_fts_phrase(query), limit),
+        "WHERE verses_fts MATCH ?" + hidden_sql + " ORDER BY rank LIMIT ?",
+        (_fts_phrase(query), *hidden_params, limit),
     ).fetchall()
     return [
         Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
@@ -701,10 +755,11 @@ def search_verse_references(conn: sqlite3.Connection, query: str, limit: int = 2
     query = query.strip()
     if not query or ":" not in query:
         return []
+    hidden_sql, hidden_params = _hidden_chapters_clause(conn, "chapter_id")
     rows = conn.execute(
         "SELECT id, verse_number, text, reference, chapter_id FROM verses "
-        "WHERE reference LIKE ? ORDER BY id LIMIT ?",
-        (f"%{query}%", limit),
+        "WHERE reference LIKE ?" + hidden_sql + " ORDER BY id LIMIT ?",
+        (f"%{query}%", *hidden_params, limit),
     ).fetchall()
     return [
         Verse(r["id"], r["verse_number"], r["text"], r["reference"], r["chapter_id"])
@@ -720,15 +775,16 @@ def search_chapters(conn: sqlite3.Connection, query: str, limit: int = 20) -> li
     if len(query) < 2:
         return []
     label_expr = "b.name || ' ' || c.chapter_number"
+    hidden_sql, hidden_params = _hidden_chapters_clause(conn, "c.id")
     rows = conn.execute(
         f"SELECT c.id AS chapter_id, {label_expr} AS label FROM chapters c "
         f"JOIN books b ON b.id = c.book_id "
-        f"WHERE {label_expr} LIKE ? "
+        f"WHERE {label_expr} LIKE ?{hidden_sql} "
         f"ORDER BY "
         f"CASE WHEN {label_expr} = ? THEN 0 "
         f"WHEN {label_expr} LIKE ? THEN 1 ELSE 2 END, "
         f"b.id, c.chapter_number LIMIT ?",
-        (f"%{query}%", query, f"{query}%", limit),
+        (f"%{query}%", *hidden_params, query, f"{query}%", limit),
     ).fetchall()
     return [ChapterMatch(r["chapter_id"], r["label"]) for r in rows]
 
@@ -1168,6 +1224,7 @@ def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[Cros
         return []
     volume, _testament, book, chapter = location
     this_side = (volume.slug, book.name, chapter.chapter_number)
+    hidden = hidden_volume_slugs(conn)
 
     curated_rows = conn.execute(
         "SELECT * FROM cross_references "
@@ -1187,7 +1244,7 @@ def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[Cros
 
     results = []
     for row in curated_rows:
-        oriented = _orient_cross_reference_row(conn, row, this_side)
+        oriented = _orient_cross_reference_row(conn, row, this_side, hidden)
         if oriented is None:
             continue
         local_start, local_end, related_reference, related_chapter_id = oriented
@@ -1203,7 +1260,7 @@ def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[Cros
             )
         )
     for row in user_rows:
-        oriented = _orient_cross_reference_row(conn, row, this_side)
+        oriented = _orient_cross_reference_row(conn, row, this_side, hidden)
         if oriented is None:
             continue
         local_start, local_end, related_reference, related_chapter_id = oriented
@@ -1223,14 +1280,16 @@ def get_cross_references(conn: sqlite3.Connection, chapter_id: int) -> list[Cros
 
 
 def _orient_cross_reference_row(
-    conn: sqlite3.Connection, row: sqlite3.Row, this_side: tuple[str, str, int]
+    conn: sqlite3.Connection, row: sqlite3.Row, this_side: tuple[str, str, int],
+    hidden: set[str] = frozenset(),
 ) -> tuple[int | None, int | None, str, int] | None:
     """For a cross_references/user_cross_references row (same column
     shape), whichever side is NOT `this_side` (volume slug, book name,
     chapter number) is "the other one": returns this side's own verse
     range, the other side's display reference, and the other side's local
     chapter_id - or None if the other side's chapter isn't in this
-    database (see get_cross_references)."""
+    database (see get_cross_references), or is in a `hidden` volume
+    (OPTIONAL_VOLUMES the reader hasn't switched on)."""
     is_primary_side = (row["volume_slug"], row["book_name"], row["chapter_number"]) == this_side
     if is_primary_side:
         local_start, local_end = row["verse_start"], row["verse_end"]
@@ -1245,6 +1304,8 @@ def _orient_cross_reference_row(
         other_chapter_number = row["chapter_number"]
         other_start, other_end = row["verse_start"], row["verse_end"]
 
+    if other_volume_slug in hidden:
+        return None
     other_chapter = conn.execute(
         "SELECT c.id FROM chapters c "
         "JOIN books b ON b.id = c.book_id "

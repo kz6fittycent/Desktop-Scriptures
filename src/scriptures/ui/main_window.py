@@ -62,8 +62,11 @@ from scriptures.data_access import (
     get_verses,
     get_volume,
     get_volumes,
+    is_volume_shown,
+    OPTIONAL_VOLUMES,
     record_reading,
     set_setting,
+    set_volume_shown,
 )
 from scriptures.family_history import pick_next_reminder_date
 from scriptures.family_history import should_show_reminder as should_show_family_history_reminder
@@ -446,6 +449,18 @@ class MainWindow(QMainWindow):
         voice_menu.aboutToShow.connect(self._update_voice_labels)
         self._update_voice_labels()
 
+        # Volumes outside the Standard Works - in the database already, but
+        # shown only once switched on here (or in the Welcome window); see
+        # data_access.OPTIONAL_VOLUMES.
+        books_menu = QMenu("Additional &Books", self)
+        self._volume_actions: dict[str, QAction] = {}
+        for slug, (label, _key) in OPTIONAL_VOLUMES.items():
+            action = QAction(f"Show {label}", self, checkable=True)
+            action.setChecked(is_volume_shown(self.conn, slug))
+            action.triggered.connect(lambda checked=False, s=slug: self._set_volume_shown(s, checked))
+            books_menu.addAction(action)
+            self._volume_actions[slug] = action
+
         menu = view_menu = QMenu("&View", self)
 
         theme_menu = menu.addMenu("App Theme")
@@ -769,6 +784,7 @@ class MainWindow(QMainWindow):
         root_menu.addSeparator()
         root_menu.addMenu(view_menu)
         root_menu.addMenu(voice_menu)
+        root_menu.addMenu(books_menu)
         root_menu.addSeparator()
         root_menu.addMenu(sync_menu)
         root_menu.addMenu(ai_menu)
@@ -985,6 +1001,35 @@ class MainWindow(QMainWindow):
         if self._current_reading_view is not None:
             self._current_reading_view.set_listen_enabled(enabled)
 
+    def _set_volume_shown(self, slug: str, shown: bool, offer_index: bool = True) -> None:
+        """Show or hide one of OPTIONAL_VOLUMES: the library (and the page
+        being read, if it's in that volume) follows at once; search, AI
+        search and cross-references read the setting each time they run."""
+        self._volume_actions[slug].setChecked(shown)
+        if is_volume_shown(self.conn, slug) == shown:
+            return
+        set_volume_shown(self.conn, slug, shown)
+        row = self.conn.execute("SELECT name FROM volumes WHERE slug = ?", (slug,)).fetchone()
+        name = row[0] if row else None
+        if not self._path or (not shown and self._path[0]["label"] == name):
+            self.show_volumes()
+        if shown and offer_index:
+            self._offer_study_index_update(OPTIONAL_VOLUMES[slug][0])
+
+    def _offer_study_index_update(self, label: str) -> None:
+        """A study index built while a volume was hidden doesn't have it -
+        offer to add it (only what's new is embedded)."""
+        if self._current_study_search() is None:
+            return  # no study index in use; plain AI search already sees it
+        answer = QMessageBox.question(
+            self,
+            "Study Index",
+            f"AI search can include the {label} once the study index has added it. "
+            "Only the new text is sent to your embedding model. Add it now?",
+        )
+        if answer == QMessageBox.StandardButton.Yes:
+            self._show_study_index(start_immediately=True)
+
     def maybe_show_welcome(self) -> None:
         """At startup (see app.py): the Welcome window, unless the user
         has asked not to see it again."""
@@ -997,6 +1042,8 @@ class MainWindow(QMainWindow):
             set_listen_enabled=self._set_listen_enabled,
             open_ai_wizard=self._show_ai_setup_wizard,
             ai_configured=lambda: self._current_ai_config() is not None,
+            volume_shown=lambda slug: is_volume_shown(self.conn, slug),
+            set_volume_shown=lambda slug, shown: self._set_volume_shown(slug, shown, offer_index=False),
             dont_show_again=get_setting(self.conn, WELCOME_DONT_SHOW_SETTING) == "true",
             parent=self,
         )

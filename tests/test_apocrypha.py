@@ -34,9 +34,16 @@ BOOKS = [
 ]
 
 
-def _conn(tmp: Path):
+def _conn(tmp: Path, show: bool = True):
+    """A copy of the shipped database - with both optional volumes switched
+    on (they start hidden; see test_hidden_until_switched_on) unless `show`
+    is False."""
     shutil.copy(PROJECT_ROOT / "data" / "scriptures.db", tmp / "s.db")
-    return connect(tmp / "s.db")
+    conn = connect(tmp / "s.db")
+    if show:
+        for slug in da.OPTIONAL_VOLUMES:
+            da.set_volume_shown(conn, slug, True)
+    return conn
 
 
 def _chapter(conn, book: str, number: int) -> int:
@@ -50,7 +57,7 @@ def test_the_volume_and_its_text() -> None:
     tmp = Path(tempfile.mkdtemp(prefix="scriptures-apocrypha-"))
     try:
         conn = _conn(tmp)
-        volume = next(v for v in da.get_volumes(conn) if v.slug == "apocrypha")
+        volume = next(v for v in da.get_volumes(conn, include_hidden=True) if v.slug == "apocrypha")
         assert volume.name == "Apocrypha" and not da.get_testaments(conn, volume.id)
         assert [b.name for b in da.get_books(conn, volume.id)] == BOOKS
         count = conn.execute(
@@ -82,7 +89,7 @@ def test_reading_view_headings_prologue_and_cross_references() -> None:
     try:
         conn = _conn(tmp)
         window = MainWindow(conn)
-        volume = next(v for v in da.get_volumes(conn) if v.slug == "apocrypha")
+        volume = next(v for v in da.get_volumes(conn, include_hidden=True) if v.slug == "apocrypha")
         window._on_volume_clicked(volume.id)  # the volume page, with D&C 91's counsel
         # Ecclesiasticus' prologue is chapter 0, "Ecclesiasticus - Prologue".
         prologue = _chapter(conn, "Ecclesiasticus", 0)
@@ -141,7 +148,7 @@ def test_other_ancient_texts() -> None:
     tmp = Path(tempfile.mkdtemp(prefix="scriptures-other-texts-"))
     try:
         conn = _conn(tmp)
-        volume = next(v for v in da.get_volumes(conn) if v.slug == "other-ancient-texts")
+        volume = next(v for v in da.get_volumes(conn, include_hidden=True) if v.slug == "other-ancient-texts")
         assert [b.name for b in da.get_books(conn, volume.id)] == ["1 Enoch", "Jasher"]
         counts = dict(conn.execute(
             "SELECT b.name, count(*) FROM verses v JOIN chapters c ON c.id = v.chapter_id "
@@ -175,10 +182,65 @@ def test_other_ancient_texts() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_hidden_until_switched_on() -> None:
+    """Both volumes start hidden - library, search, reference lookups,
+    cross-references, the study index, AI search - and come back, from
+    the same database, once switched on."""
+    from scriptures import ask, study_ask, study_index
+    from scriptures.ui.main_window import MainWindow
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-hidden-"))
+    try:
+        conn = _conn(tmp, show=False)
+        optional = set(da.OPTIONAL_VOLUMES)
+        assert da.hidden_volume_slugs(conn) == optional
+        assert not optional & {v.slug for v in da.get_volumes(conn)}
+        assert optional <= {v.slug for v in da.get_volumes(conn, include_hidden=True)}
+        assert not da.search_verses(conn, "Maccabeus")
+        assert not da.search_verse_references(conn, "Tobit 1:1")
+        assert not da.search_chapters(conn, "Jasher 1")
+        assert da.get_verse_by_loose_reference(conn, "Ecclesiasticus", 28, 2) is None
+        assert da.get_chapter_by_loose_reference(conn, "1 Enoch", 1) is None
+        assert "Apocrypha" not in ask.system_prompt(conn)
+        jude = conn.execute(
+            "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id WHERE b.name = 'Jude'"
+        ).fetchone()[0]
+        assert not [x for x in da.get_cross_references(conn, jude) if x.related_reference.startswith("1 Enoch")]
+        pieces = study_index.collect_pieces(conn)
+        assert not [p for p in pieces if p.volume_slug in optional or p.meta.get("related_volume_slug") in optional]
+        # An index built while they were showing: AI search still leaves them out.
+        index_conn = study_index.connect_index(tmp / "index.db")
+        study_index.sync_pieces(index_conn, [
+            p for p in study_index._scripture_pieces(conn) if p.volume_slug in ("apocrypha", "book-of-mormon")
+        ])
+        index = study_index.StudyIndex(index_conn)
+        question = "Judas Maccabeus and the dedication of the temple"
+        hits = study_ask.gather_candidates(index, [question], question, None, conn, [])
+        assert hits and not [h for h in hits if h.volume_slug in optional], hits
+        assert study_ask.gather_candidates(index, [question, "just the Apocrypha"], question, None, conn, []) == []
+        # The menu switch brings it all back.
+        window = MainWindow(conn)
+        assert not window._volume_actions["apocrypha"].isChecked()
+        window._set_volume_shown("apocrypha", True, offer_index=False)
+        assert window._volume_actions["apocrypha"].isChecked()
+        assert "apocrypha" in {v.slug for v in da.get_volumes(conn)}
+        assert da.search_verses(conn, "Maccabeus")
+        assert da.get_verse_by_loose_reference(conn, "Ecclesiasticus", 28, 2) is not None
+        assert "Apocrypha" in ask.system_prompt(conn)
+        hits = study_ask.gather_candidates(index, [question], question, None, conn, [])
+        assert [h for h in hits if h.volume_slug == "apocrypha"]
+        assert "other-ancient-texts" not in {v.slug for v in da.get_volumes(conn)}
+        index_conn.close()
+        print("test_hidden_until_switched_on: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_the_volume_and_its_text()
     test_reading_view_headings_prologue_and_cross_references()
     test_ai_search_and_the_study_index()
     test_other_ancient_texts()
+    test_hidden_until_switched_on()
     print("All Apocrypha tests passed.")

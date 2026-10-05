@@ -70,7 +70,11 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply
 
 from scriptures.ai_client import AUTH_ERRORS, AiConfig, build_request
 from scriptures.citations import Citation, get_citations
-from scriptures.data_access import get_chapter_by_loose_reference, get_verse_by_loose_reference
+from scriptures.data_access import (
+    get_chapter_by_loose_reference,
+    get_verse_by_loose_reference,
+    is_volume_shown,
+)
 
 # Cap on how many citing talks are attached per resolved reference - a
 # heavily-cited verse (e.g. John 3:16) could otherwise pad out a single
@@ -93,11 +97,16 @@ MAX_REFERENCES = 6
 # this constant exists to prevent.
 LOCAL_SUPPLEMENT_LIMIT = 3
 
+# Only when the reader has switched the Apocrypha on (system_prompt).
+APOCRYPHA_CLAUSE = (
+    " - and the Apocrypha of the King James Bible (e.g. Ecclesiasticus, "
+    "Wisdom of Solomon, 1 Maccabees) -"
+)
 SYSTEM_PROMPT = (
     "You help locate passages in the LDS standard works (the Holy Bible, "
     "the Book of Mormon, the Doctrine and Covenants, the Pearl of Great "
-    "Price, and the Joseph Smith Translation) - and the Apocrypha of the "
-    "King James Bible (e.g. Ecclesiasticus, Wisdom of Solomon, 1 Maccabees) - "
+    "Price, and the Joseph Smith Translation)"
+    f"{APOCRYPHA_CLAUSE} "
     "that are relevant to a "
     "reader's question. Reply with ONLY a JSON array of up to "
     f"{MAX_REFERENCES} scripture reference strings, most relevant first - "
@@ -111,6 +120,14 @@ SYSTEM_PROMPT = (
     'baptism") - narrow or adjust your previous answer accordingly, still '
     "following the same rules."
 )
+
+
+def system_prompt(conn: sqlite3.Connection) -> str:
+    """SYSTEM_PROMPT, without the Apocrypha unless the reader has switched
+    it on (data_access.OPTIONAL_VOLUMES) - its references wouldn't resolve."""
+    if is_volume_shown(conn, "apocrypha"):
+        return SYSTEM_PROMPT
+    return SYSTEM_PROMPT.replace(APOCRYPHA_CLAUSE, "")
 
 
 @dataclass(frozen=True)
@@ -585,7 +602,7 @@ class QuestionAsker(QObject):
         self.question = question
         self._is_initial_question = not history
         self._manager = QNetworkAccessManager(self)
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        messages = [{"role": "system", "content": system_prompt(conn)}]
         for prior_question, prior_references in history:
             messages.append({"role": "user", "content": prior_question})
             messages.append({"role": "assistant", "content": json.dumps(prior_references)})

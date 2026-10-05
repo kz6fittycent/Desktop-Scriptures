@@ -12,7 +12,10 @@ vectors here.
 
 What gets indexed ("pieces"):
 
-- scripture: every volume's verses (headed by the reference alone - an
+- scripture: every volume's verses - except a hidden one (the
+  Apocrypha and Other Ancient Texts until the reader switches them on,
+  data_access.OPTIONAL_VOLUMES; switching one on and rebuilding embeds
+  just that volume) - (headed by the reference alone - an
   earlier "(volume name)" suffix made "Lectures on Faith" match any
   question about faith) in small overlapping windows (up to
   WINDOW verses, and up to WINDOW_MAX_CHARS - Lectures on Faith's long
@@ -66,6 +69,7 @@ import numpy as np
 
 from scriptures.ask import extract_keywords
 from scriptures.citations import iter_citing_works
+from scriptures.data_access import hidden_volume_slugs
 
 INDEX_FILENAME = "study_index.db"
 
@@ -284,7 +288,12 @@ def collect_pieces(conn: sqlite3.Connection) -> list[Piece]:
     pieces.extend(_citing_work_pieces())
     pieces.extend(_note_pieces(conn))
     pieces.extend(_lexicon_pieces(conn))
-    return pieces
+    # Nothing from (or pointing into) a volume the reader hasn't switched on.
+    hidden = hidden_volume_slugs(conn)
+    return [
+        p for p in pieces
+        if p.volume_slug not in hidden and p.meta.get("related_volume_slug") not in hidden
+    ]
 
 
 def _windows(lengths: list[int]) -> list[tuple[int, int]]:
@@ -970,8 +979,12 @@ class StudyIndex:
         if self._ids is None:
             self.adopt_arrays(self._arrays_from(self.conn))
 
-    def _mask(self, kinds: set[str] | None, volume_slugs: set[str] | None) -> np.ndarray:
+    def _mask(
+        self, kinds: set[str] | None, volume_slugs: set[str] | None, exclude_volume_slugs: set[str] = frozenset()
+    ) -> np.ndarray:
         mask = np.ones(len(self._ids), dtype=bool)
+        if exclude_volume_slugs:
+            mask &= ~np.isin(self._volumes, list(exclude_volume_slugs))
         if kinds:
             mask &= np.isin(self._kinds, list(kinds))
         if volume_slugs:
@@ -982,7 +995,7 @@ class StudyIndex:
 
     def _semantic_ranking(
         self, query_vector: list[float], kinds: set[str] | None, volume_slugs: set[str] | None,
-        limit: int,
+        limit: int, exclude_volume_slugs: set[str] = frozenset(),
     ) -> list[int]:
         self._load()
         if len(self._ids) == 0:
@@ -997,7 +1010,7 @@ class StudyIndex:
         for start in range(0, len(self._ids), self._BLOCK_ROWS):
             block = self._matrix[start:start + self._BLOCK_ROWS].astype(np.float32)
             scores[start:start + len(block)] = block @ query
-        scores[~self._mask(kinds, volume_slugs)] = -np.inf
+        scores[~self._mask(kinds, volume_slugs, exclude_volume_slugs)] = -np.inf
         candidates = min(limit, int(np.isfinite(scores).sum()))
         if candidates <= 0:
             return []
@@ -1006,7 +1019,8 @@ class StudyIndex:
         return [int(self._ids[i]) for i in top]
 
     def _keyword_ranking(
-        self, query_text: str, kinds: set[str] | None, volume_slugs: set[str] | None, limit: int
+        self, query_text: str, kinds: set[str] | None, volume_slugs: set[str] | None, limit: int,
+        exclude_volume_slugs: set[str] = frozenset(),
     ) -> list[int]:
         # "Mark's" -> "mark": FTS5 splits a possessive into "mark" + "s", so
         # the phrase "mark's" only matched text with that exact possessive -
@@ -1029,6 +1043,9 @@ class StudyIndex:
         if volume_slugs:
             sql += f" AND p.volume_slug IN ({','.join('?' * len(volume_slugs))})"
             params.extend(sorted(volume_slugs))
+        if exclude_volume_slugs:
+            sql += f" AND COALESCE(p.volume_slug, '') NOT IN ({','.join('?' * len(exclude_volume_slugs))})"
+            params.extend(sorted(exclude_volume_slugs))
         # A heading word counts a fifth as much as a body word.
         sql += " ORDER BY bm25(pieces_fts, 0.2, 1.0) LIMIT ?"
         params.append(limit)
@@ -1043,13 +1060,16 @@ class StudyIndex:
         volume_slugs: set[str] | None = None,
         kind_limits: dict[str, int] | None = None,
         limit: int = 20,
+        exclude_volume_slugs: set[str] = frozenset(),
     ) -> list[SearchHit]:
         """The best `limit` pieces for a question, fusing semantic
         similarity (when `query_vector` - the question embedded with the
         index's own model - is given) with keyword relevance. Optionally
         restricted to certain kinds and/or volumes, and/or capped per kind
         (`kind_limits`, e.g. MIXED_KIND_LIMITS) so no one kind of source
-        can fill the list.
+        can fill the list. `exclude_volume_slugs` leaves out pieces from -
+        or cross-references into - those volumes (hidden ones an index
+        built earlier still holds).
 
         Scripture results are consolidated: overlapping or adjacent
         windows of the same chapter merge into one wider result (e.g.
@@ -1059,11 +1079,11 @@ class StudyIndex:
         same chapter for this."""
         candidates = limit * 5
         semantic = (
-            self._semantic_ranking(query_vector, kinds, volume_slugs, candidates)
+            self._semantic_ranking(query_vector, kinds, volume_slugs, candidates, exclude_volume_slugs)
             if query_vector is not None
             else []
         )
-        keyword = self._keyword_ranking(query_text, kinds, volume_slugs, candidates)
+        keyword = self._keyword_ranking(query_text, kinds, volume_slugs, candidates, exclude_volume_slugs)
 
         fused: dict[int, float] = {}
         semantic_rank = {piece_id: rank for rank, piece_id in enumerate(semantic, start=1)}
@@ -1090,6 +1110,8 @@ class StudyIndex:
             if row is None:
                 continue
             meta = json.loads(row["meta"])
+            if meta.get("related_volume_slug") in exclude_volume_slugs:
+                continue
             if row["kind"] == "scripture" and self._merge_into(hits, by_chapter, meta):
                 continue
             if kind_limits and kind_counts.get(row["kind"], 0) >= kind_limits.get(row["kind"], limit):
