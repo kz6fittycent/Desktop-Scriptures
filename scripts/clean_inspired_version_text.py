@@ -37,7 +37,9 @@ The fixes, in order:
    guillemets, pound signs, and angle brackets - none ever appear in this
    text - removed from inside a word when that leaves a real word
    ("w/ith" -> "with"), and dropped outright as tokens of their own.
-   Doubled commas and semicolons become single ones, and a ; : ? or !
+   Leftover pieces of decorative drop caps ("J_", "JL", "XA.") go, and a
+   "?" misread for "s" before punctuation is fixed ("clothe?," ->
+   "clothes,"). Doubled commas and semicolons become single ones, and a ; : ? or !
    standing alone (the 1867 typesetting put a space before them) joins
    the word before it, as in the rest of the app's text.
 3. Garbled words corrected from the KJV parallel: a word that isn't real
@@ -109,6 +111,8 @@ _WORD_RE = re.compile(r"[A-Za-z]+(?:'[a-z]+)?")
 # Leading/trailing punctuation around a token's letters.
 _SPLIT_RE = re.compile(r"^(\W*)(.*?)(\W*)$", re.S)
 KEEP_SINGLE_LETTERS = {"a", "A", "I", "O"}
+# What's left of a decorative drop cap the OCR split off ("J_", "JL", "XA.").
+DROPCAP_SCRAP_RE = re.compile(r"J[L_]|_L|_|XA\.?|X\\_|J\\\.|JL\^I|J\^l|1_J|\\_J|XJL|jLJL|J_\.")
 # (what the OCR read, what the page said) - for fix 5.
 OCR_CONFUSIONS = (
     ("rn", "m"), ("in", "m"), ("ri", "n"), ("ii", "u"), ("li", "h"), ("cl", "d"), ("tb", "th"),
@@ -281,6 +285,12 @@ def drop_junk(tokens: list[str], vocabulary: set[str]) -> list[str]:
             if is_word(stripped, vocabulary):
                 token = lead + stripped + trail
         token = re.sub(r"([,;])\1+", r"\1", token)
+        # "?" misread for "s" before punctuation ("clothe?," -> "clothes,").
+        q = re.fullmatch(r"([A-Za-z]+)\?([,;.:])", token)
+        if q and is_word(q.group(1) + "s", vocabulary):
+            token = q.group(1) + "s" + q.group(2)
+        if DROPCAP_SCRAP_RE.fullmatch(token):
+            continue
         if token:
             out.append(token)
     return out

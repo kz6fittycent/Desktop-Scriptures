@@ -15,18 +15,48 @@ edge case not covered by the notes below may need its own fix. See git
 history for the Genesis pilot commit and the later commit that ran --all
 across the rest of the Bible.
 
-KNOWN LIMITATIONS as of that --all run: 61 of the Bible's 66 books
-imported (see NOT_TRANSLATED and NEEDS_MANUAL_REVIEW for the other 5).
-16 of those 61 still have a chapter-count mismatch, each a low-frequency
-OCR/layout quirk not covered by the fixes below (most off by only 1-2
-chapters; Psalms is the largest gap, 138 of 150, spread across many
-individually-plausible-looking chapters rather than one obvious failure).
-A handful of chapter titles also still have a stray leaked verse fragment
-in them (rare - search a fresh --all run's imported DB for chapters.title
-containing a digit to find current instances) - cosmetic only in most
-cases, but a few do cost the chapter its first verse or two. Re-run
---all after any future fix and diff its summary output against this
-paragraph before updating it.
+KNOWN LIMITATIONS: all 61 imported books have the KJV's chapter count;
+about 160 verse numbers are missing across the whole JST (shown as gaps,
+never renumbered around) - 24 of them Judges 9:1-24, a leaf missing from
+this copy of the scan, and most of the rest a verse the OCR merged into
+its neighbour past recovering. 2 John, 3 John, Jude and Revelation are
+still skipped (NEEDS_MANUAL_REVIEW). --all prints each book's missing
+verse numbers and the scan defects it worked around.
+
+VERSE NUMBERS (2.3.1 rewrite of parse_book): the printed chapter and verse
+numbers are followed, not counted. Before, verses were numbered 1, 2, 3...
+in the order found, so one misread number or chapter heading ("CHAPTER
+H." for II) merged text and shifted every verse after it - 145 chapters
+came out short (1 Chronicles 2 had a single verse). Now:
+
+- A chapter heading's numeral is read through its usual OCR misreadings
+  (H or U for II, T or l for I...). One that repeats the current chapter's
+  number, or is followed by the current chapter's next verse, is a running
+  header; a heading followed by running text rather than an argument is
+  one too.
+- A verse is taken at its printed number when that number comes next (or
+  within a few, past ones the OCR lost). Misread numbers ("i:>", "U1")
+  are recognized by shape and position; a number the OCR fused into the
+  previous paragraph ("...need. 36 And Joses...") is split back out; a
+  number misread inside the text ("...brethren. o And...") is found
+  between a sentence's end and a usual verse opening (fill_gaps).
+- Numbering that restarts at 2 means a chapter began whose heading was
+  unreadable; its verse 1 (and argument) are recovered from the end of
+  the chapter before. Numbering that jumps back and carries on is a
+  chapter whose opening the scan lacks (Judges 9), or a hole the scan's
+  out-of-order columns left (Mark 14: 47, 59-82, then 48-58).
+- Scan defects handled explicitly: Isaiah 1:12-26 bound ahead of the
+  book's first heading (merged into chapter 1), and Jude's verses
+  interleaved into 1 John's last page (dropped).
+
+The older notes below (BOUNDARY DETECTION onward) still describe the
+argument/drop-cap handling, which carried over.
+
+A re-import renumbers verses, so the Topical Guide's JST entries are
+re-pointed at the verse now holding their text (repoint_topic_verses), and
+existing installs are brought along by db.sync_bundled_content: changed
+text is updated, a reader's notes and highlights follow the text they were
+made on, and verses that no longer exist are removed.
 
 OCR CLEANUP: scripts/clean_inspired_version_text.py is a second pass over
 the imported text (split words, stray symbols, misread letters, the
@@ -151,7 +181,9 @@ accuracy.
 
 from __future__ import annotations
 
+import difflib
 import re
+import sqlite3
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -232,7 +264,6 @@ TITLE_PAGE_RE = re.compile(r"^[A-Z][A-Z0-9 .,';]{2,100}$")
 SENTENCE_END_RE = re.compile(r"""[.!?:"'”’]$""")
 VERSE_RE = re.compile(r"^(\d{1,3})\s+(.*)$")
 DASH_RE = re.compile(r"[—–]")
-ARGUMENT_SPLIT_RE = re.compile(r"\.\s+([A-Z]{2,}\b.*)$")
 GARBLED_HEADING_LEAD_RE = re.compile(r"^[A-Z]{4,12}\s+\S{1,6}\.?\s+(?=\S)")
 DEHYPHENATE_RE = re.compile(r"(\w)-\s+([a-z]\w*)")
 DROPCAP_WORDS = {"AND", "NOW", "THE", "BUT", "FOR", "WHEN", "THUS", "SO", "THEN", "THEREFORE", "YEA"}
@@ -330,207 +361,440 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 
-def split_argument(text: str) -> tuple[str, str | None]:
-    """Once seen in the pilot, the OCR merged an argument's tail and
-    verse 1's start into a single PARAGRAPH element - split there (see
-    module docstring's last-but-one paragraph). Only reached (via the
-    DASH_RE branch) when HEADING_PREFIX_RE already failed to match, so a
-    leading heading word is also stripped here with a looser pattern that
-    doesn't require a valid-looking roman numeral - covers a heading
-    whose numeral OCR'd badly enough that HEADING_PREFIX_RE couldn't
-    recognize it as one, but which still has a real, dashed argument
-    right behind it (e.g. "CHAPTER Ill. Aaron maketh a calf - ...")."""
+ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+# What OCR reads for roman-numeral letters in a chapter heading.
+NUMERAL_FIXES = [("H", "II"), ("U", "II"), ("N", "II"), ("T", "I"), ("l", "I"), ("1", "I"), ("J", "I"),
+                 ("!", "I"), ("|", "I"), ("i", "I"), ("Y", "V"), ("K", "X"), ("x", "X"), ("v", "V")]
+HEADING_RE = re.compile(r"^(C[A-Z]{5,7}|[A-Z]HAPTER|PSALM)\s+([A-Za-z0-9!|]{1,9})[.,]?(?:\s+(.*))?$")
+LEAD_NUM_RE = re.compile(r"^(\S{1,4})\s+(.+)$", re.S)
+DIGIT_LIKE = str.maketrans({"l": "1", "I": "1", "i": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "z": "2", "G": "6", "b": "6", "q": "9", "g": "9", "J": "1", "!": "1", "|": "1", "t": "1"})
+
+
+def roman_value(token: str) -> int | None:
+    token = token.strip(".,")
+    for seen, meant in NUMERAL_FIXES:
+        token = token.replace(seen, meant)
+    if not token or any(c not in ROMAN for c in token):
+        return None
+    total = 0
+    for a, b in zip(token, token[1:] + " "):
+        v = ROMAN[a]
+        total += -v if b != " " and ROMAN.get(b, 0) > v else v
+    return total
+
+
+def number_value(token: str) -> int | None:
+    t = token.rstrip(".,")
+    if t.isdigit():
+        return int(t)
+    mapped = t.translate(DIGIT_LIKE)
+    return int(mapped) if mapped.isdigit() else None
+
+
+def parse_book(
+    paragraphs: list[str], book_name: str, start: int, end: int, expected_chapters: int
+) -> tuple[list[dict], list[str]]:
+    """One book's chapters - [{"title": str | None, "verses": {number: text}}]
+    - and a log of the scan defects worked around. See the module
+    docstring's VERSE NUMBERS for how chapters and verses are found."""
+    header_re = header_re_for(book_name)
+    chapters: list[dict] = []
+    cur: dict | None = None
+    log: list[str] = []
+
+    def new_chapter(title: str = "") -> None:
+        nonlocal cur
+        cur = {"title": title, "verses": {}, "last": 0, "title_open": True}
+        chapters.append(cur)
+
+    def add(num: int, text: str) -> None:
+        cur["verses"][num] = text
+        cur["last"] = num
+        cur["title_open"] = False
+        split_fused()
+
+    def append(text: str) -> None:
+        if cur["last"]:
+            cur["verses"][cur["last"]] += BREAK + text
+            split_fused()
+        else:
+            add(1, text)
+
+    def split_fused() -> None:
+        """A next verse whose number the OCR ran into this paragraph
+        ("...as he had need. 36 And Joses...")."""
+        while True:
+            text = cur["verses"][cur["last"]]
+            m = None
+            for found in re.finditer(r"[.;:?!,]\s+(\d{1,3})\s+(?=[A-Z(])", text):
+                value = int(found.group(1))
+                # The next number - or a jump past numbers the OCR lost,
+                # when the one after it follows in the same text.
+                if value in cur["verses"]:
+                    continue
+                if value == cur["last"] + 1 or (
+                    cur["last"] + 1 < value <= cur["last"] + 15
+                    and re.search(rf"[.;:?!,]\s+{value + 1}\s+[A-Z(]", text[found.end():])
+                ):
+                    m = found
+                    break
+            if not m:
+                return
+            nxt_no = int(m.group(1))
+            cur["verses"][cur["last"]] = text[: m.start() + 1].strip()
+            cur["verses"][nxt_no] = text[m.end():].strip()
+            cur["last"] = nxt_no
+
+    i = start + 1  # past the book's title page
+    paras = paragraphs
+    while i < end:
+        raw = paras[i].strip()
+        i += 1
+        if not raw or _is_noise(raw) or TINY_FRAGMENT_RE.match(raw):
+            continue
+        upper = raw.upper()
+        if header_re.match(upper) or CHAPTER_RANGE_RE.match(upper):
+            continue
+
+        heading = HEADING_RE.match(raw)
+        if heading and heading.group(1) != "PSALM" and _levenshtein(heading.group(1), "CHAPTER") > 2:
+            heading = None
+        if heading:
+            value = roman_value(heading.group(2))
+            rest = heading.group(3)
+            if rest and not re.match(r"[A-Z(]", rest):
+                # Not an argument but the page's text running on - a page
+                # number and a continuation after a running header
+                # ("CHAPTER XXVI. 829 sea causeth his waves...").
+                if cur is not None and cur["verses"]:
+                    append(clean_text(re.sub(r"^\S*\d\S*\s+", "", rest)))
+                continue
+            # (Not counting verses bound in ahead of the book's first
+            # heading - see the end of this function.)
+            current_no = len(chapters) - (1 if chapters and 1 not in chapters[0]["verses"] else 0)
+            nxt = _next_real(paras, i, end, header_re)
+            # A running header: the current chapter's numbering carries on
+            # right after it (maybe past one continuation line).
+            following = _next_reals(paras, i, end, header_re, 2)
+            continues = _continues(following[0], cur) or (
+                len(following) > 1 and not _looks_like_verse_start(following[0])
+                and not HEADING_RE.match(following[0]) and _continues(following[1], cur)
+            )
+            if continues and not rest:
+                continue  # a running header: the current chapter goes on
+            if value is not None and value == current_no and cur is not None and cur["verses"] and not rest:
+                continue  # the running header repeats the current chapter's own number
+            real = False
+            if value is not None and value == current_no + 1:
+                real = not (VERSE_RE.match(nxt) and number_value(nxt.split()[0]) not in (None, 1)
+                            and cur is not None and number_value(nxt.split()[0]) == cur["last"] + 1) and not (nxt[:1].islower() and not rest)
+            elif rest:
+                real = True
+            else:
+                nv = VERSE_RE.match(nxt)
+                real = not (is_page_number(nxt) or (nv and cur is not None and cur["last"]) or nxt[:1].islower())
+            if not real:
+                continue
+            new_chapter()
+            if rest:
+                argument, verse1 = split_argument(rest)
+                cur["title"] = clean_text(argument)
+                if verse1:
+                    add(1, clean_text(verse1))
+            continue
+
+        raw = re.sub(r"^[A-Za-z]\s+(?=\d{1,3}\s)", "", raw)  # a stray mark before a verse number
+        if cur is None and LEAD_NUM_RE.match(raw) and raw.split()[0].isdigit():
+            new_chapter()  # a book whose first pages are out of order (Isaiah)
+        m = LEAD_NUM_RE.match(raw)
+        if m and cur is not None:
+            value = number_value(m.group(1))
+            text = m.group(2).strip()
+            if value is not None and len(text) > 3 and not header_re.match(text.upper()):
+                # The next number not yet seen: after filling a hole the
+                # scan's columns left (Mark 14: 47, 59-82, then 48-58),
+                # numbering resumes past the highest.
+                expected = cur["last"] + 1
+                if expected in cur["verses"]:
+                    expected = max(cur["verses"]) + 1
+                plain_digits = m.group(1).rstrip(".,").isdigit()
+                if value == expected or (plain_digits and expected < value <= expected + 3) or (
+                    plain_digits and not cur["verses"] and 1 < value < 200 and not cur["title"]
+                ):
+                    add(value, clean_text(text))
+                    continue
+                if plain_digits and value < cur["last"] and value not in cur["verses"] and value - 1 in cur["verses"]:
+                    log.append(f"filled a hole at {value}: {raw[:50]}")
+                    add(value, clean_text(text))
+                    continue
+                if plain_digits and 3 < value < cur["last"] - 1 and _continues_from(
+                    _next_reals(paras, i, end, header_re, 1)[0], value
+                ):
+                    # Numbering jumps back and carries on: the next chapter,
+                    # whose opening the scan lacks (Judges 9:1-24 - a
+                    # missing page).
+                    log.append(f"restart mid-chapter: {raw[:60]}")
+                    new_chapter()
+                    add(value, clean_text(text))
+                    continue
+                if text[:1].islower() and not plain_digits or (plain_digits and value > 200):
+                    # A page number fused onto a continuation ("80S king").
+                    append(clean_text(text))
+                    continue
+                if plain_digits and value == 2 and cur["last"] >= 3 and cur["verses"]:
+                    # Numbering restarted without a heading we could read:
+                    # a new chapter, whose unnumbered verse 1 went onto the
+                    # previous chapter's last verse.
+                    log.append(f"chapter start found by numbering: {raw[:60]}")
+                    prev = cur
+                    tail = prev.get("last_para_start")
+                    title = ""
+                    if tail is None:
+                        last_text = prev["verses"][prev["last"]]
+                        pieces = last_text.split(BREAK)
+                        start_at = next(
+                            (k for k in range(len(pieces) - 1, 0, -1) if _looks_like_verse_start(pieces[k])), None
+                        )
+                        if start_at is not None:
+                            # Before verse 1: maybe the lost heading's argument.
+                            if start_at > 1 and DASH_RE.search(pieces[start_at - 1]):
+                                title = clean_text(pieces[start_at - 1])
+                                start_at -= 1
+                                pieces[start_at] = ""
+                            prev["verses"][prev["last"]] = BREAK.join(pieces[:start_at])
+                            last_text = BREAK.join(pieces[:start_at]) + BREAK + BREAK.join(p for p in pieces[start_at:] if p)
+                            prev["verses"][prev["last"]] = last_text
+                            tail = len(BREAK.join(pieces[:start_at])) + 1
+                        else:
+                            # Argument and verse 1 in one paragraph, after the
+                            # last verse: "...my father. for his father—
+                            # Jacob is revived... nnHEN Joseph could not..."
+                            argument, verse1_text = split_argument(pieces[-1], LOOSE_SPLIT_RE)
+                            if len(pieces) > 1 and verse1_text and DASH_RE.search(argument):
+                                title = clean_text(argument)
+                                prev["verses"][prev["last"]] = BREAK.join(pieces[:-1])
+                                last_text = prev["verses"][prev["last"]] + BREAK + verse1_text
+                                prev["verses"][prev["last"]] = last_text
+                                tail = len(last_text) - len(verse1_text)
+                            else:
+                                found = DROPCAP_INSIDE_RE.search(last_text)
+                                tail = found.start() + 1 if found else None
+                    verse1 = ""
+                    if tail is not None:
+                        last_text = prev["verses"][prev["last"]]
+                        verse1 = last_text[tail:].strip()
+                        prev["verses"][prev["last"]] = last_text[:tail].strip()
+                    new_chapter()
+                    cur["title"] = title
+                    add(1, verse1 or "")
+                    add(2, clean_text(text))
+                    continue
+
+        if cur is None:
+            new_chapter()
+
+        nxt = _next_real(paras, i, end, header_re)
+        if DASH_RE.search(raw) and not cur["verses"] or (
+            DASH_RE.search(raw) and cur["verses"] and _looks_like_argument(raw)
+            and (split_argument(raw)[1] or _looks_like_verse_start(nxt))
+            and not _continues(nxt, cur)
+        ):
+            argument, verse1 = split_argument(raw)
+            if cur["verses"]:
+                new_chapter()
+            cur["title"] = clean_text(f"{cur['title']} {argument}".strip())
+            if verse1:
+                add(1, clean_text(verse1))
+            continue
+
+        if not cur["verses"]:
+            # Before verse 1: the argument, or verse 1 itself (drop cap).
+            if cur["title_open"] and not _looks_like_verse_start(raw) and not SENTENCE_END_RE.search(cur["title"] or " "):
+                argument, verse1 = split_argument(raw)
+                cur["title"] = clean_text(f"{cur['title']} {argument}".strip())
+                if verse1:
+                    add(1, clean_text(verse1))
+                continue
+            if cur["title_open"] and not cur["title"] and not _looks_like_verse_start(raw):
+                cur["title"] = clean_text(raw)
+                continue
+            add(1, clean_text(raw))
+            continue
+        # A capitalized drop-cap paragraph could be the next chapter's
+        # unnumbered verse 1 - remember where it starts.
+        if _looks_like_verse_start(raw):
+            cur["last_para_start"] = len(cur["verses"][cur["last"]]) + 1
+        append(clean_text(raw))
+
+    chapters = [c for c in chapters if c["verses"]]
+    # The scan's own defects (see the module docstring):
+    # - verses bound in ahead of a book's first heading (Isaiah 1:12-26)
+    #   belong to chapter 1;
+    if len(chapters) > expected_chapters and 1 not in chapters[0]["verses"]:
+        stray = chapters.pop(0)
+        for number, text in stray["verses"].items():
+            chapters[0]["verses"].setdefault(number, text)
+        log.append(f"merged {len(stray['verses'])} verses bound ahead of chapter 1")
+    # - a run of another book's verses past the last chapter (Jude's,
+    #   interleaved into 1 John's last pages).
+    while len(chapters) > expected_chapters and 1 not in chapters[-1]["verses"]:
+        dropped = chapters.pop()
+        log.append(f"dropped {len(dropped['verses'])} trailing verses from another book")
+    # A chapter whose verse 1 is still empty: it went onto the previous
+    # chapter's last verse, after that chapter's own text - from the
+    # last drop-cap opening there.
+    for before, c in zip(chapters, chapters[1:]):
+        if c["verses"].get(1, "x").strip():
+            continue
+        last = max(before["verses"])
+        text = before["verses"][last]
+        found = list(re.finditer(r"[.,;:]\s+([a-zA-Z~'\"\\_^]{0,3}[A-Z]{2,}\s+[A-Za-z])", text))
+        if found and len(text) - found[-1].start(1) > 20:
+            cut = found[-1].start(1)
+            c["verses"][1] = text[cut:]
+            before["verses"][last] = text[:cut].rstrip()
+            log.append(f"verse 1 recovered from the previous chapter: {text[cut:cut + 40]!r}")
+    for c in chapters:
+        c["title"] = (c["title"] or "").strip() or None
+        c.pop("last_para_start", None)
+        fill_gaps(c["verses"], log)
+        c["verses"] = {
+            n: _strip_headers(" ".join(t.replace(BREAK, " ").split()), book_name)
+            for n, t in sorted(c["verses"].items())
+        }
+    return chapters, log
+
+
+def _looks_like_verse_start(raw: str) -> bool:
+    words = raw.split()
+    if not words:
+        return False
+    # A drop cap the OCR garbled: "nnHEN", "fTlHEN", "rT\"OW".
+    if len(words) >= 2 and re.match(r"^[a-zA-Z~'\"\\_^]{1,3}[A-Z]{2,}[,.]?$", words[0]) and words[1][:1].islower():
+        return True
+    if len(words) >= 2 and len(words[0]) == 1 and words[0].isupper() and words[1][:1].isupper():
+        return True
+    first = words[0].rstrip(".,;:")
+    return len(first) >= 2 and first.isupper() and first not in ("LORD", "GOD", "I")
+
+
+def _looks_like_argument(raw: str) -> bool:
+    # An argument: capitalized phrases joined by dashes, no verse-like opening.
+    return raw[:1].isupper() and raw.count("—") + raw.count("–") >= 1 and len(raw) < 400
+
+
+DROPCAP_WORD = r"(?:[A-Z]\s?[A-Z]{1,}|[a-zA-Z~'\"\\_]{0,3}[A-Z]{2,})"
+ARGUMENT_SPLIT_RE = re.compile(r"[.,]\s+(" + DROPCAP_WORD + r"\s+[a-z].*)$")
+# Looser, for a chapter start already known to be lost in the last verse.
+LOOSE_SPLIT_RE = re.compile(r"[.,]\s+(" + DROPCAP_WORD + r"\s+[A-Za-z].*)$")
+DROPCAP_INSIDE_RE = re.compile(r"[.;:?]\s+(?:[A-Z]\s?)?[A-Z]{2,}\s+[a-z]")
+
+
+def split_argument(text: str, pattern=None) -> tuple[str, str | None]:
+    """An argument and the start of verse 1 OCR'd into one paragraph:
+    split where a drop-cap word (AND, A ND, npHEN...) follows a sentence."""
     text = GARBLED_HEADING_LEAD_RE.sub("", text)
-    m = ARGUMENT_SPLIT_RE.search(text)
+    m = (pattern or ARGUMENT_SPLIT_RE).search(text)
     if m:
         return text[: m.start() + 1].strip(), m.group(1).strip()
     return text.strip(), None
 
 
-def parse_book(paragraphs: list[str], book_name: str, start: int, end: int) -> list[dict]:
-    header_re = header_re_for(book_name)
-
-    chapters: list[dict] = []
-    current: dict | None = None
-
-    def open_chapter(title: str) -> None:
-        nonlocal current
-        current = {"title": title, "verses": []}
-        chapters.append(current)
-
-    def add_verse_text(text: str) -> None:
-        nonlocal current
-        if current is None:
-            # A book can start with real content before any heading/
-            # argument is recognized - seen once, Isaiah 1: the scan's own
-            # page order is scrambled and verses 12-26 appear before the
-            # chapter heading and verses 1-11 (a defect in the source scan
-            # itself, not something reorderable here). Opening an untitled
-            # chapter here avoids losing/crashing on that content instead.
-            open_chapter("")
-        current["verses"].append(text)
-
-    def append_to_last_verse(text: str) -> None:
-        if current is not None and current["verses"]:
-            current["verses"][-1] = f"{current['verses'][-1]} {text}"
-        else:
-            add_verse_text(text)
-
-    def title_open() -> bool:
-        """True while the current chapter's argument is still being
-        accumulated: a title has started, no verse has started yet, and
-        the title doesn't yet end in sentence-final punctuation. Some
-        pages fragment a chapter's heading/argument/verse-1 across 3+
-        separate OCR PARAGRAPH elements instead of the usual 1-2 - this
-        lets every following paragraph keep feeding the same argument
-        until it actually completes."""
-        return (
-            current is not None
-            and not current["verses"]
-            and bool(current["title"])
-            and not SENTENCE_END_RE.search(current["title"])
-        )
-
-    def looks_like_verse_start(raw: str) -> bool:
-        """This print always opens a chapter's verse 1 with a decorative
-        drop-cap word set in small caps (AND/THUS/NOW/...), sometimes
-        OCR'd as a lone stray letter plus the rest ("A ND"). An argument
-        line's first word is never in caps like this - used to end
-        title_open() accumulation even when the argument's own tail was
-        lost to OCR (e.g. cut off mid-hyphen), so real verse 1 text never
-        gets absorbed into the title."""
-        words = raw.split()
-        if not words:
-            return False
-        if len(words) >= 2 and len(words[0]) == 1 and words[0].isupper() and words[1][:1].isupper():
-            return True
-        first = words[0].rstrip(".,;:")
-        return len(first) >= 2 and first.isupper()
-
-    i = start
+def _next_real(paras, i, end, header_re) -> str:
     while i < end:
-        raw = paragraphs[i].strip()
+        p = paras[i].strip()
         i += 1
-        if not raw:
+        if not p or _is_noise(p) or TINY_FRAGMENT_RE.match(p) or header_re.match(p.upper()):
             continue
-        upper = raw.upper()
+        return p
+    return ""
 
-        if is_page_number(raw):
-            continue
-        if TINY_FRAGMENT_RE.match(raw):
-            # A lone stray letter with nothing else - a decorative
-            # drop-cap or margin mark that landed in its own PARAGRAPH
-            # element instead of merging with the word it belongs to (the
-            # same artifact DROPCAP_RE fixes when it's merged - see
-            # clean_text). No real verse, title, or argument is ever this
-            # short, so this is always noise.
-            continue
-        if header_re.match(upper):
-            continue
-        if CHAPTER_RANGE_RE.match(upper):
-            # A page spanning two chapters gets a running header naming
-            # both ("CHAPTER XX.-- XXI.") - noise, not a real boundary.
-            continue
 
-        heading = HEADING_PREFIX_RE.match(raw)
-        if heading:
-            remainder = heading.group(3)
-            if remainder:
-                # Heading and argument merged in one paragraph (common in
-                # the New Testament and Psalms) - always a real chapter
-                # start; a coincidental running-header duplicate is never
-                # followed by extra merged text.
-                argument, verse1_lead = split_argument(remainder)
-                if current is None or current["verses"]:
-                    open_chapter(clean_text(argument))
-                else:
-                    current["title"] = clean_text(argument)
-                if verse1_lead:
-                    add_verse_text(clean_text(verse1_lead))
-                continue
+def _continues(nxt: str, cur) -> bool:
+    """The next paragraph is the current chapter's next numbered verse -
+    or opens with what can only be a misread verse number ("U1")."""
+    m = LEAD_NUM_RE.match(nxt)
+    if not (cur and cur["last"] and m):
+        return False
+    token = m.group(1)
+    if number_value(token) in (cur["last"] + 1, cur["last"] + 2):
+        return True
+    return len(token) <= 3 and any(c.isdigit() for c in token) and not token.isdigit()
 
-            # Bare heading: real vs. noise. A running-header duplicate is
-            # immediately followed by a bare page number, or (when a page
-            # number wasn't printed/OCR'd separately on that page) by an
-            # explicitly-numbered verse - a real chapter start is never
-            # followed directly by verse *2+*, only by an argument or
-            # verse 1 (always unnumbered in this print). A running header
-            # that got column/page-order-shuffled into the middle of a
-            # verse is immediately followed by the interrupted verse's
-            # lowercase-starting continuation. None of these three are a
-            # real chapter start. A real heading opens a new chapter
-            # itself (title filled in as "" for now) - needed for
-            # single-topic arguments with no dash to trigger on; a
-            # dash-bearing argument right after just fills that title in,
-            # so this never double-opens.
-            nxt = paragraphs[i].strip() if i < end else ""
-            if is_page_number(nxt):
-                i += 1
-                continue
-            if VERSE_RE.match(nxt):
-                continue
-            if nxt and nxt[0].islower():
-                continue
-            open_chapter("")
-            continue
 
-        if title_open() and not looks_like_verse_start(raw) and not VERSE_RE.match(raw):
-            # Still accumulating the current chapter's argument (see
-            # title_open's docstring) - this paragraph either continues
-            # it, or completes it and leads into verse 1.
-            tail, verse1_lead = split_argument(raw)
-            current["title"] = clean_text(f"{current['title']} {tail}")
-            if verse1_lead:
-                add_verse_text(clean_text(verse1_lead))
+def _next_reals(paras, i, end, header_re, count: int) -> list[str]:
+    found = []
+    while i < end and len(found) < count:
+        p = paras[i].strip()
+        i += 1
+        if not p or _is_noise(p) or TINY_FRAGMENT_RE.match(p) or header_re.match(p.upper()):
             continue
+        found.append(p)
+    return found or [""]
 
-        m = VERSE_RE.match(raw)
-        if m:
-            remainder = m.group(2).strip()
-            if len(remainder) <= 3 or header_re.match(remainder.upper()):
-                # A page number merged with noise - either a printer's
-                # signature mark (page-bottom letter/number combinations
-                # used for collating a book's printed sections, e.g. "49
-                # 2M") or the book's own running header ("13 ST. MARK").
-                # No real verse is ever this short.
-                continue
-            # An explicit verse number wins even over a dash - verse text
-            # can genuinely contain an em dash itself (seen once in the
-            # pilot: "...blessed of thousands - of millions...").  Argument
-            # lines never start with a number, so checking this first only
-            # ever affects real verses, not chapter boundaries.
-            add_verse_text(clean_text(remainder))
-            continue
 
-        if DASH_RE.search(raw):
-            argument, verse1_lead = split_argument(raw)
-            if current is None or current["verses"]:
-                open_chapter(clean_text(argument))
-            else:
-                current["title"] = clean_text(argument)
-            if verse1_lead:
-                add_verse_text(clean_text(verse1_lead))
-            continue
+def _continues_from(nxt: str, value: int) -> bool:
+    m = LEAD_NUM_RE.match(nxt)
+    return bool(m and number_value(m.group(1)) in (value + 1, value + 2))
 
-        # Continuation: either a still-untitled chapter's title line
-        # (before its verse 1 starts), verse 1's un-numbered text, or a
-        # wrapped continuation of the previous verse across a page/column
-        # break. Also covers the Bible's five one-chapter books, whose
-        # title is followed directly by the argument/verse 1 with no
-        # heading/chapter-number at all.
-        if current is None:
-            open_chapter("")
-        if current["title"] == "" and not current["verses"]:
-            current["title"] = raw
+
+# A page number the OCR misread ("80S", "U1"): a short token with a digit in it.
+PAGE_LIKE_RE = re.compile(r"^(?=\S*\d)[A-Za-z0-9$]{1,4}$")
+
+
+def _is_noise(p: str) -> bool:
+    return is_page_number(p) or bool(PAGE_LIKE_RE.match(p.strip()))
+
+
+VERSE_OPENERS = (
+    r"(?:And|But|For|Then|Now|Wherefore|Therefore|Behold|Yea|Thus|So|Neither|Nevertheless|"
+    r"Verily|Ye|They|He|She|It|Let|Who|What|How|If|When|Because)"
+)
+BREAK = "\u2029"  # a paragraph break in the scan, kept until the end
+GARBLED_NUMBER_RE = re.compile(r"^(\S{1,4})\s+(?=[A-Z(])")
+RUNNING_HEADER_IN_TEXT_RE = re.compile(
+    r"\s*\bC[A-Z]{5,7}\s+[IVXLCDMHT1l]{1,8}\.?(?:\s*[—–-]+\s*[IVXLCDMHT1l]{1,8}\.?)?(?=\s|$)"
+)
+
+
+def fill_gaps(verses: dict, log: list) -> None:
+    """A verse number the OCR misread ("i:>" for 13) left that verse inside
+    the one before: split it back out at the paragraph that opens with
+    something that can't be a word."""
+    for number in sorted(verses):
+        missing = number + 1
+        if missing in verses or missing + 1 not in verses:
             continue
-        if not current["verses"]:
-            add_verse_text(clean_text(raw))
+        pieces = verses[number].split(BREAK)
+        for k in range(1, len(pieces)):
+            m = GARBLED_NUMBER_RE.match(pieces[k])
+            if m and not m.group(1).isalpha() and not m.group(1).lower() in ("o", "a", "i"):
+                verses[number] = BREAK.join(pieces[:k])
+                verses[missing] = BREAK.join([pieces[k][m.end():]] + pieces[k + 1:])
+                log.append(f"recovered verse {missing}: {m.group(1)!r}")
+                break
         else:
-            append_to_last_verse(clean_text(raw))
+            # Inside the text: a misread number ("o", "0", "1 5", "l6")
+            # between a sentence's end and a usual verse opening.
+            m = re.search(
+                r"[.;:?!]\s+((?:\d\s)?[0-9oOlI|]{1,3})\s+(?=" + VERSE_OPENERS + r"\b)",
+                verses[number],
+            )
+            if m and not re.fullmatch(r"[OI]", m.group(1)):
+                text = verses[number]
+                verses[number] = text[: m.start() + 1]
+                verses[missing] = text[m.end():]
+                log.append(f"recovered verse {missing} mid-text: {m.group(1)!r}")
 
-    for c in chapters:
-        c["title"] = (c["title"] or "").strip() or None
-    return [c for c in chapters if c["verses"]]
+
+def _strip_headers(text: str, book_name: str) -> str:
+    """A running header the OCR placed mid-verse: a chapter's ("...at thy
+    CHAPTER XL.— XL1 command") or the book's own, in capitals ("...to use
+    THE ACTS. them despitefully")."""
+    text = RUNNING_HEADER_IN_TEXT_RE.sub("", text)
+    core = re.escape(_book_core(book_name))
+    text = re.sub(rf"\s+(?:ST\.\s+|THE\s+|[IV1]+\.\s+)?{core}\.(?=\s|$)", "", text)
+    return text.strip()
 
 
 def _get_or_create_volume(conn) -> int:
@@ -572,9 +836,12 @@ def _delete_existing_book(conn, volume_id: int, book_name: str) -> None:
             conn.execute("DELETE FROM highlights WHERE verse_id = ?", (verse_id,))
             conn.execute("DELETE FROM notes WHERE verse_id = ?", (verse_id,))
             conn.execute("DELETE FROM tag_assignments WHERE verse_id = ?", (verse_id,))
+            conn.execute("UPDATE journal_entries SET verse_id = NULL WHERE verse_id = ?", (verse_id,))
         conn.execute("DELETE FROM notes WHERE chapter_id = ?", (chapter_id,))
         conn.execute("DELETE FROM tag_assignments WHERE chapter_id = ?", (chapter_id,))
         conn.execute("DELETE FROM reading_log WHERE chapter_id = ?", (chapter_id,))
+        conn.execute("DELETE FROM reading_history WHERE chapter_id = ?", (chapter_id,))
+        conn.execute("UPDATE journal_entries SET chapter_id = NULL WHERE chapter_id = ?", (chapter_id,))
         conn.execute("DELETE FROM verses WHERE chapter_id = ?", (chapter_id,))
     conn.execute("DELETE FROM chapters WHERE book_id = ?", (book_id,))
     conn.execute("DELETE FROM books WHERE id = ?", (book_id,))
@@ -602,7 +869,7 @@ def import_book(
         chapter_id = cur.lastrowid
         if not chapter["title"]:
             summary["empty_titles"] += 1
-        for verse_number, text in enumerate(chapter["verses"], start=1):
+        for verse_number, text in chapter["verses"].items():
             reference = f"{book_name} {chapter_number}:{verse_number}"
             conn.execute(
                 "INSERT INTO verses (chapter_id, verse_number, text, reference) VALUES (?, ?, ?, ?)",
@@ -615,17 +882,69 @@ def import_book(
     return summary
 
 
-def _report(book_name: str, summary: dict) -> None:
+def _report(book_name: str, summary: dict, chapters: list[dict], notes: list[str]) -> None:
     expected = EXPECTED_CHAPTERS.get(book_name)
     flag = "" if summary["chapters"] == expected else "  <-- MISMATCH"
+    missing = sum(
+        1 for c in chapters for n in range(1, max(c["verses"]) + 1) if n not in c["verses"]
+    )
     print(
         f"  {book_name:<20} {summary['chapters']:>3} chapters "
         f"(expected {expected:>3}), {summary['verses']:>4} verses, "
-        f"{summary['empty_titles']} untitled{flag}"
+        f"{missing} verse numbers missing, {summary['empty_titles']} untitled{flag}"
     )
+    for note in notes:
+        if not note.startswith(("recovered", "filled", "chapter start")):
+            print(f"      {note}")
+
+
+def _jst_texts(conn) -> dict[str, tuple[str, str]]:
+    return {
+        r["reference"]: (r["name"], r["text"])
+        for r in conn.execute(
+            "SELECT b.name, v.reference, v.text FROM verses v JOIN chapters c ON c.id = v.chapter_id "
+            "JOIN books b ON b.id = c.book_id JOIN volumes vol ON vol.id = b.volume_id WHERE vol.slug = ?",
+            (VOLUME_SLUG,),
+        )
+    }
+
+
+def repoint_topic_verses(conn, before: dict[str, tuple[str, str]]) -> None:
+    """The Topical Guide lists some JST verses by reference
+    (build_topical_guide.py); a re-import can renumber them. Each is
+    re-pointed at the verse that now holds the text it was chosen for, or
+    dropped if no verse does."""
+    after: dict[str, list[tuple[str, str]]] = {}
+    for reference, (book, text) in _jst_texts(conn).items():
+        after.setdefault(book, []).append((reference, text))
+    moved = dropped = 0
+    for row in conn.execute(
+        "SELECT id, reference FROM topic_verses WHERE volume_slug = ?", (VOLUME_SLUG,)
+    ).fetchall():
+        book, old_text = before.get(row["reference"], (None, None))
+        if old_text is None:
+            continue
+        words = set(old_text.lower().split())
+        candidates = sorted(after.get(book, []), key=lambda rt: -len(words & set(rt[1].lower().split())))[:10]
+        best = max(
+            candidates, key=lambda rt: difflib.SequenceMatcher(None, old_text, rt[1]).ratio(), default=None
+        )
+        if best is None or difflib.SequenceMatcher(None, old_text, best[1]).ratio() < 0.6:
+            conn.execute("DELETE FROM topic_verses WHERE id = ?", (row["id"],))
+            dropped += 1
+        elif best[0] != row["reference"]:
+            try:
+                conn.execute("UPDATE topic_verses SET reference = ? WHERE id = ?", (best[0], row["id"]))
+                moved += 1
+            except sqlite3.IntegrityError:  # the topic already lists that verse
+                conn.execute("DELETE FROM topic_verses WHERE id = ?", (row["id"],))
+                dropped += 1
+    conn.commit()
+    print(f"Topical Guide: {moved} JST verse(s) re-pointed after renumbering, {dropped} dropped.")
 
 
 def import_all(paragraphs: list[str], conn) -> None:
+    before = _jst_texts(conn)
     volume_id = _get_or_create_volume(conn)
     ot_id = _get_or_create_testament(conn, volume_id, "Old Testament", 1)
     nt_id = _get_or_create_testament(conn, volume_id, "New Testament", 2)
@@ -660,9 +979,11 @@ def import_all(paragraphs: list[str], conn) -> None:
             print(f"  {book_name:<20} skipped - needs manual review (see NEEDS_MANUAL_REVIEW)")
             continue
 
-        chapters = parse_book(paragraphs, book_name, start, end)
+        chapters, notes = parse_book(paragraphs, book_name, start, end, EXPECTED_CHAPTERS[book_name])
         summary = import_book(conn, book_name, chapters, testament_id, sort_order)
-        _report(book_name, summary)
+        _report(book_name, summary, chapters, notes)
+
+    repoint_topic_verses(conn, before)
 
 
 def main() -> None:
@@ -718,7 +1039,7 @@ def main() -> None:
         conn, volume_id, "Old Testament" if is_ot else "New Testament", 1 if is_ot else 2
     )
 
-    chapters = parse_book(paragraphs, book_name, start, end)
+    chapters, _notes = parse_book(paragraphs, book_name, start, end, EXPECTED_CHAPTERS[book_name])
     print(f"Importing Joseph Smith Translation, {book_name} ...")
     summary = import_book(conn, book_name, chapters, testament_id, sort_order)
     compact(conn)

@@ -384,6 +384,11 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                     book_id = cur.lastrowid
                 else:
                     book_id = brow["id"]
+                # Verses whose text changed beyond recognition - renumbered
+                # upstream (the JST re-import) - as (verse id, old text):
+                # their notes and highlights follow the text, below.
+                displaced: list[tuple[int, str]] = []
+                bundled_verses: set[tuple[int, int]] = set()
 
                 for b_chap in conn.execute(
                     "SELECT * FROM bundled.chapters WHERE book_id = ? ORDER BY chapter_number",
@@ -421,8 +426,15 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                             "SELECT id, text FROM verses WHERE chapter_id = ? AND verse_number = ?",
                             (chapter_id, b_verse["verse_number"]),
                         ).fetchone()
+                        bundled_verses.add((b_chap["chapter_number"], b_verse["verse_number"]))
                         if vrow is not None and vrow["text"] != b_verse["text"]:
-                            _update_verse_text(conn, vrow["id"], vrow["text"], b_verse["text"])
+                            if _similar_text(vrow["text"], b_verse["text"]):
+                                _update_verse_text(conn, vrow["id"], vrow["text"], b_verse["text"])
+                            else:
+                                displaced.append((vrow["id"], vrow["text"]))
+                                conn.execute(
+                                    "UPDATE verses SET text = ? WHERE id = ?", (b_verse["text"], vrow["id"])
+                                )
                         if vrow is None:
                             conn.execute(
                                 "INSERT INTO verses "
@@ -435,6 +447,8 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                                     b_verse["reference"],
                                 ),
                             )
+                _rehome_displaced(conn, book_id, displaced)
+                _prune_stale_verses(conn, book_id, bundled_verses)
         _sync_bundled_topics(conn)
         _sync_bundled_topic_key_verses(conn)
         _sync_bundled_lexicon(conn)
@@ -443,6 +457,104 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
         conn.commit()
     finally:
         conn.execute("DETACH DATABASE bundled")
+
+
+def _similar_text(a: str, b: str) -> bool:
+    """The same verse, corrected - rather than a different verse now
+    under that number."""
+    matcher = difflib.SequenceMatcher(None, a, b, autojunk=False)
+    return matcher.quick_ratio() >= 0.6 and matcher.ratio() >= 0.6
+
+
+def _has_user_data(conn: sqlite3.Connection, verse_id: int) -> bool:
+    return any(
+        conn.execute(f"SELECT 1 FROM {table} WHERE verse_id = ? LIMIT 1", (verse_id,)).fetchone()
+        for table in ("highlights", "notes", "tag_assignments", "journal_entries")
+    )
+
+
+def _rehome_displaced(conn: sqlite3.Connection, book_id: int, displaced: list[tuple[int, str]]) -> None:
+    """A verse renumbered upstream now holds different text: move its
+    notes, tags, journal links and highlights to whichever verse of the
+    book now holds the text they were made on. With no such verse, its
+    highlights (which can't be placed) are removed; notes and tags stay.
+
+    Every move is decided first, from the rows as they were, and applied
+    after - otherwise a note moved onto a verse that was itself renumbered
+    would be moved again, and again."""
+    if not displaced:
+        return
+    book_verses = conn.execute(
+        "SELECT v.id, v.text FROM verses v JOIN chapters c ON c.id = v.chapter_id WHERE c.book_id = ?",
+        (book_id,),
+    ).fetchall()
+    moves = []  # (table, row id, target verse id or None, old text, target text)
+    for verse_id, old in displaced:
+        rows = [
+            (table, r["id"])
+            for table in ("notes", "tag_assignments", "journal_entries", "highlights")
+            for r in conn.execute(f"SELECT id FROM {table} WHERE verse_id = ?", (verse_id,))
+        ]
+        if not rows:
+            continue
+        old_words = set(old.lower().split())
+        candidates = sorted(book_verses, key=lambda r: -len(old_words & set(r["text"].lower().split())))[:10]
+        scored = [(difflib.SequenceMatcher(None, old, r["text"], autojunk=False).ratio(), r) for r in candidates]
+        best_ratio, target = max(scored, key=lambda pair: pair[0], default=(0.0, None))
+        if best_ratio < 0.7 or target is None or target["id"] == verse_id:
+            target = None
+        for table, row_id in rows:
+            moves.append((table, row_id, target, old))
+    for table, row_id, target, old in moves:
+        if table == "highlights":
+            if target is None:
+                conn.execute(
+                    "UPDATE highlights SET deleted_at = datetime('now'), updated_at = datetime('now') "
+                    "WHERE id = ? AND deleted_at IS NULL",
+                    (row_id,),
+                )
+                continue
+            h = conn.execute("SELECT start_offset, end_offset FROM highlights WHERE id = ?", (row_id,)).fetchone()
+            start = remap_offset(old, target["text"], h["start_offset"])
+            end = max(start, remap_offset(old, target["text"], h["end_offset"], is_end=True))
+            conn.execute(
+                "UPDATE highlights SET verse_id = ?, start_offset = ?, end_offset = ?, "
+                "updated_at = datetime('now') WHERE id = ?",
+                (target["id"], start, end, row_id),
+            )
+        elif target is not None:
+            conn.execute(
+                f"UPDATE {table} SET verse_id = ?, updated_at = datetime('now') WHERE id = ?",
+                (target["id"], row_id),
+            )
+
+
+def _prune_stale_verses(conn: sqlite3.Connection, book_id: int, bundled: set[tuple[int, int]]) -> None:
+    """Verses (and then chapters) the bundled book no longer has - a
+    renumbering upstream - go, unless the reader's own data is on them."""
+    for row in conn.execute(
+        "SELECT v.id, c.chapter_number, v.verse_number FROM verses v "
+        "JOIN chapters c ON c.id = v.chapter_id WHERE c.book_id = ?",
+        (book_id,),
+    ).fetchall():
+        if (row["chapter_number"], row["verse_number"]) not in bundled and not _has_user_data(conn, row["id"]):
+            conn.execute("DELETE FROM verses WHERE id = ?", (row["id"],))
+    bundled_chapters = {chapter for chapter, _verse in bundled}
+    for row in conn.execute(
+        "SELECT id, chapter_number FROM chapters WHERE book_id = ?", (book_id,)
+    ).fetchall():
+        if row["chapter_number"] in bundled_chapters:
+            continue
+        if conn.execute("SELECT 1 FROM verses WHERE chapter_id = ? LIMIT 1", (row["id"],)).fetchone():
+            continue
+        if any(
+            conn.execute(f"SELECT 1 FROM {table} WHERE chapter_id = ? LIMIT 1", (row["id"],)).fetchone()
+            for table in ("notes", "tag_assignments", "journal_entries")
+        ):
+            continue
+        for table in ("reading_log", "reading_history"):
+            conn.execute(f"DELETE FROM {table} WHERE chapter_id = ?", (row["id"],))
+        conn.execute("DELETE FROM chapters WHERE id = ?", (row["id"],))
 
 
 def remap_offset(old: str, new: str, offset: int, *, is_end: bool = False) -> int:
@@ -486,7 +598,8 @@ def _sync_bundled_topics(conn: sqlite3.Connection) -> None:
     like the scripture text above, not user data - synced the same way,
     by natural key (topic slug; a topic_verse by its verse reference
     string; a topic_talk by its URL) so a re-run of
-    scripts/build_topical_guide.py just adds what's new."""
+    scripts/build_topical_guide.py just adds what's new, and a topic's
+    verse list follows the bundled one exactly."""
     for b_topic in conn.execute("SELECT * FROM bundled.topics ORDER BY sort_order"):
         row = conn.execute(
             "SELECT id FROM topics WHERE slug = ?", (b_topic["slug"],)
@@ -506,6 +619,19 @@ def _sync_bundled_topics(conn: sqlite3.Connection) -> None:
                 (b_topic["name"], b_topic["description"], b_topic["sort_order"], topic_id),
             )
 
+        # A topic's verses are exactly the bundled ones: one the bundled
+        # copy dropped or re-pointed (the JST's renumbering) goes here too.
+        wanted = {
+            (r["volume_slug"], r["reference"])
+            for r in conn.execute(
+                "SELECT volume_slug, reference FROM bundled.topic_verses WHERE topic_id = ?", (b_topic["id"],)
+            )
+        }
+        for r in conn.execute(
+            "SELECT id, volume_slug, reference FROM topic_verses WHERE topic_id = ?", (topic_id,)
+        ).fetchall():
+            if (r["volume_slug"], r["reference"]) not in wanted:
+                conn.execute("DELETE FROM topic_verses WHERE id = ?", (r["id"],))
         for b_tv in conn.execute(
             "SELECT * FROM bundled.topic_verses WHERE topic_id = ? ORDER BY sort_order",
             (b_topic["id"],),
@@ -648,11 +774,15 @@ def _sync_bundled_cross_references(conn: sqlite3.Connection) -> None:
 # install the same sync identity (see _ensure_device_id), and the FTS
 # backfill flag describes one particular copy's history, not the data.
 _DEVICE_SPECIFIC_SETTINGS = ("device_id", "journal_entries_fts_backfilled")
+# Reading activity a developer's own use of the shipped file leaves behind -
+# it would show up as a new install's "Resume Reading" history and streak.
+_READING_ACTIVITY_TABLES = ("reading_history", "reading_log")
 
 
 def compact(conn: sqlite3.Connection) -> None:
     """Prepare data/scriptures.db for shipping: drop the device-specific
-    settings connect() just added (see _DEVICE_SPECIFIC_SETTINGS), commit,
+    settings connect() just added (see _DEVICE_SPECIFIC_SETTINGS) and any
+    reading activity (_READING_ACTIVITY_TABLES), commit,
     then VACUUM away the free pages a bulk import/rebuild leaves behind.
     Every script under scripts/ that writes data/scriptures.db calls this
     last: that file is committed to git and shipped as-is, and left
@@ -662,6 +792,8 @@ def compact(conn: sqlite3.Connection) -> None:
         f"DELETE FROM settings WHERE key IN ({','.join('?' * len(_DEVICE_SPECIFIC_SETTINGS))})",
         _DEVICE_SPECIFIC_SETTINGS,
     )
+    for table in _READING_ACTIVITY_TABLES:
+        conn.execute(f"DELETE FROM {table}")
     conn.commit()
     conn.execute("VACUUM")
 
