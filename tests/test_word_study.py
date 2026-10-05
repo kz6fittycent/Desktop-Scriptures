@@ -173,6 +173,45 @@ def test_right_click_lookup_opens_the_tab() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_exact_word_in_a_verse() -> None:
+    """Right-clicking a word in a tagged verse puts the word behind it
+    there first: "anointed" in Psalm 2:2 is mashiach (H4899), and "loved"
+    in John 3:16 agapao (G25) - in the KJV, and in the JST's same verse."""
+    from scriptures.ui.reading_view import ReadingView
+
+    tmp = Path(tempfile.mkdtemp(prefix="scriptures-word-study-"))
+    try:
+        conn = _conn(tmp)
+
+        def chapter(volume: str, book: str, number: int) -> int:
+            return conn.execute(
+                "SELECT c.id FROM chapters c JOIN books b ON b.id = c.book_id JOIN volumes v ON v.id = b.volume_id "
+                "WHERE v.slug = ? AND b.name = ? AND c.chapter_number = ?", (volume, book, number)
+            ).fetchone()[0]
+
+        for volume, book, number, verse_number, word, strongs in (
+            ("holy-bible", "Psalms", 2, 2, "anointed", "H4899"),
+            ("holy-bible", "John", 3, 16, "loved", "G25"),
+            ("inspired-version", "John", 3, 16, "loved", "G25"),
+        ):
+            chapter_id = chapter(volume, book, number)
+            verses = da.get_verses(conn, chapter_id)
+            view = ReadingView(conn, chapter_id, f"{book} {number}", verses,
+                               theme.get_reading_palette("day"), "Serif", 14)
+            verse = next(v for v in verses if v.verse_number == verse_number)
+            view._on_word_lookup_requested(word, verse, verse.text.index(word))
+            panel = view._word_study_panel
+            assert panel._exact == [strongs], (volume, book, panel._exact)
+            assert panel._entry._current == strongs
+            assert panel._buttons[0].text().startswith("In this verse")
+            assert f"In {book} {number}:{verse_number}" in panel._status.text()
+        # A word the translators supplied has nothing behind it: the general matches.
+        assert da.get_word_strongs(conn, "holy-bible", "Genesis 1:1", "In the beginning God", 3) == []
+        print("test_exact_word_in_a_verse: PASSED")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def test_names_in_book_of_mormon_text_are_links() -> None:
     from PySide6.QtTest import QTest
 
@@ -259,6 +298,7 @@ if __name__ == "__main__":
     test_derivation_links_and_back()
     test_book_of_mormon_name_card()
     test_right_click_lookup_opens_the_tab()
+    test_exact_word_in_a_verse()
     test_names_in_book_of_mormon_text_are_links()
     test_hebrew_calendar()
     print("All Word Study tests passed.")

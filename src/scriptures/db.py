@@ -452,6 +452,7 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
         _sync_bundled_topics(conn)
         _sync_bundled_topic_key_verses(conn)
         _sync_bundled_lexicon(conn)
+        _sync_bundled_word_tags(conn)
         _sync_bundled_bom_names(conn)
         _sync_bundled_cross_references(conn)
         conn.commit()
@@ -707,6 +708,25 @@ def _sync_bundled_lexicon(conn: sqlite3.Connection) -> None:
         "derivation, definition, kjv_renderings, gloss) "
         "SELECT strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
         "kjv_renderings, gloss FROM bundled.lexicon_entries"
+    )
+
+
+def _sync_bundled_word_tags(conn: sqlite3.Connection) -> None:
+    """The Bible's word-by-word Strong's tags (scripts/import_strongs_tags.py)
+    - mirrored from the bundled copy like the lexicon, but only when they
+    differ: some 31,000 rows, too many to rewrite on every launch."""
+    has_table = conn.execute(
+        "SELECT 1 FROM bundled.sqlite_master WHERE type = 'table' AND name = 'word_tags'"
+    ).fetchone()
+    if not has_table:
+        return
+    fingerprint = "SELECT count(*), coalesce(sum(length(tags)), 0) FROM {}word_tags"
+    if conn.execute(fingerprint.format("")).fetchone() == conn.execute(fingerprint.format("bundled.")).fetchone():
+        return
+    conn.execute("DELETE FROM word_tags")
+    conn.execute(
+        "INSERT INTO word_tags (volume_slug, reference, tags) "
+        "SELECT volume_slug, reference, tags FROM bundled.word_tags"
     )
 
 

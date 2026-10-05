@@ -10,9 +10,11 @@ chriō. Reading the New Testament, Greek matches are listed first; the Old
 Testament, Hebrew/Aramaic. Picking one shows the full entry below
 (lexicon_dialog's LexiconEntryView).
 
-These are the words the KJV translates that way in general, not
-necessarily the exact word behind one particular verse - pinning that
-down needs a word-by-word tagged text, planned separately.
+Typed in, these are the words the KJV translates that way in general.
+Right-clicked in a Bible or JST verse, the exact word behind it in that
+verse comes first ("In John 3:16, "loved" translates:") - from the
+word-by-word Strong's tags (scripts/import_strongs_tags.py,
+data_access.get_word_strongs) - and the general matches after it.
 
 A Book of Mormon name (data_access.get_bom_name, built by
 scripts/build_bom_names.py) gets a card above any matches: its meaning,
@@ -40,7 +42,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import hebrew_calendar
-from scriptures.data_access import BomName, LexiconEntry, get_bom_name, search_lexicon
+from scriptures.data_access import BomName, LexiconEntry, get_bom_name, get_lexicon_entry, search_lexicon
 from scriptures.ui.lexicon_dialog import LexiconEntryView, language_name, linked
 
 INTRO = (
@@ -268,6 +270,9 @@ class WordStudyPanel(QWidget):
         self._conn = conn
         self._preferred = preferred_language
         self._buttons: list[_MatchButton] = []
+        # The Strong's number(s) behind a right-clicked word in its verse.
+        self._exact: list[str] = []
+        self._exact_reference: str | None = None
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -311,7 +316,11 @@ class WordStudyPanel(QWidget):
         layout.addWidget(self._entry)
         layout.addStretch(1)
 
-    def look_up(self, word: str) -> None:
+    def look_up(self, word: str, exact: list[str] | None = None, reference: str | None = None) -> None:
+        """Look up a word; `exact` - the Strong's number(s) behind it in the
+        verse `reference` it was right-clicked in - come first."""
+        self._exact = [s for s in (exact or []) if get_lexicon_entry(self._conn, s) is not None]
+        self._exact_reference = reference
         word = " ".join(word.split())
         dates = hebrew_calendar.find_dates(word)
         if dates and dates[0][0] <= 4 and dates[0][1] == len(word):  # the whole entry is a date
@@ -352,7 +361,13 @@ class WordStudyPanel(QWidget):
         if name is not None:
             self._name_card = _BomNameCard(name, self._follow_card_link)
             self._name_slot.addWidget(self._name_card)
+        exact = self._exact
         entries = search_lexicon(self._conn, word, preferred_language=self._preferred)
+        if exact:
+            # The verse's own word(s) first, then the general matches.
+            entries = [get_lexicon_entry(self._conn, s) for s in exact] + [
+                e for e in entries if e.strongs not in exact
+            ]
         if name is not None and name.tier != "biblical":
             # A Book of Mormon-only name's lexicon "matches" would only be
             # words sharing letters - its own Strong's links are in the card.
@@ -366,12 +381,21 @@ class WordStudyPanel(QWidget):
                 'root form ("anoint" rather than "anointing"), or a Strong\'s number like H4899.'
             )
             return
-        self._status.setText(
-            f'Words the King James Version translates as "{word}":'
-            if len(entries) > 1 else f'The original word for "{word}":'
-        )
-        for entry in entries:
+        if exact:
+            self._status.setText(
+                f'In {self._exact_reference}, "{word}" translates the first word below'
+                + (" (and the next)" if len(exact) == 2 else "")
+                + (". Other words the King James Version translates that way follow." if len(entries) > len(exact) else ".")
+            )
+        else:
+            self._status.setText(
+                f'Words the King James Version translates as "{word}":'
+                if len(entries) > 1 else f'The original word for "{word}":'
+            )
+        for index, entry in enumerate(entries):
             button = _MatchButton(entry)
+            if index < len(exact):
+                button.setText(f"In this verse · {button.text()}")
             button.clicked.connect(lambda _checked=False, s=entry.strongs: self._select(s))
             self._matches.addWidget(button)
             self._buttons.append(button)

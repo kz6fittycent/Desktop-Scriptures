@@ -163,6 +163,19 @@ CREATE TABLE IF NOT EXISTS lexicon_entries (
     gloss           TEXT NOT NULL DEFAULT ''
 );
 
+-- Which Strong's number each word of a Bible (or JST) verse translates -
+-- one row per verse, `tags` = "start-end:H7225 start-end:H853,H5414 ..."
+-- (character offsets into that verse's text). Developer-authored by
+-- scripts/import_strongs_tags.py, synced forward like the lexicon; read
+-- by data_access.get_word_strongs for Word Study's "exact word" lookups.
+CREATE TABLE IF NOT EXISTS word_tags (
+    id           INTEGER PRIMARY KEY,
+    volume_slug  TEXT NOT NULL,
+    reference    TEXT NOT NULL,
+    tags         TEXT NOT NULL,
+    UNIQUE (volume_slug, reference)
+);
+
 -- Book of Mormon proper names and what's known of their meaning, labeled
 -- by confidence (`tier`: defined / biblical / hebrew_root / proposed /
 -- unknown; '' = not yet researched) - see scripts/build_bom_names.py,

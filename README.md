@@ -12,7 +12,7 @@ Works, can be switched on under **Menu → Additional Books**.
 
 - **Study:** notes, tags, verse highlighting, keyword search, a Topical Guide, and a searchable Journal with one entry per day.
 - **Cross-references:** 610 hand-checked parallel passages, each tagged with the doctrine it teaches, plus any you add yourself.
-- **Word Study:** the Hebrew, Aramaic, and Greek words behind the English, and what Book of Mormon names may mean, each labeled by how sure that meaning is. In Book of Mormon chapters, names and dates are links; dates open a card placing them in Israel's calendar.
+- **Word Study:** the Hebrew, Aramaic, and Greek word behind any word of the Bible (right-click it), and what Book of Mormon names may mean, each labeled by how sure that meaning is. In Book of Mormon chapters, names and dates are links; dates open a card placing them in Israel's calendar.
 - **Citations:** the General Conference talks and Liahona articles that cite each verse, kept current by a weekly update.
 - **Listen:** any chapter read aloud, verse by verse, in a choice of four voices you download once.
 - **Sync:** your study across your own devices, through a folder your cloud client already syncs.
@@ -34,6 +34,7 @@ This is an **unofficial** application, not produced by or affiliated with The Ch
 - 1 Enoch (R. H. Charles, 1917): [Project Gutenberg](https://www.gutenberg.org/ebooks/77935) and Distributed Proofreaders. Book of Jasher (1840): [Wikisource](https://en.wikisource.org/wiki/Sefer_Ha-yashar,_or,_the_Book_of_Jasher_(1840)). Both public domain.
 - General Conference citations: [BYU's Scripture Citation Index](https://scriptures.byu.edu). Liahona citations: each article's own scripture links on [churchofjesuschrist.org](https://www.churchofjesuschrist.org). Both are metadata only (title, speaker, date, link); the app links to talks and articles, never copies them.
 - The Topical Guide (`scripts/build_topical_guide.py`) and cross-references (`scripts/build_cross_references.py`) are this project's own work, checked against the app's text. The Topical Guide is not the Church's copyrighted one.
+- Strong's numbers for each word of the KJV: the CrossWire Bible Society and [eBible.org](https://ebible.org/find/details.php?id=eng-kjv) (public domain).
 - Lexicons: Strong's dictionaries in [Open Scriptures](https://github.com/openscriptures/strongs)' corrected editions (CC BY-SA, for the lexicon data only) and word meanings from [STEP Bible](https://www.STEPBible.org) (Tyndale House, Cambridge; CC BY 4.0).
 - Book of Mormon name meanings: this project's own summaries of the proposals in BYU's [Book of Mormon Onomasticon](https://onoma.lib.byu.edu), linked rather than copied.
 
@@ -81,9 +82,8 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 ### v3.0
 
-The goal: ask about a word, a name, or a place and get a clear, sourced answer, even with a small AI model on your own computer. Done so far: Hebrew and Greek word meanings, Book of Mormon names and their links in the text, and Book of Mormon dates in Israel's calendar.
+The goal: ask about a word, a name, or a place and get a clear, sourced answer, even with a small AI model on your own computer. Done so far: Hebrew and Greek word meanings, the exact word behind each word of the Bible (and the JST) through a word-by-word Strong's-tagged text, Book of Mormon names and their links in the text, and Book of Mormon dates in Israel's calendar.
 
-- [ ] A word-by-word Strong's-tagged text, so Word Study shows the exact word behind a verse
 - [ ] Short answers drawn only from the sources found, with every statement cited
 - [ ] Geography for all the Standard Works: Bible places and maps, and the Book of Mormon geography models shown side by side as their proponents' theories (the Church takes no official position)
 - [ ] Archaeological references

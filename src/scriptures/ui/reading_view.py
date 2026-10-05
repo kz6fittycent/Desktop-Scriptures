@@ -92,6 +92,7 @@ from scriptures.data_access import (
     get_highlights,
     get_note,
     get_tags,
+    get_word_strongs,
 )
 from scriptures.ui.chapter_panel import PANEL_MIN_WIDTH, PANEL_WIDTH, ChapterPanel
 from scriptures.ui.citations_panel import CitationsPanel
@@ -157,7 +158,7 @@ class _VerseTextEdit(QTextEdit):
     highlight_remove_requested = Signal(int, int)
     highlight_color_requested = Signal(str)
     cross_reference_requested = Signal()
-    word_lookup_requested = Signal(str)
+    word_lookup_requested = Signal(str, int)  # the word, and where it is in the verse
     link_clicked = Signal(str)  # "name:Zarahemla" or "month:1:4" (day 0 = none)
     # Copy (Ctrl+C or the context menu): ReadingView copies the selection
     # across every verse it spans, not just this one's.
@@ -366,14 +367,20 @@ class _VerseTextEdit(QTextEdit):
         # the word that was right-clicked.
         if has_selection:
             word = self.textCursor().selectedText().strip()
+            word_offset = self.textCursor().selectionStart()
         else:
             word_cursor = self.cursorForPosition(event.pos())
             word_cursor.select(QTextCursor.SelectionType.WordUnderCursor)
             word = word_cursor.selectedText().strip()
-        word = word.strip(".,;:!?()[]'\"")
+            word_offset = word_cursor.selectionStart()
+        stripped = word.lstrip(".,;:!?()[]'\"")
+        word_offset += len(word) - len(stripped)
+        word = stripped.rstrip(".,;:!?()[]'\"")
         if word and len(word.split()) <= 3:
             lookup_action = QAction(f"Look Up Original Word: {word}", self)
-            lookup_action.triggered.connect(lambda checked=False, w=word: self.word_lookup_requested.emit(w))
+            lookup_action.triggered.connect(
+                lambda checked=False, w=word, o=word_offset: self.word_lookup_requested.emit(w, o)
+            )
             new_actions.append(lookup_action)
 
         if new_actions:
@@ -461,6 +468,8 @@ class ReadingView(QWidget):
         super().__init__(parent)
         self.conn = conn
         self.chapter_id = chapter_id
+        location = get_chapter_location(conn, chapter_id)
+        self._volume_slug = location[0].slug if location else None
         self._title = title
         self._verses = verses
         self._verse_highlights = get_highlights(conn, chapter_id)
@@ -573,7 +582,9 @@ class ReadingView(QWidget):
             body.cross_reference_requested.connect(
                 lambda v=verse: self._on_cross_reference_requested(v)
             )
-            body.word_lookup_requested.connect(self._on_word_lookup_requested)
+            body.word_lookup_requested.connect(
+                lambda word, offset, v=verse: self._on_word_lookup_requested(word, v, offset)
+            )
             body.set_link_spans(link_spans.get(verse.id, []))
             body.link_clicked.connect(self._on_text_link_clicked)
             body.copy_requested.connect(self._copy_selection)
@@ -756,9 +767,15 @@ class ReadingView(QWidget):
             index, self._cross_references_tab_label(self._cross_references_panel)
         )
 
-    def _on_word_lookup_requested(self, word: str) -> None:
+    def _on_word_lookup_requested(self, word: str, verse: Verse | None = None, offset: int = 0) -> None:
+        """Word Study for a word - right-clicked in a verse, the exact
+        Hebrew, Aramaic or Greek word behind it there, when the verse is
+        tagged (data_access.get_word_strongs)."""
         self._side_tabs.setCurrentWidget(self._word_study_panel)
-        self._word_study_panel.look_up(word)
+        exact: list[str] = []
+        if verse is not None and self._volume_slug in ("holy-bible", "inspired-version"):
+            exact = get_word_strongs(self.conn, self._volume_slug, verse.reference, verse.text, offset)
+        self._word_study_panel.look_up(word, exact=exact, reference=verse.reference if verse else None)
 
     def _on_text_link_clicked(self, target: str) -> None:
         """A Book of Mormon name or date clicked in the text - its card in

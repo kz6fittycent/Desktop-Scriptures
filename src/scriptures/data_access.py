@@ -7,6 +7,7 @@ independent of the schema.
 
 from __future__ import annotations
 
+import difflib
 import json
 import re
 import sqlite3
@@ -1043,6 +1044,63 @@ _LEXICON_COLUMNS = (
     "strongs, language, lemma, transliteration, pronunciation, derivation, definition, "
     "kjv_renderings, gloss"
 )
+
+
+# A word, as scripts/import_strongs_tags.py counts them (word_tags stores
+# a word's position among these).
+WORD_RE = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
+
+
+def _word_tags(conn: sqlite3.Connection, volume_slug: str, reference: str) -> dict[int, list[str]]:
+    row = conn.execute(
+        "SELECT tags FROM word_tags WHERE volume_slug = ? AND reference = ?", (volume_slug, reference)
+    ).fetchone()
+    tags = {}
+    for item in (row[0].split() if row else []):
+        position, _, numbers = item.partition(":")
+        tags[int(position)] = numbers.split(",")
+    return tags
+
+
+def get_word_strongs(
+    conn: sqlite3.Connection, volume_slug: str, reference: str, text: str, offset: int
+) -> list[str]:
+    """The Strong's number(s) behind the word at character `offset` of a
+    verse's `text` - [] if that word has none (a word the translators
+    supplied, or one the JST added) or the verse isn't tagged. A JST verse
+    borrows the tags of the KJV verse with the same reference, wherever its
+    words match (see scripts/import_strongs_tags.py)."""
+    words = list(WORD_RE.finditer(text))
+    position = next((i for i, m in enumerate(words) if m.start() <= offset < m.end()), None)
+    if position is None:
+        return []
+    if volume_slug == "inspired-version":
+        # The KJV verse closest in wording - usually the same reference, but
+        # the JST renumbers some chapters (Matthew 5), so its neighbours too.
+        book, _, chapter_verse = reference.rpartition(" ")
+        chapter, _, verse = chapter_verse.partition(":")
+        ours = [m.group(0).lower() for m in words]
+        best = (0.0, None, None)
+        for r, kjv_text in conn.execute(
+            "SELECT v.reference, v.text FROM verses v JOIN chapters c ON c.id = v.chapter_id "
+            "JOIN books b ON b.id = c.book_id JOIN volumes vol ON vol.id = b.volume_id "
+            "WHERE vol.slug = 'holy-bible' AND b.name = ? AND c.chapter_number = ? "
+            "AND v.verse_number BETWEEN ? AND ?",
+            (book, int(chapter), int(verse) - 4, int(verse) + 4),
+        ):
+            theirs = [w.lower() for w in WORD_RE.findall(kjv_text)]
+            matcher = difflib.SequenceMatcher(None, ours, theirs, autojunk=False)
+            if matcher.ratio() > best[0]:
+                best = (matcher.ratio(), r, matcher)
+        ratio, kjv_reference, matcher = best
+        if ratio < 0.5:
+            return []
+        kjv_tags = _word_tags(conn, "holy-bible", kjv_reference)
+        for op, i1, i2, j1, _j2 in matcher.get_opcodes():
+            if op == "equal" and i1 <= position < i2:
+                return kjv_tags.get(j1 + position - i1, [])
+        return []
+    return _word_tags(conn, volume_slug, reference).get(position, [])
 
 
 def get_lexicon_entry(conn: sqlite3.Connection, strongs: str) -> LexiconEntry | None:
