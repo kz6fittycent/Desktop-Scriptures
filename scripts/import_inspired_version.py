@@ -28,6 +28,10 @@ cases, but a few do cost the chapter its first verse or two. Re-run
 --all after any future fix and diff its summary output against this
 paragraph before updating it.
 
+OCR CLEANUP: scripts/clean_inspired_version_text.py is a second pass over
+the imported text (split words, stray symbols, misread letters, the
+chapter summaries' italic misreadings) - run it after any re-import.
+
 Usage:
     python3 scripts/import_inspired_version.py <book-name> <path-to-djvu.xml> <path-to-db>
     python3 scripts/import_inspired_version.py --all <path-to-djvu.xml> <path-to-db>

@@ -7,6 +7,7 @@ path relative to the project.
 
 from __future__ import annotations
 
+import difflib
 import sqlite3
 import uuid
 from pathlib import Path
@@ -308,9 +309,10 @@ def _ensure_device_id(conn: sqlite3.Connection) -> None:
 
 def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> None:
     """Copy any volumes/testaments/books/chapters/verses that exist in the
-    bundled (packaged) database but not yet in `conn`, leaving whatever is
-    already present - and all user data (notes/tags/highlights/reading
-    streak/settings) - untouched.
+    bundled (packaged) database but not yet in `conn`, and take the bundled
+    text of any verse whose text was corrected upstream (its highlights
+    move with it - see _update_verse_text), leaving all other user data
+    (notes/tags/reading streak/settings) untouched.
 
     Without this, a snap refresh only replaces the read-only bundled copy
     inside the new revision's squashfs. The writable copy under
@@ -413,9 +415,11 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
                         (b_chap["id"],),
                     ):
                         vrow = conn.execute(
-                            "SELECT id FROM verses WHERE chapter_id = ? AND verse_number = ?",
+                            "SELECT id, text FROM verses WHERE chapter_id = ? AND verse_number = ?",
                             (chapter_id, b_verse["verse_number"]),
                         ).fetchone()
+                        if vrow is not None and vrow["text"] != b_verse["text"]:
+                            _update_verse_text(conn, vrow["id"], vrow["text"], b_verse["text"])
                         if vrow is None:
                             conn.execute(
                                 "INSERT INTO verses "
@@ -436,6 +440,42 @@ def sync_bundled_content(conn: sqlite3.Connection, bundled_db_path: Path) -> Non
         conn.commit()
     finally:
         conn.execute("DETACH DATABASE bundled")
+
+
+def remap_offset(old: str, new: str, offset: int, *, is_end: bool = False) -> int:
+    """Where character `offset` of `old` falls in `new`, a corrected copy of
+    the same text: exact inside unchanged stretches; at the start (or, for
+    the end of a range, the end) of whatever replaced a changed one."""
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, old, new, autojunk=False).get_opcodes():
+        if i1 <= offset < i2 or (offset == i2 == len(old)):
+            if op == "equal":
+                return j1 + (offset - i1)
+            return j2 if is_end else j1
+    return len(new)
+
+
+def _update_verse_text(conn: sqlite3.Connection, verse_id: int, old: str, new: str) -> None:
+    """A bundled verse's text was corrected (e.g. the JST's OCR cleanup,
+    scripts/clean_inspired_version_text.py): take the new text, and move
+    each highlight on it so it stays on the same words. Every device makes
+    the same move from the same two texts, so synced devices agree once
+    each has updated. The FTS index follows through the verses_au
+    trigger."""
+    conn.execute("UPDATE verses SET text = ? WHERE id = ?", (new, verse_id))
+    for h in conn.execute(
+        "SELECT id, start_offset, end_offset FROM highlights WHERE verse_id = ?", (verse_id,)
+    ).fetchall():
+        start = remap_offset(old, new, h["start_offset"])
+        end = max(start, remap_offset(old, new, h["end_offset"], is_end=True))
+        if end > start:
+            conn.execute(
+                "UPDATE highlights SET start_offset = ?, end_offset = ? WHERE id = ?", (start, end, h["id"])
+            )
+        else:  # it covered only text the correction removed
+            conn.execute(
+                "UPDATE highlights SET deleted_at = datetime('now'), updated_at = datetime('now') WHERE id = ?",
+                (h["id"],),
+            )
 
 
 def _sync_bundled_topics(conn: sqlite3.Connection) -> None:
