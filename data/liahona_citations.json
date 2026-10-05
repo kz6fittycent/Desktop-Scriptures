@@ -1,6 +1,6 @@
 {
   "_source": "churchofjesuschrist.org Ensign/Liahona magazine (English, 1971-present)",
-  "_harvested": "2026-10-04",
+  "_harvested": "2026-10-05",
   "_note": "Metadata only (article title, author, date, churchofjesuschrist.org URL) - never article text, per copyright. Citations are detected via each article's own hyperlinks to /study/scriptures/..., never by reading article prose. See scripts/harvest_liahona_citations.py. One entry per article; each article's references are the exact verse reference strings used in the imported database (e.g. 'Genesis 1:1').",
   "articles": [
   {"talk_title": "April 6, 1830: The Day the Church Was Organized", "speaker": "Doyle L. Green", "date": "January 1971", "url": "https://www.churchofjesuschrist.org/study/ensign/1971/01/april-6-1830-the-day-the-church-was-organized?lang=eng", "references": ["Amos 3:7", "Doctrine and Covenants 135:3", "Doctrine and Covenants 20:1", "Doctrine and Covenants 20:11", "Doctrine and Covenants 20:12", "Doctrine and Covenants 20:25", "Hebrews 5:4", "Joseph Smith--History 1:19", "Joseph Smith--History 1:53", "Joseph Smith--History 1:54"]},
