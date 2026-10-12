@@ -49,6 +49,12 @@ _UNCAUGHT_RE = re.compile(
     re.MULTILINE,
 )
 
+# Qt messages that are harmless and frequent - Qt's Wayland plugin warns
+# every time focus moves between text fields - so they'd crowd real errors
+# out of the part of the log a bug report sends. Still printed, just not
+# logged.
+_QT_NOISE_RE = re.compile(r"QWaylandTextInputv3::(?:enable|disable)Surface")
+
 _crash_file = None  # kept open for faulthandler for the whole session
 
 
@@ -141,11 +147,16 @@ def install_qt_message_handler() -> None:
     qt_log = logging.getLogger("qt")
 
     def handler(mode, _context, message) -> None:
-        qt_log.log(levels.get(mode, logging.WARNING), message)
+        if not is_qt_noise(message):
+            qt_log.log(levels.get(mode, logging.WARNING), message)
         print(message, file=sys.stderr)
 
     qInstallMessageHandler(handler)
     log.info("Qt %s, platform plugin %s", qVersion(), os.environ.get("QT_QPA_PLATFORM") or "default")
+
+
+def is_qt_noise(message: str) -> bool:
+    return bool(_QT_NOISE_RE.search(message))
 
 
 def _excepthook(exc_type, exc, tb) -> None:

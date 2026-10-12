@@ -145,6 +145,17 @@ def test_exception_in_qt_slot_reaches_the_log() -> None:
     print("test_exception_in_qt_slot_reaches_the_log: PASSED")
 
 
+def test_qt_wayland_focus_noise_not_logged() -> None:
+    noise = (
+        "virtual void QtWaylandClient::QWaylandTextInputv3::enableSurface(wl_surface*) "
+        "Try to enable surface 0x28586ca0 with focusing surface 0x2868c3c0"
+    )
+    assert app_log.is_qt_noise(noise)
+    assert app_log.is_qt_noise(noise.replace("enableSurface", "disableSurface"))
+    assert not app_log.is_qt_noise("QPainter::begin: Paint device returned engine == 0")
+    print("test_qt_wayland_focus_noise_not_logged: PASSED")
+
+
 def test_pending_reports_capped_and_expired() -> None:
     for n in range(bug_report.PENDING_MAX_FILES + 2):
         assert bug_report.save_pending({"description": str(n)}) is not None
@@ -170,6 +181,7 @@ if __name__ == "__main__":
         test_classify_response()
         test_uncaught_exception_is_logged_and_reported()
         test_exception_in_qt_slot_reaches_the_log()
+        test_qt_wayland_focus_noise_not_logged()
         test_pending_reports_capped_and_expired()
         print("All bug report tests passed.")
     finally:
