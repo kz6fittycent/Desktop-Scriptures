@@ -30,6 +30,7 @@ replaying a chat history - simpler for a small local model to follow.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import re
 import sqlite3
@@ -463,6 +464,15 @@ def fit_to_limit(hits: list[study_index.SearchHit], limit: int) -> list[study_in
     return result
 
 
+# The talk-prep helper's relevance cutoff: a passage must rank in the top
+# this share of all scripture for the question (StudyIndex.
+# scripture_rank_fractions) - looser for verses talks on the topic cite.
+# Measured on four topics users tried: every verse they'd expect ranked
+# in the top 3.5%; the ones they called a stretch ranked 8-30% (Hebrews
+# 11:1 for scripture study, Amos 3:7 and Matthew 3:2 for the Messiah).
+TALK_PREP_MAX_RANK = 0.05
+TALK_PREP_MAX_RANK_CITED = 0.10
+
 # The talk-prep helper's share of scripture among its results - a talk is
 # built on the scriptures, and in testing gemma3-4b picked 3 of 8 for
 # "repentance" while Alma 34 sat unpicked among the candidates.
@@ -489,6 +499,31 @@ def _overlap(a: study_index.SearchHit, b: study_index.SearchHit) -> bool:
     )
 
 
+# Passages of one chapter this close (in verses) are shown as one - Isaiah
+# 61:1 and 61:3 as Isaiah 61:1-3 - as long as the result stays this short.
+TALK_PREP_MERGE_GAP = 2
+TALK_PREP_MERGE_MAX_VERSES = 8
+
+
+def _merged_if_near(a: study_index.SearchHit, b: study_index.SearchHit) -> study_index.SearchHit | None:
+    if a.chapter_id is None or a.chapter_id != b.chapter_id:
+        return None
+    a_start, a_end = a.meta.get("verse_start"), a.meta.get("verse_end")
+    b_start, b_end = b.meta.get("verse_start"), b.meta.get("verse_end")
+    if None in (a_start, a_end, b_start, b_end):
+        return None
+    start, end = min(a_start, b_start), max(a_end, b_end)
+    near = b_start <= a_end + TALK_PREP_MERGE_GAP + 1 and a_start <= b_end + TALK_PREP_MERGE_GAP + 1
+    if not near or end - start + 1 > TALK_PREP_MERGE_MAX_VERSES:
+        return None
+    meta = dict(a.meta)
+    book, chapter = meta.get("book"), meta.get("chapter")
+    meta.update(verse_start=start, verse_end=end)
+    if book and chapter:
+        meta["reference"] = f"{book} {chapter}:" + (f"{start}" if start == end else f"{start}-{end}")
+    return dataclasses.replace(a, meta=meta)
+
+
 def balance_for_talk_prep(
     chosen: list[study_index.SearchHit],
     candidates: list[study_index.SearchHit],
@@ -497,31 +532,43 @@ def balance_for_talk_prep(
     favored: list[study_index.SearchHit] = (),
 ) -> list[study_index.SearchHit]:
     """At most `limit` results, about TALK_PREP_SCRIPTURE_SHARE of them
-    from the Standard Works - the chat model's picks first, then the
-    best remaining candidates (Topical Guide key passages lead those) -
-    with with_minimums' talks and articles, no passage that overlaps one
-    already listed, and no article that's just a reprint of a talk already
-    listed.
+    from the Standard Works, with with_minimums' talks and articles, no
+    passage that overlaps one already listed, and no article that's just
+    a reprint of a talk already listed.
 
-    `favored` (a lesson's reading, an assigned talk's cited verses) fill
-    up to half the scripture slots first, whether or not the chat model
-    picked them - they're what the user said the talk is built on."""
+    Scripture comes from, in order: `favored` (the caller's trusted
+    passages, best first - an assigned talk's cited verses, a lesson's
+    reading, the verses talks on the topic cite most) for up to half the
+    slots; the chat model's own picks; then the rest of `favored` and the
+    Topical Guide's key passages, until the share is met. Never other
+    search results the chat model passed over: in testing those were the
+    loose matches users noticed (Ephesians 3:11 for adversity, by the
+    word "purpose"). Fewer results beat unrelated ones."""
     target = max(1, round(limit * TALK_PREP_SCRIPTURE_SHARE))
     scripture: list[study_index.SearchHit] = []
-    favored_picked = [h for h in chosen if h in favored] + [h for h in favored if h not in chosen]
-    for hit in favored_picked:
+
+    def add(hit: study_index.SearchHit) -> None:
+        if tier(hit) != 0 or any(_overlap(hit, other) for other in scripture):
+            return
+        for i, other in enumerate(scripture):
+            merged = _merged_if_near(other, hit)
+            if merged is not None:
+                scripture[i] = merged
+                return
+        scripture.append(hit)
+
+    for hit in favored:
         if len(scripture) >= (target + 1) // 2:
             break
-        if tier(hit) == 0 and not any(_overlap(hit, other) for other in scripture):
-            scripture.append(hit)
-    for hit in [h for h in chosen if tier(h) == 0]:
-        if not any(_overlap(hit, other) for other in scripture):
-            scripture.append(hit)
-    for hit in candidates:
+        add(hit)
+    for hit in chosen:
+        add(hit)
+    trusted = list(favored) + [h for h in candidates if h.meta.get("key_topic")]
+    for hit in trusted:
         if len(scripture) >= target:
             break
-        if tier(hit) == 0 and not any(_overlap(hit, other) for other in scripture):
-            scripture.append(hit)
+        add(hit)
+
     rest: list[study_index.SearchHit] = []
     for hit in with_minimums([h for h in chosen if tier(h) != 0], candidates, question):
         if hit.kind == "article" and any(r.kind == "talk" and _same_work(r, hit) for r in rest + chosen):
@@ -901,6 +948,19 @@ class StudyQuestionAsker(QObject):
         talk-prep helper compares verses against it to find key verses."""
         return self._vector
 
+    def _relevant(self, hits: list[study_index.SearchHit]) -> list[study_index.SearchHit]:
+        """Drops scripture that ranks too low for the question (see
+        TALK_PREP_MAX_RANK); without the question's embedding, keeps all."""
+        if self._vector is None or not self._index.is_loaded():
+            return list(hits)
+        fractions = self._index.scripture_rank_fractions(self._vector, hits)
+        kept = []
+        for hit in hits:
+            cutoff = TALK_PREP_MAX_RANK_CITED if hit.meta.get("consensus") or hit.key.startswith("cited:") else TALK_PREP_MAX_RANK
+            if fractions.get(hit.key, 0.0) <= cutoff:
+                kept.append(hit)
+        return kept
+
     def _capped(self, hits: list[study_index.SearchHit]) -> list[study_index.SearchHit]:
         return fit_to_limit(hits, self._max_selected) if self._cap_total else hits
 
@@ -937,8 +997,13 @@ class StudyQuestionAsker(QObject):
         # A follow-up that asked for one volume or kind gets only that.
         if detect_filters(self._questions)[0] is None:
             if self._cap_total:
+                chosen_hits = self._relevant(chosen_hits)
+                # Pinned candidates the caller marked "offer, don't favor"
+                # (a lesson reading's plain search matches) only count if
+                # the chat model picks them.
+                favored = self._relevant([h for h in self._pinned if not h.meta.get("offer_only")])
                 chosen_hits = balance_for_talk_prep(
-                    chosen_hits, self._hits, self._max_selected, self._query, self._pinned
+                    chosen_hits, self._hits, self._max_selected, self._query, favored
                 )
             else:
                 chosen_hits = with_minimums(chosen_hits, self._hits, self._query)

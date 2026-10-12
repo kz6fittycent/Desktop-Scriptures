@@ -99,6 +99,16 @@ MAX_PINNED_CITED = 8
 MAX_PINNED_READING = 5
 MAX_READING_PER_CHAPTER = 2
 
+# Citation consensus (consensus_hits): how many matching talks and articles
+# to read, how many must cite a verse, how many passages to offer.
+CONSENSUS_WORKS = 40
+CONSENSUS_MIN_WORKS = 2
+CONSENSUS_PASSAGES = 10
+# A work citing up to this many verses counts fully for each; one citing
+# more counts for less per verse (by the square root).
+CONSENSUS_FULL_WEIGHT_REFERENCES = 15
+CONSENSUS_MAX_PASSAGE = 6  # verses - longer runs split into separate passages
+
 
 # Directions: how many themes are offered, chosen from how many found.
 DIRECTIONS_SHOWN = 4
@@ -447,23 +457,114 @@ def reading_hits(
     query: str,
     vector: list[float] | None,
 ) -> list[study_index.SearchHit]:
-    """The lesson reading's passages that best match the topic."""
-    if not chapter_ids:
+    """The lesson reading's passages that best match the topic - searched
+    within the reading itself (a search of all scripture, filtered to the
+    reading afterwards, missed Isaiah 61:1-3 for "Messiah" in Isaiah
+    58-66), at most MAX_READING_PER_CHAPTER from any one chapter."""
+    pieces = index.pieces_in_chapters(set(chapter_ids))
+    if not pieces:
         return []
-    wanted = set(chapter_ids)
-    hits = index.search(query, vector, kinds={"scripture"}, limit=400)
+    hits = index.search(query, vector, kinds={"scripture"}, limit=MAX_PINNED_READING * 3, piece_ids=pieces)
     chosen: list[study_index.SearchHit] = []
     per_chapter: dict[int, int] = {}
-    for hit in hits:  # spread across the reading, not all from one chapter
-        if hit.chapter_id not in wanted or per_chapter.get(hit.chapter_id, 0) >= MAX_READING_PER_CHAPTER:
+    for hit in hits:
+        if per_chapter.get(hit.chapter_id, 0) >= MAX_READING_PER_CHAPTER:
             continue
         per_chapter[hit.chapter_id] = per_chapter.get(hit.chapter_id, 0) + 1
+        hit.meta["pinned_label"] = "from the lesson's reading"
+        # Only the best match is favored outright (so the reading is
+        # always represented); the rest are offered to the chat model.
+        # Favoring them all put Isaiah 66:19-24 first for "Messiah".
+        if chosen:
+            hit.meta["offer_only"] = True
         chosen.append(hit)
         if len(chosen) >= MAX_PINNED_READING:
             break
-    for hit in chosen:
-        hit.meta["pinned_label"] = "from the lesson's reading"
     return chosen
+
+
+def consensus_hits(
+    conn: sqlite3.Connection,
+    index: study_index.StudyIndex,
+    query: str,
+    vector: list[float] | None,
+    volumes: set[str] | None = None,
+    chapter_ids: set[int] | None = None,
+) -> list[study_index.SearchHit]:
+    """The verses Church leaders reach for on this topic: the talks and
+    articles that best match it, and the verses most of them cite -
+    consecutive verses joined into one passage, best first.
+
+    This, not the chat model's judgment, is what keeps results to what a
+    reader would expect. Tested on four topics, it found D&C 121:7-8 and
+    122:7-8 for adversity, D&C 19:16-18 and Alma 7:11-12 for the
+    Atonement, Isaiah 9:6 for the Messiah; gemma3-4b, asked to filter
+    results itself, dropped D&C 19:16 and kept Matthew 3:2 for "Messiah".
+
+    A verse needs CONSENSUS_MIN_WORKS works citing it. A work that cites
+    many verses counts for less per verse - a study guide citing a whole
+    book shouldn't outvote three talks. A Conference talk and its
+    Ensign/Liahona reprint count once. `chapter_ids` keeps only verses in
+    those chapters (a lesson's reading)."""
+    # By meaning alone when there's an embedding: matching titles by word
+    # brought in articles about the book of Revelation for "personal
+    # revelation", and with them Revelation 7.
+    works = index.search("" if vector is not None else query, vector, kinds={"talk", "article"}, limit=CONSENSUS_WORKS)
+    weights: dict[str, float] = {}
+    counts: dict[str, int] = {}
+    seen: set[tuple[str, str]] = set()
+    for hit in works:
+        work = work_by_url(hit.meta.get("url", ""))
+        if work is None or not work.references:
+            continue
+        identity = (work.talk_title.strip().lower(), work.speaker.strip().lower())
+        if identity in seen:
+            continue
+        seen.add(identity)
+        weight = 1.0 / max(1.0, (len(work.references) / CONSENSUS_FULL_WEIGHT_REFERENCES) ** 0.5)
+        for reference in set(work.references):
+            weights[reference] = weights.get(reference, 0.0) + weight
+            counts[reference] = counts.get(reference, 0) + 1
+
+    located: dict[tuple[int, int], tuple[float, int]] = {}  # (chapter_id, verse) -> (weight, works)
+    for reference, works_citing in counts.items():
+        if works_citing < CONSENSUS_MIN_WORKS:
+            continue
+        row = conn.execute(
+            "SELECT v.chapter_id, v.verse_number, vol.slug FROM verses v JOIN chapters c ON c.id = v.chapter_id "
+            "JOIN books b ON b.id = c.book_id JOIN volumes vol ON vol.id = b.volume_id "
+            "WHERE v.reference = ? AND vol.slug != 'inspired-version' ORDER BY vol.sort_order LIMIT 1",
+            (reference,),
+        ).fetchone()
+        if row is None or row[2] not in STANDARD_WORKS:
+            continue
+        if volumes is not None and row[2] not in volumes:
+            continue
+        if chapter_ids is not None and row[0] not in chapter_ids:
+            continue
+        located[(row[0], row[1])] = (weights[reference], works_citing)
+
+    passages: list[list] = []  # [chapter_id, start, end, weight, works]
+    for (chapter_id, verse), (weight, works_citing) in sorted(located.items()):
+        last = passages[-1] if passages else None
+        if last and last[0] == chapter_id and verse == last[2] + 1 and verse - last[1] < CONSENSUS_MAX_PASSAGE:
+            last[2] = verse
+            last[3] = max(last[3], weight)
+            last[4] = max(last[4], works_citing)
+        else:
+            passages.append([chapter_id, verse, verse, weight, works_citing])
+    passages.sort(key=lambda p: p[3], reverse=True)
+
+    hits = []
+    for chapter_id, start, end, _weight, works_citing in passages[:CONSENSUS_PASSAGES]:
+        hit = _passage_hit(
+            conn, chapter_id, start, end, f"cited in {works_citing} talks and articles on this topic",
+            f"consensus:{chapter_id}:{start}-{end}",
+        )
+        if hit is not None:
+            hit.meta["consensus"] = works_citing
+            hits.append(hit)
+    return hits
 
 
 # ---------------------------------------------------------------------

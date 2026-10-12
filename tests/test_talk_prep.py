@@ -132,23 +132,25 @@ def test_themes_are_distinct_directions() -> None:
 def test_balance_for_talk_prep() -> None:
     a = _hit("scripture", "Alma 32:17-23", 32, 17, 23)
     a_inner = _hit("scripture", "Alma 32:21", 32, 21, 21)
-    b = _hit("scripture", "Alma 34:31", 34, 31, 31)
-    c = _hit("scripture", "Hebrews 11:1", 11, 1, 1, volume="holy-bible")
+    loose = _hit("scripture", "Hebrews 11:1", 11, 1, 1, volume="holy-bible")  # a search result, unpicked
+    key = _hit("scripture", "Alma 34:31", 34, 31, 31, key_topic="Repentance")  # a Topical Guide key passage
     reading = _hit("scripture", "Alma 33:3", 33, 3, 3)
-    talk = _hit("talk", title="Faith", speaker="A", url="u1")
+    talk = _hit("talk", url="u1")
     talk.meta.update(title="Faith", speaker="A")
-    reprint = _hit("article", title="Faith", speaker="A", url="u2")
+    reprint = _hit("article", url="u2")
+    reprint.meta.update(title="Faith", speaker="A")
     jod = _hit("discourse", "JoD", volume=None)
     chosen = [a, a_inner, jod, reprint, talk]
-    result = study_ask.balance_for_talk_prep(chosen, [b, c, reading], 5, "faith", favored=[reading])
-    assert len(result) == 5
+    result = study_ask.balance_for_talk_prep(chosen, [loose, key, reading], 5, "faith", favored=[reading])
     assert a_inner not in result  # overlaps Alma 32:17-23
-    assert reading in result  # the lesson's reading is favored
+    assert reading in result and result.index(reading) == 0  # the lesson's reading leads
+    assert key in result  # topped up from a trusted passage...
+    assert loose not in result  # ...never from a search result the model passed over
     assert reprint not in result  # the Ensign reprint of a talk already listed
     assert talk in result
     if jod in result:  # trimmed "Also" items go before the talk
         assert result.index(talk) < result.index(jod)
-    assert sum(1 for h in result if study_ask.tier(h) == 0) == 3  # 60% of 5
+    assert len(result) <= 5
     print("test_balance_for_talk_prep: PASSED")
 
 

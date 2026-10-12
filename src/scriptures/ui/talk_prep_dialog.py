@@ -605,6 +605,10 @@ class TalkPrepDialog(QDialog):
     def _find_sources(self) -> None:
         interview = self._interview
         study = self._study
+        # Trusted passages, most trusted first - see
+        # study_ask.balance_for_talk_prep, which favors them in this order.
+        query = " ".join(interview.questions())
+        volumes = interview.volumes()
         pinned = []
         if interview.talk_url:
             work = talk_prep.work_by_url(interview.talk_url)
@@ -612,9 +616,13 @@ class TalkPrepDialog(QDialog):
                 pinned += talk_prep.cited_verse_hits(self.conn, work)
         if interview.is_lesson and interview.lesson_source in ("cfm", "block") and interview.lesson_text:
             chapters = talk_prep.parse_reading_block(self.conn, interview.lesson_text)
-            pinned += talk_prep.reading_hits(
-                self.conn, study.index, chapters, " ".join(interview.questions()), self._topic_vector
+            pinned += talk_prep.consensus_hits(
+                self.conn, study.index, query, self._topic_vector, volumes, set(chapters)
             )
+            pinned += talk_prep.reading_hits(self.conn, study.index, chapters, query, self._topic_vector)
+        # Always - even with talks left out of the results, what they cite
+        # is the best guide to the verses a reader would expect.
+        pinned += talk_prep.consensus_hits(self.conn, study.index, query, self._topic_vector, volumes)
         if self._session is None or self._session.interview is not interview:
             self._session = talk_prep.new_session(interview)
 

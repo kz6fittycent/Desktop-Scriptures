@@ -995,7 +995,7 @@ class StudyIndex:
 
     def _semantic_ranking(
         self, query_vector: list[float], kinds: set[str] | None, volume_slugs: set[str] | None,
-        limit: int, exclude_volume_slugs: set[str] = frozenset(),
+        limit: int, exclude_volume_slugs: set[str] = frozenset(), piece_ids: set[int] | None = None,
     ) -> list[int]:
         self._load()
         if len(self._ids) == 0:
@@ -1010,7 +1010,10 @@ class StudyIndex:
         for start in range(0, len(self._ids), self._BLOCK_ROWS):
             block = self._matrix[start:start + self._BLOCK_ROWS].astype(np.float32)
             scores[start:start + len(block)] = block @ query
-        scores[~self._mask(kinds, volume_slugs, exclude_volume_slugs)] = -np.inf
+        mask = self._mask(kinds, volume_slugs, exclude_volume_slugs)
+        if piece_ids is not None:
+            mask &= np.isin(self._ids, list(piece_ids))
+        scores[~mask] = -np.inf
         candidates = min(limit, int(np.isfinite(scores).sum()))
         if candidates <= 0:
             return []
@@ -1020,7 +1023,7 @@ class StudyIndex:
 
     def _keyword_ranking(
         self, query_text: str, kinds: set[str] | None, volume_slugs: set[str] | None, limit: int,
-        exclude_volume_slugs: set[str] = frozenset(),
+        exclude_volume_slugs: set[str] = frozenset(), piece_ids: set[int] | None = None,
     ) -> list[int]:
         # "Mark's" -> "mark": FTS5 splits a possessive into "mark" + "s", so
         # the phrase "mark's" only matched text with that exact possessive -
@@ -1046,6 +1049,11 @@ class StudyIndex:
         if exclude_volume_slugs:
             sql += f" AND COALESCE(p.volume_slug, '') NOT IN ({','.join('?' * len(exclude_volume_slugs))})"
             params.extend(sorted(exclude_volume_slugs))
+        if piece_ids is not None:
+            if not piece_ids:
+                return []
+            sql += f" AND p.id IN ({','.join('?' * len(piece_ids))})"
+            params.extend(sorted(piece_ids))
         # A heading word counts a fifth as much as a body word.
         sql += " ORDER BY bm25(pieces_fts, 0.2, 1.0) LIMIT ?"
         params.append(limit)
@@ -1061,6 +1069,7 @@ class StudyIndex:
         kind_limits: dict[str, int] | None = None,
         limit: int = 20,
         exclude_volume_slugs: set[str] = frozenset(),
+        piece_ids: set[int] | None = None,
     ) -> list[SearchHit]:
         """The best `limit` pieces for a question, fusing semantic
         similarity (when `query_vector` - the question embedded with the
@@ -1069,7 +1078,9 @@ class StudyIndex:
         (`kind_limits`, e.g. MIXED_KIND_LIMITS) so no one kind of source
         can fill the list. `exclude_volume_slugs` leaves out pieces from -
         or cross-references into - those volumes (hidden ones an index
-        built earlier still holds).
+        built earlier still holds). `piece_ids` searches only those pieces
+        (the talk-prep helper's search within a lesson's reading - see
+        pieces_in_chapters).
 
         Scripture results are consolidated: overlapping or adjacent
         windows of the same chapter merge into one wider result (e.g.
@@ -1079,11 +1090,13 @@ class StudyIndex:
         same chapter for this."""
         candidates = limit * 5
         semantic = (
-            self._semantic_ranking(query_vector, kinds, volume_slugs, candidates, exclude_volume_slugs)
+            self._semantic_ranking(query_vector, kinds, volume_slugs, candidates, exclude_volume_slugs, piece_ids)
             if query_vector is not None
             else []
         )
-        keyword = self._keyword_ranking(query_text, kinds, volume_slugs, candidates, exclude_volume_slugs)
+        keyword = self._keyword_ranking(
+            query_text, kinds, volume_slugs, candidates, exclude_volume_slugs, piece_ids
+        )
 
         fused: dict[int, float] = {}
         semantic_rank = {piece_id: rank for rank, piece_id in enumerate(semantic, start=1)}
@@ -1136,6 +1149,64 @@ class StudyIndex:
             if len(hits) >= limit:
                 break
         return hits
+
+    def scripture_rank_fractions(self, query_vector: list[float], hits: list[SearchHit]) -> dict[str, float]:
+        """For each scripture hit (by key): the share of all scripture
+        pieces that match `query_vector` better than its best piece -
+        0.001 is the top 0.1%. A rank, not a raw similarity, so one cutoff
+        works across embedding models, whose scores sit on different
+        scales. The talk-prep helper drops passages ranked too low
+        (study_ask.TALK_PREP_MAX_RANK). Hits with no pieces are left out."""
+        self._load()
+        if len(self._ids) == 0:
+            return {}
+        query = np.asarray(query_vector, dtype=np.float32)
+        if query.shape[0] != self._matrix.shape[1]:
+            return {}
+        norm = float(np.linalg.norm(query))
+        if norm > 0:
+            query = query / norm
+        scores = np.empty(len(self._ids), dtype=np.float32)
+        for start in range(0, len(self._ids), self._BLOCK_ROWS):
+            block = self._matrix[start:start + self._BLOCK_ROWS].astype(np.float32)
+            scores[start:start + len(block)] = block @ query
+        scripture = np.sort(scores[np.isin(self._kinds, ["scripture"])])
+        if len(scripture) == 0:
+            return {}
+        position = {int(pid): i for i, pid in enumerate(self._ids)}
+        fractions: dict[str, float] = {}
+        for hit in hits:
+            if hit.kind != "scripture" or hit.chapter_id is None:
+                continue
+            first, last = hit.meta.get("verse_start"), hit.meta.get("verse_end")
+            best = None
+            for pid, meta in self.conn.execute(
+                "SELECT id, meta FROM pieces WHERE kind = 'scripture' AND chapter_id = ?", (hit.chapter_id,)
+            ):
+                piece = json.loads(meta)
+                if first is not None and not (
+                    piece.get("verse_start", 0) <= last and piece.get("verse_end", 0) >= first
+                ):
+                    continue
+                i = position.get(pid)
+                if i is not None and (best is None or scores[i] > best):
+                    best = scores[i]
+            if best is not None:
+                better = len(scripture) - int(np.searchsorted(scripture, best, side="right"))
+                fractions[hit.key] = better / len(scripture)
+        return fractions
+
+    def pieces_in_chapters(self, chapter_ids: set[int]) -> set[int]:
+        """The scripture pieces of these chapters, for search(piece_ids=...)."""
+        if not chapter_ids:
+            return set()
+        return {
+            r[0]
+            for r in self.conn.execute(
+                f"SELECT id FROM pieces WHERE kind = 'scripture' AND chapter_id IN ({','.join('?' * len(chapter_ids))})",
+                sorted(chapter_ids),
+            )
+        }
 
     @staticmethod
     def _merge_into(hits: list[SearchHit], by_chapter: dict[tuple, list[int]], meta: dict) -> bool:
