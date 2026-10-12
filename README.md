@@ -10,19 +10,20 @@ Works, can be switched on under **Menu → Additional Books**.
 
 ## Features
 
-- **Study:** notes, tags, verse highlighting, keyword search, a Topical Guide, and a searchable Journal with one entry per day.
+- **Study:** notes, tags, verse highlighting, keyword search, a Topical Guide, and a searchable Journal with one entry per day, right on the menu bar.
 - **Cross-references:** 610 hand-checked parallel passages, each tagged with the doctrine it teaches, plus any you add yourself.
 - **Word Study:** the Hebrew, Aramaic, and Greek word behind any word of the Bible (right-click it), and what Book of Mormon names may mean, each labeled by how sure that meaning is. In Book of Mormon chapters, names and dates are links; dates open a card placing them in Israel's calendar.
 - **Citations:** the General Conference talks and Liahona articles that cite each verse, kept current by a weekly update.
 - **Listen:** any chapter read aloud, verse by verse, in a choice of four voices you download once.
 - **Sync:** your study across your own devices, through a folder your cloud client already syncs.
-- **Opt-in extras:** AI-assisted search using an AI service you choose, Church News, Come Follow Me, an Inspirational Message, and reminders for General Conference, temple recommend renewal, and family history.
+- **AI (opt-in):** search in your own words, and **Talk Prep**, a guided helper that finds the scriptures, Conference talks, and articles for a talk or lesson. It never writes the talk. Uses an AI service you choose: OpenAI, Anthropic's Claude, Google Gemini, OpenRouter, Groq, Mistral, or one running on your own computer.
+- **Opt-in extras:** Church News, Come Follow Me, an Inspirational Message, and reminders for General Conference, temple recommend renewal, and family history.
 
 A Welcome window on first launch walks through the optional parts.
 
 ## Privacy
 
-The app reads and studies fully offline. It contacts nothing until you switch a feature on, with one exception: about once a day it checks this project's GitHub for new talk and article citations (switch it off under **Menu → View → Download New Talks and Articles**).
+The app reads and studies fully offline. It contacts nothing until you switch a feature on, with one exception: about once a day it checks this project's GitHub for new talk and article citations (switch it off under **Menu → View → Download New Talks and Articles**). **Menu → Help → Report a Bug...** sends nothing until you click Submit; it then posts your note and the app's technical log (never your notes or Journal) as a public issue on this project's GitHub.
 
 ## Sources and credits
 
@@ -40,7 +41,7 @@ This is an **unofficial** application, not produced by or affiliated with The Ch
 
 ## Help and About
 
-The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Menu → Help (Wiki)...** links to each page. **Menu → About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software and data the app includes, and of the downloadable voices), and credits.
+The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user guide; in the app, **Menu → Help → Wiki...** links to each page, and **Menu → Help → Report a Bug...** reports a problem without a GitHub account. **Menu → About** shows the version, the license (GPL-3.0 - **View License...** shows it in full, offline, along with the licenses of the software and data the app includes, and of the downloadable voices), and credits.
 
 ## Screenshots
 
@@ -77,7 +78,6 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 ### Next
 
-- [ ] Talk prep helper: an AI-assisted chat that suggests scriptures, talks, and articles for a talk or lesson, built on the study index
 - [ ] Windows and macOS out of testing into regular releases, with code signing if there's demand
 
 ### v3.0
