@@ -91,6 +91,10 @@ The goal: ask about a word, a name, or a place and get a clear, sourced answer, 
 
 Every source's license is checked before anything is imported. Copyrighted works are linked and summarized, not copied.
 
+### v4.0
+
+- [ ] Human narration of the Standard Works in Listen: a professional narrator's voice, either recorded in full as optional downloads or as a voice built from his recordings that reads any chapter
+
 ## License
 
 Copyright (C) 2026 kz6fittycent
