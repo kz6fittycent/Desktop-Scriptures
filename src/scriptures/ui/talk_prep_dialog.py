@@ -675,7 +675,10 @@ class TalkPrepDialog(QDialog):
         self._key_finder = talk_prep.KeyVerseFinder(
             self.conn,
             self._study,
-            talk_prep.drop_unrelated_words(talk_prep.prefer_conference_talks(results), self._interview.topic),
+            talk_prep.label_jst(
+                self.conn,
+                talk_prep.drop_unrelated_words(talk_prep.prefer_conference_talks(results), self._interview.topic),
+            ),
             " ".join(self._interview.questions()),
             self._asker.query_vector,
             self,

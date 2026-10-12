@@ -154,6 +154,27 @@ def test_balance_for_talk_prep() -> None:
     print("test_balance_for_talk_prep: PASSED")
 
 
+def test_jst_passages_are_labeled() -> None:
+    tmp_root = Path(tempfile.mkdtemp(prefix="scriptures-talk-prep-test-"))
+    try:
+        conn = _make_db(tmp_root)
+        conn.executescript(
+            """
+            INSERT INTO volumes (id, name, slug, sort_order) VALUES (4, 'Joseph Smith Translation', 'inspired-version', 5);
+            INSERT INTO books (id, volume_id, name, sort_order) VALUES (4, 4, 'Matthew', 1);
+            INSERT INTO chapters (id, book_id, chapter_number) VALUES (40, 4, 3);
+            INSERT INTO verses (chapter_id, verse_number, text, reference) VALUES (40, 6, 'And thou, Bethlehem', 'Matthew 3:6');
+            """
+        )
+        jst = StudyResult(kind="scripture", title="Matthew 3:6", chapter_id=40, verse_start=6, verse_end=6, key_verse=6)
+        kjv = StudyResult(kind="scripture", title="Hebrews 11:1", chapter_id=11, verse_start=1, verse_end=1, key_verse=1)
+        labeled = talk_prep.label_jst(conn, [jst, kjv])
+        assert [r.title for r in labeled] == ["JST Matthew 3:6", "Hebrews 11:1"]
+        print("test_jst_passages_are_labeled: PASSED")
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+
+
 def test_lexicon_kept_only_when_on_topic() -> None:
     on_topic = StudyResult(kind="lexicon", title="Greek word metanoia", detail="repentance - a change of mind")
     off_topic = StudyResult(kind="lexicon", title="Hebrew word shathah", detail="to drink - drunk, banquet")
@@ -241,6 +262,7 @@ if __name__ == "__main__":
     test_parse_reading_block()
     test_themes_are_distinct_directions()
     test_balance_for_talk_prep()
+    test_jst_passages_are_labeled()
     test_lexicon_kept_only_when_on_topic()
     test_reprints_become_conference_talks()
     test_sessions_journal_and_text()

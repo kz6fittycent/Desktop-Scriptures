@@ -300,6 +300,21 @@ def is_standard_works(conn: sqlite3.Connection, result: StudyResult) -> bool:
     return result.kind == "scripture" and volume_slug(conn, result) in STANDARD_WORKS
 
 
+JST = "inspired-version"
+
+
+def label_jst(conn: sqlite3.Connection, results: list[StudyResult]) -> list[StudyResult]:
+    """A Joseph Smith Translation passage shares the Bible's book names but
+    not always its numbering - JST Matthew 3:6 is the King James Matthew
+    2:6 - so unlabeled it looks like the wrong verse."""
+    return [
+        dataclasses.replace(r, title=f"JST {r.title}")
+        if r.kind == "scripture" and not r.title.startswith("JST") and volume_slug(conn, r) == JST
+        else r
+        for r in results
+    ]
+
+
 def drop_unrelated_words(results: list[StudyResult], topic: str) -> list[StudyResult]:
     """An original-language word only when it's about the topic - its
     meaning or renderings mention one of the topic's words. (gemma3-4b
@@ -870,7 +885,8 @@ def key_verses(conn: sqlite3.Connection, results: list[StudyResult], count: int 
             (result.chapter_id, result.key_verse),
         ).fetchone()
         if row is not None:
-            found.append((row[0], row[1]))
+            reference = f"JST {row[0]}" if volume_slug(conn, result) == JST else row[0]
+            found.append((reference, row[1]))
         if len(found) >= count:
             break
     return found
