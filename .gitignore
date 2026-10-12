@@ -31,3 +31,6 @@ data/study_index.db
 /dist/
 /dmg/
 packaging/windows/desktop-scriptures.ico
+
+# Wrangler's local cache for the bug-report relay (relay/bug-report)
+.wrangler/

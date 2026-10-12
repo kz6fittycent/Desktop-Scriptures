@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
-from scriptures import ai_setup, citations, content_updates, study_index
+from scriptures import ai_setup, bug_report, citations, content_updates, study_index
 from scriptures.study_ask import StudySearch
 from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
@@ -83,6 +83,7 @@ from scriptures.ui.ai_settings_dialog import AiSettingsDialog
 from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
 from scriptures.ui.about_help import HelpDialog, LicenseDialog
+from scriptures.ui.bug_report_dialog import BugReportDialog
 from scriptures.ui.voices_dialog import VoicesDialog
 from scriptures.ui.welcome_dialog import WelcomeDialog
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
@@ -632,9 +633,10 @@ class MainWindow(QMainWindow):
 
         self._update_highlight_menu_labels()
 
-        # A plain action, not a submenu - there's only ever one thing to
-        # do here (open the Journal), so a submenu with a single item
-        # would just be an extra click for nothing.
+        # Its own entry on the menu bar, right after Menu (added there at
+        # the end of this section) - a plain action, not a menu: there's
+        # only ever one thing to do here (open the Journal), so a dropdown
+        # with a single item would just be an extra click for nothing.
         journal_action = QAction("&Journal", self)
         # Not a direct connection to self._show_journal: QAction.triggered
         # emits a bool (its checked state), which would otherwise land in
@@ -767,19 +769,24 @@ class MainWindow(QMainWindow):
             )
         )
 
-        # Help: the wiki, which walks through every feature. (The AI Setup
+        # Help: the wiki, which walks through every feature (the AI Setup
         # Guide lives under AI Integration, beside the wizard; the wiki
-        # dialog links the same page.)
-        wiki_action = QAction("&Help (Wiki)...", self)
+        # dialog links the same page), and Report a Bug - see
+        # bug_report_dialog.py.
+        help_menu = QMenu("&Help", self)
+        wiki_action = QAction("&Wiki...", self)
         wiki_action.setShortcut(QKeySequence.StandardKey.HelpContents)
         wiki_action.triggered.connect(lambda: HelpDialog(self).exec())
         # The shortcut has to live on the window too: an action only inside
         # a closed submenu doesn't receive its key presses.
         self.addAction(wiki_action)
+        help_menu.addAction(wiki_action)
+        report_bug_action = QAction("Report a &Bug...", self)
+        report_bug_action.triggered.connect(lambda: BugReportDialog(self).exec())
+        help_menu.addAction(report_bug_action)
 
         # The drill-down, in order: everyday reading tools first, then
         # settings, then housekeeping, then help.
-        root_menu.addAction(journal_action)
         root_menu.addMenu(highlight_menu)
         root_menu.addSeparator()
         root_menu.addMenu(view_menu)
@@ -795,8 +802,12 @@ class MainWindow(QMainWindow):
         welcome_action = QAction("Welcome...", self)
         welcome_action.triggered.connect(self.show_welcome)
         root_menu.addAction(welcome_action)
-        root_menu.addAction(wiki_action)
+        root_menu.addMenu(help_menu)
         root_menu.addMenu(about_menu)
+
+        # QMenuBar takes a plain action as a top-level entry just fine
+        # (unlike a QWidgetAction - see below).
+        self.menuBar().addAction(journal_action)
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
@@ -984,6 +995,16 @@ class MainWindow(QMainWindow):
         self._citation_updater = content_updates.CitationUpdater(self)
         self._citation_updater.finished.connect(self._on_citation_updates_checked)
         self._citation_updater.check()
+
+    def send_pending_bug_reports(self) -> None:
+        """Called a little while after startup (app.py): retries any bug
+        report that couldn't be sent when the user submitted it - see
+        bug_report.py. Does nothing (and contacts nothing) if there are none."""
+        if not bug_report.pending_reports():
+            return
+        self._pending_sender = bug_report.PendingSender(self)
+        self._pending_sender.finished.connect(self._pending_sender.deleteLater)
+        self._pending_sender.start()
 
     def _on_citation_updates_checked(self, updated: list, problems: list) -> None:
         self._citation_updater.deleteLater()

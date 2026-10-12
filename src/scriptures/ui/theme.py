@@ -734,6 +734,13 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary};
             border: 2px solid {p.primary};
         }}
+        QLabel#bugReportMessage {{
+            font-size: 14px;
+        }}
+        QLabel#bugReportNote {{
+            color: {p.muted};
+            font-size: 12px;
+        }}
         QLabel#familyHistoryMessage {{
             font-size: 15px;
             font-weight: bold;

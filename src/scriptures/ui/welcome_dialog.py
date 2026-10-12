@@ -172,7 +172,7 @@ class WelcomeDialog(QDialog):
             "<li><b>Menu → Additional Books</b> - the Apocrypha and Other Ancient Texts</li>"
             "<li><b>Menu → AI Integration</b> - the AI Setup Wizard and AI Settings</li>"
             "<li><b>Menu → Welcome...</b> - this window</li>"
-            "<li><b>Menu → Help (Wiki)...</b> - a guide to every feature</li>"
+            "<li><b>Menu → Help → Wiki...</b> - a guide to every feature</li>"
             "</ul>"
         ))
         v.addStretch(1)

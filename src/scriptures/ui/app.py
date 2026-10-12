@@ -35,7 +35,7 @@ if not getattr(sys, "frozen", False):
 from PySide6.QtCore import QTimer  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from scriptures import paths  # noqa: E402
+from scriptures import app_log, paths  # noqa: E402
 from scriptures.db import connect, sync_bundled_content  # noqa: E402
 from scriptures.ui.main_window import MainWindow  # noqa: E402
 
@@ -129,6 +129,7 @@ def _screenshots(window: MainWindow, folder: Path) -> None:
 
 
 def main() -> None:
+    app_log.setup()
     args = sys.argv[1:]
     smoke_test = "--smoke-test" in args
     screenshot_dir = None
@@ -155,6 +156,7 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     app.setApplicationName(paths.APP_NAME)
+    app_log.install_qt_message_handler()
     window = MainWindow(conn)
     window.show()
     if smoke_test:
@@ -166,6 +168,8 @@ def main() -> None:
         QTimer.singleShot(0, window.maybe_show_welcome)
         # New talks/articles (content_updates.py) - after startup has settled.
         QTimer.singleShot(10_000, window.check_for_citation_updates)
+        # Bug reports that couldn't be sent at the time (bug_report.py).
+        QTimer.singleShot(15_000, window.send_pending_bug_reports)
     sys.exit(app.exec())
 
 
