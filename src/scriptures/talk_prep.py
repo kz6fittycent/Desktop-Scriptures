@@ -50,7 +50,14 @@ from scriptures.ai_client import AiConfig, ChatRequest, numbers_schema
 from scriptures.citations import Citation, CitingWork, iter_citing_works
 from scriptures.data_access import get_journal_entry, get_setting, save_journal_entry
 from scriptures.embeddings import EmbeddingRequest, QueryEmbedder
-from scriptures.study_ask import STANDARD_WORKS, StudyResult, StudySearch, _VectorLoader, snippet_keywords
+from scriptures.study_ask import (
+    STANDARD_WORKS,
+    StudyQuestionAsker,
+    StudyResult,
+    StudySearch,
+    _VectorLoader,
+    snippet_keywords,
+)
 from scriptures.sync import TALK_PREP_SYNC_SETTING
 
 BANNER = (
@@ -758,6 +765,103 @@ class DirectionFinder(QObject):
         if chosen is None:  # the index's own order instead
             chosen = list(range(min(DIRECTIONS_SHOWN, len(self._themes))))
         self.ready.emit([self._themes[i] for i in chosen], self._vector)
+
+
+# ---------------------------------------------------------------------
+# The search itself
+# ---------------------------------------------------------------------
+
+
+def trusted_passages(
+    conn: sqlite3.Connection,
+    index: study_index.StudyIndex,
+    interview: Interview,
+    vector: list[float] | None,
+) -> list[study_index.SearchHit]:
+    """Passages the results favor, most trusted first (see
+    study_ask.balance_for_talk_prep): an assigned talk's cited verses; a
+    lesson's reading - what talks on the topic cite from it, then its best
+    match; then what talks on the topic cite anywhere. The last always,
+    even with talks left out of the results: what they cite is the best
+    guide to the verses a reader would expect."""
+    query = " ".join(interview.questions())
+    volumes = interview.volumes()
+    passages: list[study_index.SearchHit] = []
+    if interview.talk_url:
+        work = work_by_url(interview.talk_url)
+        if work is not None:
+            passages += cited_verse_hits(conn, work)
+    if interview.is_lesson and interview.lesson_source in ("cfm", "block") and interview.lesson_text:
+        chapters = parse_reading_block(conn, interview.lesson_text)
+        passages += consensus_hits(conn, index, query, vector, volumes, set(chapters))
+        passages += reading_hits(conn, index, chapters, query, vector)
+    passages += consensus_hits(conn, index, query, vector, volumes)
+    return passages
+
+
+class TalkPrepSearch(QObject):
+    """Step 4's search, start to finish, short of key verses - shared by
+    the dialog and scripts/eval_talk_prep.py, so the benchmark measures
+    exactly what users get. `succeeded(results, note, query_vector)` or
+    `failed(message, needs_api_key)` fires once."""
+
+    succeeded = Signal(list, str, object)
+    failed = Signal(str, bool)
+
+    def __init__(
+        self,
+        conn: sqlite3.Connection,
+        study: StudySearch,
+        chat_config: AiConfig,
+        interview: Interview,
+        fallback_vector: list[float] | None = None,
+        parent: QObject | None = None,
+    ):
+        super().__init__(parent)
+        self.conn = conn
+        self._study = study
+        self._chat_config = chat_config
+        self._interview = interview
+        self._asker = None
+        # The whole query - topic, direction, impressions - embedded for the
+        # citation search: the topic alone ("Second Coming") matched talks
+        # about Christ in general, and with them the First Vision.
+        self._embedder = QueryEmbedder(
+            study.embedding_config,
+            study.embedding_config.model,
+            " ".join(interview.questions()),
+            study.embedding_dimensions,
+            self,
+        )
+        self._embedder.ready.connect(self._search_with)
+        self._embedder.failed.connect(lambda _message: self._search_with(fallback_vector))
+
+    def _search_with(self, vector) -> None:
+        study, interview = self._study, self._interview
+        self._asker = StudyQuestionAsker(
+            self.conn,
+            study.index,
+            study.index_path,
+            self._chat_config,
+            study.embedding_config,
+            study.embedding_dimensions,
+            interview.questions(),
+            self,
+            max_selected=interview.result_limit,
+            cap_total=True,
+            context=interview.context(),
+            volumes=interview.volumes(),
+            skip_groups=interview.skip_groups(),
+            pinned=trusted_passages(self.conn, study.index, interview, vector),
+        )
+        self._asker.succeeded.connect(self._on_results)
+        self._asker.failed.connect(self.failed)
+
+    def _on_results(self, results: list, note: str) -> None:
+        tidy = label_jst(
+            self.conn, drop_unrelated_words(prefer_conference_talks(results), self._interview.topic)
+        )
+        self.succeeded.emit(tidy, note, self._asker.query_vector)
 
 
 # ---------------------------------------------------------------------

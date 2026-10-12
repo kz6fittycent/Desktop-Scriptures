@@ -43,8 +43,7 @@ from PySide6.QtWidgets import (
 from scriptures import talk_prep
 from scriptures.ai_client import AiConfig
 from scriptures.cfm import CfmFetcher
-from scriptures.embeddings import QueryEmbedder
-from scriptures.study_ask import StudyQuestionAsker, StudyResult, StudySearch, _VectorLoader
+from scriptures.study_ask import StudyResult, StudySearch, _VectorLoader
 from scriptures.ui.toggle_row import ToggleRow
 
 _WIDTH = 720
@@ -126,7 +125,7 @@ class TalkPrepDialog(QDialog):
         self._topic_vector: list[float] | None = None
         self._themes: list[str] = []
         self._finder = None
-        self._asker = None
+        self._search = None
         self._key_finder = None
         self._cfm_fetcher = None
 
@@ -612,76 +611,21 @@ class TalkPrepDialog(QDialog):
         self._results_title.setText(self._session.title)
         self._results_status.setText("Searching the scriptures, talks, and articles...")
         self._results_scroll.setWidget(QWidget())
-        # The whole query - topic, direction, impressions - embedded for the
-        # citation search: the topic alone ("Second Coming") matched talks
-        # about Christ in general, and with them the First Vision.
-        study = self._study
-        self._query_embedder = QueryEmbedder(
-            study.embedding_config,
-            study.embedding_config.model,
-            " ".join(interview.questions()),
-            study.embedding_dimensions,
-            self,
+        self._search = talk_prep.TalkPrepSearch(
+            self.conn, self._study, self._chat_config, interview, self._topic_vector, self
         )
-        self._query_embedder.ready.connect(self._search_with)
-        self._query_embedder.failed.connect(lambda _message: self._search_with(self._topic_vector))
-
-    def _search_with(self, vector) -> None:
-        interview = self._interview
-        study = self._study
-        # Trusted passages, most trusted first - see
-        # study_ask.balance_for_talk_prep, which favors them in this order.
-        query = " ".join(interview.questions())
-        volumes = interview.volumes()
-        pinned = []
-        if interview.talk_url:
-            work = talk_prep.work_by_url(interview.talk_url)
-            if work is not None:
-                pinned += talk_prep.cited_verse_hits(self.conn, work)
-        if interview.is_lesson and interview.lesson_source in ("cfm", "block") and interview.lesson_text:
-            chapters = talk_prep.parse_reading_block(self.conn, interview.lesson_text)
-            pinned += talk_prep.consensus_hits(self.conn, study.index, query, vector, volumes, set(chapters))
-            pinned += talk_prep.reading_hits(self.conn, study.index, chapters, query, vector)
-        # Always - even with talks left out of the results, what they cite
-        # is the best guide to the verses a reader would expect.
-        pinned += talk_prep.consensus_hits(self.conn, study.index, query, vector, volumes)
-
-        self._asker = StudyQuestionAsker(
-            self.conn,
-            study.index,
-            study.index_path,
-            self._chat_config,
-            study.embedding_config,
-            study.embedding_dimensions,
-            interview.questions(),
-            self,
-            max_selected=interview.result_limit,
-            cap_total=True,
-            context=interview.context(),
-            volumes=volumes,
-            skip_groups=interview.skip_groups(),
-            pinned=pinned,
-        )
-        self._asker.succeeded.connect(self._on_results)
-        self._asker.failed.connect(self._on_results_failed)
+        self._search.succeeded.connect(self._on_results)
+        self._search.failed.connect(self._on_results_failed)
 
     def _set_results_busy(self, busy: bool) -> None:
         for button in (self._refine_button, self._journal_button, self._copy_button, self._export_button, self._next_button):
             button.setEnabled(not busy)
 
-    def _on_results(self, results: list, note: str) -> None:
+    def _on_results(self, results: list, note: str, query_vector) -> None:
         self._results_note = note
         self._results_status.setText("Finding the key verses...")
         self._key_finder = talk_prep.KeyVerseFinder(
-            self.conn,
-            self._study,
-            talk_prep.label_jst(
-                self.conn,
-                talk_prep.drop_unrelated_words(talk_prep.prefer_conference_talks(results), self._interview.topic),
-            ),
-            " ".join(self._interview.questions()),
-            self._asker.query_vector,
-            self,
+            self.conn, self._study, results, " ".join(self._interview.questions()), query_vector, self
         )
         self._key_finder.done.connect(self._on_key_verses)
         self._key_finder.start()
