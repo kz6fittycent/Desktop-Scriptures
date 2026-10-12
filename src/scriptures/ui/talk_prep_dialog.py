@@ -43,6 +43,7 @@ from PySide6.QtWidgets import (
 from scriptures import talk_prep
 from scriptures.ai_client import AiConfig
 from scriptures.cfm import CfmFetcher
+from scriptures.embeddings import QueryEmbedder
 from scriptures.study_ask import StudyQuestionAsker, StudyResult, StudySearch, _VectorLoader
 from scriptures.ui.toggle_row import ToggleRow
 
@@ -604,6 +605,29 @@ class TalkPrepDialog(QDialog):
 
     def _find_sources(self) -> None:
         interview = self._interview
+        if self._session is None or self._session.interview is not interview:
+            self._session = talk_prep.new_session(interview)
+        self._show(self._results_page)
+        self._set_results_busy(True)
+        self._results_title.setText(self._session.title)
+        self._results_status.setText("Searching the scriptures, talks, and articles...")
+        self._results_scroll.setWidget(QWidget())
+        # The whole query - topic, direction, impressions - embedded for the
+        # citation search: the topic alone ("Second Coming") matched talks
+        # about Christ in general, and with them the First Vision.
+        study = self._study
+        self._query_embedder = QueryEmbedder(
+            study.embedding_config,
+            study.embedding_config.model,
+            " ".join(interview.questions()),
+            study.embedding_dimensions,
+            self,
+        )
+        self._query_embedder.ready.connect(self._search_with)
+        self._query_embedder.failed.connect(lambda _message: self._search_with(self._topic_vector))
+
+    def _search_with(self, vector) -> None:
+        interview = self._interview
         study = self._study
         # Trusted passages, most trusted first - see
         # study_ask.balance_for_talk_prep, which favors them in this order.
@@ -616,21 +640,12 @@ class TalkPrepDialog(QDialog):
                 pinned += talk_prep.cited_verse_hits(self.conn, work)
         if interview.is_lesson and interview.lesson_source in ("cfm", "block") and interview.lesson_text:
             chapters = talk_prep.parse_reading_block(self.conn, interview.lesson_text)
-            pinned += talk_prep.consensus_hits(
-                self.conn, study.index, query, self._topic_vector, volumes, set(chapters)
-            )
-            pinned += talk_prep.reading_hits(self.conn, study.index, chapters, query, self._topic_vector)
+            pinned += talk_prep.consensus_hits(self.conn, study.index, query, vector, volumes, set(chapters))
+            pinned += talk_prep.reading_hits(self.conn, study.index, chapters, query, vector)
         # Always - even with talks left out of the results, what they cite
         # is the best guide to the verses a reader would expect.
-        pinned += talk_prep.consensus_hits(self.conn, study.index, query, self._topic_vector, volumes)
-        if self._session is None or self._session.interview is not interview:
-            self._session = talk_prep.new_session(interview)
+        pinned += talk_prep.consensus_hits(self.conn, study.index, query, vector, volumes)
 
-        self._show(self._results_page)
-        self._set_results_busy(True)
-        self._results_title.setText(self._session.title)
-        self._results_status.setText("Searching the scriptures, talks, and articles...")
-        self._results_scroll.setWidget(QWidget())
         self._asker = StudyQuestionAsker(
             self.conn,
             study.index,
@@ -643,7 +658,7 @@ class TalkPrepDialog(QDialog):
             max_selected=interview.result_limit,
             cap_total=True,
             context=interview.context(),
-            volumes=interview.volumes(),
+            volumes=volumes,
             skip_groups=interview.skip_groups(),
             pinned=pinned,
         )

@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import math
 import re
 import sqlite3
 import uuid
@@ -101,7 +102,10 @@ MAX_READING_PER_CHAPTER = 2
 
 # Citation consensus (consensus_hits): how many matching talks and articles
 # to read, how many must cite a verse, how many passages to offer.
-CONSENSUS_WORKS = 40
+# 25, with the closest-matching counting more: with 40 counted equally,
+# Easter talks (close to "Second Coming of Christ" by meaning) brought in
+# the empty tomb; with 20, a direction's own drift took over.
+CONSENSUS_WORKS = 25
 CONSENSUS_MIN_WORKS = 2
 CONSENSUS_PASSAGES = 10
 # A work citing up to this many verses counts fully for each; one citing
@@ -223,6 +227,7 @@ class Interview:
 # ---------------------------------------------------------------------
 
 _works_cache: list[CitingWork] | None = None
+_citing_counts: dict[str, int] | None = None
 
 
 def all_works() -> list[CitingWork]:
@@ -260,6 +265,18 @@ def find_works(query: str, limit: int = 50) -> list[CitingWork]:
             if len(found) >= limit:
                 break
     return found
+
+
+def citing_counts() -> dict[str, int]:
+    """How many of all the talks and articles cite each verse."""
+    global _citing_counts
+    if _citing_counts is None:
+        counts: dict[str, int] = {}
+        for work in all_works():
+            for reference in set(work.references):
+                counts[reference] = counts.get(reference, 0) + 1
+        _citing_counts = counts
+    return _citing_counts
 
 
 def work_by_url(url: str) -> CitingWork | None:
@@ -492,8 +509,14 @@ def consensus_hits(
     chapter_ids: set[int] | None = None,
 ) -> list[study_index.SearchHit]:
     """The verses Church leaders reach for on this topic: the talks and
-    articles that best match it, and the verses most of them cite -
-    consecutive verses joined into one passage, best first.
+    articles that best match it, and the verses they cite - weighed, as
+    a search engine weighs words (TF-IDF), by how much more often talks on
+    this topic cite a verse than all talks do. Consecutive verses are
+    joined into one passage, best first.
+
+    The weighing matters: counting citations alone, the First Vision, D&C
+    76:22-24, 2 Nephi 25:26, and 3 Nephi 11 - cited in talks on nearly
+    everything - topped "Second Coming", ahead of Matthew 24-25 and D&C 45.
 
     This, not the chat model's judgment, is what keeps results to what a
     reader would expect. Tested on four topics, it found D&C 121:7-8 and
@@ -513,7 +536,7 @@ def consensus_hits(
     weights: dict[str, float] = {}
     counts: dict[str, int] = {}
     seen: set[tuple[str, str]] = set()
-    for hit in works:
+    for rank, hit in enumerate(works):
         work = work_by_url(hit.meta.get("url", ""))
         if work is None or not work.references:
             continue
@@ -522,6 +545,7 @@ def consensus_hits(
             continue
         seen.add(identity)
         weight = 1.0 / max(1.0, (len(work.references) / CONSENSUS_FULL_WEIGHT_REFERENCES) ** 0.5)
+        weight /= math.sqrt(rank + 1)  # the closest-matching talks count most
         for reference in set(work.references):
             weights[reference] = weights.get(reference, 0.0) + weight
             counts[reference] = counts.get(reference, 0) + 1
@@ -542,7 +566,9 @@ def consensus_hits(
             continue
         if chapter_ids is not None and row[0] not in chapter_ids:
             continue
-        located[(row[0], row[1])] = (weights[reference], works_citing)
+        everywhere = citing_counts().get(reference, works_citing)
+        rarity = math.log(len(all_works()) / max(everywhere, 1))
+        located[(row[0], row[1])] = (weights[reference] * rarity, works_citing)
 
     passages: list[list] = []  # [chapter_id, start, end, weight, works]
     for (chapter_id, verse), (weight, works_citing) in sorted(located.items()):

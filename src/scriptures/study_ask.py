@@ -502,7 +502,7 @@ def _overlap(a: study_index.SearchHit, b: study_index.SearchHit) -> bool:
 # Passages of one chapter this close (in verses) are shown as one - Isaiah
 # 61:1 and 61:3 as Isaiah 61:1-3 - as long as the result stays this short.
 TALK_PREP_MERGE_GAP = 2
-TALK_PREP_MERGE_MAX_VERSES = 8
+TALK_PREP_MERGE_MAX_VERSES = 10  # one story - Luke 17:11-19, the ten lepers
 
 
 def _merged_if_near(a: study_index.SearchHit, b: study_index.SearchHit) -> study_index.SearchHit | None:
@@ -536,14 +536,16 @@ def balance_for_talk_prep(
     passage that overlaps one already listed, and no article that's just
     a reprint of a talk already listed.
 
-    Scripture comes from, in order: `favored` (the caller's trusted
-    passages, best first - an assigned talk's cited verses, a lesson's
-    reading, the verses talks on the topic cite most) for up to half the
-    slots; the chat model's own picks; then the rest of `favored` and the
-    Topical Guide's key passages, until the share is met. Never other
-    search results the chat model passed over: in testing those were the
-    loose matches users noticed (Ephesians 3:11 for adversity, by the
-    word "purpose"). Fewer results beat unrelated ones."""
+    Scripture comes from, in order: the key passages of a Topical Guide
+    topic the question names; `favored` (the caller's trusted passages,
+    best first - an assigned talk's cited verses, a lesson's reading, the
+    verses talks on the topic cite); other Topical Guide key passages,
+    until the share is met; only then the chat model's own
+    scripture picks. In testing its Conference talk picks were spot on but
+    its scripture picks often weren't (3 Nephi 11 and D&C 76 for the
+    Second Coming), so they only fill in where citations run thin. Never
+    other search results the chat model passed over (Ephesians 3:11 for
+    adversity, by the word "purpose"). Fewer results beat unrelated ones."""
     target = max(1, round(limit * TALK_PREP_SCRIPTURE_SHARE))
     scripture: list[study_index.SearchHit] = []
 
@@ -557,16 +559,17 @@ def balance_for_talk_prep(
                 return
         scripture.append(hit)
 
-    for hit in favored:
-        if len(scripture) >= (target + 1) // 2:
-            break
-        add(hit)
-    for hit in chosen:
-        add(hit)
-    trusted = list(favored) + [h for h in candidates if h.meta.get("key_topic")]
+    # A Topical Guide topic named in the question ("Second Coming") leads:
+    # its key passages are the most hand-picked the app has. Other key
+    # passages (topics matched only by meaning) come after `favored`.
+    keys = [h for h in candidates if h.meta.get("key_topic")]
+    named = [h for h in keys if h.meta["key_topic"].lower() in question.lower()]
+    trusted = named + list(favored) + [h for h in keys if h not in named]
     for hit in trusted:
         if len(scripture) >= target:
             break
+        add(hit)
+    for hit in chosen:  # beyond the share, trimmed below unless room is left
         add(hit)
 
     rest: list[study_index.SearchHit] = []
