@@ -12,6 +12,7 @@ built on, and ships with, the following works under their own licenses.
 | Qt for Python (PySide6) and the Qt libraries | LGPL-3.0 | https://doc.qt.io/qtforpython-6/ |
 | ONNX Runtime | MIT | https://github.com/microsoft/onnxruntime |
 | NumPy | BSD-3-Clause | https://numpy.org |
+| Anthropic Python SDK (`anthropic`) - used only when AI Integration points at Claude - and the libraries it uses: Pydantic, jiter, AnyIO, h11, docstring-parser, truststore, annotated-types, typing-inspection (MIT); httpx2, httpcore2, idna (BSD-3-Clause); sniffio (MIT or Apache-2.0); typing-extensions (PSF-2.0) | MIT, BSD-3-Clause, Apache-2.0, PSF-2.0 | https://github.com/anthropics/anthropic-sdk-python |
 | Python | Python Software Foundation License | https://www.python.org |
 | SQLite | Public domain | https://sqlite.org |
 

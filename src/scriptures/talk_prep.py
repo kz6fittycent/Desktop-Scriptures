@@ -44,10 +44,9 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from PySide6.QtCore import QObject, Signal
-from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply
 
 from scriptures import study_index
-from scriptures.ai_client import AiConfig, build_request
+from scriptures.ai_client import AiConfig, ChatRequest, numbers_schema
 from scriptures.citations import Citation, CitingWork, iter_citing_works
 from scriptures.data_access import get_journal_entry, get_setting, save_journal_entry
 from scriptures.embeddings import EmbeddingRequest, QueryEmbedder
@@ -124,8 +123,8 @@ DIRECTION_PROMPT = (
     "numbered list of themes found in the Church's talks, articles, and "
     f"Topical Guide. Choose up to {DIRECTIONS_SHOWN} that fit the topic and "
     "are clearly different from each other - distinct directions the talk "
-    "could take. Reply with ONLY a JSON array of their numbers, best first, "
-    "e.g. [3, 7, 1]. Use only numbers from the list."
+    "could take. Reply with ONLY JSON listing their numbers, best first, "
+    'e.g. {"numbers": [3, 7, 1]}. Use only numbers from the list.'
 )
 
 
@@ -709,7 +708,6 @@ class DirectionFinder(QObject):
         self._embedded = False
         self._loaded = study.index.is_loaded()
         self._themes: list[str] = []
-        self._manager: QNetworkAccessManager | None = None
 
         self._embedder = QueryEmbedder(
             study.embedding_config, study.embedding_config.model, self._query, study.embedding_dimensions, self
@@ -747,27 +745,16 @@ class DirectionFinder(QObject):
         if len(self._themes) <= DIRECTIONS_SHOWN:
             self.ready.emit(self._themes, self._vector)
             return
-        self._manager = QNetworkAccessManager(self)
-        payload = json.dumps(
-            {
-                "model": self._chat_config.model or "gpt-4o-mini",
-                "temperature": 0,
-                "messages": direction_messages(self._interview.topic or self._query, self._themes),
-            }
-        ).encode("utf-8")
-        self._reply = self._manager.post(build_request(self._chat_config, "/chat/completions"), payload)
-        self._reply.finished.connect(self._on_reply)
+        self._request = ChatRequest(
+            self._chat_config,
+            direction_messages(self._interview.topic or self._query, self._themes),
+            schema=numbers_schema(len(self._themes)),
+            parent=self,
+        )
+        self._request.finished.connect(self._on_reply)
 
-    def _on_reply(self) -> None:
-        reply = self._reply
-        chosen = None
-        if reply.error() == QNetworkReply.NetworkError.NoError:
-            try:
-                content = json.loads(bytes(reply.readAll()))["choices"][0]["message"]["content"]
-                chosen = parse_directions(content, len(self._themes))
-            except (ValueError, KeyError, IndexError, TypeError):
-                chosen = None
-        reply.deleteLater()
+    def _on_reply(self, content: str | None, _message: str, _needs_key: bool) -> None:
+        chosen = parse_directions(content, len(self._themes)) if content is not None else None
         if chosen is None:  # the index's own order instead
             chosen = list(range(min(DIRECTIONS_SHOWN, len(self._themes))))
         self.ready.emit([self._themes[i] for i in chosen], self._vector)

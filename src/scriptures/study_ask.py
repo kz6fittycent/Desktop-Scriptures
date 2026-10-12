@@ -39,10 +39,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal
-from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply
 
 from scriptures import study_index
-from scriptures.ai_client import AUTH_ERRORS, AiConfig, build_request
+from scriptures.ai_client import AiConfig, ChatRequest, numbers_schema
 from scriptures.ask import citations_for, extract_keywords
 from scriptures.citations import Citation
 from scriptures.data_access import get_topic_key_passages, hidden_volume_slugs
@@ -110,9 +109,10 @@ KEY_PASSAGES_AFTER = 8
 # for "how can I know the Book of Mormon is true". The index's own topic
 # ranking is the fallback when the model's reply isn't usable.
 TOPIC_PROMPT = (
-    "You match a question to Topical Guide topics. Reply with ONLY a JSON "
-    "array of the numbers of the 1 or 2 topics that best fit the question, "
-    "most relevant first - e.g. [12] or [12, 40]. If none clearly fit, reply []."
+    "You match a question to Topical Guide topics. Reply with ONLY JSON "
+    "listing the numbers of the 1 or 2 topics that best fit the question, "
+    'most relevant first - e.g. {"numbers": [12]} or {"numbers": [12, 40]}. '
+    'If none clearly fit, reply {"numbers": []}.'
 )
 
 # Shown, per tier, when the chat model's selection isn't usable.
@@ -142,9 +142,9 @@ def selection_prompt(max_selected: int = MAX_SELECTED) -> str:
         "the scriptures and the Church's own publications. You'll get their "
         "question and a numbered list of passages and sources from this app's "
         "library. Choose the ones that genuinely help with the question, most "
-        f"helpful first, at most {max_selected}. Reply with ONLY a JSON array "
-        "of their numbers - no prose, no markdown, e.g. [4, 1, 9]. Use only "
-        "numbers from the list. If none of them fit, reply []."
+        f"helpful first, at most {max_selected}. Reply with ONLY JSON listing "
+        'their numbers - no prose, no markdown, e.g. {"numbers": [4, 1, 9]}. Use only '
+        'numbers from the list. If none of them fit, reply {"numbers": []}.'
     )
 
 
@@ -854,7 +854,6 @@ class StudyQuestionAsker(QObject):
         self._embedded = False
         self._loaded = index.is_loaded()
         self._hits: list[study_index.SearchHit] = []
-        self._manager: QNetworkAccessManager | None = None
 
         self._embedder = QueryEmbedder(
             embedding_config, embedding_config.model, self._query, embedding_dimensions, self
@@ -885,34 +884,19 @@ class StudyQuestionAsker(QObject):
             self._gather(None)  # a filtered follow-up uses no topics
             return
         self._topics = all_topics(self.conn)
-        self._manager = QNetworkAccessManager(self)
-        payload = json.dumps(
-            {
-                "model": self._chat_config.model or "gpt-4o-mini",
-                "temperature": 0,
-                "messages": topic_messages(self._questions, self._topics),
-            }
-        ).encode("utf-8")
-        self._topic_reply = self._manager.post(
-            build_request(self._chat_config, "/chat/completions"), payload
+        self._topic_request = ChatRequest(
+            self._chat_config,
+            topic_messages(self._questions, self._topics),
+            schema=numbers_schema(len(self._topics)),
+            parent=self,
         )
-        self._topic_reply.finished.connect(self._on_topics)
+        self._topic_request.finished.connect(self._on_topics)
 
-    def _on_topics(self) -> None:
-        reply = self._topic_reply
-        topic_ids = None
-        if reply.error() == QNetworkReply.NetworkError.NoError:
-            try:
-                content = json.loads(bytes(reply.readAll()))["choices"][0]["message"]["content"]
-                topic_ids = parse_topic_choice(content, self._topics)
-            except (ValueError, KeyError, IndexError, TypeError):
-                topic_ids = None
-        elif reply.error() in AUTH_ERRORS:
-            reply.deleteLater()
-            self.failed.emit(reply.errorString(), True)
+    def _on_topics(self, content: str | None, message: str, needs_key: bool) -> None:
+        if content is None and needs_key:
+            self.failed.emit(message, True)
             return
-        reply.deleteLater()
-        self._gather(topic_ids)
+        self._gather(parse_topic_choice(content, self._topics) if content is not None else None)
 
     def _gather(self, topic_ids: list[int] | None) -> None:
         self._hits = gather_candidates(
@@ -929,17 +913,14 @@ class StudyQuestionAsker(QObject):
         if not self._hits:
             self.succeeded.emit([], "")
             return
-        if self._manager is None:
-            self._manager = QNetworkAccessManager(self)
-        payload = json.dumps(
-            {
-                "model": self._chat_config.model or "gpt-4o-mini",
-                "temperature": 0.1,
-                "messages": selection_messages(self._questions, self._hits, self._max_selected, self._context),
-            }
-        ).encode("utf-8")
-        self._reply = self._manager.post(build_request(self._chat_config, "/chat/completions"), payload)
-        self._reply.finished.connect(self._on_selected)
+        self._request = ChatRequest(
+            self._chat_config,
+            selection_messages(self._questions, self._hits, self._max_selected, self._context),
+            temperature=0.1,
+            schema=numbers_schema(len(self._hits)),
+            parent=self,
+        )
+        self._request.finished.connect(self._on_selected)
 
     def _results(self, hits: list[study_index.SearchHit]) -> list[StudyResult]:
         question = " ".join(self._questions)
@@ -973,21 +954,12 @@ class StudyQuestionAsker(QObject):
             f"Showing the study index's best matches - {why}",
         )
 
-    def _on_selected(self) -> None:
-        reply = self._reply
-        error = reply.error()
-        raw = bytes(reply.readAll()).decode("utf-8", errors="replace")
-        reply.deleteLater()
-        if error != QNetworkReply.NetworkError.NoError:
-            if error in AUTH_ERRORS:
-                self.failed.emit(reply.errorString(), True)
+    def _on_selected(self, content: str | None, message: str, needs_key: bool) -> None:
+        if content is None:
+            if needs_key:
+                self.failed.emit(message, True)
                 return
-            self._fallback(f"the AI didn't answer ({reply.errorString()}).")
-            return
-        try:
-            content = json.loads(raw)["choices"][0]["message"]["content"]
-        except (ValueError, KeyError, IndexError, TypeError):
-            self._fallback("the AI's reply wasn't in the expected format.")
+            self._fallback(f"the AI didn't answer ({message}).")
             return
         chosen = parse_selection(content, len(self._hits), self._max_selected)
         if chosen is None:

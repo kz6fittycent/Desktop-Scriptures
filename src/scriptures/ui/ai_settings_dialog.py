@@ -5,7 +5,8 @@ bring-your-own-endpoint AI-assisted search, never a built-in provider).
 Alpaca-style configuration: a base URL and API key for any OpenAI-
 compatible chat-completions endpoint (OpenAI itself, another hosted
 provider with a compatible endpoint, or a locally-run server such as
-Ollama's), plus which model to ask for. A "Test Connection" button
+Ollama's) or for Anthropic's Claude (https://api.anthropic.com - see
+ai_client.is_anthropic), plus which model to ask for. A "Test Connection" button
 confirms the base URL + key actually work before the user leaves the
 dialog, without spending any completion tokens.
 
@@ -32,7 +33,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from scriptures.ai_client import AiConfig, ConnectionTester, embeddings_config
+from scriptures.ai_client import AiConfig, ConnectionTester, embeddings_config, is_anthropic
 from scriptures.embeddings import EmbeddingRequest
 from scriptures.ui.toggle_row import ToggleRow
 
@@ -82,6 +83,10 @@ class AiSettingsDialog(QDialog):
 
         self._base_url_edit = QLineEdit(base_url)
         self._base_url_edit.setPlaceholderText("https://api.openai.com/v1")
+        self._base_url_edit.setToolTip(
+            "Any OpenAI-compatible address (OpenAI, Gemini, OpenRouter, Groq, Mistral, Ollama, ...), "
+            "or https://api.anthropic.com for Claude."
+        )
         form.addRow("Base URL:", self._base_url_edit)
 
         key_row = QHBoxLayout()
@@ -212,7 +217,13 @@ class AiSettingsDialog(QDialog):
         chat = AiConfig(self.base_url, self.api_key, self.model)
         config = embeddings_config(chat, self.embeddings_base_url, self.embeddings_api_key, model)
         if not model or not config.base_url:
-            self._embeddings_status_label.setText("Enter an embedding model (and a URL) first.")
+            if model and is_anthropic(chat):
+                self._embeddings_status_label.setText(
+                    "Anthropic has no embedding models - enter a separate Embeddings URL "
+                    "(e.g. http://localhost:11434/v1 for Ollama)."
+                )
+            else:
+                self._embeddings_status_label.setText("Enter an embedding model (and a URL) first.")
             return
         dimensions = self.embedding_dimensions
         self._embeddings_status_label.setText("Testing...")

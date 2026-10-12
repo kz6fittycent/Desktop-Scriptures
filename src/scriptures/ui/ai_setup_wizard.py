@@ -272,7 +272,10 @@ class _ServerPage(QWizardPage):
             else:
                 detail = f"{server.base_url} - running, but no {'embedding' if self.embeddings else 'chat'} models listed"
             self._cards.add(server.base_url, f"{server.name} on this computer", detail)
-        self._cards.add(_OPENAI, "OpenAI", "Hosted - needs an API key from platform.openai.com; usage is billed by OpenAI")
+        for provider in ai_setup.HOSTED_PROVIDERS:
+            if self.embeddings and not provider.offers_embeddings:
+                continue
+            self._cards.add(provider.key, provider.name, provider.detail)
         self._cards.add(_OTHER, "Somewhere else", "Any other OpenAI-compatible address")
         self._add_trailing_choices()
         if scanning:
@@ -314,22 +317,30 @@ class _ServerPage(QWizardPage):
         self._form_container.setVisible(key not in (_SAME_AS_CHAT, _SKIP))
         self._test_row.setVisible(key != _SKIP)
         server = self._server_for(key)
-        self._url.setReadOnly(key not in (_OTHER, _OPENAI))
-        self._key.setEnabled(key in (_OTHER, _OPENAI))
+        hosted = ai_setup.hosted_provider(key)
+        self._url.setReadOnly(key != _OTHER and hosted is None)
+        self._key.setEnabled(key == _OTHER or hosted is not None)
         if server is not None:
             self._url.setText(server.base_url)
             self._key.clear()
             self._set_models(server.embedding_models if self.embeddings else server.chat_models)
             self._after_server_selected(server)
-        elif key == _OPENAI:
-            self._url.setText(ai_setup.OPENAI_BASE_URL)
-            self._key.setText(self._wizard.initial.get("api_key", ""))
-            recommended = (
-                ai_setup.RECOMMENDED_OPENAI_EMBEDDING_MODEL if self.embeddings
-                else ai_setup.RECOMMENDED_OPENAI_CHAT_MODEL
-            )
-            self._set_models([recommended])
-            self._dimensions.setText(ai_setup.RECOMMENDED_OPENAI_EMBEDDING_DIMENSIONS)
+        elif hosted is not None:
+            self._url.setText(hosted.base_url)
+            initial = self._wizard.initial
+            same_service = initial.get("embeddings_base_url" if self.embeddings else "base_url", "") == hosted.base_url
+            key_name = "embeddings_api_key" if self.embeddings else "api_key"
+            self._key.setText(initial.get(key_name, "") if same_service else "")
+            recommended = hosted.embedding_model if self.embeddings else hosted.chat_model
+            self._set_models([recommended] if recommended else [])
+            self._dimensions.setText(hosted.embedding_dimensions if self.embeddings else "")
+            if not recommended:
+                self._hint.setText(f"Enter your {hosted.name} API key, then click <b>Refresh</b> to choose a model.")
+            elif not self.embeddings and not hosted.offers_embeddings:
+                self._hint.setText(
+                    f"{hosted.name} has no embedding models, so the study index (next page) needs "
+                    "another service - Ollama on this computer works well."
+                )
         elif key == _OTHER:
             self._url.clear()
             self._set_models([])
@@ -405,8 +416,9 @@ class _ChatPage(_ServerPage):
         initial_url = self._wizard.initial.get("base_url", "")
         if any(s.base_url == initial_url for s in found):
             return initial_url
-        if initial_url == ai_setup.OPENAI_BASE_URL:
-            return _OPENAI
+        hosted = ai_setup.hosted_provider_for_url(initial_url)
+        if hosted is not None:
+            return hosted.key
         if initial_url:
             return _OTHER
         suggested = ai_setup.suggested_chat_server(found)
@@ -452,6 +464,9 @@ class _EmbeddingsPage(_ServerPage):
         )
 
     def _add_leading_choices(self) -> None:
+        chat = ai_setup.hosted_provider(self._wizard.chat_page.choice())
+        if chat is not None and not chat.offers_embeddings:
+            return  # e.g. Anthropic - nothing to use for the study index there
         self._cards.add(_SAME_AS_CHAT, "Same as chat", "Use the chat service's address - only if it offers embedding models")
 
     def _add_trailing_choices(self) -> None:
@@ -466,7 +481,8 @@ class _EmbeddingsPage(_ServerPage):
         if initial_url and any(s.base_url == initial_url for s in found):
             return initial_url
         chat = self._wizard.chat_page
-        if chat.choice() == _OPENAI:
+        hosted = ai_setup.hosted_provider(chat.choice())
+        if hosted is not None and hosted.offers_embeddings:
             return _SAME_AS_CHAT
         chat_server = self._server_for(chat.choice())
         if chat_server is not None and chat_server.embedding_models:
@@ -488,9 +504,10 @@ class _EmbeddingsPage(_ServerPage):
             self._key.setEnabled(False)
             self._key.clear()
             chat_server = self._server_for(chat.choice())
-            if chat.choice() == _OPENAI:
-                self._set_models([ai_setup.RECOMMENDED_OPENAI_EMBEDDING_MODEL])
-                self._dimensions.setText(ai_setup.RECOMMENDED_OPENAI_EMBEDDING_DIMENSIONS)
+            hosted = ai_setup.hosted_provider(chat.choice())
+            if hosted is not None:
+                self._set_models([hosted.embedding_model] if hosted.embedding_model else [])
+                self._dimensions.setText(hosted.embedding_dimensions)
             else:
                 self._set_models(chat_server.embedding_models if chat_server else [])
             self.completeChanged.emit()

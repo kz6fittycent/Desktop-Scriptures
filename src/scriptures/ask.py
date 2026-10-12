@@ -66,9 +66,8 @@ import sqlite3
 from dataclasses import dataclass, field
 
 from PySide6.QtCore import QObject, Signal
-from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply
 
-from scriptures.ai_client import AUTH_ERRORS, AiConfig, build_request
+from scriptures.ai_client import AiConfig, ChatRequest, strings_schema
 from scriptures.citations import Citation, get_citations
 from scriptures.data_access import (
     get_chapter_by_loose_reference,
@@ -108,14 +107,14 @@ SYSTEM_PROMPT = (
     "Price, and the Joseph Smith Translation)"
     f"{APOCRYPHA_CLAUSE} "
     "that are relevant to a "
-    "reader's question. Reply with ONLY a JSON array of up to "
+    "reader's question. Reply with ONLY JSON listing up to "
     f"{MAX_REFERENCES} scripture reference strings, most relevant first - "
-    'no prose, no markdown, just e.g. ["3 Nephi 11:18-22", "3 Nephi 18:1-11"]. '
+    'no prose, no markdown, just e.g. {"references": ["3 Nephi 11:18-22", "3 Nephi 18:1-11"]}. '
     "Each reference must be a real book name, chapter number, and "
     "optionally a verse or verse range (e.g. \"Alma 32:21\", \"Doctrine and "
     'Covenants 76", "1 Nephi 3:7"). If nothing in these books is clearly '
-    "relevant, reply with an empty array []. The conversation may include "
-    "your own earlier replies (each still just a bare JSON array) and a "
+    'relevant, reply with {"references": []}. The conversation may include '
+    "your own earlier replies (each in that same JSON form) and a "
     "follow-up refining what's wanted (e.g. \"just the ones about "
     'baptism") - narrow or adjust your previous answer accordingly, still '
     "following the same rules."
@@ -601,34 +600,19 @@ class QuestionAsker(QObject):
         self.conn = conn
         self.question = question
         self._is_initial_question = not history
-        self._manager = QNetworkAccessManager(self)
         messages = [{"role": "system", "content": system_prompt(conn)}]
         for prior_question, prior_references in history:
             messages.append({"role": "user", "content": prior_question})
-            messages.append({"role": "assistant", "content": json.dumps(prior_references)})
+            messages.append({"role": "assistant", "content": json.dumps({"references": prior_references})})
         messages.append({"role": "user", "content": question})
-        payload = json.dumps(
-            {"model": config.model or "gpt-4o-mini", "temperature": 0.2, "messages": messages}
-        ).encode("utf-8")
-        self._reply = self._manager.post(build_request(config, "/chat/completions"), payload)
-        self._reply.finished.connect(self._on_finished)
+        self._request = ChatRequest(
+            config, messages, temperature=0.2, schema=strings_schema("references"), parent=self
+        )
+        self._request.finished.connect(self._on_finished)
 
-    def _on_finished(self) -> None:
-        reply = self._reply
-        error = reply.error()
-        if error != QNetworkReply.NetworkError.NoError:
-            message = reply.errorString()
-            needs_key = error in AUTH_ERRORS
-            reply.deleteLater()
+    def _on_finished(self, content: str | None, message: str, needs_key: bool) -> None:
+        if content is None:
             self.failed.emit(message, needs_key)
-            return
-
-        raw = bytes(reply.readAll()).decode("utf-8", errors="replace")
-        reply.deleteLater()
-        try:
-            content = json.loads(raw)["choices"][0]["message"]["content"]
-        except (json.JSONDecodeError, KeyError, IndexError, TypeError):
-            self.failed.emit("The AI endpoint's response wasn't in the expected format.", False)
             return
 
         candidates = _extract_candidates(content)

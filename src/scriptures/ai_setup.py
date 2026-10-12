@@ -17,7 +17,14 @@ from dataclasses import dataclass
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply
 
-from scriptures.ai_client import AiConfig, build_request
+from scriptures.ai_client import (
+    ANTHROPIC_BASE_URL,
+    RECOMMENDED_ANTHROPIC_MODEL,
+    AiConfig,
+    AnthropicModelListing,
+    build_request,
+    is_anthropic,
+)
 
 WIKI_URL = "https://github.com/kz6fittycent/Desktop-Scriptures/wiki"
 AI_SETUP_GUIDE_URL = f"{WIKI_URL}/Choosing-an-AI-Setup"
@@ -31,6 +38,65 @@ RECOMMENDED_OLLAMA_EMBEDDING_MODEL = "embeddinggemma"
 RECOMMENDED_OLLAMA_CHAT_MODEL = "gemma3:4b"
 
 PROBE_TIMEOUT_MS = 1500
+
+
+@dataclass(frozen=True)
+class HostedProvider:
+    """A hosted AI service the setup wizard offers by name. All but
+    Anthropic speak the OpenAI-compatible API (see ai_client.py). A blank
+    model means none is suggested - the wizard asks the service for its
+    list once there's a key (model names change faster than releases)."""
+
+    key: str
+    name: str
+    base_url: str
+    detail: str
+    chat_model: str = ""
+    embedding_model: str = ""
+    embedding_dimensions: str = ""
+    offers_embeddings: bool = False
+
+
+HOSTED_PROVIDERS = (
+    HostedProvider(
+        "openai", "OpenAI", OPENAI_BASE_URL,
+        "Hosted - needs an API key from platform.openai.com; usage is billed by OpenAI",
+        RECOMMENDED_OPENAI_CHAT_MODEL, RECOMMENDED_OPENAI_EMBEDDING_MODEL,
+        RECOMMENDED_OPENAI_EMBEDDING_DIMENSIONS, offers_embeddings=True,
+    ),
+    HostedProvider(
+        "anthropic", "Anthropic (Claude)", ANTHROPIC_BASE_URL,
+        "Hosted - needs an API key from console.anthropic.com; usage is billed by Anthropic",
+        RECOMMENDED_ANTHROPIC_MODEL,
+    ),
+    HostedProvider(
+        "gemini", "Google Gemini", "https://generativelanguage.googleapis.com/v1beta/openai",
+        "Hosted - needs an API key from Google AI Studio; usage is billed by Google",
+        offers_embeddings=True,
+    ),
+    HostedProvider(
+        "openrouter", "OpenRouter", "https://openrouter.ai/api/v1",
+        "Hosted - one API key for models from many companies; usage is billed by OpenRouter",
+    ),
+    HostedProvider(
+        "groq", "Groq", "https://api.groq.com/openai/v1",
+        "Hosted - needs an API key from console.groq.com; usage is billed by Groq",
+    ),
+    HostedProvider(
+        "mistral", "Mistral", "https://api.mistral.ai/v1",
+        "Hosted - needs an API key from console.mistral.ai; usage is billed by Mistral",
+        offers_embeddings=True,
+    ),
+)
+
+
+def hosted_provider(key: str | None) -> HostedProvider | None:
+    return next((p for p in HOSTED_PROVIDERS if p.key == key), None)
+
+
+def hosted_provider_for_url(url: str) -> HostedProvider | None:
+    url = url.strip().rstrip("/")
+    return next((p for p in HOSTED_PROVIDERS if p.base_url.rstrip("/") == url), None)
 
 
 @dataclass(frozen=True)
@@ -128,6 +194,12 @@ class ModelLister(QObject):
 
     def __init__(self, config: AiConfig, timeout_ms: int = 10_000, parent: QObject | None = None):
         super().__init__(parent)
+        if is_anthropic(config):
+            self._listing = AnthropicModelListing(config, self)
+            self._listing.finished.connect(
+                lambda ok, models, message, _needs_key: self.finished.emit(ok, models, message)
+            )
+            return
         self._manager = QNetworkAccessManager(self)
         request = build_request(config, "/models")
         request.setTransferTimeout(timeout_ms)
