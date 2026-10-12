@@ -470,6 +470,21 @@ CREATE INDEX IF NOT EXISTS idx_reading_history_chapter ON reading_history(chapte
 -- once by db.py on first run and never changed) - this row is never itself
 -- synced by sync.py, since it identifies one specific device, not shared
 -- state.
+-- Talk Prep sessions (talk_prep.py): one guided preparation - its
+-- interview answers and results - as JSON, so it can be reopened during
+-- the week. `uid` is the natural key sync.py matches across devices
+-- (only when the user turns Talk Prep syncing on); `deleted_at` is a
+-- tombstone for the same reason as notes' own.
+CREATE TABLE IF NOT EXISTS talk_prep_sessions (
+    id          INTEGER PRIMARY KEY,
+    uid         TEXT NOT NULL UNIQUE,
+    title       TEXT NOT NULL,
+    data        TEXT NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at  TEXT
+);
+
 CREATE TABLE IF NOT EXISTS settings (
     key    TEXT PRIMARY KEY,
     value  TEXT NOT NULL

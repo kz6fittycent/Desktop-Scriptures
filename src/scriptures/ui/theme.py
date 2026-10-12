@@ -734,6 +734,36 @@ def app_stylesheet(theme: str, accent: str = DEFAULT_ACCENT) -> str:
             background-color: {p.primary};
             border: 2px solid {p.primary};
         }}
+        QLabel#talkPrepBanner {{
+            background-color: {p.card_bg};
+            color: {p.card_text};
+            border-left: 4px solid {p.primary};
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }}
+        QLabel#talkPrepHeading {{
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 4px;
+        }}
+        QLabel#talkPrepHint {{
+            color: {p.muted};
+            font-size: 12px;
+        }}
+        QLabel#talkPrepKeyVerses {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-left: 4px solid {p.primary};
+            border-radius: 6px;
+            padding: 10px 12px;
+        }}
+        QFrame#talkPrepResult {{
+            background-color: {p.surface};
+            border: 1px solid {p.border};
+            border-radius: 6px;
+        }}
+        QFrame#talkPrepResult QLabel {{ background: transparent; }}
         QLabel#bugReportMessage {{
             font-size: 14px;
         }}

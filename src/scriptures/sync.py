@@ -47,9 +47,14 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from scriptures.data_access import get_device_id
+from scriptures.data_access import get_device_id, get_setting
 
 DEVICE_FILE_GLOB = "device-*.json"
+
+# Talk Prep sessions (talk_prep.py) sync only when the user turns this on
+# (Menu → Sync → Sync Talk Prep Sessions) - on each device: a device with
+# it off neither writes its sessions to the folder nor takes others'.
+TALK_PREP_SYNC_SETTING = "sync_talk_prep"
 
 
 def _device_file_path(sync_folder: Path, device_id: str) -> Path:
@@ -249,6 +254,22 @@ def _export_reading_log(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return out
 
 
+def _export_talk_prep_sessions(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    if get_setting(conn, TALK_PREP_SYNC_SETTING) != "true":
+        return []
+    return [
+        {
+            "uid": r["uid"],
+            "title": r["title"],
+            "data": r["data"],
+            "created_at": r["created_at"],
+            "updated_at": r["updated_at"],
+            "deleted_at": r["deleted_at"],
+        }
+        for r in conn.execute("SELECT * FROM talk_prep_sessions")
+    ]
+
+
 def export_device_state(conn: sqlite3.Connection, sync_folder: Path) -> Path:
     """Writes this device's entire current state to
     <sync_folder>/device-<device_id>.json, overwriting whatever this
@@ -276,6 +297,7 @@ def export_device_state(conn: sqlite3.Connection, sync_folder: Path) -> Path:
         "highlights": _export_highlights(conn),
         "reading_log": _export_reading_log(conn),
         "user_cross_references": _export_user_cross_references(conn),
+        "talk_prep_sessions": _export_talk_prep_sessions(conn),
     }
 
     dest = _device_file_path(sync_folder, device_id)
@@ -508,6 +530,28 @@ def _apply_reading_log(conn: sqlite3.Connection, record: dict[str, Any]) -> None
     )
 
 
+def _apply_talk_prep_session(conn: sqlite3.Connection, record: dict[str, Any]) -> None:
+    existing = conn.execute(
+        "SELECT id, updated_at FROM talk_prep_sessions WHERE uid = ?", (record["uid"],)
+    ).fetchone()
+    if existing and existing["updated_at"] >= record["updated_at"]:
+        return
+    if existing:
+        conn.execute(
+            "UPDATE talk_prep_sessions SET title = ?, data = ?, updated_at = ?, deleted_at = ? WHERE id = ?",
+            (record["title"], record["data"], record["updated_at"], record["deleted_at"], existing["id"]),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO talk_prep_sessions (uid, title, data, created_at, updated_at, deleted_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                record["uid"], record["title"], record["data"],
+                record["created_at"], record["updated_at"], record["deleted_at"],
+            ),
+        )
+
+
 def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
     """Reads every device-*.json file in `sync_folder` (including this
     device's own last export, if any), merges all records by natural key
@@ -529,6 +573,7 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
     highlights: dict[tuple, dict[str, Any]] = {}
     reading_log: dict[tuple, dict[str, Any]] = {}
     user_cross_references: dict[tuple, dict[str, Any]] = {}
+    talk_prep_sessions: dict[str, dict[str, Any]] = {}
 
     for payload in _read_device_files(sync_folder):
         for rec in payload.get("notes", []):
@@ -544,6 +589,8 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
             _keep_latest(reading_log, rec["read_date"], rec)
         for rec in payload.get("user_cross_references", []):
             _keep_latest(user_cross_references, _user_cross_reference_key(rec), rec)
+        for rec in payload.get("talk_prep_sessions", []):
+            _keep_latest(talk_prep_sessions, rec["uid"], rec)
 
     for rec in notes.values():
         _apply_note(conn, rec)
@@ -557,6 +604,9 @@ def import_and_merge(conn: sqlite3.Connection, sync_folder: Path) -> None:
         _apply_reading_log(conn, rec)
     for rec in user_cross_references.values():
         _apply_user_cross_reference(conn, rec)
+    if get_setting(conn, TALK_PREP_SYNC_SETTING) == "true":
+        for rec in talk_prep_sessions.values():
+            _apply_talk_prep_session(conn, rec)
 
     conn.commit()
 

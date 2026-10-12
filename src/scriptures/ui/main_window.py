@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
-from scriptures import ai_setup, bug_report, citations, content_updates, study_index
+from scriptures import ai_setup, bug_report, citations, content_updates, study_index, talk_prep
 from scriptures.study_ask import StudySearch
 from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
@@ -76,7 +76,7 @@ from scriptures.general_conference import (
     should_show_reminder,
 )
 from scriptures.sotd import get_scripture_of_the_day
-from scriptures.sync import sync_now
+from scriptures.sync import TALK_PREP_SYNC_SETTING, sync_now
 from scriptures import tts
 from scriptures.temple_recommend import should_show_reminder as should_show_temple_reminder
 from scriptures.ui.ai_settings_dialog import AiSettingsDialog
@@ -84,6 +84,7 @@ from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
 from scriptures.ui.about_help import HelpDialog, LicenseDialog
 from scriptures.ui.bug_report_dialog import BugReportDialog
+from scriptures.ui.talk_prep_dialog import TalkPrepDialog
 from scriptures.ui.voices_dialog import VoicesDialog
 from scriptures.ui.welcome_dialog import WelcomeDialog
 from scriptures.ui.ai_setup_wizard import AiSetupWizard, guide_link_html
@@ -657,6 +658,15 @@ class MainWindow(QMainWindow):
         sync_options_action.triggered.connect(self._show_sync_options)
         sync_menu.addAction(sync_options_action)
 
+        # Talk Prep sessions are kept on this computer unless the user
+        # opts in - see sync.py's TALK_PREP_SYNC_SETTING.
+        self._sync_talk_prep_action = QAction("Sync Talk Prep Sessions", self, checkable=True)
+        self._sync_talk_prep_action.setChecked(talk_prep.sync_enabled(self.conn))
+        self._sync_talk_prep_action.toggled.connect(
+            lambda on: set_setting(self.conn, TALK_PREP_SYNC_SETTING, "true" if on else "false")
+        )
+        sync_menu.addAction(self._sync_talk_prep_action)
+
         sync_menu.addSeparator()
 
         self._sync_now_action = QAction("Sync Now", self)
@@ -808,6 +818,13 @@ class MainWindow(QMainWindow):
         # QMenuBar takes a plain action as a top-level entry just fine
         # (unlike a QWidgetAction - see below).
         self.menuBar().addAction(journal_action)
+        # Talk Prep (talk_prep_dialog.py) - only shown once AI Integration
+        # is set up (see _update_search_placeholder, which runs whenever
+        # that changes).
+        self._talk_prep_action = QAction("&Talk Prep", self)
+        self._talk_prep_action.triggered.connect(self._show_talk_prep)
+        self.menuBar().addAction(self._talk_prep_action)
+        self._talk_prep_dialog: TalkPrepDialog | None = None
 
         # QMenuBar doesn't actually support QWidgetAction - a widget added
         # that way gets geometry but is left unparented and never painted.
@@ -995,6 +1012,25 @@ class MainWindow(QMainWindow):
         self._citation_updater = content_updates.CitationUpdater(self)
         self._citation_updater.finished.connect(self._on_citation_updates_checked)
         self._citation_updater.check()
+
+    def _show_talk_prep(self) -> None:
+        if self._talk_prep_dialog is not None and self._talk_prep_dialog.isVisible():
+            self._talk_prep_dialog.raise_()
+            self._talk_prep_dialog.activateWindow()
+            return
+        config = self._current_ai_config()
+        if config is None:
+            return
+        self._talk_prep_dialog = TalkPrepDialog(
+            self.conn,
+            config,
+            self._current_study_search(),
+            open_chapter=self._on_search_result_selected,
+            open_topic=self._show_topic_detail,
+            build_index=self._show_study_index,
+            parent=self,
+        )
+        self._talk_prep_dialog.show()
 
     def send_pending_bug_reports(self) -> None:
         """Called a little while after startup (app.py): retries any bug
@@ -1347,7 +1383,9 @@ class MainWindow(QMainWindow):
         too, not just keywords/references. Refreshed here and right after
         AI Settings closes, so turning it on/off takes effect immediately
         rather than needing a restart to notice."""
-        if self._current_ai_config() is not None:
+        ai_on = self._current_ai_config() is not None
+        self._talk_prep_action.setVisible(ai_on)
+        if ai_on:
             self.search_bar.setPlaceholderText("Ask a question, or search...")
             # A plain-text QToolTip doesn't wrap - Qt just renders it as
             # one unbroken line, which for a sentence this long extended

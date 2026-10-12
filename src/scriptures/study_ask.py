@@ -135,15 +135,19 @@ _KIND_LABELS = {
     "lexicon": "Original-language word",
 }
 
-SELECTION_PROMPT = (
-    "You help someone preparing a talk or lesson find helpful sources in "
-    "the scriptures and the Church's own publications. You'll get their "
-    "question and a numbered list of passages and sources from this app's "
-    "library. Choose the ones that genuinely help with the question, most "
-    f"helpful first, at most {MAX_SELECTED}. Reply with ONLY a JSON array "
-    "of their numbers - no prose, no markdown, e.g. [4, 1, 9]. Use only "
-    "numbers from the list. If none of them fit, reply []."
-)
+def selection_prompt(max_selected: int = MAX_SELECTED) -> str:
+    return (
+        "You help someone preparing a talk or lesson find helpful sources in "
+        "the scriptures and the Church's own publications. You'll get their "
+        "question and a numbered list of passages and sources from this app's "
+        "library. Choose the ones that genuinely help with the question, most "
+        f"helpful first, at most {max_selected}. Reply with ONLY a JSON array "
+        "of their numbers - no prose, no markdown, e.g. [4, 1, 9]. Use only "
+        "numbers from the list. If none of them fit, reply []."
+    )
+
+
+SELECTION_PROMPT = selection_prompt()
 
 
 @dataclass(frozen=True)
@@ -161,6 +165,12 @@ class StudyResult:
     # A lexicon entry's Strong's number ("H4899") - opens that entry.
     strongs: str | None = None
     citations: list[Citation] = field(default_factory=list)
+    # A scripture result's verse range within chapter_id, and - set by the
+    # talk-prep helper (talk_prep.py) - the one verse that best carries
+    # the question, to bring to the front.
+    verse_start: int | None = None
+    verse_end: int | None = None
+    key_verse: int | None = None
 
     @property
     def kind_label(self) -> str:
@@ -335,12 +345,22 @@ def gather_candidates(
     vector: list[float] | None,
     conn: sqlite3.Connection | None = None,
     topic_ids: list[int] | None = None,
+    *,
+    volumes: set[str] | None = None,
+    skip_groups: frozenset[str] = frozenset(),
+    pinned: list[study_index.SearchHit] = (),
 ) -> list[study_index.SearchHit]:
     """The candidates the chat model chooses from: one search per
     CANDIDATE_GROUPS group plus - given the main database `conn` - the
     best-matching Topical Guide topics' key passages, listed first; or,
     when a follow-up asked for one volume or kind of source
-    (detect_filters), a single search restricted to it."""
+    (detect_filters), a single search restricted to it.
+
+    The talk-prep helper (talk_prep.py) narrows this further: `volumes`
+    limits the Standard Works group to the volumes the user chose,
+    `skip_groups` leaves out whole CANDIDATE_GROUPS by name, and `pinned`
+    (verses an assigned talk cites, or a lesson's reading) always lead the
+    list, ahead of everything the searches found."""
     # Volumes the reader hasn't switched on (data_access.OPTIONAL_VOLUMES)
     # are left out even if an index built earlier still holds them.
     hidden = hidden_volume_slugs(conn) if conn is not None else set()
@@ -352,7 +372,13 @@ def gather_candidates(
             query, vector, kinds=kinds, volume_slugs=volumes, limit=CANDIDATES, exclude_volume_slugs=hidden
         )
     hits: list[study_index.SearchHit] = []
-    for _name, group_kinds, group_volumes, count in CANDIDATE_GROUPS:
+    for name, group_kinds, group_volumes, count in CANDIDATE_GROUPS:
+        if name in skip_groups:
+            continue
+        if name == "standard_works" and volumes is not None:
+            group_volumes = group_volumes & volumes
+            if not group_volumes:
+                continue
         if group_volumes and group_volumes <= hidden:
             continue
         hits.extend(
@@ -363,12 +389,17 @@ def gather_candidates(
         )
     if conn is not None:
         keys = _key_passage_hits(conn, index, query, vector, hits, topic_ids)
+        if volumes is not None:
+            keys = [h for h in keys if h.volume_slug in volumes]
         leads, rest, seen_topics = [], [], set()
         for hit in keys:  # keys come in topic order, most central first
             topic = hit.meta.get("key_topic")
             (rest if topic in seen_topics else leads).append(hit)
             seen_topics.add(topic)
         hits = leads + hits[:KEY_PASSAGES_AFTER] + rest + hits[KEY_PASSAGES_AFTER:]
+    if pinned:
+        pinned_keys = {h.key for h in pinned}
+        hits = list(pinned) + [h for h in hits if h.key not in pinned_keys]
     return hits
 
 
@@ -415,6 +446,94 @@ def with_minimums(
                 result.append(hit)
                 have += 1
     return result
+
+
+def fit_to_limit(hits: list[study_index.SearchHit], limit: int) -> list[study_index.SearchHit]:
+    """At most `limit` hits, trimmed from the end of whichever tier has the
+    most - so the talks and articles with_minimums guaranteed aren't the
+    first to go just because they sort after scripture."""
+    result = list(hits)
+    while len(result) > limit:
+        counts: dict[int, int] = {}
+        for hit in result:
+            counts[tier(hit)] = counts.get(tier(hit), 0) + 1
+        biggest = max(counts, key=lambda level: (counts[level], -level))
+        last = max(i for i, h in enumerate(result) if tier(h) == biggest)
+        del result[last]
+    return result
+
+
+# The talk-prep helper's share of scripture among its results - a talk is
+# built on the scriptures, and in testing gemma3-4b picked 3 of 8 for
+# "repentance" while Alma 34 sat unpicked among the candidates.
+TALK_PREP_SCRIPTURE_SHARE = 0.6
+
+
+def _same_work(a: study_index.SearchHit, b: study_index.SearchHit) -> bool:
+    """A Conference talk and its Ensign/Liahona reprint: same speaker,
+    same title."""
+    return (
+        a.meta.get("title", "").strip().lower() == b.meta.get("title", "").strip().lower()
+        and a.meta.get("speaker", "").strip().lower() == b.meta.get("speaker", "").strip().lower()
+    )
+
+
+def _overlap(a: study_index.SearchHit, b: study_index.SearchHit) -> bool:
+    """Two passages sharing a verse (Alma 32:17-23 and Alma 32:21) - the
+    passage search and the Topical Guide's key passages can both find one."""
+    if a.chapter_id is None or a.chapter_id != b.chapter_id:
+        return False
+    return (
+        a.meta.get("verse_start", 0) <= b.meta.get("verse_end", 0)
+        and b.meta.get("verse_start", 0) <= a.meta.get("verse_end", 0)
+    )
+
+
+def balance_for_talk_prep(
+    chosen: list[study_index.SearchHit],
+    candidates: list[study_index.SearchHit],
+    limit: int,
+    question: str = "",
+    favored: list[study_index.SearchHit] = (),
+) -> list[study_index.SearchHit]:
+    """At most `limit` results, about TALK_PREP_SCRIPTURE_SHARE of them
+    from the Standard Works - the chat model's picks first, then the
+    best remaining candidates (Topical Guide key passages lead those) -
+    with with_minimums' talks and articles, no passage that overlaps one
+    already listed, and no article that's just a reprint of a talk already
+    listed.
+
+    `favored` (a lesson's reading, an assigned talk's cited verses) fill
+    up to half the scripture slots first, whether or not the chat model
+    picked them - they're what the user said the talk is built on."""
+    target = max(1, round(limit * TALK_PREP_SCRIPTURE_SHARE))
+    scripture: list[study_index.SearchHit] = []
+    favored_picked = [h for h in chosen if h in favored] + [h for h in favored if h not in chosen]
+    for hit in favored_picked:
+        if len(scripture) >= (target + 1) // 2:
+            break
+        if tier(hit) == 0 and not any(_overlap(hit, other) for other in scripture):
+            scripture.append(hit)
+    for hit in [h for h in chosen if tier(h) == 0]:
+        if not any(_overlap(hit, other) for other in scripture):
+            scripture.append(hit)
+    for hit in candidates:
+        if len(scripture) >= target:
+            break
+        if tier(hit) == 0 and not any(_overlap(hit, other) for other in scripture):
+            scripture.append(hit)
+    rest: list[study_index.SearchHit] = []
+    for hit in with_minimums([h for h in chosen if tier(h) != 0], candidates, question):
+        if hit.kind == "article" and any(r.kind == "talk" and _same_work(r, hit) for r in rest + chosen):
+            continue
+        rest.append(hit)
+    # Talks and articles before the rest, so trimming drops "Also" items
+    # (Journal of Discourses, the Apocrypha, ...) first, not the talk
+    # with_minimums just guaranteed.
+    rest = by_tier(rest)
+    rest_count = min(len(rest), limit - min(len(scripture), target))
+    scripture_count = min(len(scripture), limit - rest_count)
+    return scripture[:scripture_count] + rest[:rest_count]
 
 
 def retrieval_query(questions: list[str]) -> str:
@@ -470,7 +589,15 @@ def _snippet(text: str, limit: int = SNIPPET_CHARS, keywords: list[str] = ()) ->
     return ("..." if start else "") + piece
 
 
-def selection_messages(questions: list[str], hits: list[study_index.SearchHit]) -> list[dict]:
+def selection_messages(
+    questions: list[str],
+    hits: list[study_index.SearchHit],
+    max_selected: int = MAX_SELECTED,
+    context: str = "",
+) -> list[dict]:
+    """`context` (the talk-prep helper's "a 10-minute sacrament meeting
+    talk" and so on) goes to the chat model only - never into retrieval,
+    where "sacrament meeting" would match passages about the sacrament."""
     if len(questions) == 1:
         ask = f"Question: {questions[0]}"
     else:
@@ -484,19 +611,23 @@ def selection_messages(questions: list[str], hits: list[study_index.SearchHit]) 
         label = _KIND_LABELS.get(hit.kind, hit.kind)
         if hit.kind == "scripture":
             heading = hit.meta.get("reference", heading)
-            if hit.meta.get("key_topic"):
+            if hit.meta.get("pinned_label"):
+                label = f"Scripture - {hit.meta['pinned_label']}"
+            elif hit.meta.get("key_topic"):
                 label = f"Scripture - a key passage on {hit.meta['key_topic']}"
         line = f"[{number}] ({label}) {heading}"
         if body:
             line += f" - {_snippet(body, keywords=keywords)}"
         lines.append(line)
+    if context:
+        ask = f"{context}\n{ask}"
     return [
-        {"role": "system", "content": SELECTION_PROMPT},
+        {"role": "system", "content": selection_prompt(max_selected)},
         {"role": "user", "content": f"{ask}\n\nSources:\n" + "\n".join(lines)},
     ]
 
 
-def parse_selection(content: str, count: int) -> list[int] | None:
+def parse_selection(content: str, count: int, limit: int = MAX_SELECTED) -> list[int] | None:
     """0-based indexes the model chose, in its order, deduplicated and
     limited to the list's real range. None if the reply isn't a JSON array
     of numbers at all (prose, a refusal, ...) - [] means it explicitly
@@ -520,7 +651,7 @@ def parse_selection(content: str, count: int) -> list[int] | None:
             chosen.append(number - 1)
     if values and not chosen:
         return None  # numbers, but none from the list - not a real answer
-    return chosen[:MAX_SELECTED]
+    return chosen[:limit]
 
 
 def _chapter_for(conn: sqlite3.Connection, volume_slug: str | None, reference: str) -> int | None:
@@ -563,6 +694,8 @@ def to_result(
             detail=_snippet(" ".join(r[1] for r in rows), 400, keywords),
             chapter_id=hit.chapter_id,
             citations=citations_for([r[2] for r in rows]),
+            verse_start=rows[0][0],
+            verse_end=rows[-1][0],
         )
     if hit.kind == "lexicon":
         gloss = meta.get("gloss", "")
@@ -643,9 +776,26 @@ class StudyQuestionAsker(QObject):
         embedding_dimensions: int | None,
         questions: list[str],
         parent: QObject | None = None,
+        *,
+        max_selected: int = MAX_SELECTED,
+        cap_total: bool = False,
+        context: str = "",
+        volumes: set[str] | None = None,
+        skip_groups: frozenset[str] = frozenset(),
+        pinned: list[study_index.SearchHit] = (),
     ):
         super().__init__(parent)
         self.conn = conn
+        # The talk-prep helper's options - see gather_candidates and
+        # selection_messages. Defaults leave AI search as it always was.
+        self._max_selected = max_selected
+        # True: at most max_selected results in all, minimums included
+        # (plain AI search lets with_minimums add a few past it).
+        self._cap_total = cap_total
+        self._context = context
+        self._volumes = volumes
+        self._skip_groups = skip_groups
+        self._pinned = list(pinned)
         self._index = index
         self._chat_config = chat_config
         self._questions = list(questions)
@@ -722,6 +872,9 @@ class StudyQuestionAsker(QObject):
             self._vector if self._index.is_loaded() else None,
             self.conn,
             topic_ids,
+            volumes=self._volumes,
+            skip_groups=self._skip_groups,
+            pinned=self._pinned,
         )
         if not self._hits:
             self.succeeded.emit([], "")
@@ -732,7 +885,7 @@ class StudyQuestionAsker(QObject):
             {
                 "model": self._chat_config.model or "gpt-4o-mini",
                 "temperature": 0.1,
-                "messages": selection_messages(self._questions, self._hits),
+                "messages": selection_messages(self._questions, self._hits, self._max_selected, self._context),
             }
         ).encode("utf-8")
         self._reply = self._manager.post(build_request(self._chat_config, "/chat/completions"), payload)
@@ -742,9 +895,18 @@ class StudyQuestionAsker(QObject):
         question = " ".join(self._questions)
         return [r for r in (to_result(self.conn, h, question) for h in hits) if r is not None]
 
+    @property
+    def query_vector(self) -> list[float] | None:
+        """The question as embedded (None if embedding failed) - the
+        talk-prep helper compares verses against it to find key verses."""
+        return self._vector
+
+    def _capped(self, hits: list[study_index.SearchHit]) -> list[study_index.SearchHit]:
+        return fit_to_limit(hits, self._max_selected) if self._cap_total else hits
+
     def _fallback(self, why: str) -> None:
         self.succeeded.emit(
-            self._results(fallback_hits(self._hits)),
+            self._results(self._capped(fallback_hits(self._hits))),
             f"Showing the study index's best matches - {why}",
         )
 
@@ -764,7 +926,7 @@ class StudyQuestionAsker(QObject):
         except (ValueError, KeyError, IndexError, TypeError):
             self._fallback("the AI's reply wasn't in the expected format.")
             return
-        chosen = parse_selection(content, len(self._hits))
+        chosen = parse_selection(content, len(self._hits), self._max_selected)
         if chosen is None:
             self._fallback("the AI's reply didn't pick from the list.")
             return
@@ -774,5 +936,10 @@ class StudyQuestionAsker(QObject):
         chosen_hits = [self._hits[i] for i in chosen]
         # A follow-up that asked for one volume or kind gets only that.
         if detect_filters(self._questions)[0] is None:
-            chosen_hits = with_minimums(chosen_hits, self._hits, self._query)
+            if self._cap_total:
+                chosen_hits = balance_for_talk_prep(
+                    chosen_hits, self._hits, self._max_selected, self._query, self._pinned
+                )
+            else:
+                chosen_hits = with_minimums(chosen_hits, self._hits, self._query)
         self.succeeded.emit(self._results(by_tier(chosen_hits)), "")
