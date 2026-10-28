@@ -14,11 +14,19 @@ Each comes with a `.sha256` checksum.
 
 ## Releasing
 
-Push a tag matching `__version__`, e.g. `git tag v2.3.0 && git push origin v2.3.0`.
-The workflow builds both, runs each packaged app's `--smoke-test`, and
+Releases follow the snap: `/promote <revision> stable` on a call-for-testing
+issue (promote-to-stable.yml) tags `v<version>` and starts the workflow on
+that tag. It builds both, runs each packaged app's `--smoke-test`, and
 publishes a GitHub Release. To try packaging changes without releasing,
 push to the `desktop-builds-test` branch or run the workflow by hand. The
 files are then kept as workflow artifacts.
+
+Package managers pick up each release:
+
+- **Winget** (`kz6fittycent.DesktopScriptures`): the workflow's `winget` job
+  opens the winget-pkgs pull request, given the `WINGET_TOKEN` secret.
+- **Homebrew:** the tap [kz6fittycent/homebrew-tap](https://github.com/kz6fittycent/homebrew-tap)
+  checks daily for a new release and updates its cask.
 
 ## Unsigned builds
 

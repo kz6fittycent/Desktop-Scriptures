@@ -29,7 +29,10 @@ class AppUpdateDialog(QDialog):
             f"Download it here:<br><a href=\"{url}\">{url}</a><br><br>"
             "Install it over this version - your notes, highlights, Journal, and study "
             "index stay. The first time it opens, your system asks once, the same as "
-            "when you first installed it."
+            "when you first installed it.<br><br>"
+            "Installed it with Winget or Homebrew? Update the same way instead: "
+            "<code>winget upgrade kz6fittycent.DesktopScriptures</code> or "
+            "<code>brew upgrade --cask desktop-scriptures</code>."
         )
         intro.setTextFormat(Qt.TextFormat.RichText)
         intro.setOpenExternalLinks(True)

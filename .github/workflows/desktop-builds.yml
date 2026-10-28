@@ -359,3 +359,29 @@ jobs:
             --title "Desktop Scriptures ${GITHUB_REF_NAME#v}" \
             --latest \
             --notes "Windows 11 (64-bit): download the -setup.exe. macOS (Apple Silicon): download the .dmg. Both are unsigned; the wiki's Installation page (https://github.com/$GITHUB_REPOSITORY/wiki/Installation) shows how to open them the first time. Installing a newer version keeps your notes and highlights. Linux: install the snap (snap install desktop-scriptures)."
+
+  winget:
+    # Updates the Winget package (kz6fittycent.DesktopScriptures) with a PR
+    # to microsoft/winget-pkgs. Needs the WINGET_TOKEN secret: a classic
+    # token with the public_repo scope (Komac can't open the PR with a
+    # fine-grained one), from the account that forked winget-pkgs. Skipped
+    # without it. Only updates an existing package - the first version was
+    # submitted by hand. Homebrew needs nothing here: the tap
+    # (kz6fittycent/homebrew-tap) checks for new releases itself.
+    name: Update Winget
+    needs: release
+    runs-on: ubuntu-latest
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+    steps:
+      - name: No token
+        if: env.WINGET_TOKEN == ''
+        run: echo "::notice::WINGET_TOKEN isn't set; submit this version to Winget by hand."
+
+      - name: Open the winget-pkgs pull request
+        if: env.WINGET_TOKEN != ''
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: kz6fittycent.DesktopScriptures
+          installers-regex: '-windows-x64-setup\.exe$'
+          token: ${{ secrets.WINGET_TOKEN }}
