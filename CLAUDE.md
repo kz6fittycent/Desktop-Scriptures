@@ -6,11 +6,15 @@ module docstrings; this file points at them rather than repeating them.
 
 ## Where things stand
 
-- **Released: 2.3.3** (2026-10-12, `d48a325`; snap on candidate, then
-  promoted with `/promote <revision> stable done` on the call-for-testing
-  issue). In it: Journal on the menu bar; Help → Report a Bug; Talk Prep;
-  more AI providers (Claude, Gemini, OpenRouter, Groq, Mistral) with
-  structured output; the Talk Prep benchmark.
+- **Released: 2.3.4** (2026-10-28; snap on candidate, then promoted with
+  `/promote <revision> stable done` on the call-for-testing issue). In it:
+  a verse can get just a tag (the entry no longer closes when moving from
+  the note box to the tag box); OpenRouter for the study index (its
+  embedding models are listed at `/embeddings/models`).
+- 2.3.3 (2026-10-12): Journal on the menu bar; Help → Report a Bug; Talk
+  Prep; more AI providers with structured output; the Talk Prep benchmark.
+- Known flaky test: `tests/test_voices.py`'s corrupt-download case
+  sometimes reports success (timing); fails roughly 1 run in 3.
 - The user guide is the wiki: a separate repo,
   `git@github.com:kz6fittycent/Desktop-Scriptures.wiki.git`.
 - Planned features: the README's **Roadmap** section.
