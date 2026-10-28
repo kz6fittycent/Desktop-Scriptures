@@ -15,9 +15,10 @@ from __future__ import annotations
 
 import sqlite3
 
-from PySide6.QtCore import QEvent, QTimer, Signal
+from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
+    QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -154,6 +155,12 @@ class VerseNoteEntry(QFrame):
 
         self._reload_tags()
 
+        # An empty entry goes away when focus leaves the entry as a whole,
+        # not when it leaves the note box: the pencil icon puts the cursor
+        # in the note box, and moving from there to the tag box used to
+        # delete the entry before a tag could be typed.
+        QApplication.instance().focusChanged.connect(self._on_focus_changed)
+
     def focus_note(self) -> None:
         self._note.text_edit.setFocus()
 
@@ -161,8 +168,16 @@ class VerseNoteEntry(QFrame):
         if obj is self._note.text_edit and event.type() == QEvent.Type.FocusOut:
             self._note.flush_pending_save()
             self.changed.emit(self.verse.id)
-            self._maybe_remove()
         return super().eventFilter(obj, event)
+
+    def _on_focus_changed(self, old: QWidget | None, new: QWidget | None) -> None:
+        if not self._contains(old) or self._contains(new):
+            return
+        # Switching to another window, or opening a context menu, isn't
+        # leaving the entry - focus comes straight back to it.
+        if new is None or new.window().windowType() == Qt.WindowType.Popup:
+            return
+        self._maybe_remove()
 
     def flush_pending_save(self) -> None:
         self._note.flush_pending_save()
@@ -194,8 +209,15 @@ class VerseNoteEntry(QFrame):
         self._maybe_remove()
 
     def _maybe_remove(self) -> None:
+        # Still being edited (e.g. the last tag was just removed): leave it
+        # for _on_focus_changed() to clear once the user moves on.
+        if self._contains(QApplication.focusWidget()):
+            return
         if not self._note.has_text() and not get_tags(self.conn, verse_id=self.verse.id):
             self.should_remove.emit(self.verse.id)
+
+    def _contains(self, widget: QWidget | None) -> bool:
+        return widget is not None and (widget is self or self.isAncestorOf(widget))
 
 
 class ChapterPanel(QWidget):
