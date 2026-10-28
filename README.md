@@ -74,6 +74,8 @@ the wiki's [Installation](https://github.com/kz6fittycent/Desktop-Scriptures/wik
 page shows how. They don't update themselves, but an **Update Available**
 button appears on the menu bar when a newer release is out; install it over
 the old one (your notes and highlights stay).
+On a Mac, Homebrew works too:
+`brew install --cask kz6fittycent/tap/desktop-scriptures`.
 Other packagers (Chocolatey, for example) are welcome; the community would
 maintain those. See [`packaging/README.md`](packaging/README.md).
 

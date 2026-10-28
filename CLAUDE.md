@@ -34,13 +34,15 @@ module docstrings; this file points at them rather than repeating them.
      daily workflow writes `Casks/desktop-scriptures.rb` from the latest
      release. Empty until the first real release (2.3.4). Gatekeeper is
      left alone: the cask prints the Open Anyway steps.
-   - Winget `kz6fittycent.DesktopScriptures`: TODO once 2.3.4 is released,
-     the first submission by hand (Komac/wingetcreate, PR to
-     microsoft/winget-pkgs from the owner's account - approved). After
-     that, desktop-builds.yml's `winget` job updates it, once the owner
-     adds the `WINGET_TOKEN` secret (classic token, public_repo scope).
-   - Then add Winget/Homebrew lines to the README Install section and the
-     wiki Installation page.
+   - Homebrew cask live at 2.3.4 (2026-10-28); README + wiki mention it.
+   - Winget `kz6fittycent.DesktopScriptures`: first version submitted by
+     hand as microsoft/winget-pkgs#464157 (hand-written 1.12.0 manifests,
+     schema-validated; fork kz6fittycent/winget-pkgs). The owner must
+     accept Microsoft's CLA on the PR. Once merged, add the Winget line
+     to README/wiki; from then on desktop-builds.yml's `winget` job
+     submits each release (WINGET_TOKEN: classic, public_repo, never
+     expires). The 2.3.4 run's winget job failed only because the
+     package didn't exist yet.
 2. **Windows/macOS releases are automated (2026-10-28):** `/promote <rev>
    stable` (promote-to-stable.yml) also tags `v<version>` (version from the
    call-for-testing issue title; the newest `main` commit at that version)
