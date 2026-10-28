@@ -65,12 +65,16 @@ The [wiki](https://github.com/kz6fittycent/Desktop-Scriptures/wiki) is the user 
 sudo snap install desktop-scriptures
 ```
 
-**Windows 11 and macOS (Apple Silicon):** in testing. Every change on
-`main` produces a test build - see the newest issue labeled
-[`desktop-testing`](https://github.com/kz6fittycent/Desktop-Scriptures/issues?q=label%3Adesktop-testing)
-for download links and how to open them. They aren't code-signed yet, so the
-first launch takes one extra click on each system. Releases (from a version
-tag) go on the [Releases page](https://github.com/kz6fittycent/Desktop-Scriptures/releases).
+**Windows 11 and macOS (Apple Silicon):** download the `-setup.exe`
+(Windows) or the `.dmg` (macOS) from the
+[latest release](https://github.com/kz6fittycent/Desktop-Scriptures/releases/latest).
+A release comes out each time the snap reaches stable. They aren't
+code-signed yet, so the first launch takes one extra click on each system;
+the wiki's [Installation](https://github.com/kz6fittycent/Desktop-Scriptures/wiki/Installation)
+page shows how. They don't update themselves yet: to update, install the
+newer release over the old one (your notes and highlights stay). Test builds
+of every change on `main` are in the newest issue labeled
+[`desktop-testing`](https://github.com/kz6fittycent/Desktop-Scriptures/issues?q=label%3Adesktop-testing).
 Packagers are welcome: Homebrew, Winget, and Chocolatey packages would be
 maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
@@ -78,7 +82,8 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 ### Next
 
-- [ ] Windows and macOS out of testing into regular releases, with code signing if there's demand
+- [ ] An "update available" notice in the Windows and macOS builds
+- [ ] Code signing for the Windows and macOS builds, if there's demand
 
 ### v3.0
 

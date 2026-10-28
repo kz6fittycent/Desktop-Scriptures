@@ -8,12 +8,20 @@ name: 🚀 Promote to Stable
 # `environment:` on the job itself though - matching those conditions
 # only lets the run start and sit waiting for manual approval, it
 # doesn't release anything by itself.
+#
+# Promoting a release (plain x.y.z, read from the call-for-testing issue's
+# title) also tags it v<version> and starts desktop-builds.yml on that
+# tag, which publishes the Windows/macOS GitHub Release - so the desktop
+# downloads go out exactly when the snap reaches stable.
 on:
   issue_comment:
     types: [created]
 
 permissions:
   issues: write
+  contents: write  # the v<version> tag
+  actions: write  # starting desktop-builds.yml (a tag pushed with
+                  # GITHUB_TOKEN wouldn't trigger it on its own)
 
 env:
   SNAP_NAME: desktop-scriptures
@@ -94,3 +102,43 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: gh issue close "${ISSUE_NUMBER}" --repo "${{ github.repository }}"
+
+      - name: Checkout (for the desktop release tag)
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Start the Windows & macOS release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          # "Call for testing: v2.3.4 (revision 42)" - only plain releases.
+          if [[ ! "$ISSUE_TITLE" =~ ^Call\ for\ testing:\ v([0-9]+\.[0-9]+\.[0-9]+)\ \( ]]; then
+            echo "Not a release's call for testing ('$ISSUE_TITLE'); no desktop release."
+            exit 0
+          fi
+          version="${BASH_REMATCH[1]}"
+          tag="v${version}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "$tag is already released."
+            exit 0
+          fi
+          # The newest commit still at this version is the one the snap was
+          # built from (every later app change bumps __version__).
+          sha=""
+          for c in $(git rev-list -n 500 origin/main); do
+            v="$(git show "$c:src/scriptures/__init__.py" | sed -n 's/^__version__ = "\(.*\)"/\1/p')"
+            if [[ "$v" == "$version" ]]; then sha="$c"; break; fi
+          done
+          if [[ -z "$sha" ]]; then
+            echo "::error::No commit on main has __version__ $version"
+            exit 1
+          fi
+          if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$sha" --silent
+          fi
+          gh workflow run desktop-builds.yml --repo "$GITHUB_REPOSITORY" --ref "$tag"
+          gh issue comment "${ISSUE_NUMBER}" --repo "$GITHUB_REPOSITORY" \
+            --body "Building the Windows and macOS release for \`$tag\` (${sha:0:7}); it will appear under Releases when done."

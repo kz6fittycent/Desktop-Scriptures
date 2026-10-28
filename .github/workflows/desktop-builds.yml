@@ -12,10 +12,12 @@ name: 🖥️ Windows & macOS Builds
 #   what to try, and the screenshots. Only the 3 newest test pre-releases
 #   are kept.
 # - a version tag (v2.3.0): builds and publishes the real GitHub Release.
+#   promote-to-stable.yml does this when a snap release is promoted: it
+#   creates the tag and starts a run on it (a manual run on a tag counts).
 # - a push to the desktop-builds-test branch: the same as main (issue titled
 #   "[test branch]"), for trying packaging changes without building the snap.
-# - a manual run (Actions tab -> Run workflow): builds only; the files are
-#   kept as workflow artifacts.
+# - a manual run (Actions tab -> Run workflow) on a branch: builds only; the
+#   files are kept as workflow artifacts.
 
 on:
   push:
@@ -355,4 +357,5 @@ jobs:
           gh release create "$GITHUB_REF_NAME" release/* \
             --repo "$GITHUB_REPOSITORY" \
             --title "Desktop Scriptures ${GITHUB_REF_NAME#v}" \
-            --notes "Windows and macOS builds - unsigned. See the wiki's Installation page for how to open them the first time. Linux: install the snap (snap install desktop-scriptures)."
+            --latest \
+            --notes "Windows 11 (64-bit): download the -setup.exe. macOS (Apple Silicon): download the .dmg. Both are unsigned; the wiki's Installation page (https://github.com/$GITHUB_REPOSITORY/wiki/Installation) shows how to open them the first time. Installing a newer version keeps your notes and highlights. Linux: install the snap (snap install desktop-scriptures)."
