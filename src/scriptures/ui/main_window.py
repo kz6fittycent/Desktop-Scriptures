@@ -35,7 +35,8 @@ from PySide6.QtWidgets import (
 )
 
 from scriptures import __version__
-from scriptures import ai_setup, bug_report, citations, content_updates, study_index, talk_prep
+from scriptures import ai_setup, app_updates, bug_report, citations, content_updates, study_index, talk_prep
+from scriptures.paths import is_frozen
 from scriptures.study_ask import StudySearch
 from scriptures.ai_client import AiConfig, embeddings_config
 from scriptures.data_access import (
@@ -84,6 +85,7 @@ from scriptures.ui.study_index_dialog import StudyIndexDialog
 from scriptures.ui.lexicon_dialog import LEXICON_CREDIT
 from scriptures.ui.about_help import HelpDialog, LicenseDialog
 from scriptures.ui.bug_report_dialog import BugReportDialog
+from scriptures.ui.app_update_dialog import AppUpdateDialog
 from scriptures.ui.talk_prep_dialog import TalkPrepDialog
 from scriptures.ui.voices_dialog import VoicesDialog
 from scriptures.ui.welcome_dialog import WelcomeDialog
@@ -208,6 +210,11 @@ WELCOME_DONT_SHOW_SETTING = "welcome_dont_show"
 # about once a day - see content_updates.py. On unless set to "false".
 CITATION_UPDATES_SETTING = "citation_updates"
 CITATION_UPDATES_CHECKED_SETTING = "citation_updates_checked"  # Unix time of the last check
+# Windows/macOS builds only: a newer release's notice - see app_updates.py.
+# On unless set to "false".
+APP_UPDATES_SETTING = "app_updates"
+APP_UPDATES_CHECKED_SETTING = "app_updates_checked"  # Unix time of the last check
+APP_UPDATE_LATEST_SETTING = "app_update_latest"  # the newest release seen (Release.to_json)
 
 # The highlighter's armed color (or "clear"), so it stays selected across
 # launches instead of resetting to Off every time - a standing tool
@@ -535,6 +542,14 @@ class MainWindow(QMainWindow):
         self._citation_updates_action.triggered.connect(self._set_citation_updates)
         menu.addAction(self._citation_updates_action)
 
+        # The snap updates itself; only the Windows/macOS builds need this.
+        self._app_updates_action = QAction("Check for App Updates", self, checkable=True)
+        self._app_updates_action.setToolTip("Say when a newer version is out - checked about once a day")
+        self._app_updates_action.setChecked(self._app_updates_enabled())
+        self._app_updates_action.triggered.connect(self._set_app_updates)
+        self._app_updates_action.setVisible(is_frozen())
+        menu.addAction(self._app_updates_action)
+
         self._church_news_action = QAction("Show Church News Headline", self, checkable=True)
         self._church_news_action.setChecked(
             get_setting(self.conn, CHURCH_NEWS_ENABLED_SETTING) == "true"
@@ -842,6 +857,14 @@ class MainWindow(QMainWindow):
         corner_layout.setContentsMargins(0, 0, 8, 0)
         corner_layout.setSpacing(8)
 
+        # Shown only when app_updates.py found a newer release.
+        self.update_button = QPushButton("Update Available")
+        self.update_button.setObjectName("resumeButton")  # same look
+        self.update_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.update_button.clicked.connect(self._show_app_update)
+        self.update_button.setVisible(False)
+        corner_layout.addWidget(self.update_button)
+
         # A plain QPushButton with clicked -> exec()'d QMenu, not
         # setMenu() - setMenu()'s built-in drop-down arrow is drawn by
         # the active Qt style, which wouldn't necessarily match this
@@ -870,6 +893,7 @@ class MainWindow(QMainWindow):
         self.menuBar().setCornerWidget(self._menu_corner, Qt.Corner.TopRightCorner)
         self._update_resume_button()
         self._update_streak_display()
+        self._update_app_update_button()
 
     def _update_streak_display(self) -> None:
         streak = get_reading_streak(self.conn)
@@ -1041,6 +1065,58 @@ class MainWindow(QMainWindow):
         self._pending_sender = bug_report.PendingSender(self)
         self._pending_sender.finished.connect(self._pending_sender.deleteLater)
         self._pending_sender.start()
+
+    def _app_updates_enabled(self) -> bool:
+        return get_setting(self.conn, APP_UPDATES_SETTING, "true") != "false"
+
+    def _set_app_updates(self, enabled: bool) -> None:
+        set_setting(self.conn, APP_UPDATES_SETTING, "true" if enabled else "false")
+        self._update_app_update_button()
+        if enabled:
+            self.check_for_app_update(force=True)
+
+    def check_for_app_update(self, force: bool = False) -> None:
+        """Called a little while after startup (app.py) - see
+        app_updates.py. Windows/macOS builds only; at most about once a
+        day, unless `force`."""
+        if not is_frozen() or not self._app_updates_enabled():
+            return
+        if getattr(self, "_release_checker", None) is not None:
+            return
+        last = float(get_setting(self.conn, APP_UPDATES_CHECKED_SETTING, "0") or 0)
+        if not force and time.time() - last < app_updates.CHECK_INTERVAL_HOURS * 3600:
+            return
+        self._release_checker = app_updates.ReleaseChecker(self)
+        self._release_checker.finished.connect(self._on_app_update_checked)
+
+    def _on_app_update_checked(self, ok: bool, release) -> None:
+        self._release_checker.deleteLater()
+        self._release_checker = None
+        if not ok:
+            return  # try again next launch
+        set_setting(self.conn, APP_UPDATES_CHECKED_SETTING, str(int(time.time())))
+        set_setting(self.conn, APP_UPDATE_LATEST_SETTING, release.to_json() if release else "")
+        self._update_app_update_button()
+
+    def _pending_app_update(self) -> "app_updates.Release | None":
+        """The newest release seen, if it's newer than this app - remembered
+        between launches, so the notice doesn't wait for the next check."""
+        if not is_frozen() or not self._app_updates_enabled():
+            return None
+        release = app_updates.Release.from_json(get_setting(self.conn, APP_UPDATE_LATEST_SETTING, "") or "")
+        return release if release and app_updates.is_newer(release.version) else None
+
+    def _update_app_update_button(self) -> None:
+        release = self._pending_app_update()
+        self.update_button.setVisible(release is not None)
+        if release is not None:
+            self.update_button.setToolTip(f"Desktop Scriptures {release.version} is out")
+        self._refresh_menu_corner_geometry()
+
+    def _show_app_update(self) -> None:
+        release = self._pending_app_update()
+        if release is not None:
+            AppUpdateDialog(release, self).exec()
 
     def _on_citation_updates_checked(self, updated: list, problems: list) -> None:
         self._citation_updater.deleteLater()

@@ -170,6 +170,8 @@ def main() -> None:
         QTimer.singleShot(10_000, window.check_for_citation_updates)
         # Bug reports that couldn't be sent at the time (bug_report.py).
         QTimer.singleShot(15_000, window.send_pending_bug_reports)
+        # A newer Windows/macOS release (app_updates.py) - frozen builds only.
+        QTimer.singleShot(20_000, window.check_for_app_update)
     sys.exit(app.exec())
 
 

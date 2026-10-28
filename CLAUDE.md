@@ -21,25 +21,19 @@ module docstrings; this file points at them rather than repeating them.
 
 ## Next iteration
 
-1. **"Update available" for the Windows/macOS builds** (they don't update
-   themselves; users may not use Homebrew or Winget). Proposed, not yet
-   agreed:
-   - Frozen builds only (`paths.is_frozen()`).
-   - Check GitHub's `/releases/latest` (it skips pre-releases) about once
-     a day, under its own View toggle.
-   - Show a menu-bar notice that opens one dialog with release notes and
-     a download link.
-   - No auto-install: the builds aren't code-signed. Sparkle/WinSparkle
-     only once they are.
-   - Open question: tell test-build users about newer test builds (a
-     separate opt-in)?
+1. **"Update available" for the Windows/macOS builds: built 2026-10-28**
+   (`app_updates.py`, `ui/app_update_dialog.py`; not released yet, no
+   version bump by the owner's choice). Frozen builds only; daily check of
+   `/releases/latest`; View → Check for App Updates; menu-bar button →
+   dialog with the link. Test builds get no separate notice. Next: Winget
+   and a Homebrew tap.
 2. **Windows/macOS releases are automated (2026-10-28):** `/promote <rev>
    stable` (promote-to-stable.yml) also tags `v<version>` (version from the
    call-for-testing issue title; the newest `main` commit at that version)
    and starts `desktop-builds.yml` on the tag, which publishes the GitHub
    Release (marked latest). The first real one is whichever release is
    promoted next (2.3.4). README and wiki Installation now point at
-   `releases/latest`; item 1 is what's still missing for those users.
+   `releases/latest`.
 3. **Talk Prep quality:**
    - The user corrects the expected/avoid verses in
      `scripts/talk_prep_eval_topics.json`.

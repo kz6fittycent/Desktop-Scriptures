@@ -23,7 +23,7 @@ A Welcome window on first launch walks through the optional parts.
 
 ## Privacy
 
-The app reads and studies fully offline. It contacts nothing until you switch a feature on, with one exception: about once a day it checks this project's GitHub for new talk and article citations (switch it off under **Menu → View → Download New Talks and Articles**). **Menu → Help → Report a Bug...** sends nothing until you click Submit; it then posts your note and the app's technical log (never your notes or Journal) as a public issue on this project's GitHub.
+The app reads and studies fully offline. It contacts nothing until you switch a feature on, with one exception: about once a day it checks this project's GitHub for new talk and article citations (switch it off under **Menu → View → Download New Talks and Articles**). The Windows and macOS versions also check GitHub about once a day for a newer release, to show an **Update Available** button (switch it off under **Menu → View → Check for App Updates**); nothing is downloaded for you. **Menu → Help → Report a Bug...** sends nothing until you click Submit; it then posts your note and the app's technical log (never your notes or Journal) as a public issue on this project's GitHub.
 
 ## Sources and credits
 
@@ -71,8 +71,9 @@ sudo snap install desktop-scriptures
 A release comes out each time the snap reaches stable. They aren't
 code-signed yet, so the first launch takes one extra click on each system;
 the wiki's [Installation](https://github.com/kz6fittycent/Desktop-Scriptures/wiki/Installation)
-page shows how. They don't update themselves yet: to update, install the
-newer release over the old one (your notes and highlights stay). Test builds
+page shows how. They don't update themselves, but an **Update Available**
+button appears on the menu bar when a newer release is out; install it over
+the old one (your notes and highlights stay). Test builds
 of every change on `main` are in the newest issue labeled
 [`desktop-testing`](https://github.com/kz6fittycent/Desktop-Scriptures/issues?q=label%3Adesktop-testing).
 Packagers are welcome: Homebrew, Winget, and Chocolatey packages would be
@@ -82,7 +83,6 @@ maintained by the community. See [`packaging/README.md`](packaging/README.md).
 
 ### Next
 
-- [ ] An "update available" notice in the Windows and macOS builds
 - [ ] Code signing for the Windows and macOS builds, if there's demand
 
 ### v3.0
