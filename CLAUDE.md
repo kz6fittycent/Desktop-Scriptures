@@ -25,8 +25,19 @@ module docstrings; this file points at them rather than repeating them.
    (`app_updates.py`, `ui/app_update_dialog.py`; not released yet, no
    version bump by the owner's choice). Frozen builds only; daily check of
    `/releases/latest`; View → Check for App Updates; menu-bar button →
-   dialog with the link. Test builds get no separate notice. Next: Winget
-   and a Homebrew tap.
+   dialog with the link. Test builds get no separate notice.
+   **Package managers (set up 2026-10-28):**
+   - Homebrew: tap `kz6fittycent/homebrew-tap` (~/git/homebrew-tap); its
+     daily workflow writes `Casks/desktop-scriptures.rb` from the latest
+     release. Empty until the first real release (2.3.4). Gatekeeper is
+     left alone: the cask prints the Open Anyway steps.
+   - Winget `kz6fittycent.DesktopScriptures`: TODO once 2.3.4 is released,
+     the first submission by hand (Komac/wingetcreate, PR to
+     microsoft/winget-pkgs from the owner's account - approved). After
+     that, desktop-builds.yml's `winget` job updates it, once the owner
+     adds the `WINGET_TOKEN` secret (classic token, public_repo scope).
+   - Then add Winget/Homebrew lines to the README Install section and the
+     wiki Installation page.
 2. **Windows/macOS releases are automated (2026-10-28):** `/promote <rev>
    stable` (promote-to-stable.yml) also tags `v<version>` (version from the
    call-for-testing issue title; the newest `main` commit at that version)
