@@ -3,6 +3,19 @@ name: 🧪 Snap Builds
 on:
   push:
     branches: [ main ]
+    # A push that only touches these builds nothing: none of them go into
+    # the snap, and each build becomes a candidate with a call for testing.
+    # (THIRD_PARTY_LICENSES.md is not here - the snap ships it.)
+    paths-ignore:
+      - README.md
+      - CLAUDE.md
+      - docs/**
+      - packaging/**
+      - relay/**
+      - tests/**
+      - .github/workflows/desktop-builds.yml
+      - .github/workflows/promote-to-stable.yml
+      - .github/workflows/close-stale-reports.yml
   pull_request:
     branches: [ main ]
 
