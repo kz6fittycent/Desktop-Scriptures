@@ -88,6 +88,7 @@ The goal: ask about a word, a name, or a place and get a clear, sourced answer, 
 - [ ] Geography for all the Standard Works: Bible places and maps, and the Book of Mormon geography models shown side by side as their proponents' theories (the Church takes no official position)
 - [ ] Archaeological references
 - [ ] Optional content packs, downloaded on demand
+- [ ] Meanings of phrases (e.g. "the eye of a needle")
 
 Every source's license is checked before anything is imported. Copyrighted works are linked and summarized, not copied.
 
