@@ -19,6 +19,25 @@ on:
   push:
     tags: [ "v*" ]
     branches: [ main, desktop-builds-test ]
+    # A branch push that only touches these builds nothing - none of them
+    # go into the Windows or macOS app. (GitHub never applies this to tag
+    # pushes, so releases always build. Unlike snap-builds.yml, the rest of
+    # packaging/ isn't here: the spec and installer script are build input.)
+    paths-ignore:
+      - README.md
+      - CLAUDE.md
+      - docs/**
+      - packaging/README.md
+      - relay/**
+      - snap/**
+      - tests/**
+      - .github/workflows/call-for-testing.yml
+      - .github/workflows/close-stale-reports.yml
+      - .github/workflows/promote-to-stable.yml
+      - .github/workflows/refresh-gc-citations.yml
+      - .github/workflows/refresh-liahona-citations.yml
+      - .github/workflows/security-rebuild.yml
+      - .github/workflows/snap-builds.yml
   workflow_dispatch:
 
 permissions:

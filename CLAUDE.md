@@ -73,8 +73,9 @@ module docstrings; this file points at them rather than repeating them.
     push.
 - **Commit, don't push**, unless asked. A push to `main` builds the snap
   and publishes a candidate. (Not when a push only touches docs/CI files - the
-  `paths-ignore` list in `snap-builds.yml`; anything else, like `src/` or
-  `data/`, still builds.) Before pushing, `git fetch` and rebase: the
+  `paths-ignore` lists in `snap-builds.yml` and `desktop-builds.yml`;
+  anything else, like `src/` or `data/`, still builds. Tag pushes always
+  build.) Before pushing, `git fetch` and rebase: the
   scheduled citation refreshes merge their own PRs to `main`.
 - **After every commit that changes app behavior, launch the app** for the
   owner to try. Skip this for docs/CI-only commits. Don't launch a second
