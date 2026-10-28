@@ -171,6 +171,7 @@ class _ServerPage(QWizardPage):
         super().__init__()
         self._wizard = wizard
         self._lister: ModelLister | None = None
+        self._listed_embeddings_only = False
         self._test = None
 
         # Up to six cards plus the form can be taller than the wizard on
@@ -362,7 +363,14 @@ class _ServerPage(QWizardPage):
         if not url:
             return
         self._test_status.setText("Asking for the list of models...")
-        self._lister = ModelLister(AiConfig(url, self._key.text().strip(), ""), parent=self)
+        hosted = ai_setup.hosted_provider_for_url(url)
+        # A service with a separate embedding-model list returns nothing but
+        # embedding models there, many of them named without "embed".
+        self._listed_embeddings_only = bool(
+            self.embeddings and hosted is not None and hosted.embedding_models_path
+        )
+        path = hosted.embedding_models_path if self._listed_embeddings_only else "/models"
+        self._lister = ModelLister(AiConfig(url, self._key.text().strip(), ""), parent=self, path=path)
         self._lister.finished.connect(self._on_models_listed)
 
     def _on_models_listed(self, ok: bool, models: list, message: str) -> None:
@@ -371,6 +379,8 @@ class _ServerPage(QWizardPage):
             self._test_status.setText(f"⚠️ {message}")
             return
         chat, embedding = ai_setup.split_models(models)
+        if self._listed_embeddings_only:
+            embedding = models
         wanted = embedding if self.embeddings else chat
         # A server that only lists one kind might be named unusually -
         # offer everything rather than nothing.

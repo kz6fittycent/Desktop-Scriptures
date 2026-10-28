@@ -157,6 +157,73 @@ def test_wizard_results_for_snap_chat_and_ollama_embeddings() -> None:
         snap.shutdown()
 
 
+def _openrouter_server(chat_ids: list[str], embedding_ids: list[str]) -> ThreadingHTTPServer:
+    """OpenRouter's shape: /models lists chat models only, and embedding
+    models are listed separately at /embeddings/models."""
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_GET(self):  # noqa: N802
+            ids = embedding_ids if self.path.endswith("/embeddings/models") else chat_ids
+            payload = json.dumps({"data": [{"id": m} for m in ids]}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server
+
+
+def test_openrouter_study_index_models() -> None:
+    """OpenRouter is offered for the study index, suggests OpenAI's small
+    embedding model, and its Refresh lists the separate embedding-model
+    list - including models with no "embed" in the name."""
+    import dataclasses
+
+    from scriptures.ui.ai_setup_wizard import AiSetupWizard
+
+    openrouter = ai_setup.hosted_provider("openrouter")
+    assert openrouter.offers_embeddings
+    assert openrouter.embedding_model == "openai/text-embedding-3-small"
+    assert openrouter.embedding_dimensions == "512"
+    for key in ("anthropic", "groq"):
+        assert not ai_setup.hosted_provider(key).offers_embeddings, key
+
+    embedding_ids = ["openai/text-embedding-3-small", "baai/bge-m3", "voyageai/voyage-4"]
+    server = _openrouter_server(["openai/gpt-5", "meta-llama/llama-4"], embedding_ids)
+    stand_in_url = f"http://127.0.0.1:{server.server_address[1]}/api/v1"
+    original_providers, original_servers = ai_setup.HOSTED_PROVIDERS, ai_setup.KNOWN_LOCAL_SERVERS
+    ai_setup.HOSTED_PROVIDERS = tuple(
+        dataclasses.replace(p, base_url=stand_in_url) if p.key == "openrouter" else p
+        for p in original_providers
+    )
+    ai_setup.KNOWN_LOCAL_SERVERS = ()
+    try:
+        wizard = AiSetupWizard({})
+        page = wizard.embeddings_page
+        page.initializePage()
+        page._cards.select("openrouter")
+        QApplication.processEvents()
+        assert page.url() == stand_in_url
+        assert page.model() == "openai/text-embedding-3-small"
+        assert page.dimensions() == "512"
+
+        page._key.setText("test-key")
+        page._list_models()
+        assert _wait(page._lister.finished) is not None, "model list never arrived"
+        listed = [page._model.itemText(i) for i in range(page._model.count())]
+        assert listed == embedding_ids, listed
+        print("test_openrouter_study_index_models: PASSED")
+    finally:
+        ai_setup.HOSTED_PROVIDERS, ai_setup.KNOWN_LOCAL_SERVERS = original_providers, original_servers
+        server.shutdown()
+
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
     test_model_classification_and_ordering()
@@ -164,4 +231,5 @@ if __name__ == "__main__":
     test_suggested_chat_server_prefers_general_models()
     test_local_scan_finds_running_servers_only()
     test_wizard_results_for_snap_chat_and_ollama_embeddings()
+    test_openrouter_study_index_models()
     print("All AI setup tests passed.")

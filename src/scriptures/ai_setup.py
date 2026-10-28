@@ -55,6 +55,9 @@ class HostedProvider:
     embedding_model: str = ""
     embedding_dimensions: str = ""
     offers_embeddings: bool = False
+    # Where the service lists its embedding models, if its plain /models
+    # leaves them out (OpenRouter's does).
+    embedding_models_path: str = ""
 
 
 HOSTED_PROVIDERS = (
@@ -77,6 +80,10 @@ HOSTED_PROVIDERS = (
     HostedProvider(
         "openrouter", "OpenRouter", "https://openrouter.ai/api/v1",
         "Hosted - one API key for models from many companies; usage is billed by OpenRouter",
+        embedding_model="openai/" + RECOMMENDED_OPENAI_EMBEDDING_MODEL,
+        embedding_dimensions=RECOMMENDED_OPENAI_EMBEDDING_DIMENSIONS,
+        offers_embeddings=True,
+        embedding_models_path="/embeddings/models",
     ),
     HostedProvider(
         "groq", "Groq", "https://api.groq.com/openai/v1",
@@ -188,11 +195,17 @@ class FoundServer:
 
 
 class ModelLister(QObject):
-    """GET {base_url}/models once - `finished(ok, models, message)`."""
+    """GET {base_url}{path} once - `finished(ok, models, message)`."""
 
     finished = Signal(bool, list, str)
 
-    def __init__(self, config: AiConfig, timeout_ms: int = 10_000, parent: QObject | None = None):
+    def __init__(
+        self,
+        config: AiConfig,
+        timeout_ms: int = 10_000,
+        parent: QObject | None = None,
+        path: str = "/models",
+    ):
         super().__init__(parent)
         if is_anthropic(config):
             self._listing = AnthropicModelListing(config, self)
@@ -201,7 +214,7 @@ class ModelLister(QObject):
             )
             return
         self._manager = QNetworkAccessManager(self)
-        request = build_request(config, "/models")
+        request = build_request(config, path)
         request.setTransferTimeout(timeout_ms)
         self._reply = self._manager.get(request)
         self._reply.finished.connect(self._on_finished)
