@@ -25,7 +25,10 @@ module docstrings; this file points at them rather than repeating them.
    (`app_updates.py`, `ui/app_update_dialog.py`; not released yet, no
    version bump by the owner's choice). Frozen builds only; daily check of
    `/releases/latest`; View → Check for App Updates; menu-bar button →
-   dialog with the link. Test builds get no separate notice.
+   dialog with the link.
+   Desktop call-for-testing (test pre-releases, desktop-testing issues)
+   dropped 2026-10-28 at the owner's request: pushes only build and
+   smoke-test; /promote releases everything.
    **Package managers (set up 2026-10-28):**
    - Homebrew: tap `kz6fittycent/homebrew-tap` (~/git/homebrew-tap); its
      daily workflow writes `Casks/desktop-scriptures.rb` from the latest

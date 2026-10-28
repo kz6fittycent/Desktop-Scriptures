@@ -73,11 +73,9 @@ code-signed yet, so the first launch takes one extra click on each system;
 the wiki's [Installation](https://github.com/kz6fittycent/Desktop-Scriptures/wiki/Installation)
 page shows how. They don't update themselves, but an **Update Available**
 button appears on the menu bar when a newer release is out; install it over
-the old one (your notes and highlights stay). Test builds
-of every change on `main` are in the newest issue labeled
-[`desktop-testing`](https://github.com/kz6fittycent/Desktop-Scriptures/issues?q=label%3Adesktop-testing).
-Packagers are welcome: Homebrew, Winget, and Chocolatey packages would be
-maintained by the community. See [`packaging/README.md`](packaging/README.md).
+the old one (your notes and highlights stay).
+Other packagers (Chocolatey, for example) are welcome; the community would
+maintain those. See [`packaging/README.md`](packaging/README.md).
 
 ## Roadmap
 

@@ -5,19 +5,15 @@ name: 🖥️ Windows & macOS Builds
 # captures screenshots of it. Both are unsigned; see packaging/README.md.
 #
 # Runs on:
-# - a push to main: builds, then a call for testing - like the snap's
-#   (call-for-testing.yml): the installers go on a public pre-release, so
-#   testers without a GitHub account can download them, and an issue
-#   (label: desktop-testing) gives the links, how to open an unsigned app,
-#   what to try, and the screenshots. Only the 3 newest test pre-releases
-#   are kept.
-# - a version tag (v2.3.0): builds and publishes the real GitHub Release.
-#   promote-to-stable.yml does this when a snap release is promoted: it
-#   creates the tag and starts a run on it (a manual run on a tag counts).
-# - a push to the desktop-builds-test branch: the same as main (issue titled
-#   "[test branch]"), for trying packaging changes without building the snap.
-# - a manual run (Actions tab -> Run workflow) on a branch: builds only; the
-#   files are kept as workflow artifacts.
+# - a version tag (v2.3.0): builds and publishes the real GitHub Release,
+#   then updates Winget. promote-to-stable.yml does this when a snap release
+#   is promoted: it creates the tag and starts a run on it (a manual run on
+#   a tag counts).
+# - a push to main or the desktop-builds-test branch, or a manual run on a
+#   branch: builds and smoke-tests only, so a packaging problem shows up
+#   before the next /promote. The files are kept as workflow artifacts.
+#   (Test pre-releases and desktop-testing issues were dropped 2026-10-28:
+#   /promote releases everything.)
 
 on:
   push:
@@ -182,159 +178,6 @@ jobs:
           name: screenshots-${{ runner.os }}
           path: screenshots/*.png
           if-no-files-found: error
-
-  call-for-testing:
-    name: Call for testing
-    needs: build
-    if: github.event_name == 'push' && github.ref_type == 'branch'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Read the version
-        id: version
-        run: |
-          version="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/scriptures/__init__.py)"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "tag=test-v$version-build$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
-
-      - name: Download the builds
-        uses: actions/download-artifact@v8
-        with:
-          pattern: desktop-scriptures-*
-          path: builds
-          merge-multiple: true
-
-      - name: Download the screenshots
-        uses: actions/download-artifact@v8
-        with:
-          pattern: screenshots-*
-          path: screenshots
-
-      - name: Publish a test pre-release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          gh release create "$TAG" builds/* \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --prerelease \
-            --title "Test build: Desktop Scriptures $VERSION (build $GITHUB_RUN_NUMBER)" \
-            --notes "A test build for Windows and macOS - not a release. See the linked call for testing issue."
-
-          # Keep only the 3 newest test pre-releases (each is ~700 MB).
-          gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt \
-            --jq '[.[] | select(.tagName | startswith("test-v"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName' |
-          while read -r old; do
-            echo "Removing old test pre-release $old"
-            gh release delete "$old" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
-          done
-
-      - name: Publish the screenshots to the screenshots branch
-        id: shots
-        env:
-          TAG: ${{ steps.version.outputs.tag }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          cp -r screenshots /tmp/new-screenshots
-          if git ls-remote --exit-code --heads origin screenshots >/dev/null 2>&1; then
-            git fetch origin screenshots
-            git checkout -B screenshots origin/screenshots
-          else
-            git checkout --orphan screenshots
-            git rm -rf --quiet .
-          fi
-          dest="desktop/$TAG"
-          mkdir -p "$dest"
-          cp /tmp/new-screenshots/screenshots-Windows/*.png "$dest/" 2>/dev/null && \
-            for f in "$dest"/[0-9]-*.png; do mv "$f" "$dest/windows-$(basename "$f")"; done
-          cp /tmp/new-screenshots/screenshots-macOS/*.png "$dest/" 2>/dev/null && \
-            for f in "$dest"/[0-9]-*.png; do mv "$f" "$dest/macos-$(basename "$f")"; done
-          ls "$dest"
-          git add "$dest"
-          git commit -m "Add Windows and macOS screenshots for $TAG"
-          for attempt in 1 2 3; do
-            if git push origin screenshots; then break; fi
-            if [[ "$attempt" == 3 ]]; then echo "::error::push failed after 3 attempts"; exit 1; fi
-            sleep 10; git fetch origin screenshots; git rebase origin/screenshots
-          done
-          echo "dest=$dest" >> "$GITHUB_OUTPUT"
-
-      - name: Open the call for testing issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
-          VERSION: ${{ steps.version.outputs.version }}
-          DEST: ${{ steps.shots.outputs.dest }}
-        run: |
-          gh label create "desktop-testing" --repo "$GITHUB_REPOSITORY" --color "1D76DB" \
-            --description "Windows/macOS test build ready for testing" 2>/dev/null || true
-
-          release="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$TAG"
-          download="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG"
-          shots="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/screenshots/$DEST"
-          prefix=""
-          [[ "$GITHUB_REF_NAME" != "main" ]] && prefix="[test branch] "
-
-          body=$(cat <<EOF
-          A new test build of Desktop Scriptures for **Windows** and **macOS** is ready. Thank you for helping test it!
-
-          **Version:** $VERSION (build $GITHUB_RUN_NUMBER) · [all files and checksums]($release)
-
-          ## Windows 11
-
-          1. Download **[Desktop-Scriptures-$VERSION-windows-x64-setup.exe]($download/Desktop-Scriptures-$VERSION-windows-x64-setup.exe)** (about 325 MB).
-          2. Open it. Windows will say **"Windows protected your PC"** because the app isn't code-signed yet: click **More info**, then **Run anyway**.
-          3. Click through the installer (no administrator password needed). Desktop Scriptures appears in the Start menu.
-
-          ## macOS (Apple Silicon - M1 or newer)
-
-          1. Download **[Desktop-Scriptures-$VERSION-macos-arm64.dmg]($download/Desktop-Scriptures-$VERSION-macos-arm64.dmg)** (about 360 MB).
-          2. Open it and drag **Desktop Scriptures** into **Applications**.
-          3. The first time you open it, macOS will refuse because the app isn't code-signed yet. Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to Desktop Scriptures. After that it opens normally.
-
-          ## What to try
-
-          - [ ] It opens, and the home page looks right
-          - [ ] Open a chapter (e.g. the Book of Mormon → Helaman → 1) and read a little
-          - [ ] Hover over a blue name in a Book of Mormon chapter, then click it - a card opens in the Word Study tab
-          - [ ] Search for a word (the search box at the top right)
-          - [ ] **Listen** (top of a chapter) offers to download a voice (about 63 MB) the first time, then reads the chapter aloud
-          - [ ] Add a note or a highlight, quit the app, reopen it - it's still there
-          - [ ] Anything that looks wrong, or text that doesn't fit
-
-          **Reporting:** comment on this issue (a free GitHub account is needed), or just tell James. A screenshot of anything odd helps a lot - please say which system you're on.
-
-          ## Automated screenshots
-
-          Taken on GitHub's build machines right after building, as a check that each build starts.
-
-          **Windows**
-
-          ![Windows home]($shots/windows-1-home.png)
-
-          ![Windows - Helaman 1 with Word Study]($shots/windows-2-word-study.png)
-
-          **macOS**
-
-          ![macOS home]($shots/macos-1-home.png)
-
-          ![macOS - Helaman 1 with Word Study]($shots/macos-2-word-study.png)
-
-          ---
-          _Opened automatically after a successful build on \`$GITHUB_REF_NAME\`. These test builds aren't a release - only the 3 newest are kept._
-          EOF
-          )
-          gh issue create --repo "$GITHUB_REPOSITORY" --label "desktop-testing" \
-            --title "${prefix}Call for testing: Windows & macOS v$VERSION (build $GITHUB_RUN_NUMBER)" \
-            --body "$body"
 
   release:
     name: Publish GitHub Release
