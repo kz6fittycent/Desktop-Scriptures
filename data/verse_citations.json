@@ -1,9 +1,27 @@
 {
   "_source": "scriptures.byu.edu Citation Index (General Conference talks)",
-  "_harvested": "2026-10-26",
+  "_harvested": "2026-11-02",
   "_note": "Metadata only (talk title, speaker, date, churchofjesuschrist.org URL) - never talk text, per copyright. See scripts/harvest_citations.py. Keyed by the exact verse reference string used in the imported database (e.g. 'Genesis 1:1').",
   "citations": {
     "Moses 1:39": [
+      {
+        "talk_title": "God Is at Your Side",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/52munoz-spannaus?lang=eng"
+      },
+      {
+        "talk_title": "Come to the Lord in His Holy House",
+        "speaker": "Gerrit W. Gong",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/12gong?lang=eng"
+      },
+      {
+        "talk_title": "I Am a Child of God",
+        "speaker": "Hutch U. Fale",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/26fale?lang=eng"
+      },
       {
         "talk_title": "The Character of Christ",
         "speaker": "D. Todd Christofferson",
@@ -1445,6 +1463,12 @@
     ],
     "Joseph Smith--History 1:17": [
       {
+        "talk_title": "Prophets, Seers, and Revelators",
+        "speaker": "Vaiangina Sikahema",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/15sikahema?lang=eng"
+      },
+      {
         "talk_title": "He Knows You by Name",
         "speaker": "Clement M. Matswagothata",
         "date": "April 2026",
@@ -2145,6 +2169,12 @@
     ],
     "Joseph Smith--History 1:19": [
       {
+        "talk_title": "Take Upon Us His Name",
+        "speaker": "James G. O. Fantone",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/44fantone?lang=eng"
+      },
+      {
         "talk_title": "Worship",
         "speaker": "D. Todd Christofferson",
         "date": "April 2025",
@@ -2341,6 +2371,18 @@
     ],
     "Matthew 22:37": [
       {
+        "talk_title": "Love Like Jesus",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/210rasband?lang=eng"
+      },
+      {
+        "talk_title": "You Are Good Enough to Teach",
+        "speaker": "Gabriel W. Reid",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/58reid?lang=eng"
+      },
+      {
         "talk_title": "The Lord Looketh on the Heart",
         "speaker": "Ronald M. Barcellos",
         "date": "October 2025",
@@ -2488,6 +2530,18 @@
       }
     ],
     "Matthew 22:39": [
+      {
+        "talk_title": "Love Like Jesus",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/210rasband?lang=eng"
+      },
+      {
+        "talk_title": "O Be Wise",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/19christofferson?lang=eng"
+      },
       {
         "talk_title": "Go and Do Likewise",
         "speaker": "James E. Evanson",
@@ -3795,6 +3849,12 @@
     ],
     "Moroni 10:5": [
       {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
+      {
         "talk_title": "That All May Be Edified",
         "speaker": "Chad H Webb",
         "date": "October 2025",
@@ -4547,6 +4607,18 @@
     ],
     "2 Nephi 2:25": [
       {
+        "talk_title": "Integrity and Virtue Lead to Happiness",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/46cook?lang=eng"
+      },
+      {
+        "talk_title": "Integrity and Virtue Lead to Happiness",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/46cook?lang=eng"
+      },
+      {
         "talk_title": "Ministering—“That Ye Love One Another; as I Have Loved You”",
         "speaker": "Kristin M. Yee",
         "date": "April 2026",
@@ -5082,6 +5154,30 @@
       }
     ],
     "Articles of Faith 1:13": [
+      {
+        "talk_title": "God Is at Your Side",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/52munoz-spannaus?lang=eng"
+      },
+      {
+        "talk_title": "God Is at Your Side",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/52munoz-spannaus?lang=eng"
+      },
+      {
+        "talk_title": "God Is at Your Side",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/52munoz-spannaus?lang=eng"
+      },
+      {
+        "talk_title": "Integrity and Virtue Lead to Happiness",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/46cook?lang=eng"
+      },
       {
         "talk_title": "All Who Have Endured Valiantly",
         "speaker": "David A. Bednar",
@@ -7387,6 +7483,12 @@
     ],
     "James 1:5": [
       {
+        "talk_title": "The Ninety and Ten",
+        "speaker": "Michael A. Dunn",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/28dunn?lang=eng"
+      },
+      {
         "talk_title": "The Eternal Gift of Testimony",
         "speaker": "Kevin G. Brown",
         "date": "October 2025",
@@ -8667,6 +8769,12 @@
     ],
     "Matthew 5:48": [
       {
+        "talk_title": "The Hour of Your Mission Is Come",
+        "speaker": "Sean Douglas",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/18douglas?lang=eng"
+      },
+      {
         "talk_title": "The Character of Christ",
         "speaker": "D. Todd Christofferson",
         "date": "April 2026",
@@ -9016,6 +9124,30 @@
       }
     ],
     "John 3:16": [
+      {
+        "talk_title": "Integrity and Virtue Lead to Happiness",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/46cook?lang=eng"
+      },
+      {
+        "talk_title": "I Am a Child of God",
+        "speaker": "Hutch U. Fale",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/26fale?lang=eng"
+      },
+      {
+        "talk_title": "I Am a Child of God",
+        "speaker": "Hutch U. Fale",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/26fale?lang=eng"
+      },
+      {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
       {
         "talk_title": "A Peculiar Treasure",
         "speaker": "Alan R. Walker",
@@ -10541,6 +10673,18 @@
     ],
     "John 14:27": [
       {
+        "talk_title": "Using the Language of Peacemakers",
+        "speaker": "Alfred Kyungu",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/47kyungu?lang=eng"
+      },
+      {
+        "talk_title": "Love Like Jesus",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/210rasband?lang=eng"
+      },
+      {
         "talk_title": "Prayers for Peace",
         "speaker": "Henry B. Eyring",
         "date": "April 2026",
@@ -11395,6 +11539,18 @@
     ],
     "Matthew 11:28": [
       {
+        "talk_title": "Love Like Jesus",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/210rasband?lang=eng"
+      },
+      {
+        "talk_title": "Jesus Christ Is the Light and Life of the World",
+        "speaker": "Thabo Lebethoa",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/55lebethoa?lang=eng"
+      },
+      {
         "talk_title": "Choose Jesus Christ as Your Guide",
         "speaker": "Edward B. Rowe",
         "date": "April 2026",
@@ -11774,6 +11930,18 @@
       }
     ],
     "Matthew 11:29": [
+      {
+        "talk_title": "Love Like Jesus",
+        "speaker": "Ronald A. Rasband",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/210rasband?lang=eng"
+      },
+      {
+        "talk_title": "You Are Good Enough to Teach",
+        "speaker": "Gabriel W. Reid",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/58reid?lang=eng"
+      },
       {
         "talk_title": "The Character of Christ",
         "speaker": "D. Todd Christofferson",
@@ -12350,6 +12518,24 @@
       }
     ],
     "Mosiah 18:9": [
+      {
+        "talk_title": "Courage Born of Our Faith in Jesus Christ",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/43andersen?lang=eng"
+      },
+      {
+        "talk_title": "Comfort from the Holy Ghost",
+        "speaker": "Matthew J. Eyring",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/29eyring?lang=eng"
+      },
+      {
+        "talk_title": "The Gift of Testimony",
+        "speaker": "Gérald Caussé",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/14causse?lang=eng"
+      },
       {
         "talk_title": "The Name by Which Ye Are Called",
         "speaker": "B. Corey Cuvelier",
@@ -13309,6 +13495,12 @@
     ],
     "Doctrine and Covenants 121:45": [
       {
+        "talk_title": "Integrity and Virtue Lead to Happiness",
+        "speaker": "Quentin L. Cook",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/46cook?lang=eng"
+      },
+      {
         "talk_title": "The Plan of Mercy",
         "speaker": "James R. Rasband",
         "date": "April 2025",
@@ -14210,6 +14402,24 @@
       }
     ],
     "Malachi 3:10": [
+      {
+        "talk_title": "“Prove Me Now Herewith”",
+        "speaker": "Moisés Villanueva",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/53villanueva?lang=eng"
+      },
+      {
+        "talk_title": "“Prove Me Now Herewith”",
+        "speaker": "Moisés Villanueva",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/53villanueva?lang=eng"
+      },
+      {
+        "talk_title": "“Prove Me Now Herewith”",
+        "speaker": "Moisés Villanueva",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/53villanueva?lang=eng"
+      },
       {
         "talk_title": "Tithing—Putting God First",
         "speaker": "Jorge T. Becerra",
@@ -15386,6 +15596,12 @@
       }
     ],
     "Doctrine and Covenants 14:7": [
+      {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
       {
         "talk_title": "All Who Have Endured Valiantly",
         "speaker": "David A. Bednar",
@@ -18359,6 +18575,24 @@
     ],
     "Doctrine and Covenants 20:77": [
       {
+        "talk_title": "God Is at Your Side",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/52munoz-spannaus?lang=eng"
+      },
+      {
+        "talk_title": "Courage Born of Our Faith in Jesus Christ",
+        "speaker": "Neil L. Andersen",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/43andersen?lang=eng"
+      },
+      {
+        "talk_title": "Divine Appointments",
+        "speaker": "Timothy L. Farnes",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/22farnes?lang=eng"
+      },
+      {
         "talk_title": "I Feel My Savior’s Love",
         "speaker": "Pedro X. Larreal",
         "date": "April 2026",
@@ -19879,6 +20113,12 @@
     ],
     "John 14:15": [
       {
+        "talk_title": "You Are Good Enough to Teach",
+        "speaker": "Gabriel W. Reid",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/58reid?lang=eng"
+      },
+      {
         "talk_title": "Ministering—“That Ye Love One Another; as I Have Loved You”",
         "speaker": "Kristin M. Yee",
         "date": "April 2026",
@@ -20760,6 +21000,12 @@
       }
     ],
     "Amos 3:7": [
+      {
+        "talk_title": "Prophets, Seers, and Revelators",
+        "speaker": "Vaiangina Sikahema",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/15sikahema?lang=eng"
+      },
       {
         "talk_title": "Prophets of God",
         "speaker": "Andrea Muñoz Spannaus",
@@ -22853,6 +23099,12 @@
     ],
     "Doctrine and Covenants 58:27": [
       {
+        "talk_title": "O Be Wise",
+        "speaker": "D. Todd Christofferson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/19christofferson?lang=eng"
+      },
+      {
         "talk_title": "They Are Their Own Judges",
         "speaker": "David A. Bednar",
         "date": "October 2025",
@@ -23668,6 +23920,12 @@
       }
     ],
     "3 Nephi 27:27": [
+      {
+        "talk_title": "The Hour of Your Mission Is Come",
+        "speaker": "Sean Douglas",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/18douglas?lang=eng"
+      },
       {
         "talk_title": "Jesus Christ Is Not Our Burden; He Is Our Relief",
         "speaker": "David J. Wunderli",
@@ -24731,6 +24989,12 @@
     ],
     "Doctrine and Covenants 88:118": [
       {
+        "talk_title": "You Are Good Enough to Teach",
+        "speaker": "Gabriel W. Reid",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/58reid?lang=eng"
+      },
+      {
         "talk_title": "Right Before Our Eyes",
         "speaker": "Ronald A. Rasband",
         "date": "April 2025",
@@ -25034,6 +25298,12 @@
       }
     ],
     "Doctrine and Covenants 1:38": [
+      {
+        "talk_title": "Prophets, Seers, and Revelators",
+        "speaker": "Vaiangina Sikahema",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/15sikahema?lang=eng"
+      },
       {
         "talk_title": "Prophets of God",
         "speaker": "Andrea Muñoz Spannaus",
@@ -25456,6 +25726,18 @@
       }
     ],
     "Moroni 10:32": [
+      {
+        "talk_title": "Come unto Christ",
+        "speaker": "Edward Dube",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/45dube?lang=eng"
+      },
+      {
+        "talk_title": "You Are Good Enough to Teach",
+        "speaker": "Gabriel W. Reid",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/58reid?lang=eng"
+      },
       {
         "talk_title": "Come unto Christ—Together",
         "speaker": "Taniela B. Wakolo",
@@ -26366,6 +26648,12 @@
       }
     ],
     "Articles of Faith 1:1": [
+      {
+        "talk_title": "The Gospel of Jesus Christ Is for All",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/49oaks?lang=eng"
+      },
       {
         "talk_title": "Hosanna and Hallelujah—The Living Jesus Christ: The Heart of Restoration and Easter",
         "speaker": "Gerrit W. Gong",
@@ -28147,6 +28435,12 @@
     ],
     "Philippians 4:7": [
       {
+        "talk_title": "Comfort from the Holy Ghost",
+        "speaker": "Matthew J. Eyring",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/29eyring?lang=eng"
+      },
+      {
         "talk_title": "The Family Proclamation—Words from God",
         "speaker": "Ronald A. Rasband",
         "date": "October 2025",
@@ -28490,6 +28784,12 @@
       }
     ],
     "Doctrine and Covenants 13:1": [
+      {
+        "talk_title": "God Is at Your Side",
+        "speaker": "Andrea Muñoz Spannaus",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/52munoz-spannaus?lang=eng"
+      },
       {
         "talk_title": "The Times of Restitution of All Things",
         "speaker": "David A. Bednar",
@@ -28882,6 +29182,12 @@
       }
     ],
     "Doctrine and Covenants 38:27": [
+      {
+        "talk_title": "Christ-Centered Unity",
+        "speaker": "Dieter F. Uchtdorf",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/51uchtdorf?lang=eng"
+      },
       {
         "talk_title": "About His Business",
         "speaker": "Patrick Kearon",
@@ -29379,6 +29685,12 @@
     ],
     "John 14:26": [
       {
+        "talk_title": "You Are Good Enough to Teach",
+        "speaker": "Gabriel W. Reid",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/58reid?lang=eng"
+      },
+      {
         "talk_title": "’Tis Eastertide: No One Walks Alone",
         "speaker": "Gerrit W. Gong",
         "date": "April 2026",
@@ -29790,6 +30102,12 @@
       }
     ],
     "John 16:33": [
+      {
+        "talk_title": "“How Long Will It Be Ere They Believe Me?”",
+        "speaker": "Dale G. Renlund",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/21renlund?lang=eng"
+      },
       {
         "talk_title": "Jesus Christ Is Not Our Burden; He Is Our Relief",
         "speaker": "David J. Wunderli",
@@ -34108,6 +34426,12 @@
     ],
     "Alma 17:2": [
       {
+        "talk_title": "Spiritual Immunity",
+        "speaker": "Franklin Dewey Richards",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/23chigbundu?lang=eng"
+      },
+      {
         "talk_title": "The Book of Mormon—an Immeasurable Treasure on Our Journey",
         "speaker": "Ozani Farias",
         "date": "October 2025",
@@ -37181,6 +37505,12 @@
     ],
     "Helaman 5:11": [
       {
+        "talk_title": "Jesus Christ Is the Great Deliverer!",
+        "speaker": "Kevin J. Hathaway",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/16hathaway?lang=eng"
+      },
+      {
         "talk_title": "The Testimony of Jesus",
         "speaker": "D. Todd Christofferson",
         "date": "April 2024",
@@ -37777,6 +38107,12 @@
     ],
     "Mark 10:38": [],
     "Mark 10:45": [
+      {
+        "talk_title": "Quick to Help, Slow to Judge",
+        "speaker": "Paul H. Sinclair",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/56sinclair?lang=eng"
+      },
       {
         "talk_title": "The Living Bread Which Came Down from Heaven",
         "speaker": "D. Todd Christofferson",
@@ -38410,6 +38746,12 @@
     ],
     "Moroni 7:45": [
       {
+        "talk_title": "Teach Truth with Love",
+        "speaker": "Clark G. Gilbert",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/59gilbert?lang=eng"
+      },
+      {
         "talk_title": "All Who Have Endured Valiantly",
         "speaker": "David A. Bednar",
         "date": "April 2026",
@@ -38569,6 +38911,12 @@
       }
     ],
     "Moroni 8:26": [
+      {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
       {
         "talk_title": "The Love of God",
         "speaker": "Benjamin M. Z. Tai",
@@ -39149,6 +39497,12 @@
     ],
     "Mosiah 3:18": [
       {
+        "talk_title": "The Gospel of Jesus Christ Is for All",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/49oaks?lang=eng"
+      },
+      {
         "talk_title": "The Special Status of Children",
         "speaker": "Merlin R. Lybbert",
         "date": "April 1994",
@@ -39288,6 +39642,12 @@
     "Numbers 4:24": [],
     "Numbers 6:10": [],
     "Omni 1:26": [
+      {
+        "talk_title": "The Gospel of Jesus Christ Is for All",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/49oaks?lang=eng"
+      },
       {
         "talk_title": "Come unto Christ—Together",
         "speaker": "Taniela B. Wakolo",
@@ -40816,6 +41176,18 @@
     ],
     "Alma 42:8": [
       {
+        "talk_title": "Consider Your Ways, and from This Day Will the Lord Bless You",
+        "speaker": "Ciro Schmeil",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/48schmeil?lang=eng"
+      },
+      {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
+      {
         "talk_title": "Ensuring a Righteous Judgment",
         "speaker": "James R. Rasband",
         "date": "5 2020",
@@ -41176,6 +41548,12 @@
     "Doctrine and Covenants 104:60": [],
     "Doctrine and Covenants 105:29": [],
     "Doctrine and Covenants 121:7": [
+      {
+        "talk_title": "Jesus Christ Is the Great Deliverer!",
+        "speaker": "Kevin J. Hathaway",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/16hathaway?lang=eng"
+      },
       {
         "talk_title": "Our Heavenly Guidance System",
         "speaker": "Sergio R. Vargas",
@@ -41905,6 +42283,12 @@
     ],
     "Doctrine and Covenants 93:13": [
       {
+        "talk_title": "I Am a Child of God",
+        "speaker": "Hutch U. Fale",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/26fale?lang=eng"
+      },
+      {
         "talk_title": "All Who Have Endured Valiantly",
         "speaker": "David A. Bednar",
         "date": "April 2026",
@@ -42305,6 +42689,12 @@
     ],
     "Hebrews 13:25": [],
     "Hebrews 4:16": [
+      {
+        "talk_title": "The Ninety and Ten",
+        "speaker": "Michael A. Dunn",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/28dunn?lang=eng"
+      },
       {
         "talk_title": "Confidence in the Presence of God",
         "speaker": "Russell M. Nelson",
@@ -43398,6 +43788,12 @@
       }
     ],
     "Matthew 16:25": [
+      {
+        "talk_title": "Come unto Christ",
+        "speaker": "Edward Dube",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/45dube?lang=eng"
+      },
       {
         "talk_title": "Ministering—“That Ye Love One Another; as I Have Loved You”",
         "speaker": "Kristin M. Yee",
@@ -44652,6 +45048,12 @@
     "Abraham 1:26": [],
     "Acts 17:29": [
       {
+        "talk_title": "The Ninety and Ten",
+        "speaker": "Michael A. Dunn",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/28dunn?lang=eng"
+      },
+      {
         "talk_title": "The Love of God",
         "speaker": "Benjamin M. Z. Tai",
         "date": "April 2025",
@@ -44860,6 +45262,12 @@
       }
     ],
     "Articles of Faith 1:10": [
+      {
+        "talk_title": "Come to the Lord in His Holy House",
+        "speaker": "Gerrit W. Gong",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/12gong?lang=eng"
+      },
       {
         "talk_title": "The Lord Jesus Christ Will Come Again",
         "speaker": "Russell M. Nelson",
@@ -45243,6 +45651,12 @@
     "Doctrine and Covenants 6:1": [],
     "Doctrine and Covenants 6:15": [
       {
+        "talk_title": "Jesus Christ Is the Light and Life of the World",
+        "speaker": "Thabo Lebethoa",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/55lebethoa?lang=eng"
+      },
+      {
         "talk_title": "Personal Revelation and Testimony",
         "speaker": "Barbara Thompson",
         "date": "October 2011",
@@ -45458,6 +45872,12 @@
     ],
     "Doctrine and Covenants 90:34": [],
     "Doctrine and Covenants 93:11": [
+      {
+        "talk_title": "I Am a Child of God",
+        "speaker": "Hutch U. Fale",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/26fale?lang=eng"
+      },
       {
         "talk_title": "All Who Have Endured Valiantly",
         "speaker": "David A. Bednar",
@@ -46132,7 +46552,14 @@
         "url": "https://www.churchofjesuschrist.org/study/general-conference/1983/04/the-gospel-of-jesus-christ-and-basic-needs-of-people?lang=eng"
       }
     ],
-    "Genesis 16:14": [],
+    "Genesis 16:14": [
+      {
+        "talk_title": "Quick to Help, Slow to Judge",
+        "speaker": "Paul H. Sinclair",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/56sinclair?lang=eng"
+      }
+    ],
     "Genesis 22:15": [],
     "Genesis 30:30": [],
     "Genesis 7:70": [],
@@ -46192,6 +46619,12 @@
       }
     ],
     "John 15:26": [
+      {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
       {
         "talk_title": "Our Constant Companion",
         "speaker": "Henry B. Eyring",
@@ -46841,6 +47274,12 @@
     "Moroni 10:9": [],
     "Moses 7:62": [
       {
+        "talk_title": "The Gospel of Jesus Christ Is for All",
+        "speaker": "Dallin H. Oaks",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/49oaks?lang=eng"
+      },
+      {
         "talk_title": "This Day",
         "speaker": "Ronald A. Rasband",
         "date": "October 2022",
@@ -47164,6 +47603,12 @@
     "Revelation 8:3": [],
     "Romans 1:20": [],
     "Romans 8:16": [
+      {
+        "talk_title": "Fruit to Make One Happy",
+        "speaker": "Gary E. Stevenson",
+        "date": "October 2026",
+        "url": "https://www.churchofjesuschrist.org/study/general-conference/2026/10/57stevenson?lang=eng"
+      },
       {
         "talk_title": "Receive His Gift",
         "speaker": "Patrick Kearon",
