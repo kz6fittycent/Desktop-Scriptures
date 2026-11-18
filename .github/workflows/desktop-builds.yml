@@ -33,6 +33,7 @@ on:
       - tests/**
       - .github/workflows/call-for-testing.yml
       - .github/workflows/close-stale-reports.yml
+      - .github/workflows/grype.yml
       - .github/workflows/promote-to-stable.yml
       - .github/workflows/refresh-gc-citations.yml
       - .github/workflows/refresh-liahona-citations.yml

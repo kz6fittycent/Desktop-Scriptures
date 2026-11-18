@@ -16,6 +16,7 @@ on:
       - .github/workflows/desktop-builds.yml
       - .github/workflows/promote-to-stable.yml
       - .github/workflows/close-stale-reports.yml
+      - .github/workflows/grype.yml
   pull_request:
     branches: [ main ]
 
