@@ -149,3 +149,7 @@ module docstrings; this file points at them rather than repeating them.
   `~/snap/desktop-scriptures/common/`.
 - **CI note:** GitHub's `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19.
   Check that first if a build breaks after then.
+
+- **Grype** (`.github/workflows/grype.yml`, added 2026-11-18): on pushes, PRs and
+  weekly, it fails on high or critical CVEs with a fix and uploads SARIF to the
+  Security tab.
