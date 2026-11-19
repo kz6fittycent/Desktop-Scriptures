@@ -31,7 +31,7 @@ on:
       - relay/**
       - snap/**
       - tests/**
-      - .github/workflows/call-for-testing.yml
+      - .github/workflows/snap-builds.yml
       - .github/workflows/close-stale-reports.yml
       - .github/workflows/grype.yml
       - .github/workflows/promote-to-stable.yml
