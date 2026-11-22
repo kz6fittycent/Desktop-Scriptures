@@ -85,6 +85,10 @@ maintain those. See [`packaging/README.md`](packaging/README.md).
 
 - [ ] Code signing for the Windows and macOS builds, if there's demand
 
+### Future
+
+- [ ] More languages, one at a time: the app's menus and screens first, then scripture text in that language as an optional download. Scripture text must match the Church's published edition word for word, so a language's text is added only with the Church's permission (it holds the copyright on its translations); the app never machine-translates scripture.
+
 ### v3.0
 
 The goal: ask about a word, a name, or a place and get a clear, sourced answer, even with a small AI model on your own computer. Done so far: Hebrew and Greek word meanings, the exact word behind each word of the Bible (and the JST) through a word-by-word Strong's-tagged text, Book of Mormon names and their links in the text, and Book of Mormon dates in Israel's calendar.
