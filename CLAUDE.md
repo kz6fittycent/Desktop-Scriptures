@@ -144,9 +144,16 @@ module docstrings; this file points at them rather than repeating them.
   Each needs a database and its own study index together, from the same
   install: a fresh bundled DB and an older install's index disagree on JST
   chapter ids.
-- **The owner's AI setup:** gemma3-4b (inference snap, port 8328) for chat;
-  embeddinggemma through Ollama for embeddings. The snap's data is in
+- **The owner's AI setup** (checked 2026-11-21 in the snap's `settings`
+  table): chat is Groq (`https://api.groq.com/openai/v1`,
+  `openai/gpt-oss-120b`, free tier: 1,000 requests/day, 8,000 tokens/min);
+  embeddings are `embeddinggemma` through skyfire's own Ollama
+  (`http://localhost:11434/v1`). The snap's data is in
   `~/snap/desktop-scriptures/common/`.
+- **Hosted free embeddings don't work for a full index.** Gemini's free tier
+  (`gemini-embedding-2`) counts each input text as a request (1,000/day), so
+  ~94k pieces take ~95 days. Groq has no embedding models. Keep embeddings
+  local.
 - **CI note:** GitHub's `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19.
   Check that first if a build breaks after then.
 
